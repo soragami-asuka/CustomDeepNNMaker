@@ -19,20 +19,15 @@ namespace CustomDeepNNLibrary
 	/** レイヤー種別 */
 	enum ELayerKind
 	{
-		LAYER_KIND_CPU = 0x00 << 8,	/**< CPU処理レイヤー */
-		LAYER_KIND_GPU = 0x01 << 8,	/**< GPU処理レイヤー */
+		LAYER_KIND_CPU = 0x00 << 16,	/**< CPU処理レイヤー */
+		LAYER_KIND_GPU = 0x01 << 16,	/**< GPU処理レイヤー */
 
-		LAYER_KIND_INPUT  = 0x00 << 0,	/**< 入力レイヤー */
-		LAYER_KIND_OUTPUT = 0x01 << 0,	/**< 出力レイヤー */
-		LAYER_KIND_CALC   = 0x02 << 0,	/**< 計算レイヤー,中間層 */
+		LAYER_KIND_SINGLE_INPUT  = 0x01 << 0,	/**< 入力レイヤー */
+		LAYER_KIND_MULT_INPUT    = 0x01 << 1,	/**< 入力レイヤー */
+		LAYER_KIND_SINGLE_OUTPUT = 0x01 << 2,	/**< 出力レイヤー */
+		LAYER_KIND_MULT_OUTPUT   = 0x01 << 3,	/**< 出力レイヤー */
 
-		LAYER_KIND_CPU_INPUT  = LAYER_KIND_CPU | LAYER_KIND_INPUT,
-		LAYER_KIND_CPU_OUTPUT = LAYER_KIND_CPU | LAYER_KIND_OUTPUT,
-		LAYER_KIND_CPU_CALC   = LAYER_KIND_CPU | LAYER_KIND_CALC,
-		
-		LAYER_KIND_GPU_INPUT  = LAYER_KIND_GPU | LAYER_KIND_INPUT,
-		LAYER_KIND_GPU_OUTPUT = LAYER_KIND_GPU | LAYER_KIND_OUTPUT,
-		LAYER_KIND_GPU_CALC   = LAYER_KIND_GPU | LAYER_KIND_CALC,
+		LAYER_KIND_CALC          = 0x01 << 8,	/**< 計算レイヤー,中間層 */
 	};
 
 	/** レイヤーベース */
