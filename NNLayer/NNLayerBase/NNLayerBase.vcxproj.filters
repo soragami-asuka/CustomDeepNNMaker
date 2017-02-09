@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="NNLayerInterface">
+      <UniqueIdentifier>{d3837ec8-6c9b-44f8-96d6-a442affcd96d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\IDataLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\IInputLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\IIODataLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\ILayerBase.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\INNLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\INNLayerConfig.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\INNLayerDLL.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\INNLayerDLLManager.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\IODataStruct.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\IOutputLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\ISingleInputLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\LayerErrorCode.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\NNlayerFunction.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\IMultInputLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
