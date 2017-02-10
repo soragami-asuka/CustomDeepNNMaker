@@ -52,11 +52,22 @@ namespace CustomDeepNNLibrary
 		virtual ELayerErrorCode GetLayerCode(GUID& o_layerCode)const = 0;
 
 	public:
-		/** 演算前処理を実行する.
+		/** 演算前処理を実行する.(学習用)
+			@param batchSize	同時に演算を行うバッチのサイズ.
+			NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
+			失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
+		virtual ELayerErrorCode PreProcessLearn(unsigned int batchSize) = 0;
+
+		/** 演算前処理を実行する.(演算用)
 			@param batchSize	同時に演算を行うバッチのサイズ.
 			NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 			失敗した場合はCalculate以降の処理は実行不可. */
-		virtual ELayerErrorCode PreCalculate(unsigned int batchSize) = 0;
+		virtual ELayerErrorCode PreProcessCalculate(unsigned int batchSize) = 0;
+
+		/** 学習ループの初期化処理.データセットの学習開始前に実行する
+			失敗した場合はCalculate以降の処理は実行不可. */
+		virtual ELayerErrorCode PreProcessLearnLoop(const INNLayerConfig& config) = 0;
+
 
 		/** バッチサイズを取得する.
 			@return 同時に演算を行うバッチのサイズ */

@@ -14,6 +14,7 @@ namespace CustomDeepNNLibrary
 	{
 	private:
 		std::string name;
+		std::string id;
 
 		std::string defaultValue;
 		std::string value;
@@ -84,6 +85,17 @@ namespace CustomDeepNNLibrary
 				return LAYER_ERROR_COMMON_OUT_OF_ARRAYRANGE;
 
 			memcpy(o_szNameBuf, this->name.c_str(), this->name.size() + 1);
+
+			return LAYER_ERROR_NONE;
+		}
+		/** 項目IDを取得する.
+			@param o_szIDBuf	IDを格納するバッファ. CONFIGITEM_NAME_MAXのバイト数が必要 */
+		ELayerErrorCode GetConfigID(char o_szIDBuf[])const
+		{
+			if(this->name.size() >= CONFIGITEM_NAME_MAX)
+				return LAYER_ERROR_COMMON_OUT_OF_ARRAYRANGE;
+
+			memcpy(o_szIDBuf, this->name.c_str(), this->name.size() + 1);
 
 			return LAYER_ERROR_NONE;
 		}

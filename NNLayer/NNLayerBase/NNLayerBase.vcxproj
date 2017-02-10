@@ -84,6 +84,7 @@
     <ClInclude Include="..\..\NNLayerInterface\IODataStruct.h" />
     <ClInclude Include="..\..\NNLayerInterface\IOutputLayer.h" />
     <ClInclude Include="..\..\NNLayerInterface\ISingleInputLayer.h" />
+    <ClInclude Include="..\..\NNLayerInterface\ISingleOutputLayer.h" />
     <ClInclude Include="..\..\NNLayerInterface\LayerErrorCode.h" />
     <ClInclude Include="..\..\NNLayerInterface\NNlayerFunction.h" />
     <ClInclude Include="stdafx.h" />

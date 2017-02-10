@@ -137,7 +137,11 @@ namespace CustomDeepNNLibrary
 		/** 項目名を取得する.
 			@param o_szNameBuf	名前を格納するバッファ. CONFIGITEM_NAME_MAXのバイト数が必要 */
 		virtual ELayerErrorCode GetConfigName(char o_szNameBuf[])const = 0;
-		
+		/** 項目IDを取得する.
+			IDはLayerConfig内において必ずユニークである.
+			@param o_szIDBuf	IDを格納するバッファ.CONFIGITEM_NAME_MAXのバイト数が必要　*/
+		virtual ELayerErrorCode GetConfigID(char o_szIDBuf[])const = 0;
+
 	public:
 		/** 保存に必要なバイト数を取得する */
 		virtual unsigned int GetUseBufferByteCount()const = 0;
@@ -351,7 +355,9 @@ namespace CustomDeepNNLibrary
 		/** 設定項目数を取得する */
 		virtual unsigned int GetItemCount()const = 0;
 		/** 設定項目を番号指定で取得する */
-		virtual const INNLayerConfigItemBase* GetItemByNum(unsigned int num)const = 0;
+		virtual const INNLayerConfigItemBase* GetItemByNum(unsigned int i_num)const = 0;
+		/** 設定項目をID指定で取得する */
+		virtual const INNLayerConfigItemBase* GetItemByID(const char i_szIDBuf[])const = 0;
 
 	public:
 		/** 保存に必要なバイト数を取得する */

@@ -27,3 +27,12 @@
 *.exe
 *.out
 *.app
+/CustomDeepNNMaker.sdf
+/ipch
+/Library/NNLayerConfig/Debug/NNLayerConfig.tlog/CL.read.1.tlog
+/Library/NNLayerConfig/Debug/NNLayerConfig.tlog/CL.write.1.tlog
+/Library/NNLayerConfig/Debug/NNLayerConfig.tlog/cl.command.1.tlog
+/CustomDeepNNMaker.v12.suo
+/Library/NNLayerConfig/Debug/NNLayerConfig.log
+/Library/NNLayerConfig/Debug/vc120.idb
+/Library/NNLayerConfig/Debug/vc120.pdb

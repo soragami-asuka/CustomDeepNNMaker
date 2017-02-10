@@ -118,6 +118,24 @@ namespace CustomDeepNNLibrary
 				return NULL;
 			return this->lpLayerConfigItem[num];
 		}
+		/** 設定項目をID指定で取得する */
+		const INNLayerConfigItemBase* GetItemByID(const char i_szIDBuf[])const
+		{
+			// 同一IDを検索
+			for(unsigned int i=0; i<this->lpLayerConfigItem.size(); i++)
+			{
+				char szID[CONFIGITEM_NAME_MAX];
+
+				// 対象項目のIDを取得
+				if(this->lpLayerConfigItem[i]->GetConfigID(szID) != ELayerErrorCode::LAYER_ERROR_NONE)
+					continue;
+
+				// 比較
+				if(std::string(szID) == i_szIDBuf)
+					return this->lpLayerConfigItem[i];
+			}
+			return NULL;
+		}
 		
 		/** アイテムを追加する.
 			追加されたアイテムは内部でdeleteされる. */
