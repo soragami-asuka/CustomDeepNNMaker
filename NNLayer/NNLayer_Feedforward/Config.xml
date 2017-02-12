@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Config>
+  <Int id="NeuronCount">
+    <Name>ニューロン数</Name>
+    <Text>
+      レイヤー内のニューロン数.
+      出力バッファ数に直結する.
+    </Text>
+    <Min>1</Min>
+    <Max>65535</Max>
+    <Default>200</Default>
+  </Int>
+</Config>

@@ -16,6 +16,9 @@
     <Filter Include="NNLayerInterface">
       <UniqueIdentifier>{d3837ec8-6c9b-44f8-96d6-a442affcd96d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="NNLayerBase">
+      <UniqueIdentifier>{10a101aa-ee6c-4de6-ada4-53b5add44234}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
