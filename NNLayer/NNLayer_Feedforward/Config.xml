@@ -1,13 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Config>
-  <Int id="NeuronCount">
-    <Name>ニューロン数</Name>
-    <Text>
-      レイヤー内のニューロン数.
-      出力バッファ数に直結する.
-    </Text>
-    <Min>1</Min>
-    <Max>65535</Max>
-    <Default>200</Default>
-  </Int>
+  <!--レイヤーのデータ構造-->
+  <Structure>
+    <Int id="NeuronCount">
+      <Name>ニューロン数</Name>
+      <Text>
+        レイヤー内のニューロン数.
+        出力バッファ数に直結する.
+      </Text>
+      <Min>1</Min>
+      <Max>65535</Max>
+      <Default>200</Default>
+    </Int>
+  </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <Learn>
+    <Float id="LearnCoeff">
+      <Name>学習係数</Name>
+      <Min>0.0</Min>
+      <Max>1000.0</Max>
+      <Default>1.0</Default>
+    </Float>
+    <Float id="DropOut">
+      <Name>ドロップアウト率</Name>
+      <Text>
+        前レイヤーを無視する割合.
+        1.0で前レイヤーの全出力を無視する
+      </Text>
+      <Min>0.0</Min>
+      <Max>1.0</Max>
+      <Default>0.0</Default>
+    </Float>
+  </Learn>
 </Config>
