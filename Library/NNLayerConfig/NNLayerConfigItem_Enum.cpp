@@ -5,13 +5,14 @@
 
 #include"NNLayerConfig.h"
 #include"INNLayerConfigItemEx_Enum.h"
+#include"NNLayerConfigItemBase.h"
 
 #include<string>
 #include<vector>
 
 namespace CustomDeepNNLibrary
 {
-	class NNLayerConfigItem_Enum : public INNLayerConfigItemEx_Enum
+	class NNLayerConfigItem_Enum : public NNLayerConfigItemBase<INNLayerConfigItemEx_Enum>
 	{
 	private:
 		struct EnumItem
@@ -70,9 +71,6 @@ namespace CustomDeepNNLibrary
 		};
 
 	private:
-		std::string name;
-		std::string id;
-
 		std::vector<EnumItem> lpEnumItem;
 
 		std::string value;
@@ -81,15 +79,13 @@ namespace CustomDeepNNLibrary
 
 	public:
 		/** コンストラクタ */
-		NNLayerConfigItem_Enum(const char szName[])
-			: INNLayerConfigItemEx_Enum()
-			, name (szName)
+		NNLayerConfigItem_Enum(const char i_szID[], const char i_szName[], const char i_szText[])
+			: NNLayerConfigItemBase(i_szID, i_szName, i_szText)
 		{
 		}
 		/** コピーコンストラクタ */
 		NNLayerConfigItem_Enum(const NNLayerConfigItem_Enum& item)
-			: INNLayerConfigItemEx_Enum()
-			, name	(item.name)
+			: NNLayerConfigItemBase(item)
 			, lpEnumItem (item.lpEnumItem)
 			, value (item.value)
 			, defaultValue (item.defaultValue)
@@ -106,9 +102,11 @@ namespace CustomDeepNNLibrary
 				return false;
 
 			// アイテムを変換
-			NNLayerConfigItem_Enum* pItem = (NNLayerConfigItem_Enum*)&item;
+			const NNLayerConfigItem_Enum* pItem = dynamic_cast<const NNLayerConfigItem_Enum*>(&item);
+			if(pItem == NULL)
+				return false;
 
-			if(this->name != pItem->name)
+			if(NNLayerConfigItemBase::operator!=(*pItem))
 				return false;
 
 			for(unsigned int itemNum=0; itemNum<this->lpEnumItem.size(); itemNum++)
@@ -141,28 +139,6 @@ namespace CustomDeepNNLibrary
 		NNLayerConfigItemType GetItemType()const
 		{
 			return CONFIGITEM_TYPE_ENUM;
-		}
-		/** 項目名を取得する.
-			@param o_szNameBuf	名前を格納するバッファ. CONFIGITEM_NAME_MAXのバイト数が必要 */
-		ELayerErrorCode GetConfigName(char o_szNameBuf[])const
-		{
-			if(this->name.size() >= CONFIGITEM_NAME_MAX)
-				return LAYER_ERROR_COMMON_OUT_OF_ARRAYRANGE;
-
-			memcpy(o_szNameBuf, this->name.c_str(), this->name.size() + 1);
-
-			return LAYER_ERROR_NONE;
-		}
-		/** 項目IDを取得する.
-			@param o_szIDBuf	IDを格納するバッファ. CONFIGITEM_NAME_MAXのバイト数が必要 */
-		ELayerErrorCode GetConfigID(char o_szIDBuf[])const
-		{
-			if(this->name.size() >= CONFIGITEM_NAME_MAX)
-				return LAYER_ERROR_COMMON_OUT_OF_ARRAYRANGE;
-
-			memcpy(o_szIDBuf, this->name.c_str(), this->name.size() + 1);
-
-			return LAYER_ERROR_NONE;
 		}
 
 	public:
@@ -418,8 +394,8 @@ namespace CustomDeepNNLibrary
 	};
 	
 	/** 設定項目(列挙値)を作成する */
-	extern "C" NNLAYERCONFIG_API INNLayerConfigItemEx_Enum* CreateLayerCofigItem_Enum(const char szName[])
+	extern "C" NNLAYERCONFIG_API INNLayerConfigItemEx_Enum* CreateLayerCofigItem_Enum(const char i_szID[], const char i_szName[], const char i_szText[])
 	{
-		return new NNLayerConfigItem_Enum(szName);
+		return new NNLayerConfigItem_Enum(i_szID, i_szName, i_szText);
 	}
 }

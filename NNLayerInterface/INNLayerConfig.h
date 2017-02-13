@@ -27,6 +27,8 @@ namespace CustomDeepNNLibrary
 	};
 
 	static const unsigned int CONFIGITEM_NAME_MAX = 64;
+	static const unsigned int CONFIGITEM_TEXT_MAX = 1024;
+	static const unsigned int CONFIGITEM_ID_MAX   = 64;
 	static const unsigned int LAYERTYPE_CODE_MAX  = 36 + 1;	/**< レイヤーの種類を識別するためのコードの最大文字数(36文字＋nullコード) */
 
 	/** バージョンコード */
@@ -134,13 +136,16 @@ namespace CustomDeepNNLibrary
 	public:
 		/** 設定項目種別を取得する */
 		virtual NNLayerConfigItemType GetItemType()const = 0;
-		/** 項目名を取得する.
-			@param o_szNameBuf	名前を格納するバッファ. CONFIGITEM_NAME_MAXのバイト数が必要 */
-		virtual ELayerErrorCode GetConfigName(char o_szNameBuf[])const = 0;
 		/** 項目IDを取得する.
 			IDはLayerConfig内において必ずユニークである.
-			@param o_szIDBuf	IDを格納するバッファ.CONFIGITEM_NAME_MAXのバイト数が必要　*/
+			@param o_szIDBuf	IDを格納するバッファ.CONFIGITEM_ID_MAXのバイト数が必要.　*/
 		virtual ELayerErrorCode GetConfigID(char o_szIDBuf[])const = 0;
+		/** 項目名を取得する.
+			@param o_szNameBuf	名前を格納するバッファ.CONFIGITEM_NAME_MAXのバイト数が必要. */
+		virtual ELayerErrorCode GetConfigName(char o_szNameBuf[])const = 0;
+		/** 項目の説明テキストを取得する.
+			@param o_szBuf	説明文を格納するバッファ.CONFIGITEM_TEXT_MAXのバイト数が必要. */
+		virtual ELayerErrorCode GetConfigText(char o_szBuf[])const = 0;
 
 	public:
 		/** 保存に必要なバイト数を取得する */
@@ -158,7 +163,7 @@ namespace CustomDeepNNLibrary
 	};
 
 	/** 設定項目(実数) */
-	class INNLayerConfigItem_Float : public INNLayerConfigItemBase
+	class INNLayerConfigItem_Float : virtual public INNLayerConfigItemBase
 	{
 	public:
 		/** コンストラクタ */
@@ -187,7 +192,7 @@ namespace CustomDeepNNLibrary
 	};
 
 	/** 設定項目(整数) */
-	class INNLayerConfigItem_Int : public INNLayerConfigItemBase
+	class INNLayerConfigItem_Int : virtual public INNLayerConfigItemBase
 	{
 	public:
 		/** コンストラクタ */
@@ -216,7 +221,7 @@ namespace CustomDeepNNLibrary
 	};
 
 	/** 設定項目(文字列) */
-	class INNLayerConfigItem_String : public INNLayerConfigItemBase
+	class INNLayerConfigItem_String : virtual public INNLayerConfigItemBase
 	{
 	public:
 		/** コンストラクタ */
@@ -246,7 +251,7 @@ namespace CustomDeepNNLibrary
 	};
 
 	/** 設定項目(論理値) */
-	class INNLayerConfigItem_Bool : public INNLayerConfigItemBase
+	class INNLayerConfigItem_Bool : virtual public INNLayerConfigItemBase
 	{
 	public:
 		/** コンストラクタ */
@@ -271,7 +276,7 @@ namespace CustomDeepNNLibrary
 
 	/** 設定項目(列挙型).
 		※列挙要素ID=一意の英数字. 列挙要素名=利用者が認識しやすい名前.文字列.(重複可).1行. コメント=列挙要素の説明文.複数行可 */
-	class INNLayerConfigItem_Enum : public INNLayerConfigItemBase
+	class INNLayerConfigItem_Enum : virtual public INNLayerConfigItemBase
 	{
 	public:
 		static const unsigned int ID_BUFFER_MAX = 64;			/**< 列挙要素IDの最大バイト数 */

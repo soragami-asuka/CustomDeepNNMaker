@@ -12,10 +12,7 @@ namespace CustomDeepNNLibrary
 	{
 	public:
 		/** コンストラクタ */
-		INNLayerConfigItemEx_Enum()
-			: INNLayerConfigItem_Enum()
-		{
-		}
+		INNLayerConfigItemEx_Enum(){}
 		/** デストラクタ */
 		virtual ~INNLayerConfigItemEx_Enum(){}
 
