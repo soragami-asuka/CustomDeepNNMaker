@@ -1,13 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Config>
+  
+  <!--
+  レイヤーに関する情報.
+  [language]に言語コードを記載する.
+  言語コード規格は : ISO 639-1
+  [language]が空欄の場合は[DefaultLanguage]に設定した言語コードとして取り扱う.
+  [DefaultLanguage]が設定されていない場合は[ja]が標準となる
+  -->
+  <Name language="ja">全結合ニューラルネットワークレイヤー</Name>
+  <Text>
+    全結合ニューラルネットワークレイヤー.
+    結合層と活性化層を一体化.
+    学習時に[学習係数][ドロップアウト率]を設定できる.
+  </Text>
+  <GUID>BEBA34EC-C30C-4565-9386-56088981D2D7</GUID>
+  <Version>1.0.0.0</Version>
+  <DefaultLanguage>ja</DefaultLanguage>
+
   <!--レイヤーのデータ構造-->
   <Structure>
     <Int id="NeuronCount">
-      <Name>ニューロン数</Name>
-      <Text>
+      <Name language="ja">ニューロン数</Name>
+      <Text language="ja">
         レイヤー内のニューロン数.
         出力バッファ数に直結する.
       </Text>
+      
       <Min>1</Min>
       <Max>65535</Max>
       <Default>200</Default>
@@ -17,20 +36,24 @@
   <!--学習に使用するデータの構造-->
   <Learn>
     <Float id="LearnCoeff">
-      <Name>学習係数</Name>
+      <Name language="ja">学習係数</Name>
+      
       <Min>0.0</Min>
       <Max>1000.0</Max>
       <Default>1.0</Default>
     </Float>
+    
     <Float id="DropOut">
-      <Name>ドロップアウト率</Name>
-      <Text>
+      <Name language="ja">ドロップアウト率</Name>
+      <Text language="ja">
         前レイヤーを無視する割合.
         1.0で前レイヤーの全出力を無視する
       </Text>
+      
       <Min>0.0</Min>
       <Max>1.0</Max>
       <Default>0.0</Default>
     </Float>
+    
   </Learn>
 </Config>
