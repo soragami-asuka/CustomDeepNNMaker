@@ -22,7 +22,7 @@ namespace CustomDeepNNLibrary
 
 	public:
 		/** コンストラクタ */
-		NNLayerConfigItem_Int(const char i_szID[], const char i_szName[], const char i_szText[], int minValue, int maxValue, int defaultValue)
+		NNLayerConfigItem_Int(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[], int minValue, int maxValue, int defaultValue)
 			: NNLayerConfigItemBase(i_szID, i_szName, i_szText)
 			, minValue(minValue)
 			, maxValue(maxValue)
@@ -174,7 +174,7 @@ namespace CustomDeepNNLibrary
 	};
 
 	/** 設定項目(実数)を作成する */
-	extern "C" NNLAYERCONFIG_API INNLayerConfigItem_Int* CreateLayerCofigItem_Int(const char i_szID[], const char i_szName[], const char i_szText[], int minValue, int maxValue, int defaultValue)
+	extern "C" NNLAYERCONFIG_API INNLayerConfigItem_Int* CreateLayerCofigItem_Int(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[], int minValue, int maxValue, int defaultValue)
 	{
 		return new NNLayerConfigItem_Int(i_szID, i_szName, i_szText, minValue, maxValue, defaultValue);
 	}

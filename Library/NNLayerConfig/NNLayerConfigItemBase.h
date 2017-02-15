@@ -17,13 +17,13 @@ namespace CustomDeepNNLibrary
 	class NNLayerConfigItemBase : virtual public ItemType
 	{
 	private:
-		std::string id;
-		std::string name;
-		std::string text;
+		std::wstring id;
+		std::wstring name;
+		std::wstring text;
 
 	public:
 		/** コンストラクタ */
-		NNLayerConfigItemBase(const char i_szID[], const char i_szName[], const char i_szText[])
+		NNLayerConfigItemBase(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[])
 			:	id		(i_szID)
 			,	name	(i_szName)
 			,	text	(i_szText)
@@ -62,35 +62,35 @@ namespace CustomDeepNNLibrary
 
 	public:
 		/** 項目IDを取得する.
-			@param o_szIDBuf	IDを格納するバッファ. CONFIGITEM_NAME_MAXのバイト数が必要 */
-		ELayerErrorCode GetConfigID(char o_szIDBuf[])const
+			@param o_szIDBuf	IDを格納するバッファ. CONFIGITEM_NAME_MAXの文字数が必要 */
+		ELayerErrorCode GetConfigID(wchar_t o_szIDBuf[])const
 		{
 			if(this->name.size() >= CONFIGITEM_ID_MAX)
 				return LAYER_ERROR_COMMON_OUT_OF_ARRAYRANGE;
 
-			memcpy(o_szIDBuf, this->name.c_str(), this->name.size() + 1);
+			wcscpy(o_szIDBuf, this->name.c_str());
 
 			return LAYER_ERROR_NONE;
 		}
 		/** 項目名を取得する.
-			@param o_szNameBuf	名前を格納するバッファ. CONFIGITEM_NAME_MAXのバイト数が必要 */
-		ELayerErrorCode GetConfigName(char o_szNameBuf[])const
+			@param o_szNameBuf	名前を格納するバッファ. CONFIGITEM_NAME_MAXの文字数が必要 */
+		ELayerErrorCode GetConfigName(wchar_t o_szNameBuf[])const
 		{
 			if(this->name.size() >= CONFIGITEM_NAME_MAX)
 				return LAYER_ERROR_COMMON_OUT_OF_ARRAYRANGE;
 
-			memcpy(o_szNameBuf, this->name.c_str(), this->name.size() + 1);
+			wcscpy(o_szNameBuf, this->name.c_str());
 
 			return LAYER_ERROR_NONE;
 		}
 		/** 項目の説明テキストを取得する.
-			@param o_szBuf	説明文を格納するバッファ.CONFIGITEM_TEXT_MAXのバイト数が必要. */
-		ELayerErrorCode GetConfigText(char o_szBuf[])const
+			@param o_szBuf	説明文を格納するバッファ.CONFIGITEM_TEXT_MAXの文字数が必要. */
+		ELayerErrorCode GetConfigText(wchar_t o_szBuf[])const
 		{
 			if(this->text.size() >= CONFIGITEM_TEXT_MAX)
 				return LAYER_ERROR_COMMON_OUT_OF_ARRAYRANGE;
 
-			memcpy(o_szBuf, this->text.c_str(), this->text.size() + 1);
+			wcscpy(o_szBuf, this->text.c_str());
 
 			return LAYER_ERROR_NONE;
 		}

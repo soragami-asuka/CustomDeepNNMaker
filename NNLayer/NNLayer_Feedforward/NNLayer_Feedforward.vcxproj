@@ -112,7 +112,10 @@
     <ResourceCompile Include="NNLayer_Feedforward.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="Config.xml" />
+    <Xml Include="Config.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+    <Xml Include="LanguagePack-en.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

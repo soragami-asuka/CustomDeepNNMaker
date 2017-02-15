@@ -34,10 +34,17 @@ namespace CustomDeepNNLibrary
 	/** バージョンコード */
 	struct VersionCode
 	{
-		unsigned short major;		/// メジャーバージョン	製品を根本から変更する場合に変更されます。
-		unsigned short minor;		/// マイナーバージョン	大幅な仕様変更・機能追加をする場合に変更されます。
-		unsigned short revision;	/// リビジョン			仕様変更・機能追加をする場合に変更されます。
-		unsigned short build;		/// ビルド				修正パッチごとに変更されます。
+		union
+		{
+			struct
+			{
+				unsigned short major;		/// メジャーバージョン	製品を根本から変更する場合に変更されます。
+				unsigned short minor;		/// マイナーバージョン	大幅な仕様変更・機能追加をする場合に変更されます。
+				unsigned short revision;	/// リビジョン			仕様変更・機能追加をする場合に変更されます。
+				unsigned short build;		/// ビルド				修正パッチごとに変更されます。
+			};
+			unsigned short lpData[4];
+		};
 
 		/** コンストラクタ */
 		VersionCode()
@@ -139,13 +146,13 @@ namespace CustomDeepNNLibrary
 		/** 項目IDを取得する.
 			IDはLayerConfig内において必ずユニークである.
 			@param o_szIDBuf	IDを格納するバッファ.CONFIGITEM_ID_MAXのバイト数が必要.　*/
-		virtual ELayerErrorCode GetConfigID(char o_szIDBuf[])const = 0;
+		virtual ELayerErrorCode GetConfigID(wchar_t o_szIDBuf[])const = 0;
 		/** 項目名を取得する.
 			@param o_szNameBuf	名前を格納するバッファ.CONFIGITEM_NAME_MAXのバイト数が必要. */
-		virtual ELayerErrorCode GetConfigName(char o_szNameBuf[])const = 0;
+		virtual ELayerErrorCode GetConfigName(wchar_t o_szNameBuf[])const = 0;
 		/** 項目の説明テキストを取得する.
 			@param o_szBuf	説明文を格納するバッファ.CONFIGITEM_TEXT_MAXのバイト数が必要. */
-		virtual ELayerErrorCode GetConfigText(char o_szBuf[])const = 0;
+		virtual ELayerErrorCode GetConfigText(wchar_t o_szBuf[])const = 0;
 
 	public:
 		/** 保存に必要なバイト数を取得する */
@@ -237,17 +244,17 @@ namespace CustomDeepNNLibrary
 		/** 値を取得する.
 			@param o_szBuf	格納先バッファ
 			@return 成功した場合0 */
-		virtual int GetValue(char o_szBuf[])const = 0;
+		virtual int GetValue(wchar_t o_szBuf[])const = 0;
 		/** 値を設定する
 			@param i_szBuf	設定する値
 			@return 成功した場合0 */
-		virtual ELayerErrorCode SetValue(const char i_szBuf[]) = 0;
+		virtual ELayerErrorCode SetValue(const wchar_t i_szBuf[]) = 0;
 		
 	public:
 		/** デフォルトの設定値を取得する
 			@param o_szBuf	格納先バッファ
 			@return 成功した場合0 */
-		virtual int GetDefault(char o_szBuf[])const = 0;
+		virtual int GetDefault(wchar_t o_szBuf[])const = 0;
 	};
 
 	/** 設定項目(論理値) */
@@ -279,9 +286,9 @@ namespace CustomDeepNNLibrary
 	class INNLayerConfigItem_Enum : virtual public INNLayerConfigItemBase
 	{
 	public:
-		static const unsigned int ID_BUFFER_MAX = 64;			/**< 列挙要素IDの最大バイト数 */
-		static const unsigned int NAME_BUFFER_MAX = 64;			/**< 列挙要素名の最大バイト数 */
-		static const unsigned int COMMENT_BUFFER_MAX = 256;		/**< コメントの最大バイト数 */
+		static const unsigned int ID_BUFFER_MAX = 64;			/**< 列挙要素IDの最大文字数 */
+		static const unsigned int NAME_BUFFER_MAX = 64;			/**< 列挙要素名の最大文字数 */
+		static const unsigned int COMMENT_BUFFER_MAX = 256;		/**< コメントの最大文字数 */
 
 	public:
 		/** コンストラクタ */
@@ -300,7 +307,7 @@ namespace CustomDeepNNLibrary
 		virtual ELayerErrorCode SetValue(int value) = 0;
 		/** 値を設定する(文字列指定)
 			@param i_szID	設定する値(文字列指定) */
-		virtual ELayerErrorCode SetValue(const char i_szEnumID[]) = 0;
+		virtual ELayerErrorCode SetValue(const wchar_t i_szEnumID[]) = 0;
 
 	public:
 		/** 列挙要素数を取得する */
@@ -309,22 +316,22 @@ namespace CustomDeepNNLibrary
 			@param num		要素番号
 			@param o_szBuf	格納先バッファ
 			@return 成功した場合0 */
-		virtual int GetEnumID(int num, char o_szBuf[])const = 0;
+		virtual int GetEnumID(int num, wchar_t o_szBuf[])const = 0;
 		/** 列挙要素IDを番号指定で取得する.
 			@param num		要素番号
 			@param o_szBuf	格納先バッファ
 			@return 成功した場合0 */
-		virtual int GetEnumName(int num, char o_szBuf[])const = 0;
-		/** 列挙要素コメントを番号指定で取得する.
+		virtual int GetEnumName(int num, wchar_t o_szBuf[])const = 0;
+		/** 列挙要素説明文を番号指定で取得する.
 			@param num		要素番号
 			@param o_szBuf	格納先バッファ
 			@return 成功した場合0 */
-		virtual int GetEnumComment(int num, char o_szBuf[])const = 0;
+		virtual int GetEnumText(int num, wchar_t o_szBuf[])const = 0;
 
 		/** IDを指定して列挙要素番号を取得する
 			@param i_szBuf　調べる列挙ID.
 			@return 成功した場合0<=num<GetEnumCountの値. 失敗した場合は負の値が返る. */
-		virtual int GetNumByID(const char i_szBuf[])const = 0;
+		virtual int GetNumByID(const wchar_t i_szBuf[])const = 0;
 
 
 		/** デフォルトの設定値を取得する */
@@ -362,7 +369,7 @@ namespace CustomDeepNNLibrary
 		/** 設定項目を番号指定で取得する */
 		virtual const INNLayerConfigItemBase* GetItemByNum(unsigned int i_num)const = 0;
 		/** 設定項目をID指定で取得する */
-		virtual const INNLayerConfigItemBase* GetItemByID(const char i_szIDBuf[])const = 0;
+		virtual const INNLayerConfigItemBase* GetItemByID(const wchar_t i_szIDBuf[])const = 0;
 
 	public:
 		/** 保存に必要なバイト数を取得する */

@@ -17,29 +17,29 @@ namespace CustomDeepNNLibrary
 	private:
 		struct EnumItem
 		{
-			std::string id;
-			std::string name;
-			std::string comment;
+			std::wstring id;
+			std::wstring name;
+			std::wstring text;
 
 			/** コンストラクタ */
 			EnumItem()
-				: id ("")
-				, name ("")
-				, comment ("")
+				: id (L"")
+				, name (L"")
+				, text (L"")
 			{
 			}
 			/** コンストラクタ */
-			EnumItem(const std::string& id, const std::string& name, const std::string& comment)
+			EnumItem(const std::wstring& id, const std::wstring& name, const std::wstring& text)
 				: id		(id)
 				, name		(name)
-				, comment	(comment)
+				, text		(text)
 			{
 			}
 			/** コピーコンストラクタ */
 			EnumItem(const EnumItem& item)
 				: id		(item.id)
 				, name		(item.name)
-				, comment	(item.comment)
+				, text		(item.text)
 			{
 			}
 
@@ -48,7 +48,7 @@ namespace CustomDeepNNLibrary
 			{
 				this->id = item.id;
 				this->name = item.name;
-				this->comment = item.comment;
+				this->text = item.text;
 
 				return *this;
 			}
@@ -60,7 +60,7 @@ namespace CustomDeepNNLibrary
 					return false;
 				if(this->name != item.name)
 					return false;
-				if(this->name != item.comment)
+				if(this->text != item.text)
 					return false;
 				return true;
 			}
@@ -73,13 +73,13 @@ namespace CustomDeepNNLibrary
 	private:
 		std::vector<EnumItem> lpEnumItem;
 
-		std::string value;
-		std::string defaultValue;
+		std::wstring value;
+		std::wstring defaultValue;
 
 
 	public:
 		/** コンストラクタ */
-		NNLayerConfigItem_Enum(const char i_szID[], const char i_szName[], const char i_szText[])
+		NNLayerConfigItem_Enum(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[])
 			: NNLayerConfigItemBase(i_szID, i_szName, i_szText)
 		{
 		}
@@ -165,7 +165,7 @@ namespace CustomDeepNNLibrary
 		/** 値を設定する(文字列指定)
 			@param i_szID	設定する値(文字列指定)
 			@return 成功した場合0 */
-		ELayerErrorCode SetValue(const char i_szEnumID[])
+		ELayerErrorCode SetValue(const wchar_t i_szEnumID[])
 		{
 			return this->SetValue(this->GetNumByID(i_szEnumID));
 		}
@@ -180,14 +180,14 @@ namespace CustomDeepNNLibrary
 			@param num		要素番号
 			@param o_szBuf	格納先バッファ
 			@return 成功した場合0 */
-		int GetEnumID(int num, char o_szBuf[])const
+		int GetEnumID(int num, wchar_t o_szBuf[])const
 		{
 			if(num < 0)
 				return -1;
 			if(num >= (int)this->lpEnumItem.size())
 				return -1;
 			
-			memcpy(o_szBuf, this->lpEnumItem[num].id.c_str(), this->lpEnumItem[num].id.size() + 1);
+			wcscpy(o_szBuf, this->lpEnumItem[num].id.c_str());
 
 			return 0;
 		}
@@ -195,29 +195,29 @@ namespace CustomDeepNNLibrary
 			@param num		要素番号
 			@param o_szBuf	格納先バッファ
 			@return 成功した場合0 */
-		int GetEnumName(int num, char o_szBuf[])const
+		int GetEnumName(int num, wchar_t o_szBuf[])const
 		{
 			if(num < 0)
 				return -1;
 			if(num >= (int)this->lpEnumItem.size())
 				return -1;
 			
-			memcpy(o_szBuf, this->lpEnumItem[num].name.c_str(), this->lpEnumItem[num].name.size() + 1);
+			wcscpy(o_szBuf, this->lpEnumItem[num].name.c_str());
 
 			return 0;
 		}
-		/** 列挙要素コメントを番号指定で取得する.
+		/** 列挙要素説明文を番号指定で取得する.
 			@param num		要素番号
 			@param o_szBuf	格納先バッファ
 			@return 成功した場合0 */
-		int GetEnumComment(int num, char o_szBuf[])const
+		int GetEnumText(int num, wchar_t o_szBuf[])const
 		{
 			if(num < 0)
 				return -1;
 			if(num >= (int)this->lpEnumItem.size())
 				return -1;
 			
-			memcpy(o_szBuf, this->lpEnumItem[num].comment.c_str(), this->lpEnumItem[num].comment.size() + 1);
+			wcscpy(o_szBuf, this->lpEnumItem[num].text.c_str());
 
 			return 0;
 		}
@@ -225,9 +225,9 @@ namespace CustomDeepNNLibrary
 		/** IDを指定して列挙要素番号を取得する
 			@param i_szBuf　調べる列挙ID.
 			@return 成功した場合0<=num<GetEnumCountの値. 失敗した場合は負の値が返る. */
-		int GetNumByID(const char i_szEnumID[])const
+		int GetNumByID(const wchar_t i_szEnumID[])const
 		{
-			std::string enumID = i_szEnumID;
+			std::wstring enumID = i_szEnumID;
 
 			for(unsigned int itemNum=0; itemNum<this->lpEnumItem.size(); itemNum++)
 			{
@@ -251,14 +251,14 @@ namespace CustomDeepNNLibrary
 			@param szEnumName	追加する名前
 			@param szComment	追加するコメント分.
 			@return 成功した場合、追加されたアイテムの番号が返る. 失敗した場合は負の値が返る. */
-		int AddEnumItem(const char szEnumID[], const char szEnumName[], const char szComment[])
+		int AddEnumItem(const wchar_t szEnumID[], const wchar_t szEnumName[], const wchar_t szComment[])
 		{
 			// 同一IDが存在するか確認
 			int sameID = this->GetNumByID(szEnumID);
 			if(sameID >= 0)
 				return -1;
 
-			std::string id = szEnumID;
+			std::wstring id = szEnumID;
 			if(id.size()+1 >= ID_BUFFER_MAX)
 				return -1;
 
@@ -291,7 +291,7 @@ namespace CustomDeepNNLibrary
 		/** 列挙値を削除する
 			@param szEnumID 削除する列挙ID
 			@return 成功した場合0 */
-		int EraseEnumItem(const char szEnumID[])
+		int EraseEnumItem(const wchar_t szEnumID[])
 		{
 			return this->EraseEnumItem(this->GetNumByID(szEnumID));
 		}
@@ -301,7 +301,7 @@ namespace CustomDeepNNLibrary
 			@return 成功した場合0 */
 		int SetDefaultItem(int num)
 		{
-			char szEnumID[ID_BUFFER_MAX];
+			wchar_t szEnumID[ID_BUFFER_MAX];
 
 			// IDを取得する
 			if(this->GetEnumID(num, szEnumID) < 0)
@@ -314,7 +314,7 @@ namespace CustomDeepNNLibrary
 		/** デフォルト値を設定する.	ID指定. 
 			@param szID デフォルト値に設定するID. 
 			@return 成功した場合0 */
-		int SetDefaultItem(const char szEnumID[])
+		int SetDefaultItem(const wchar_t szEnumID[])
 		{
 			if(this->GetNumByID(szEnumID) < 0)
 				return -1;
@@ -355,12 +355,12 @@ namespace CustomDeepNNLibrary
 				bufferPos += sizeof(unsigned int);
 
 				// 値
-				std::vector<char> szBuf(bufferSize+1, NULL);
+				std::vector<wchar_t> szBuf(bufferSize+1, NULL);
 				for(unsigned int i=0; i<bufferSize; i++)
 				{
 					szBuf[i] = i_lpBuffer[bufferPos++];
 				}
-				std::string value = &szBuf[0];
+				std::wstring value = &szBuf[0];
 
 
 				this->SetValue(value.c_str());
@@ -394,7 +394,7 @@ namespace CustomDeepNNLibrary
 	};
 	
 	/** 設定項目(列挙値)を作成する */
-	extern "C" NNLAYERCONFIG_API INNLayerConfigItemEx_Enum* CreateLayerCofigItem_Enum(const char i_szID[], const char i_szName[], const char i_szText[])
+	extern "C" NNLAYERCONFIG_API INNLayerConfigItemEx_Enum* CreateLayerCofigItem_Enum(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[])
 	{
 		return new NNLayerConfigItem_Enum(i_szID, i_szName, i_szText);
 	}

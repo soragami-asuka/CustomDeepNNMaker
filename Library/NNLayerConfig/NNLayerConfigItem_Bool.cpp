@@ -20,7 +20,7 @@ namespace CustomDeepNNLibrary
 
 	public:
 		/** コンストラクタ */
-		NNLayerConfigItem_Bool(const char i_szID[], const char i_szName[], const char i_szText[], bool defaultValue)
+		NNLayerConfigItem_Bool(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[], bool defaultValue)
 			: NNLayerConfigItemBase(i_szID, i_szName, i_szText)
 			, defaultValue(defaultValue)
 			, value	(defaultValue)
@@ -145,7 +145,7 @@ namespace CustomDeepNNLibrary
 	};
 	
 	/** 設定項目(実数)を作成する */
-	extern "C" NNLAYERCONFIG_API INNLayerConfigItem_Bool* CreateLayerCofigItem_Bool(const char i_szID[], const char i_szName[], const char i_szText[], bool defaultValue)
+	extern "C" NNLAYERCONFIG_API INNLayerConfigItem_Bool* CreateLayerCofigItem_Bool(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[], bool defaultValue)
 	{
 		return new NNLayerConfigItem_Bool(i_szID, i_szName, i_szText, defaultValue);
 	}

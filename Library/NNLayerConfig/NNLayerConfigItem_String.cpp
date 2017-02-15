@@ -14,12 +14,12 @@ namespace CustomDeepNNLibrary
 	class NNLayerConfigItem_String : public NNLayerConfigItemBase<INNLayerConfigItem_String>
 	{
 	private:
-		std::string defaultValue;
-		std::string value;
+		std::wstring defaultValue;
+		std::wstring value;
 
 	public:
 		/** コンストラクタ */
-		NNLayerConfigItem_String(const char i_szID[], const char i_szName[], const char i_szText[], const char defaultValue[])
+		NNLayerConfigItem_String(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[], const wchar_t defaultValue[])
 			: NNLayerConfigItemBase(i_szID, i_szName, i_szText)
 			, defaultValue(defaultValue)
 			, value	(defaultValue)
@@ -86,16 +86,16 @@ namespace CustomDeepNNLibrary
 		/** 値を取得する.
 			@param o_szBuf	格納先バッファ
 			@return 成功した場合0 */
-		virtual int GetValue(char o_szBuf[])const
+		virtual int GetValue(wchar_t o_szBuf[])const
 		{
-			memcpy(o_szBuf, this->value.c_str(), this->value.size() + 1);
+			wcscpy(o_szBuf, this->value.c_str());
 
 			return 0;
 		}
 		/** 値を設定する
 			@param i_szBuf	設定する値
 			@return 成功した場合0 */
-		virtual ELayerErrorCode SetValue(const char i_szBuf[])
+		virtual ELayerErrorCode SetValue(const wchar_t i_szBuf[])
 		{
 			this->value = i_szBuf;
 
@@ -106,9 +106,9 @@ namespace CustomDeepNNLibrary
 		/** デフォルトの設定値を取得する
 			@param o_szBuf	格納先バッファ
 			@return 成功した場合0 */
-		int GetDefault(char o_szBuf[])const
+		int GetDefault(wchar_t o_szBuf[])const
 		{
-			memcpy(o_szBuf, this->defaultValue.c_str(), this->defaultValue.size() + 1);
+			wcscpy(o_szBuf, this->defaultValue.c_str());
 
 			return 0;
 		}
@@ -143,7 +143,7 @@ namespace CustomDeepNNLibrary
 				bufferPos += sizeof(unsigned int);
 
 				// 値
-				std::vector<char> szBuf(bufferSize+1, NULL);
+				std::vector<wchar_t> szBuf(bufferSize+1, NULL);
 				for(unsigned int i=0; i<bufferSize; i++)
 				{
 					szBuf[i] = i_lpBuffer[bufferPos++];
@@ -179,7 +179,7 @@ namespace CustomDeepNNLibrary
 	};
 	
 	/** 設定項目(実数)を作成する */
-	extern "C" NNLAYERCONFIG_API INNLayerConfigItem_String* CreateLayerCofigItem_String(const char i_szID[], const char i_szName[], const char i_szText[], const char szDefaultValue[])
+	extern "C" NNLAYERCONFIG_API INNLayerConfigItem_String* CreateLayerCofigItem_String(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[], const wchar_t szDefaultValue[])
 	{
 		return new NNLayerConfigItem_String(i_szID, i_szName, i_szText, szDefaultValue);
 	}

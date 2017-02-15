@@ -119,19 +119,19 @@ namespace CustomDeepNNLibrary
 			return this->lpLayerConfigItem[num];
 		}
 		/** İ’è€–Ú‚ğIDw’è‚Åæ“¾‚·‚é */
-		const INNLayerConfigItemBase* GetItemByID(const char i_szIDBuf[])const
+		const INNLayerConfigItemBase* GetItemByID(const wchar_t i_szIDBuf[])const
 		{
 			// “¯ˆêID‚ğŒŸõ
 			for(unsigned int i=0; i<this->lpLayerConfigItem.size(); i++)
 			{
-				char szID[CONFIGITEM_NAME_MAX];
+				wchar_t szID[CONFIGITEM_NAME_MAX];
 
 				// ‘ÎÛ€–Ú‚ÌID‚ğæ“¾
 				if(this->lpLayerConfigItem[i]->GetConfigID(szID) != ELayerErrorCode::LAYER_ERROR_NONE)
 					continue;
 
 				// ”äŠr
-				if(std::string(szID) == i_szIDBuf)
+				if(std::wstring(szID) == i_szIDBuf)
 					return this->lpLayerConfigItem[i];
 			}
 			return NULL;

@@ -20,15 +20,15 @@ namespace CustomDeepNNLibrary
 	extern "C" NNLAYERCONFIG_API INNLayerConfigEx* CreateEmptyLayerConfig(const GUID& layerCode, const VersionCode& versionCode);
 
 	/** İ’è€–Ú(À”)‚ğì¬‚·‚é */
-	extern "C" NNLAYERCONFIG_API INNLayerConfigItem_Float* CreateLayerCofigItem_Float(const char i_szID[], const char i_szName[], const char i_szText[], float minValue, float maxValue, float defaultValue);
+	extern "C" NNLAYERCONFIG_API INNLayerConfigItem_Float* CreateLayerCofigItem_Float(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[], float minValue, float maxValue, float defaultValue);
 	/** İ’è€–Ú(®”)‚ğì¬‚·‚é */
-	extern "C" NNLAYERCONFIG_API INNLayerConfigItem_Int* CreateLayerCofigItem_Int(const char i_szID[], const char i_szName[], const char i_szText[], int minValue, int maxValue, int defaultValue);
+	extern "C" NNLAYERCONFIG_API INNLayerConfigItem_Int* CreateLayerCofigItem_Int(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[], int minValue, int maxValue, int defaultValue);
 	/** İ’è€–Ú(•¶š—ñ)‚ğì¬‚·‚é */
-	extern "C" NNLAYERCONFIG_API INNLayerConfigItem_String* CreateLayerCofigItem_String(const char i_szID[], const char i_szName[], const char i_szText[], const char szDefaultValue[]);
+	extern "C" NNLAYERCONFIG_API INNLayerConfigItem_String* CreateLayerCofigItem_String(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[], const wchar_t szDefaultValue[]);
 	/** İ’è€–Ú(˜_—’l)‚ğì¬‚·‚é */
-	extern "C" NNLAYERCONFIG_API INNLayerConfigItem_Bool* CreateLayerCofigItem_Bool(const char i_szID[], const char i_szName[], const char i_szText[], bool defaultValue);
+	extern "C" NNLAYERCONFIG_API INNLayerConfigItem_Bool* CreateLayerCofigItem_Bool(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[], bool defaultValue);
 	/** İ’è€–Ú(—ñ‹“’l)‚ğì¬‚·‚é */
-	extern "C" NNLAYERCONFIG_API INNLayerConfigItemEx_Enum* CreateLayerCofigItem_Enum(const char i_szID[], const char i_szName[], const char i_szText[]);
+	extern "C" NNLAYERCONFIG_API INNLayerConfigItemEx_Enum* CreateLayerCofigItem_Enum(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[]);
 }
 
 

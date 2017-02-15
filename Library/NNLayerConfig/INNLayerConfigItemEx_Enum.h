@@ -24,7 +24,7 @@ namespace CustomDeepNNLibrary
 			@param szEnumName	追加する名前
 			@param szComment	追加するコメント分.
 			@return 成功した場合、追加されたアイテムの番号が返る. 失敗した場合は負の値が返る. */
-		virtual int AddEnumItem(const char szEnumID[], const char szEnumName[], const char szComment[]) = 0;
+		virtual int AddEnumItem(const wchar_t szEnumID[], const wchar_t szEnumName[], const wchar_t szComment[]) = 0;
 
 		/** 列挙値を削除する.
 			@param num	削除する列挙番号
@@ -33,7 +33,7 @@ namespace CustomDeepNNLibrary
 		/** 列挙値を削除する
 			@param szEnumID 削除する列挙ID
 			@return 成功した場合0 */
-		virtual int EraseEnumItem(const char szEnumID[]) = 0;
+		virtual int EraseEnumItem(const wchar_t szEnumID[]) = 0;
 
 		/** デフォルト値を設定する.	番号指定.
 			@param num デフォルト値に設定する番号. 
@@ -42,7 +42,7 @@ namespace CustomDeepNNLibrary
 		/** デフォルト値を設定する.	ID指定. 
 			@param szID デフォルト値に設定するID. 
 			@return 成功した場合0 */
-		virtual int SetDefaultItem(const char szEnumID[]) = 0;
+		virtual int SetDefaultItem(const wchar_t szEnumID[]) = 0;
 
 	};
 }
