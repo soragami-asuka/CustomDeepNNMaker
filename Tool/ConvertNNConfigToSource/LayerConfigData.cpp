@@ -305,6 +305,41 @@ namespace
 
 		return pConfig;
 	}
+
+	/** 文字列を改行単位で分離して配列化 */
+	int TextToStringArray(const std::wstring input, std::vector<std::wstring>& lpStringArray)
+	{
+		lpStringArray.clear();
+
+		std::wstring buf = input;
+
+		while(true)
+		{
+			std::size_t indexN = buf.find(L"\n");
+			std::size_t indexRN = buf.find(L"\r\n");
+
+			std::size_t index = std::min(indexN, indexRN);
+			if(index == std::string::npos)
+			{
+				lpStringArray.push_back(buf);
+				break;
+			}
+
+			std::size_t skipByte = 1;
+			if(index == indexN)
+				skipByte = 1;
+			if(index == indexRN)
+				skipByte = 2;
+
+			lpStringArray.push_back(buf.substr(0, index));
+			buf = buf.substr(index+skipByte);
+
+			if(buf.size() == 0)
+				break;
+		}
+
+		return 0;
+	}
 }
 
 
@@ -482,8 +517,75 @@ int LayerConfigData::ReadFromXMLFile(const boost::filesystem::wpath& configFileP
 	@param	exportDirPath	出力先ディレクトリパス
 	@param	fileName		出力ファイル名.拡張子は除く.
 	@return 成功した場合0が返る. */
-int LayerConfigData::ConvertToCPPFile(const boost::filesystem::path& exportDirPath, const std::wstring& fileName)const
+int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirPath, const std::wstring& fileName)const
 {
+	std::locale::global(std::locale("japanese"));
+
+	boost::filesystem::wpath sourceFilePath = exportDirPath / (fileName + L".cpp");
+	boost::filesystem::wpath headerFilePath = exportDirPath / (fileName + L".hpp");
+
+	// GUIDを文字列に変換
+	std::wstring strGUID;
+	{
+		wchar_t szBuf[64];
+		swprintf_s(szBuf, L"%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+			this->guid.Data1,
+			this->guid.Data2,
+			this->guid.Data3,
+			this->guid.Data4[0], this->guid.Data4[1],
+			this->guid.Data4[2], this->guid.Data4[3], this->guid.Data4[4], this->guid.Data4[5], this->guid.Data4[6], this->guid.Data4[7]);
+		strGUID = szBuf;
+	}
+	
+	// ヘッダファイルの出力
+	{
+		// ファイルオープン
+		FILE* fp = _wfopen(headerFilePath.wstring().c_str(), L"w");
+		if(fp == NULL)
+			return -1;
+
+		std::vector<std::wstring> lpText;
+		TextToStringArray(this->text, lpText);
+
+		fwprintf(fp, L"/*--------------------------------------------\n");
+		fwprintf(fp, L" * FileName  : %ls\n", headerFilePath.filename().wstring().c_str());
+		fwprintf(fp, L" * LayerName : %ls\n", this->name.c_str());
+		fwprintf(fp, L" * guid      : %ls\n", strGUID.c_str());
+		if(lpText.size() > 0)
+		{
+			fwprintf(fp, L" * \n");
+			fwprintf(fp, L" * Text      : %ls\n", lpText[0].c_str());
+			for(unsigned int i=1; i<lpText.size(); i++)
+				fwprintf(fp, L" *           : %ls\n", lpText[i].c_str());
+		}
+		else
+		{
+		}
+		fwprintf(fp, L"--------------------------------------------*/\n");
+		fwprintf(fp, L"#ifndef __CUSTOM_DEEP_NN_LAYER_%s_H__\n", fileName.c_str());
+		fwprintf(fp, L"#define __CUSTOM_DEEP_NN_LAYER_%s_H__\n", fileName.c_str());
+		fwprintf(fp, L"\n");
+		fwprintf(fp, L"#define EXPORT_API extern \"C\" __declspec(dllexport)\n");
+		fwprintf(fp, L"\n");
+		fwprintf(fp, L"\n");
+		fwprintf(fp, L"#include<LayerErrorCode.h>\n");
+		fwprintf(fp, L"#include<INNLayerConfig.h>\n");
+		fwprintf(fp, L"#include<INNLayer.h>\n");
+		fwprintf(fp, L"\n");
+		fwprintf(fp, L"#include<guiddef.h>\n");
+		fwprintf(fp, L"\n");
+		fwprintf(fp, L"\n");
+		fwprintf(fp, L"\n");
+		fwprintf(fp, L"\n");
+		fwprintf(fp, L"\n");
+		fwprintf(fp, L"\n");
+		fwprintf(fp, L"#endif // __CUSTOM_DEEP_NN_LAYER_%s_H__\n", fileName.c_str());
+
+
+		// ファイルクローズ
+		fclose(fp);
+	}
+
 	return 0;
 }
 

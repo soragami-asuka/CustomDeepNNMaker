@@ -27,10 +27,15 @@ int _tmain(int argc, _TCHAR* argv[])
 	boost::filesystem::wpath exportDirPath	= argv[2];	exportDirPath.normalize();
 	std::wstring fileName = argv[3];
 
+	// 設定ファイル読み込み
 	CustomDeepNNLibrary::LayerConfigData configData;
 	if(configData.ReadFromXMLFile(configFilePath) != 0)
 		return -1;
 
+	// ソース変換出力
+	if(configData.ConvertToCPPFile(exportDirPath, fileName) != 0)
+		return -1;
+	
 	return 0;
 }
 

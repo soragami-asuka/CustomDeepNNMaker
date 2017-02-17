@@ -36,7 +36,7 @@ namespace CustomDeepNNLibrary
 		/** XMLファイルから情報を読み込む.
 			@param	configFilePath	読み込むXMLファイルのパス
 			@return	成功した場合0が返る. */
-		int ReadFromXMLFile(const boost::filesystem::path& configFilePath);
+		int ReadFromXMLFile(const boost::filesystem::wpath& configFilePath);
 		/** C++言語ソースファイルに変換/出力する.
 			.h/.cppファイルが生成される.
 			@param	exportDirPath	出力先ディレクトリパス
