@@ -17,6 +17,7 @@ using namespace CustomDeepNNLibrary;
 
 namespace
 {
+	/** レイヤー設定情報をXMLから読み込む */
 	INNLayerConfigEx* ReadLayerConfigXML(boost::property_tree::ptree& pTree, const GUID& layerCode, const VersionCode& versionCode)
 	{
 		INNLayerConfigEx* pConfig = CustomDeepNNLibrary::CreateEmptyLayerConfig(layerCode, versionCode);
@@ -321,7 +322,8 @@ namespace
 			std::size_t index = std::min(indexN, indexRN);
 			if(index == std::string::npos)
 			{
-				lpStringArray.push_back(buf);
+				if(!buf.empty())
+					lpStringArray.push_back(buf);
 				break;
 			}
 
@@ -338,6 +340,117 @@ namespace
 				break;
 		}
 
+		return 0;
+	}
+
+	/** データ構造を構造体に変換して出力する */
+	int WriteStructureToStructSource(FILE* fp, INNLayerConfig& structure)
+	{
+		for(unsigned int itemNum=0; itemNum<structure.GetItemCount(); itemNum++)
+		{
+			auto pItem = structure.GetItemByNum(itemNum);
+			if(pItem == NULL)
+				continue;
+
+			// 名前
+			wchar_t szName[CONFIGITEM_NAME_MAX];
+			pItem->GetConfigName(szName);
+
+			// ID
+			wchar_t szID[CONFIGITEM_ID_MAX];
+			pItem->GetConfigID(szID);
+
+			// 説明文
+			wchar_t szText[CONFIGITEM_TEXT_MAX];
+			std::vector<std::wstring> lpText;
+			pItem->GetConfigText(szText);
+			TextToStringArray(szText, lpText);
+
+			fwprintf(fp, L"		/** Name : %ls\n", szName);
+			fwprintf(fp, L"		  * ID   : %ls\n", szID);
+			if(lpText.size() > 0)
+			{
+				fwprintf(fp, L"		  * Text : %ls\n", lpText[0].c_str());
+				for(unsigned int i=1; i<lpText.size(); i++)
+					fwprintf(fp, L"		  *       : %ls\n", lpText[i].c_str());
+			}
+			fwprintf(fp, L"		  */\n");
+
+			switch(pItem->GetItemType())
+			{
+			case CONFIGITEM_TYPE_FLOAT:
+				{
+					const INNLayerConfigItem_Float* pItemFloat = dynamic_cast<const INNLayerConfigItem_Float*>(pItem);
+					if(pItemFloat == NULL)
+						break;
+					fwprintf(fp, L"		float %ls;\n", szID);
+				}
+				break;
+			case CONFIGITEM_TYPE_INT:
+				{
+					const INNLayerConfigItem_Int* pItemInt = dynamic_cast<const INNLayerConfigItem_Int*>(pItem);
+					if(pItemInt == NULL)
+						break;
+					fwprintf(fp, L"		int %ls;\n", szID);
+				}
+				break;
+			case CONFIGITEM_TYPE_STRING:
+				{
+					const INNLayerConfigItem_String* pItemString = dynamic_cast<const INNLayerConfigItem_String*>(pItem);
+					if(pItemString == NULL)
+						break;
+					fwprintf(fp, L"		const wchar_t %ls;\n", szID);
+				}
+				break;
+			case CONFIGITEM_TYPE_BOOL:
+				{
+					const INNLayerConfigItem_Bool* pItemBool = dynamic_cast<const INNLayerConfigItem_Bool*>(pItem);
+					if(pItemBool == NULL)
+						break;
+					fwprintf(fp, L"		const bool %ls;\n", szID);
+				}
+				break;
+			case CONFIGITEM_TYPE_ENUM:
+				{
+					const INNLayerConfigItem_Enum* pItemEnum = dynamic_cast<const INNLayerConfigItem_Enum*>(pItem);
+					if(pItemEnum == NULL)
+						break;
+					fwprintf(fp, L"		const enum{\n");
+					for(unsigned int enumNum=0; enumNum<pItemEnum->GetEnumCount(); enumNum++)
+					{
+						wchar_t szEnumName[CONFIGITEM_NAME_MAX];
+						wchar_t szEnumID[CONFIGITEM_ID_MAX];
+						wchar_t szEnumText[CONFIGITEM_TEXT_MAX];
+						std::vector<std::wstring> lpEnumText;
+
+						// 名前
+						pItemEnum->GetEnumName(enumNum, szEnumName);
+						// ID
+						pItemEnum->GetEnumID(enumNum, szEnumID);
+						// テキスト
+						pItemEnum->GetEnumText(enumNum, szEnumText);
+						TextToStringArray(szEnumText, lpEnumText);
+						
+
+						fwprintf(fp, L"			/** Name : %ls\n", szEnumName);
+						fwprintf(fp, L"			  * ID   : %ls\n", szEnumID);
+						if(lpText.size() > 0)
+						{
+							fwprintf(fp, L"			  * Text : %ls\n", lpEnumText[0].c_str());
+							for(unsigned int i=1; i<lpText.size(); i++)
+							fwprintf(fp, L"			  *      : %ls\n", lpEnumText[i].c_str());
+						}
+						fwprintf(fp, L"			  */\n");
+						fwprintf(fp, L"			%ls_%ls,\n", szID, szEnumID);
+						fwprintf(fp, L"\n");
+					}
+					fwprintf(fp, L"		}%ls;\n", szID);
+				}
+				break;
+			}
+
+			fwprintf(fp, L"\n");
+		}
 		return 0;
 	}
 }
@@ -519,7 +632,8 @@ int LayerConfigData::ReadFromXMLFile(const boost::filesystem::wpath& configFileP
 	@return 成功した場合0が返る. */
 int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirPath, const std::wstring& fileName)const
 {
-	std::locale::global(std::locale("japanese"));
+	// 出力言語設定を変更
+	_wsetlocale(LC_ALL, this->default_language.c_str());
 
 	boost::filesystem::wpath sourceFilePath = exportDirPath / (fileName + L".cpp");
 	boost::filesystem::wpath headerFilePath = exportDirPath / (fileName + L".hpp");
@@ -536,30 +650,33 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 			this->guid.Data4[2], this->guid.Data4[3], this->guid.Data4[4], this->guid.Data4[5], this->guid.Data4[6], this->guid.Data4[7]);
 		strGUID = szBuf;
 	}
-	
+
+	//======================
 	// ヘッダファイルの出力
+	//======================
 	{
 		// ファイルオープン
 		FILE* fp = _wfopen(headerFilePath.wstring().c_str(), L"w");
 		if(fp == NULL)
 			return -1;
 
-		std::vector<std::wstring> lpText;
-		TextToStringArray(this->text, lpText);
-
 		fwprintf(fp, L"/*--------------------------------------------\n");
 		fwprintf(fp, L" * FileName  : %ls\n", headerFilePath.filename().wstring().c_str());
 		fwprintf(fp, L" * LayerName : %ls\n", this->name.c_str());
 		fwprintf(fp, L" * guid      : %ls\n", strGUID.c_str());
-		if(lpText.size() > 0)
 		{
-			fwprintf(fp, L" * \n");
-			fwprintf(fp, L" * Text      : %ls\n", lpText[0].c_str());
-			for(unsigned int i=1; i<lpText.size(); i++)
-				fwprintf(fp, L" *           : %ls\n", lpText[i].c_str());
-		}
-		else
-		{
+			std::vector<std::wstring> lpText;
+			TextToStringArray(this->text, lpText);
+			if(lpText.size() > 0)
+			{
+				fwprintf(fp, L" * \n");
+				fwprintf(fp, L" * Text      : %ls\n", lpText[0].c_str());
+				for(unsigned int i=1; i<lpText.size(); i++)
+					fwprintf(fp, L" *           : %ls\n", lpText[i].c_str());
+			}
+			else
+			{
+			}
 		}
 		fwprintf(fp, L"--------------------------------------------*/\n");
 		fwprintf(fp, L"#ifndef __CUSTOM_DEEP_NN_LAYER_%s_H__\n", fileName.c_str());
@@ -574,12 +691,73 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"#include<guiddef.h>\n");
 		fwprintf(fp, L"\n");
+		fwprintf(fp, L"namespace CustomDeepNNLibrary {\n");
+		fwprintf(fp, L"namespace %s {\n", fileName.c_str());
+		fwprintf(fp, L"\n");
+		if(this->pStructure->GetItemCount() > 0)
+		{
+			fwprintf(fp, L"	/** Layer structure */\n");
+			fwprintf(fp, L"	struct LayerStructure\n");
+			fwprintf(fp, L"	{\n");
+			WriteStructureToStructSource(fp, *this->pStructure);
+			fwprintf(fp, L"	};\n");
+			fwprintf(fp, L"\n");
+		}
+		if(this->pLearn->GetItemCount() > 0)
+		{
+			fwprintf(fp, L"	/** Learning data structure */\n");
+			fwprintf(fp, L"	struct LearnDataStructure\n");
+			fwprintf(fp, L"	{\n");
+			WriteStructureToStructSource(fp, *this->pLearn);
+			fwprintf(fp, L"	};\n");
+			fwprintf(fp, L"\n");
+		}
+		fwprintf(fp, L"} // %s\n", fileName.c_str());
+		fwprintf(fp, L"} // CustomDeepNNLibrary\n");
+		fwprintf(fp, L"\n");
+		fwprintf(fp, L"\n");
+		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"#endif // __CUSTOM_DEEP_NN_LAYER_%s_H__\n", fileName.c_str());
+
+
+		// ファイルクローズ
+		fclose(fp);
+	}
+
+
+	//======================
+	// ソースファイルの出力
+	//======================
+	{
+		// ファイルオープン
+		FILE* fp = _wfopen(sourceFilePath.wstring().c_str(), L"w");
+		if(fp == NULL)
+			return -1;
+
+		fwprintf(fp, L"/*--------------------------------------------\n");
+		fwprintf(fp, L" * FileName  : %ls\n", sourceFilePath.filename().wstring().c_str());
+		fwprintf(fp, L" * LayerName : %ls\n", this->name.c_str());
+		fwprintf(fp, L" * guid      : %ls\n", strGUID.c_str());
+		{
+			std::vector<std::wstring> lpText;
+			TextToStringArray(this->text, lpText);
+			if(lpText.size() > 0)
+			{
+				fwprintf(fp, L" * \n");
+				fwprintf(fp, L" * Text      : %ls\n", lpText[0].c_str());
+				for(unsigned int i=1; i<lpText.size(); i++)
+					fwprintf(fp, L" *           : %ls\n", lpText[i].c_str());
+			}
+			else
+			{
+			}
+		}
+		fwprintf(fp, L"--------------------------------------------*/\n");
 
 
 		// ファイルクローズ

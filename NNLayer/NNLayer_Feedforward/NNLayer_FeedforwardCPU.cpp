@@ -6,6 +6,7 @@
 #include"stdafx.h"
 
 #include"NNLayer_Feedforward.h"
+#include"NNLayer_Feedforward.hpp"
 #include"NNLayer_FeedforwardBase.h"
 
 
@@ -44,7 +45,7 @@ public:
 	/** レイヤー種別の取得 */
 	ELayerKind GetLayerKind()const
 	{
-		return LAYER_KIND_CPU_CALC;
+		return LAYER_KIND_CPU | LAYER_KIND_CALC | LAYER_KIND_SINGLE_INPUT | LAYER_KIND_SINGLE_OUTPUT;
 	}
 
 	/** 初期化. 各ニューロンの値をランダムに初期化

@@ -65,10 +65,10 @@ namespace CustomDeepNNLibrary
 			@param o_szIDBuf	IDを格納するバッファ. CONFIGITEM_NAME_MAXの文字数が必要 */
 		ELayerErrorCode GetConfigID(wchar_t o_szIDBuf[])const
 		{
-			if(this->name.size() >= CONFIGITEM_ID_MAX)
+			if(this->id.size() >= CONFIGITEM_ID_MAX)
 				return LAYER_ERROR_COMMON_OUT_OF_ARRAYRANGE;
 
-			wcscpy(o_szIDBuf, this->name.c_str());
+			wcscpy(o_szIDBuf, this->id.c_str());
 
 			return LAYER_ERROR_NONE;
 		}
