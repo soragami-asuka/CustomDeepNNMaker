@@ -1,5 +1,5 @@
 /*--------------------------------------------
- * FileName  : NNLayer_Feedforward.hpp
+ * FileName  : NNLayer_Feedforward_DATA.hpp
  * LayerName : 全結合ニューラルネットワークレイヤー
  * guid      : BEBA34EC-C30C-4565-9386-56088981D2D7
  * 
@@ -7,17 +7,14 @@
  *           : 結合層と活性化層を一体化.
  *           : 学習時に[学習係数][ドロップアウト率]を設定できる.
 --------------------------------------------*/
-#ifndef __CUSTOM_DEEP_NN_LAYER_NNLayer_Feedforward_H__
-#define __CUSTOM_DEEP_NN_LAYER_NNLayer_Feedforward_H__
+#ifndef __CUSTOM_DEEP_NN_LAYER_DATA_NNLayer_Feedforward_H__
+#define __CUSTOM_DEEP_NN_LAYER_DATA_NNLayer_Feedforward_H__
 
-#define EXPORT_API extern "C" __declspec(dllexport)
-
+#include<guiddef.h>
 
 #include<LayerErrorCode.h>
 #include<INNLayerConfig.h>
 #include<INNLayer.h>
-
-#include<guiddef.h>
 
 namespace CustomDeepNNLibrary {
 namespace NNLayer_Feedforward {
@@ -74,4 +71,4 @@ namespace NNLayer_Feedforward {
 } // CustomDeepNNLibrary
 
 
-#endif // __CUSTOM_DEEP_NN_LAYER_NNLayer_Feedforward_H__
+#endif // __CUSTOM_DEEP_NN_LAYER_DATA_NNLayer_Feedforward_H__
