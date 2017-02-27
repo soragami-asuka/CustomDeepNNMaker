@@ -24,7 +24,6 @@ namespace CustomDeepNNLibrary
 			@param i_lppInputBuffer	入力データバッファ. [GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要
 			直前の計算結果を使用する */
 		virtual ELayerErrorCode CalculateLearnError(const float** i_lppInputBuffer) = 0;
-
 	};
 }
 

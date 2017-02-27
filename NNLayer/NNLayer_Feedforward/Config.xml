@@ -41,19 +41,15 @@
       <Default>sigmoid</Default>
     </Enum>
 
-    <!--
     <Bool id="BoolSample">
       <Name>Bool型のサンプル</Name>
       <Text></Text>
-      <Default>true</Default> true or falseで記入
+      <Default>true</Default>
     </Bool>
-    -->
-    <!--
     <String id="StringSample">
       <Name>String型のサンプル</Name>
       <Default>サンプル</Default>
     </String>
-    -->
   </Structure>
 
   <!--学習に使用するデータの構造-->

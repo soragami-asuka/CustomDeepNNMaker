@@ -8,7 +8,7 @@
 namespace CustomDeepNNLibrary
 {
 	/** 入出力データの次元数 */
-	const unsigned __int32 IODATA_DIMENTION_COUNT = 4;
+	const unsigned __int32 IODATA_DIMENTION_COUNT = 3;
 
 	/** 入出力データ構造 */
 	struct IODataStruct
@@ -18,7 +18,6 @@ namespace CustomDeepNNLibrary
 		{
 			struct
 			{
-				unsigned __int32 t;
 				unsigned __int32 x;
 				unsigned __int32 y;
 				unsigned __int32 z;
@@ -28,9 +27,8 @@ namespace CustomDeepNNLibrary
 		/** 1要素が持つデータ数 */
 		unsigned __int32 ch;
 
-		IODataStruct(int ch=0, int x=1, int y=1, int z=1, int t=1)
-			:	t	(t)
-			,	x	(x)
+		IODataStruct(int ch=0, int x=1, int y=1, int z=1)
+			:	x	(x)
 			,	y	(y)
 			,	z	(z)
 			,	ch	(ch)

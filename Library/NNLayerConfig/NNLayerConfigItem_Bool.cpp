@@ -73,7 +73,7 @@ namespace CustomDeepNNLibrary
 		/** İ’è€–Úí•Ê‚ğæ“¾‚·‚é */
 		NNLayerConfigItemType GetItemType()const
 		{
-			return CONFIGITEM_TYPE_INT;
+			return CONFIGITEM_TYPE_BOOL;
 		}
 
 	public:

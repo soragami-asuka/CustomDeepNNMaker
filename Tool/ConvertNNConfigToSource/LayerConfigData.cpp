@@ -526,7 +526,13 @@ namespace
 					const INNLayerConfigItem_Float* pItemFloat = dynamic_cast<const INNLayerConfigItem_Float*>(pItem);
 					if(pItemFloat == NULL)
 						break;
-					fwprintf(fp, L"		float %ls;\n", szID);
+					
+					fwprintf(fp, L"	pLayerConfig->AddItem(\n");
+					fwprintf(fp, L"		CustomDeepNNLibrary::CreateLayerCofigItem_Float(\n");
+					fwprintf(fp, L"			L\"%ls\",\n", szID);
+					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].name.c_str(),\n", dataCode.c_str(), szID);
+					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].text.c_str(),\n", dataCode.c_str(), szID);
+					fwprintf(fp, L"			%ff, %ff, %ff));\n", pItemFloat->GetMin(), pItemFloat->GetMax(), pItemFloat->GetDefault());
 				}
 				break;
 			case CONFIGITEM_TYPE_INT:
@@ -535,14 +541,11 @@ namespace
 					if(pItemInt == NULL)
 						break;
 
-					wchar_t szItemID[CustomDeepNNLibrary::CONFIGITEM_ID_MAX];
-					pItemInt->GetConfigID(szItemID);
-
 					fwprintf(fp, L"	pLayerConfig->AddItem(\n");
 					fwprintf(fp, L"		CustomDeepNNLibrary::CreateLayerCofigItem_Int(\n");
-					fwprintf(fp, L"			L\"%ls\",\n", szItemID);
-					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].name.c_str(),\n", dataCode.c_str(), szItemID);
-					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].text.c_str(),\n", dataCode.c_str(), szItemID);
+					fwprintf(fp, L"			L\"%ls\",\n", szID);
+					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].name.c_str(),\n", dataCode.c_str(), szID);
+					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].text.c_str(),\n", dataCode.c_str(), szID);
 					fwprintf(fp, L"			%ld, %ld, %ld));\n", pItemInt->GetMin(), pItemInt->GetMax(), pItemInt->GetDefault());
 				}
 				break;
@@ -551,7 +554,16 @@ namespace
 					const INNLayerConfigItem_String* pItemString = dynamic_cast<const INNLayerConfigItem_String*>(pItem);
 					if(pItemString == NULL)
 						break;
-					fwprintf(fp, L"		const wchar_t %ls;\n", szID);
+
+					std::vector<wchar_t> szDefault(pItemString->GetLength() + 1);
+					pItemString->GetDefault(&szDefault[0]);
+
+					fwprintf(fp, L"	pLayerConfig->AddItem(\n");
+					fwprintf(fp, L"		CustomDeepNNLibrary::CreateLayerCofigItem_String(\n");
+					fwprintf(fp, L"			L\"%ls\",\n", szID);
+					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].name.c_str(),\n", dataCode.c_str(), szID);
+					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].text.c_str(),\n", dataCode.c_str(), szID);
+					fwprintf(fp, L"			L\"%ls\"));\n", TextToSingleLine(&szDefault[0]).c_str());
 				}
 				break;
 			case CONFIGITEM_TYPE_BOOL:
@@ -559,7 +571,13 @@ namespace
 					const INNLayerConfigItem_Bool* pItemBool = dynamic_cast<const INNLayerConfigItem_Bool*>(pItem);
 					if(pItemBool == NULL)
 						break;
-					fwprintf(fp, L"		const bool %ls;\n", szID);
+
+					fwprintf(fp, L"	pLayerConfig->AddItem(\n");
+					fwprintf(fp, L"		CustomDeepNNLibrary::CreateLayerCofigItem_Bool(\n");
+					fwprintf(fp, L"			L\"%ls\",\n", szID);
+					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].name.c_str(),\n", dataCode.c_str(), szID);
+					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].text.c_str(),\n", dataCode.c_str(), szID);
+					fwprintf(fp, L"			%ls));\n", pItemBool->GetDefault() ? L"true" : L"false" );
 				}
 				break;
 			case CONFIGITEM_TYPE_ENUM:
@@ -567,13 +585,17 @@ namespace
 					const INNLayerConfigItem_Enum* pItemEnum = dynamic_cast<const INNLayerConfigItem_Enum*>(pItem);
 					if(pItemEnum == NULL)
 						break;
-					fwprintf(fp, L"		const enum{\n");
+					fwprintf(fp, L"	{\n");
+					fwprintf(fp, L"		CustomDeepNNLibrary::INNLayerConfigItemEx_Enum* pItemEnum = CustomDeepNNLibrary::CreateLayerCofigItem_Enum(\n");
+					fwprintf(fp, L"			L\"%ls\",\n", szID);
+					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].name.c_str(),\n", dataCode.c_str(), szID);
+					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].text.c_str());\n", dataCode.c_str(), szID);
+					fwprintf(fp, L"\n");
 					for(unsigned int enumNum=0; enumNum<pItemEnum->GetEnumCount(); enumNum++)
 					{
 						wchar_t szEnumName[CONFIGITEM_NAME_MAX];
 						wchar_t szEnumID[CONFIGITEM_ID_MAX];
 						wchar_t szEnumText[CONFIGITEM_TEXT_MAX];
-						std::vector<std::wstring> lpEnumText;
 
 						// 名前
 						pItemEnum->GetEnumName(enumNum, szEnumName);
@@ -581,28 +603,22 @@ namespace
 						pItemEnum->GetEnumID(enumNum, szEnumID);
 						// テキスト
 						pItemEnum->GetEnumText(enumNum, szEnumText);
-						TextToStringArray(szEnumText, lpEnumText);
-						
 
-						fwprintf(fp, L"			/** Name : %ls\n", szEnumName);
-						fwprintf(fp, L"			  * ID   : %ls\n", szEnumID);
-						if(lpText.size() > 0)
-						{
-							fwprintf(fp, L"			  * Text : %ls\n", lpEnumText[0].c_str());
-							for(unsigned int i=1; i<lpText.size(); i++)
-							fwprintf(fp, L"			  *      : %ls\n", lpEnumText[i].c_str());
-						}
-						fwprintf(fp, L"			  */\n");
-						fwprintf(fp, L"			%ls_%ls,\n", szID, szEnumID);
-						fwprintf(fp, L"\n");
+
+						fwprintf(fp, L"		// %d\n", enumNum);
+						fwprintf(fp, L"		pItemEnum->AddEnumItem(\n");
+						fwprintf(fp, L"			L\"%ls\",\n",   szEnumName);
+						fwprintf(fp, L"			L\"%ls\",\n",   szEnumID);
+						fwprintf(fp, L"			L\"%ls\");\n", TextToSingleLine(szEnumText).c_str());
 					}
-					fwprintf(fp, L"		}%ls;\n", szID);
+					fwprintf(fp, L"	}\n");
 				}
 				break;
 			}
 
 			fwprintf(fp, L"\n");
 		}
+		fwprintf(fp, L"	return pLayerConfig;\n");
 		return 0;
 	}
 }
@@ -1291,7 +1307,10 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"/** Create a learning setting.\n");
 		fwprintf(fp, L"  * @return If successful, new configuration information. */\n");
-		fwprintf(fp, L"EXPORT_API CustomDeepNNLibrary::INNLayerConfig* CreateLearningSetting(void);\n");
+		fwprintf(fp, L"EXPORT_API CustomDeepNNLibrary::INNLayerConfig* CreateLearningSetting(void)\n");
+		fwprintf(fp, L"{\n");
+		::WriteStructureToCreateSource(fp, *this->pLearn, L"Learn");
+		fwprintf(fp, L"}\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"/** Create learning settings from buffer.\n");
 		fwprintf(fp, L"  * @param  i_lpBuffer       Start address of the read buffer.\n");

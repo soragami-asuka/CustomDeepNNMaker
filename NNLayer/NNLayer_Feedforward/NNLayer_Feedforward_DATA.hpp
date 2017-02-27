@@ -48,6 +48,16 @@ namespace NNLayer_Feedforward {
 
 		}ActivationType;
 
+		/** Name : Bool型のサンプル
+		  * ID   : BoolSample
+		  */
+		const bool BoolSample;
+
+		/** Name : String型のサンプル
+		  * ID   : StringSample
+		  */
+		const wchar_t StringSample;
+
 	};
 
 	/** Learning data structure */

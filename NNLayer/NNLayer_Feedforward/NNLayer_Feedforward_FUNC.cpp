@@ -62,6 +62,20 @@ namespace DefaultLanguage
                 L"使用する活性化関数の種類を定義する",
             }
         },
+        {
+            L"BoolSample",
+            {
+                L"Bool型のサンプル",
+                L"",
+            }
+        },
+        {
+            L"StringSample",
+            {
+                L"String型のサンプル",
+                L"",
+            }
+        },
     };
 
 
@@ -205,21 +219,45 @@ EXPORT_API CustomDeepNNLibrary::INNLayerConfig* CreateLayerStructureSetting(void
 	  * ID   : ActivationType
 	  * Text : 使用する活性化関数の種類を定義する
 	  */
-		const enum{
-			/** Name : シグモイド関数
-			  * ID   : sigmoid
-			  * Text : y = 1 / (1 + e^(-x));
-			  */
-			ActivationType_sigmoid,
+	{
+		CustomDeepNNLibrary::INNLayerConfigItemEx_Enum* pItemEnum = CustomDeepNNLibrary::CreateLayerCofigItem_Enum(
+			L"ActivationType",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"ActivationType"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"ActivationType"].text.c_str());
 
-			/** Name : ReLU（ランプ関数）
-			  * ID   : ReLU
-			  * Text : y = max(0, x);
-			  */
-			ActivationType_ReLU,
+		// 0
+		pItemEnum->AddEnumItem(
+			L"シグモイド関数",
+			L"sigmoid",
+			L"y = 1 / (1 + e^(-x));\n範囲 0 < y < 1\n(x=0, y=0.5)を通る");
+		// 1
+		pItemEnum->AddEnumItem(
+			L"ReLU（ランプ関数）",
+			L"ReLU",
+			L"y = max(0, x);\n範囲 0 <= y\n(x=0, y=0)を通る");
+	}
 
-		}ActivationType;
+	/** Name : Bool型のサンプル
+	  * ID   : BoolSample
+	  */
+	pLayerConfig->AddItem(
+		CustomDeepNNLibrary::CreateLayerCofigItem_Bool(
+			L"BoolSample",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"BoolSample"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"BoolSample"].text.c_str(),
+			true));
 
+	/** Name : String型のサンプル
+	  * ID   : StringSample
+	  */
+	pLayerConfig->AddItem(
+		CustomDeepNNLibrary::CreateLayerCofigItem_String(
+			L"StringSample",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"StringSample"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"StringSample"].text.c_str(),
+			L"サンプル"));
+
+	return pLayerConfig;
 }
 
 /** Create layer structure settings from buffer.
@@ -249,7 +287,46 @@ EXPORT_API CustomDeepNNLibrary::INNLayerConfig* CreateLayerStructureSettingFromB
 
 /** Create a learning setting.
   * @return If successful, new configuration information. */
-EXPORT_API CustomDeepNNLibrary::INNLayerConfig* CreateLearningSetting(void);
+EXPORT_API CustomDeepNNLibrary::INNLayerConfig* CreateLearningSetting(void)
+{
+	GUID layerCode;
+	GetLayerCode(layerCode);
+
+	CustomDeepNNLibrary::VersionCode versionCode;
+	GetVersionCode(versionCode);
+
+
+	// Create Empty Setting Data
+	CustomDeepNNLibrary::INNLayerConfigEx* pLayerConfig = CustomDeepNNLibrary::CreateEmptyLayerConfig(layerCode, versionCode);
+	if(pLayerConfig == NULL)
+		return NULL;
+
+
+	// Create Item
+	/** Name : 学習係数
+	  * ID   : LearnCoeff
+	  */
+	pLayerConfig->AddItem(
+		CustomDeepNNLibrary::CreateLayerCofigItem_Float(
+			L"LearnCoeff",
+			CurrentLanguage::g_lpItemData_Learn[L"LearnCoeff"].name.c_str(),
+			CurrentLanguage::g_lpItemData_Learn[L"LearnCoeff"].text.c_str(),
+			0.000000f, 1000.000000f, 1.000000f));
+
+	/** Name : ドロップアウト率
+	  * ID   : DropOut
+	  * Text : 前レイヤーを無視する割合.
+	  *      : 1.0で前レイヤーの全出力を無視する
+	  */
+	pLayerConfig->AddItem(
+		CustomDeepNNLibrary::CreateLayerCofigItem_Float(
+			L"DropOut",
+			CurrentLanguage::g_lpItemData_Learn[L"DropOut"].name.c_str(),
+			CurrentLanguage::g_lpItemData_Learn[L"DropOut"].text.c_str(),
+			0.000000f, 1.000000f, 0.000000f));
+
+	return pLayerConfig;
+}
 
 /** Create learning settings from buffer.
   * @param  i_lpBuffer       Start address of the read buffer.

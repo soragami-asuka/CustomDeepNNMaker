@@ -28,6 +28,7 @@ namespace CustomDeepNNLibrary
 		LAYER_KIND_MULT_OUTPUT   = 0x01 << 3,	/**< 出力レイヤー */
 
 		LAYER_KIND_CALC          = 0x01 << 8,	/**< 計算レイヤー,中間層 */
+		LAYER_KIND_DATA			 = 0x02 << 8,	/**< データレイヤー.入出力層 */
 	};
 
 	/** レイヤーベース */
@@ -40,8 +41,9 @@ namespace CustomDeepNNLibrary
 		virtual ~ILayerBase(){}
 
 	public:
-		/** レイヤー種別の取得 */
-		virtual ELayerKind GetLayerKind()const = 0;
+		/** レイヤー種別の取得.
+			ELayerKind の組み合わせ. */
+		virtual unsigned int GetLayerKind()const = 0;
 
 		/** レイヤー固有のGUIDを取得する */
 		virtual ELayerErrorCode GetGUID(GUID& o_guid)const = 0;

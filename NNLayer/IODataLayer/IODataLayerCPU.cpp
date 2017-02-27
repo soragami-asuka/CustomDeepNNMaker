@@ -18,22 +18,22 @@ namespace CustomDeepNNLibrary
 		GUID guid;	/**< 識別ID */
 		CustomDeepNNLibrary::IODataStruct ioDataStruct;	/**< データ構造 */
 
-		int currentUseNo;	/**< 現在使用中の番号 */
-
 		std::vector<float*> lpBufferList;
-		std::vector<float> lpDInputBuffer;	/**< 誤差差分の保存バッファ */
+		std::vector<std::vector<float>> lpDInputBuffer;	/**< 誤差差分の保存バッファ */
 
-		std::vector<IOutputLayer*> lppInputFromLayer;	/**< 入力元レイヤーのリスト */
-		std::vector<IInputLayer*>  lppOutputToLayer;	/**< 出力先レイヤーのリスト */
+		unsigned int batchSize;	/**< バッチ処理サイズ */
+		const unsigned int* lpBatchDataNoList;	/**< バッチ処理データ番号リスト */
+
+		std::vector<float*> lpBatchDataPointer;			/**< バッチ処理データの配列先頭アドレスリスト */
+		std::vector<float*> lpBatchDInputBufferPointer;	/**< バッチ処理入力誤差差分の配列先導アドレスリスト */
 
 	public:
 		/** コンストラクタ */
 		IODataLayerCPU(GUID guid, CustomDeepNNLibrary::IODataStruct ioDataStruct)
-			:	guid			(guid)
-			,	ioDataStruct	(ioDataStruct)
-			,	currentUseNo	(-1)
+			:	guid				(guid)
+			,	ioDataStruct		(ioDataStruct)
+			,	lpBatchDataNoList	(NULL)
 		{
-			this->lpDInputBuffer.resize(this->GetBufferCount());
 		}
 		/** デストラクタ */
 		virtual ~IODataLayerCPU()
@@ -47,9 +47,9 @@ namespace CustomDeepNNLibrary
 		//==============================
 	public:
 		/** レイヤー種別の取得 */
-		ELayerKind GetLayerKind()const
+		unsigned int GetLayerKind()const
 		{
-			return LAYER_KIND_CPU_OUTPUT;
+			return ELayerKind::LAYER_KIND_CPU | ELayerKind::LAYER_KIND_SINGLE_INPUT | ELayerKind::LAYER_KIND_SINGLE_OUTPUT | ELayerKind::LAYER_KIND_DATA;
 		}
 
 		/** レイヤー固有のGUIDを取得する */
@@ -85,7 +85,7 @@ namespace CustomDeepNNLibrary
 			@return データのバッファサイズ.使用するfloat型配列の要素数. */
 		unsigned int GetBufferCount()const
 		{
-			return this->ioDataStruct.ch * this->ioDataStruct.x * this->ioDataStruct.y * this->ioDataStruct.z * this->ioDataStruct.t;
+			return this->ioDataStruct.ch * this->ioDataStruct.x * this->ioDataStruct.y * this->ioDataStruct.z;
 		}
 
 		/** データを追加する.
@@ -102,10 +102,7 @@ namespace CustomDeepNNLibrary
 				return LAYER_ERROR_COMMON_ALLOCATION_MEMORY;
 
 			// コピー
-			for(unsigned int i=0; i<this->GetBufferCount(); i++)
-			{
-				lpBuffer[i] = lpData[i];
-			}
+			memcpy(lpBuffer, lpData, sizeof(float)*this->GetBufferCount());
 
 			// リストに追加
 			lpBufferList.push_back(lpBuffer);
@@ -134,16 +131,6 @@ namespace CustomDeepNNLibrary
 			{
 				o_lpBufferList[i] = this->lpBufferList[num][i];
 			}
-
-			return LAYER_ERROR_NONE;
-		}
-		/** 使用データの切り替え */
-		ELayerErrorCode ChangeUseDataByNum(unsigned int num)
-		{
-			if(num >= this->lpBufferList.size())
-				return LAYER_ERROR_COMMON_OUT_OF_ARRAYRANGE;
-
-			this->currentUseNo = num;
 
 			return LAYER_ERROR_NONE;
 		}
@@ -179,18 +166,96 @@ namespace CustomDeepNNLibrary
 			return LAYER_ERROR_NONE;
 		}
 
+		/** バッチ処理データ番号リストを設定する.
+			設定された値を元にGetDInputBuffer(),GetOutputBuffer()の戻り値が決定する.
+			@param i_lpBatchDataNoList	設定するデータ番号リスト. [GetBatchSize()の戻り値]の要素数が必要 */
+		ELayerErrorCode SetBatchDataNoList(const unsigned int i_lpBatchDataNoList[])
+		{
+			this->lpBatchDataNoList = i_lpBatchDataNoList;
+
+			for(unsigned int i=0; i<this->lpBatchDataPointer.size(); i++)
+			{
+				if(this->lpBatchDataNoList[i] > this->lpBufferList.size())
+					return ELayerErrorCode::LAYER_ERROR_COMMON_OUT_OF_ARRAYRANGE;
+
+				this->lpBatchDataPointer[i] = this->lpBufferList[this->lpBatchDataNoList[i]];
+			}
+
+			return ELayerErrorCode::LAYER_ERROR_NONE;
+		}
+
+
+
+		//==============================
+		// レイヤー共通系
+		//==============================
+	public:
+		/** 演算前処理を実行する.(学習用)
+			@param batchSize	同時に演算を行うバッチのサイズ.
+			NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
+			失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
+		ELayerErrorCode PreProcessLearn(unsigned int batchSize)
+		{
+			// バッチ処理データ配列の初期化
+			this->batchSize = batchSize;
+			lpBatchDataPointer.resize(batchSize);
+
+			// 誤差差分データ配列の初期化
+			this->lpDInputBuffer.resize(batchSize);
+			this->lpBatchDInputBufferPointer.resize(batchSize);
+			for(unsigned int i=0; i<this->lpDInputBuffer.size(); i++)
+			{
+				this->lpDInputBuffer[i].resize(this->GetInputBufferCount());
+				this->lpBatchDInputBufferPointer[i] = &this->lpDInputBuffer[i][0];
+			}
+
+			return ELayerErrorCode::LAYER_ERROR_NONE;
+		}
+
+		/** 演算前処理を実行する.(演算用)
+			@param batchSize	同時に演算を行うバッチのサイズ.
+			NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
+			失敗した場合はCalculate以降の処理は実行不可. */
+		ELayerErrorCode PreProcessCalculate(unsigned int batchSize)
+		{
+			// バッチ処理データ配列の初期化
+			this->batchSize = batchSize;
+			lpBatchDataPointer.resize(batchSize);
+
+			return ELayerErrorCode::LAYER_ERROR_NONE;
+		}
+
+		/** 学習ループの初期化処理.データセットの学習開始前に実行する
+			失敗した場合はCalculate以降の処理は実行不可. */
+		ELayerErrorCode PreProcessLearnLoop(const INNLayerConfig& config)
+		{
+			return ELayerErrorCode::LAYER_ERROR_NONE;
+		}
+
+		/** バッチサイズを取得する.
+			@return 同時に演算を行うバッチのサイズ */
+		unsigned int GetBatchSize()const
+		{
+			return this->batchSize;
+		}
+
 
 		//==============================
 		// 入力系
 		//==============================
 	public:
-		/** 誤差差分を計算する.
+		/** 学習誤差を計算する.
+			@param i_lppInputBuffer	入力データバッファ. [GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要
 			直前の計算結果を使用する */
-		ELayerErrorCode CalculateLearnError()
+		ELayerErrorCode CalculateLearnError(const float** i_lppInputBuffer)
 		{
 			const float* lpOutputBuffer = this->GetOutputBuffer();
 			if(lpOutputBuffer == NULL)
 				return LAYER_ERROR_COMMON_NULL_REFERENCE;
+
+			for(unsigned int batchNum=0; batchNum<this->batchSize; batchNum++)
+			{
+			}
 
 			unsigned int dataNum=0;
 			for(unsigned int layerNum=0; layerNum<this->lppInputFromLayer.size(); layerNum++)
@@ -225,7 +290,7 @@ namespace CustomDeepNNLibrary
 		/** 学習差分を取得する.
 			配列の要素数はGetInputBufferCountの戻り値.
 			@return	誤差差分配列の先頭ポインタ */
-		const float* GetDInputBuffer()const
+		const float** GetDInputBuffer()const
 		{
 			return &this->lpDInputBuffer[0];
 		}
