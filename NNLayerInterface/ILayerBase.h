@@ -31,6 +31,14 @@ namespace CustomDeepNNLibrary
 		LAYER_KIND_DATA			 = 0x02 << 8,	/**< データレイヤー.入出力層 */
 	};
 
+	/** レイヤー間のデータのやり取りを行うバッチ処理用2次元配列ポインタ型.
+		[バッチサイズ][バッファ数] */
+	typedef float**				BATCH_BUFFER_POINTER;
+	/** レイヤー間のデータのやり取りを行うバッチ処理用2次元配列ポインタ型(定数).
+		[バッチサイズ][バッファ数] */
+	typedef const float*const*	CONST_BATCH_BUFFER_POINTER;
+
+
 	/** レイヤーベース */
 	class ILayerBase
 	{

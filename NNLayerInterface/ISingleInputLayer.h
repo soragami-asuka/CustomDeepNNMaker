@@ -27,10 +27,10 @@ namespace CustomDeepNNLibrary
 		/** 学習差分を取得する.
 			配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]
 			@return	誤差差分配列の先頭ポインタ */
-		virtual const float** GetDInputBuffer()const = 0;
+		virtual CONST_BATCH_BUFFER_POINTER GetDInputBuffer()const = 0;
 		/** 学習差分を取得する.
-			@param lpDOutputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
-		virtual ELayerErrorCode GetDInputBuffer(float** o_lpDInputBuffer)const = 0;
+			@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
+		virtual ELayerErrorCode GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const = 0;
 
 	public:
 		/** 入力データ構造を取得する.
