@@ -19,9 +19,9 @@ using namespace Gravisbell::NeuralNetwork;
 namespace
 {
 	/** レイヤー設定情報をXMLから読み込む */
-	ILayerConfigEx* ReadLayerConfigXML(boost::property_tree::ptree& pTree, const Gravisbell::GUID& layerCode, const VersionCode& versionCode)
+	SettingData::Standard::IDataEx* ReadLayerConfigXML(boost::property_tree::ptree& pTree, const Gravisbell::GUID& layerCode, const VersionCode& versionCode)
 	{
-		ILayerConfigEx* pConfig = Gravisbell::NeuralNetwork::CreateEmptyLayerConfig(layerCode, versionCode);
+		Gravisbell::SettingData::Standard::IDataEx* pConfig = Gravisbell::SettingData::Standard::CreateEmptyData(layerCode, versionCode);
 		if(pConfig == NULL)
 			return NULL;
 
@@ -74,7 +74,7 @@ namespace
 				}
 
 				// アイテムを作成する
-				ILayerConfigItem_Int* pItem = CreateLayerCofigItem_Int(id.c_str(), name.c_str(), text.c_str(), minValue, maxValue, defaultValue);
+				Gravisbell::SettingData::Standard::IItem_Int* pItem = Gravisbell::SettingData::Standard::CreateItem_Int(id.c_str(), name.c_str(), text.c_str(), minValue, maxValue, defaultValue);
 				if(pItem == NULL)
 				{
 					delete pConfig;
@@ -129,7 +129,7 @@ namespace
 				}
 
 				// アイテムを作成する
-				ILayerConfigItem_Float* pItem = CreateLayerCofigItem_Float(id.c_str(), name.c_str(), text.c_str(), minValue, maxValue, defaultValue);
+				Gravisbell::SettingData::Standard::IItem_Float* pItem = Gravisbell::SettingData::Standard::CreateItem_Float(id.c_str(), name.c_str(), text.c_str(), minValue, maxValue, defaultValue);
 				if(pItem == NULL)
 				{
 					delete pConfig;
@@ -172,7 +172,7 @@ namespace
 				}
 
 				// アイテムを作成する
-				ILayerConfigItem_Bool* pItem = CreateLayerCofigItem_Bool(id.c_str(), name.c_str(), text.c_str(), defaultValue);
+				Gravisbell::SettingData::Standard::IItem_Bool* pItem = Gravisbell::SettingData::Standard::CreateItem_Bool(id.c_str(), name.c_str(), text.c_str(), defaultValue);
 				if(pItem == NULL)
 				{
 					delete pConfig;
@@ -215,7 +215,7 @@ namespace
 				}
 
 				// アイテムを作成する
-				ILayerConfigItem_String* pItem = CreateLayerCofigItem_String(id.c_str(), name.c_str(), text.c_str(), defaultValue.c_str());
+				Gravisbell::SettingData::Standard::IItem_String* pItem = Gravisbell::SettingData::Standard::CreateItem_String(id.c_str(), name.c_str(), text.c_str(), defaultValue.c_str());
 				if(pItem == NULL)
 				{
 					delete pConfig;
@@ -258,7 +258,7 @@ namespace
 				}
 
 				// アイテムを作成する
-				ILayerConfigItemEx_Enum* pItem = CreateLayerCofigItem_Enum(id.c_str(), name.c_str(), text.c_str());
+				Gravisbell::SettingData::Standard::IItemEx_Enum* pItem = Gravisbell::SettingData::Standard::CreateItem_Enum(id.c_str(), name.c_str(), text.c_str());
 				if(pItem == NULL)
 				{
 					delete pConfig;
@@ -363,7 +363,7 @@ namespace
 	}
 
 	/** データ構造を構造体に変換して出力する */
-	int WriteStructureToStructSource(FILE* fp, ILayerConfig& structure)
+	int WriteStructureToStructSource(FILE* fp, SettingData::Standard::IData& structure)
 	{
 		for(unsigned int itemNum=0; itemNum<structure.GetItemCount(); itemNum++)
 		{
@@ -372,15 +372,15 @@ namespace
 				continue;
 
 			// 名前
-			wchar_t szName[CONFIGITEM_NAME_MAX];
+			wchar_t szName[SettingData::Standard::ITEM_NAME_MAX];
 			pItem->GetConfigName(szName);
 
 			// ID
-			wchar_t szID[CONFIGITEM_ID_MAX];
+			wchar_t szID[SettingData::Standard::ITEM_ID_MAX];
 			pItem->GetConfigID(szID);
 
 			// 説明文
-			wchar_t szText[CONFIGITEM_TEXT_MAX];
+			wchar_t szText[SettingData::Standard::ITEM_TEXT_MAX];
 			std::vector<std::wstring> lpText;
 			pItem->GetConfigText(szText);
 			TextToStringArray(szText, lpText);
@@ -397,49 +397,49 @@ namespace
 
 			switch(pItem->GetItemType())
 			{
-			case CONFIGITEM_TYPE_FLOAT:
+			case SettingData::Standard::ITEMTYPE_FLOAT:
 				{
-					const ILayerConfigItem_Float* pItemFloat = dynamic_cast<const ILayerConfigItem_Float*>(pItem);
+					const Gravisbell::SettingData::Standard::IItem_Float* pItemFloat = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Float*>(pItem);
 					if(pItemFloat == NULL)
 						break;
 					fwprintf(fp, L"		float %ls;\n", szID);
 				}
 				break;
-			case CONFIGITEM_TYPE_INT:
+			case SettingData::Standard::ITEMTYPE_INT:
 				{
-					const ILayerConfigItem_Int* pItemInt = dynamic_cast<const ILayerConfigItem_Int*>(pItem);
+					const Gravisbell::SettingData::Standard::IItem_Int* pItemInt = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Int*>(pItem);
 					if(pItemInt == NULL)
 						break;
 					fwprintf(fp, L"		int %ls;\n", szID);
 				}
 				break;
-			case CONFIGITEM_TYPE_STRING:
+			case SettingData::Standard::ITEMTYPE_STRING:
 				{
-					const ILayerConfigItem_String* pItemString = dynamic_cast<const ILayerConfigItem_String*>(pItem);
+					const Gravisbell::SettingData::Standard::IItem_String* pItemString = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_String*>(pItem);
 					if(pItemString == NULL)
 						break;
 					fwprintf(fp, L"		const wchar_t* %ls;\n", szID);
 				}
 				break;
-			case CONFIGITEM_TYPE_BOOL:
+			case SettingData::Standard::ITEMTYPE_BOOL:
 				{
-					const ILayerConfigItem_Bool* pItemBool = dynamic_cast<const ILayerConfigItem_Bool*>(pItem);
+					const Gravisbell::SettingData::Standard::IItem_Bool* pItemBool = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Bool*>(pItem);
 					if(pItemBool == NULL)
 						break;
 					fwprintf(fp, L"		bool %ls;\n", szID);
 				}
 				break;
-			case CONFIGITEM_TYPE_ENUM:
+			case SettingData::Standard::ITEMTYPE_ENUM:
 				{
-					const ILayerConfigItem_Enum* pItemEnum = dynamic_cast<const ILayerConfigItem_Enum*>(pItem);
+					const Gravisbell::SettingData::Standard::IItem_Enum* pItemEnum = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Enum*>(pItem);
 					if(pItemEnum == NULL)
 						break;
 					fwprintf(fp, L"		enum : S32{\n");
 					for(unsigned int enumNum=0; enumNum<pItemEnum->GetEnumCount(); enumNum++)
 					{
-						wchar_t szEnumName[CONFIGITEM_NAME_MAX];
-						wchar_t szEnumID[CONFIGITEM_ID_MAX];
-						wchar_t szEnumText[CONFIGITEM_TEXT_MAX];
+						wchar_t szEnumName[SettingData::Standard::ITEM_NAME_MAX];
+						wchar_t szEnumID[SettingData::Standard::ITEM_ID_MAX];
+						wchar_t szEnumText[SettingData::Standard::ITEM_TEXT_MAX];
 						std::vector<std::wstring> lpEnumText;
 
 						// 名前
@@ -474,7 +474,7 @@ namespace
 	}
 
 	/** データ構造をソースに変換して出力する */
-	int WriteStructureToCreateSource(FILE* fp, ILayerConfig& structure, const std::wstring& dataCode)
+	int WriteStructureToCreateSource(FILE* fp, Gravisbell::SettingData::Standard::IData& structure, const std::wstring& dataCode)
 	{
 		fwprintf(fp, L"	GUID layerCode;\n");
 		fwprintf(fp, L"	GetLayerCode(layerCode);\n");
@@ -484,7 +484,7 @@ namespace
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"	// Create Empty Setting Data\n");
-		fwprintf(fp, L"	Gravisbell::NeuralNetwork::ILayerConfigEx* pLayerConfig = Gravisbell::NeuralNetwork::CreateEmptyLayerConfig(layerCode, versionCode);\n");
+		fwprintf(fp, L"	Gravisbell::SettingData::Standard::IDataEx* pLayerConfig = Gravisbell::SettingData::Standard::CreateEmptyData(layerCode, versionCode);\n");
 		fwprintf(fp, L"	if(pLayerConfig == NULL)\n");
 		fwprintf(fp, L"		return NULL;\n");
 		fwprintf(fp, L"\n");
@@ -497,15 +497,15 @@ namespace
 				continue;
 
 			// 名前
-			wchar_t szName[CONFIGITEM_NAME_MAX];
+			wchar_t szName[Gravisbell::SettingData::Standard::ITEM_NAME_MAX];
 			pItem->GetConfigName(szName);
 
 			// ID
-			wchar_t szID[CONFIGITEM_ID_MAX];
+			wchar_t szID[Gravisbell::SettingData::Standard::ITEM_ID_MAX];
 			pItem->GetConfigID(szID);
 
 			// 説明文
-			wchar_t szText[CONFIGITEM_TEXT_MAX];
+			wchar_t szText[Gravisbell::SettingData::Standard::ITEM_TEXT_MAX];
 			std::vector<std::wstring> lpText;
 			pItem->GetConfigText(szText);
 			TextToStringArray(szText, lpText);
@@ -522,37 +522,37 @@ namespace
 
 			switch(pItem->GetItemType())
 			{
-			case CONFIGITEM_TYPE_FLOAT:
+			case Gravisbell::SettingData::Standard::ITEMTYPE_FLOAT:
 				{
-					const ILayerConfigItem_Float* pItemFloat = dynamic_cast<const ILayerConfigItem_Float*>(pItem);
+					const Gravisbell::SettingData::Standard::IItem_Float* pItemFloat = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Float*>(pItem);
 					if(pItemFloat == NULL)
 						break;
 					
 					fwprintf(fp, L"	pLayerConfig->AddItem(\n");
-					fwprintf(fp, L"		Gravisbell::NeuralNetwork::CreateLayerCofigItem_Float(\n");
+					fwprintf(fp, L"		Gravisbell::SettingData::Standard::CreateItem_Float(\n");
 					fwprintf(fp, L"			L\"%ls\",\n", szID);
 					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].name.c_str(),\n", dataCode.c_str(), szID);
 					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].text.c_str(),\n", dataCode.c_str(), szID);
 					fwprintf(fp, L"			%ff, %ff, %ff));\n", pItemFloat->GetMin(), pItemFloat->GetMax(), pItemFloat->GetDefault());
 				}
 				break;
-			case CONFIGITEM_TYPE_INT:
+			case Gravisbell::SettingData::Standard::ITEMTYPE_INT:
 				{
-					const ILayerConfigItem_Int* pItemInt = dynamic_cast<const ILayerConfigItem_Int*>(pItem);
+					const Gravisbell::SettingData::Standard::IItem_Int* pItemInt = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Int*>(pItem);
 					if(pItemInt == NULL)
 						break;
 
 					fwprintf(fp, L"	pLayerConfig->AddItem(\n");
-					fwprintf(fp, L"		Gravisbell::NeuralNetwork::CreateLayerCofigItem_Int(\n");
+					fwprintf(fp, L"		Gravisbell::SettingData::Standard::CreateItem_Int(\n");
 					fwprintf(fp, L"			L\"%ls\",\n", szID);
 					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].name.c_str(),\n", dataCode.c_str(), szID);
 					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].text.c_str(),\n", dataCode.c_str(), szID);
 					fwprintf(fp, L"			%ld, %ld, %ld));\n", pItemInt->GetMin(), pItemInt->GetMax(), pItemInt->GetDefault());
 				}
 				break;
-			case CONFIGITEM_TYPE_STRING:
+			case Gravisbell::SettingData::Standard::ITEMTYPE_STRING:
 				{
-					const ILayerConfigItem_String* pItemString = dynamic_cast<const ILayerConfigItem_String*>(pItem);
+					const Gravisbell::SettingData::Standard::IItem_String* pItemString = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_String*>(pItem);
 					if(pItemString == NULL)
 						break;
 
@@ -560,43 +560,43 @@ namespace
 					pItemString->GetDefault(&szDefault[0]);
 
 					fwprintf(fp, L"	pLayerConfig->AddItem(\n");
-					fwprintf(fp, L"		Gravisbell::NeuralNetwork::CreateLayerCofigItem_String(\n");
+					fwprintf(fp, L"		Gravisbell::SettingData::Standard::CreateItem_String(\n");
 					fwprintf(fp, L"			L\"%ls\",\n", szID);
 					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].name.c_str(),\n", dataCode.c_str(), szID);
 					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].text.c_str(),\n", dataCode.c_str(), szID);
 					fwprintf(fp, L"			L\"%ls\"));\n", TextToSingleLine(&szDefault[0]).c_str());
 				}
 				break;
-			case CONFIGITEM_TYPE_BOOL:
+			case Gravisbell::SettingData::Standard::ITEMTYPE_BOOL:
 				{
-					const ILayerConfigItem_Bool* pItemBool = dynamic_cast<const ILayerConfigItem_Bool*>(pItem);
+					const Gravisbell::SettingData::Standard::IItem_Bool* pItemBool = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Bool*>(pItem);
 					if(pItemBool == NULL)
 						break;
 
 					fwprintf(fp, L"	pLayerConfig->AddItem(\n");
-					fwprintf(fp, L"		Gravisbell::NeuralNetwork::CreateLayerCofigItem_Bool(\n");
+					fwprintf(fp, L"		Gravisbell::SettingData::Standard::CreateItem_Bool(\n");
 					fwprintf(fp, L"			L\"%ls\",\n", szID);
 					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].name.c_str(),\n", dataCode.c_str(), szID);
 					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].text.c_str(),\n", dataCode.c_str(), szID);
 					fwprintf(fp, L"			%ls));\n", pItemBool->GetDefault() ? L"true" : L"false" );
 				}
 				break;
-			case CONFIGITEM_TYPE_ENUM:
+			case Gravisbell::SettingData::Standard::ITEMTYPE_ENUM:
 				{
-					const ILayerConfigItem_Enum* pItemEnum = dynamic_cast<const ILayerConfigItem_Enum*>(pItem);
+					const Gravisbell::SettingData::Standard::IItem_Enum* pItemEnum = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Enum*>(pItem);
 					if(pItemEnum == NULL)
 						break;
 					fwprintf(fp, L"	{\n");
-					fwprintf(fp, L"		Gravisbell::NeuralNetwork::ILayerConfigItemEx_Enum* pItemEnum = Gravisbell::NeuralNetwork::CreateLayerCofigItem_Enum(\n");
+					fwprintf(fp, L"		Gravisbell::SettingData::Standard::IItemEx_Enum* pItemEnum = Gravisbell::SettingData::Standard::CreateItem_Enum(\n");
 					fwprintf(fp, L"			L\"%ls\",\n", szID);
 					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].name.c_str(),\n", dataCode.c_str(), szID);
 					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].text.c_str());\n", dataCode.c_str(), szID);
 					fwprintf(fp, L"\n");
 					for(unsigned int enumNum=0; enumNum<pItemEnum->GetEnumCount(); enumNum++)
 					{
-						wchar_t szEnumName[CONFIGITEM_NAME_MAX];
-						wchar_t szEnumID[CONFIGITEM_ID_MAX];
-						wchar_t szEnumText[CONFIGITEM_TEXT_MAX];
+						wchar_t szEnumName[Gravisbell::SettingData::Standard::ITEM_NAME_MAX];
+						wchar_t szEnumID[Gravisbell::SettingData::Standard::ITEM_ID_MAX];
+						wchar_t szEnumText[Gravisbell::SettingData::Standard::ITEM_TEXT_MAX];
 
 						// 名前
 						pItemEnum->GetEnumName(enumNum, szEnumName);
@@ -855,7 +855,7 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"#include<guiddef.h>\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"#include<Common/ErrorCode.h>\n");
-		fwprintf(fp, L"#include<NNLayerInterface/ILayerConfig.h>\n");
+		fwprintf(fp, L"#include<SettingData/Standard/IData.h>\n");
 		fwprintf(fp, L"#include<NNLayerInterface/INNLayer.h>\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"namespace Gravisbell {\n");
@@ -928,7 +928,7 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"#include<Common/ErrorCode.h>\n");
 		fwprintf(fp, L"#include<Common/VersionCode.h>\n");
 		fwprintf(fp, L"\n");
-		fwprintf(fp, L"#include<NNLayerInterface/ILayerConfig.h>\n");
+		fwprintf(fp, L"#include<SettingData/Standard/IData.h>\n");
 		fwprintf(fp, L"#include<NNLayerInterface/INNLayer.h>\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"#include\"%ls\"\n", dataHeaderFilePath.filename().wstring().c_str());
@@ -950,7 +950,7 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"/** Create a layer structure setting.\n");
 		fwprintf(fp, L"  * @return If successful, new configuration information.\n");
 		fwprintf(fp, L"  */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLayerStructureSetting(void);\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting(void);\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"/** Create layer structure settings from buffer.\n");
 		fwprintf(fp, L"  * @param  i_lpBuffer       Start address of the read buffer.\n");
@@ -958,12 +958,12 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"  * @param  o_useBufferSize  Buffer size actually read.\n");
 		fwprintf(fp, L"  * @return If successful, the configuration information created from the buffer\n");
 		fwprintf(fp, L"  */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"/** Create a learning setting.\n");
 		fwprintf(fp, L"  * @return If successful, new configuration information. */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLearningSetting(void);\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSetting(void);\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"/** Create learning settings from buffer.\n");
 		fwprintf(fp, L"  * @param  i_lpBuffer       Start address of the read buffer.\n");
@@ -971,7 +971,7 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"  * @param  o_useBufferSize  Buffer size actually read.\n");
 		fwprintf(fp, L"  * @return If successful, the configuration information created from the buffer\n");
 		fwprintf(fp, L"  */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"/** Create a layer for CPU processing.\n");
@@ -1023,7 +1023,7 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"#include<string>\n");
 		fwprintf(fp, L"#include<map>\n");
 		fwprintf(fp, L"\n");
-		fwprintf(fp, L"#include<Library/NNLayerConfig/LayerConfig.h>\n");
+		fwprintf(fp, L"#include<Library/SettingDataStandard/SettingDataStandard.h>\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"#include\"%ls\"\n", funcHeaderFilePath.filename().wstring().c_str());
 		fwprintf(fp, L"\n");
@@ -1077,9 +1077,9 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 				if(pItem == NULL)
 					continue;
 
-				wchar_t szID[Gravisbell::NeuralNetwork::CONFIGITEM_ID_MAX];
-				wchar_t szName[Gravisbell::NeuralNetwork::CONFIGITEM_NAME_MAX];
-				wchar_t szText[Gravisbell::NeuralNetwork::CONFIGITEM_TEXT_MAX];
+				wchar_t szID[Gravisbell::SettingData::Standard::ITEM_ID_MAX];
+				wchar_t szName[Gravisbell::SettingData::Standard::ITEM_NAME_MAX];
+				wchar_t szText[Gravisbell::SettingData::Standard::ITEM_TEXT_MAX];
 
 				pItem->GetConfigID(szID);
 				pItem->GetConfigName(szName);
@@ -1106,11 +1106,11 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 				if(pItem == NULL)
 					continue;
 
-				if(pItem->GetItemType() == Gravisbell::NeuralNetwork::LayerConfigItemType::CONFIGITEM_TYPE_ENUM)
+				if(pItem->GetItemType() == Gravisbell::SettingData::Standard::ItemType::ITEMTYPE_ENUM)
 				{
-					const Gravisbell::NeuralNetwork::ILayerConfigItem_Enum* pItemEnum = dynamic_cast<const Gravisbell::NeuralNetwork::ILayerConfigItem_Enum*>(pItem);
+					const Gravisbell::SettingData::Standard::IItem_Enum* pItemEnum = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Enum*>(pItem);
 					
-					wchar_t szID[Gravisbell::NeuralNetwork::CONFIGITEM_ID_MAX];
+					wchar_t szID[Gravisbell::SettingData::Standard::ITEM_ID_MAX];
 					pItem->GetConfigID(szID);
 
 					fwprintf(fp, L"        {\n");
@@ -1118,9 +1118,9 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 					fwprintf(fp, L"            {\n");
 					for(unsigned int enumItemNum=0; enumItemNum<pItemEnum->GetEnumCount(); enumItemNum++)
 					{					
-						wchar_t szEnumID[Gravisbell::NeuralNetwork::CONFIGITEM_ID_MAX];
-						wchar_t szEnumName[Gravisbell::NeuralNetwork::CONFIGITEM_NAME_MAX];
-						wchar_t szEnumText[Gravisbell::NeuralNetwork::CONFIGITEM_TEXT_MAX];
+						wchar_t szEnumID[Gravisbell::SettingData::Standard::ITEM_ID_MAX];
+						wchar_t szEnumName[Gravisbell::SettingData::Standard::ITEM_NAME_MAX];
+						wchar_t szEnumText[Gravisbell::SettingData::Standard::ITEM_TEXT_MAX];
 
 						pItemEnum->GetEnumID(enumItemNum, szEnumID);
 						pItemEnum->GetEnumName(enumItemNum, szEnumName);
@@ -1154,9 +1154,9 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 				if(pItem == NULL)
 					continue;
 
-				wchar_t szID[Gravisbell::NeuralNetwork::CONFIGITEM_ID_MAX];
-				wchar_t szName[Gravisbell::NeuralNetwork::CONFIGITEM_NAME_MAX];
-				wchar_t szText[Gravisbell::NeuralNetwork::CONFIGITEM_TEXT_MAX];
+				wchar_t szID[Gravisbell::SettingData::Standard::ITEM_ID_MAX];
+				wchar_t szName[Gravisbell::SettingData::Standard::ITEM_NAME_MAX];
+				wchar_t szText[Gravisbell::SettingData::Standard::ITEM_TEXT_MAX];
 
 				pItem->GetConfigID(szID);
 				pItem->GetConfigName(szName);
@@ -1183,11 +1183,11 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 				if(pItem == NULL)
 					continue;
 
-				if(pItem->GetItemType() == Gravisbell::NeuralNetwork::LayerConfigItemType::CONFIGITEM_TYPE_ENUM)
+				if(pItem->GetItemType() == Gravisbell::SettingData::Standard::ITEMTYPE_ENUM)
 				{
-					const Gravisbell::NeuralNetwork::ILayerConfigItem_Enum* pItemEnum = dynamic_cast<const Gravisbell::NeuralNetwork::ILayerConfigItem_Enum*>(pItem);
+					const SettingData::Standard::IItem_Enum* pItemEnum = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Enum*>(pItem);
 					
-					wchar_t szID[Gravisbell::NeuralNetwork::CONFIGITEM_ID_MAX];
+					wchar_t szID[Gravisbell::SettingData::Standard::ITEM_ID_MAX];
 					pItem->GetConfigID(szID);
 
 					fwprintf(fp, L"        {\n");
@@ -1195,9 +1195,9 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 					fwprintf(fp, L"            {\n");
 					for(unsigned int enumItemNum=0; enumItemNum<pItemEnum->GetEnumCount(); enumItemNum++)
 					{					
-						wchar_t szEnumID[Gravisbell::NeuralNetwork::CONFIGITEM_ID_MAX];
-						wchar_t szEnumName[Gravisbell::NeuralNetwork::CONFIGITEM_NAME_MAX];
-						wchar_t szEnumText[Gravisbell::NeuralNetwork::CONFIGITEM_TEXT_MAX];
+						wchar_t szEnumID[Gravisbell::SettingData::Standard::ITEM_ID_MAX];
+						wchar_t szEnumName[Gravisbell::SettingData::Standard::ITEM_NAME_MAX];
+						wchar_t szEnumText[Gravisbell::SettingData::Standard::ITEM_TEXT_MAX];
 
 						pItemEnum->GetEnumID(enumItemNum, szEnumID);
 						pItemEnum->GetEnumName(enumItemNum, szEnumName);
@@ -1279,7 +1279,7 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"/** Create a layer structure setting.\n");
 		fwprintf(fp, L"  * @return If successful, new configuration information.\n");
 		fwprintf(fp, L"  */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLayerStructureSetting(void)\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting(void)\n");
 		fwprintf(fp, L"{\n");
 		::WriteStructureToCreateSource(fp, *this->pStructure, L"LayerStructure");
 		fwprintf(fp, L"}\n");
@@ -1290,9 +1290,9 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"  * @param  o_useBufferSize  Buffer size actually read.\n");
 		fwprintf(fp, L"  * @return If successful, the configuration information created from the buffer\n");
 		fwprintf(fp, L"  */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)\n");
 		fwprintf(fp, L"{\n");
-		fwprintf(fp, L"	Gravisbell::NeuralNetwork::ILayerConfigEx* pLayerConfig = (Gravisbell::NeuralNetwork::ILayerConfigEx*)CreateLayerStructureSetting();\n");
+		fwprintf(fp, L"	Gravisbell::SettingData::Standard::IDataEx* pLayerConfig = (Gravisbell::SettingData::Standard::IDataEx*)CreateLayerStructureSetting();\n");
 		fwprintf(fp, L"	if(pLayerConfig == NULL)\n");
 		fwprintf(fp, L"		return NULL;\n");
 		fwprintf(fp, L"\n");
@@ -1311,7 +1311,7 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"/** Create a learning setting.\n");
 		fwprintf(fp, L"  * @return If successful, new configuration information. */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLearningSetting(void)\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSetting(void)\n");
 		fwprintf(fp, L"{\n");
 		::WriteStructureToCreateSource(fp, *this->pLearn, L"Learn");
 		fwprintf(fp, L"}\n");
@@ -1322,9 +1322,9 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"  * @param  o_useBufferSize  Buffer size actually read.\n");
 		fwprintf(fp, L"  * @return If successful, the configuration information created from the buffer\n");
 		fwprintf(fp, L"  */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)\n");
 		fwprintf(fp, L"{\n");
-		fwprintf(fp, L"	Gravisbell::NeuralNetwork::ILayerConfigEx* pLayerConfig = (Gravisbell::NeuralNetwork::ILayerConfigEx*)CreateLearningSetting();\n");
+		fwprintf(fp, L"	Gravisbell::SettingData::Standard::IDataEx* pLayerConfig = (Gravisbell::SettingData::Standard::IDataEx*)CreateLearningSetting();\n");
 		fwprintf(fp, L"	if(pLayerConfig == NULL)\n");
 		fwprintf(fp, L"		return NULL;\n");
 		fwprintf(fp, L"\n");

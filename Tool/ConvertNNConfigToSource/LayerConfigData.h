@@ -12,7 +12,7 @@
 #include"Common/VersionCode.h"
 #include"Common/Guiddef.h"
 
-#include"LayerConfig.h"
+#include"Library/SettingDataStandard/SettingDataStandard.h"
 
 namespace Gravisbell {
 namespace NeuralNetwork {
@@ -27,8 +27,8 @@ namespace NeuralNetwork {
 		std::wstring name;	/**< 名前 */
 		std::wstring text;	/**< 説明テキスト */
 
-		Gravisbell::NeuralNetwork::ILayerConfigEx* pStructure;	/**< レイヤー構造定義情報 */
-		Gravisbell::NeuralNetwork::ILayerConfigEx* pLearn;		/**< 学習設定情報 */
+		SettingData::Standard::IDataEx* pStructure;	/**< レイヤー構造定義情報 */
+		SettingData::Standard::IDataEx* pLearn;		/**< 学習設定情報 */
 
 	public:
 		/** コンストラクタ */
