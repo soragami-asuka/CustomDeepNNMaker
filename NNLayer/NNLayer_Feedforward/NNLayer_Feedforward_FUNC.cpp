@@ -13,7 +13,7 @@
 #include<string>
 #include<map>
 
-#include<Library/NNLayerConfig/LayerConfig.h>
+#include<Library/SettingDataStandard/SettingDataStandard.h>
 
 #include"NNLayer_Feedforward_FUNC.hpp"
 
@@ -187,7 +187,7 @@ EXPORT_API Gravisbell::ErrorCode GetVersionCode(Gravisbell::VersionCode& o_versi
 /** Create a layer structure setting.
   * @return If successful, new configuration information.
   */
-EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLayerStructureSetting(void)
+EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting(void)
 {
 	GUID layerCode;
 	GetLayerCode(layerCode);
@@ -197,7 +197,7 @@ EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLayerStructureSetting(
 
 
 	// Create Empty Setting Data
-	Gravisbell::NeuralNetwork::ILayerConfigEx* pLayerConfig = Gravisbell::NeuralNetwork::CreateEmptyLayerConfig(layerCode, versionCode);
+	Gravisbell::SettingData::Standard::IDataEx* pLayerConfig = Gravisbell::SettingData::Standard::CreateEmptyData(layerCode, versionCode);
 	if(pLayerConfig == NULL)
 		return NULL;
 
@@ -209,7 +209,7 @@ EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLayerStructureSetting(
 	  *      : 出力バッファ数に直結する.
 	  */
 	pLayerConfig->AddItem(
-		Gravisbell::NeuralNetwork::CreateLayerCofigItem_Int(
+		Gravisbell::SettingData::Standard::CreateItem_Int(
 			L"NeuronCount",
 			CurrentLanguage::g_lpItemData_LayerStructure[L"NeuronCount"].name.c_str(),
 			CurrentLanguage::g_lpItemData_LayerStructure[L"NeuronCount"].text.c_str(),
@@ -220,7 +220,7 @@ EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLayerStructureSetting(
 	  * Text : 使用する活性化関数の種類を定義する
 	  */
 	{
-		Gravisbell::NeuralNetwork::ILayerConfigItemEx_Enum* pItemEnum = Gravisbell::NeuralNetwork::CreateLayerCofigItem_Enum(
+		Gravisbell::SettingData::Standard::IItemEx_Enum* pItemEnum = Gravisbell::SettingData::Standard::CreateItem_Enum(
 			L"ActivationType",
 			CurrentLanguage::g_lpItemData_LayerStructure[L"ActivationType"].name.c_str(),
 			CurrentLanguage::g_lpItemData_LayerStructure[L"ActivationType"].text.c_str());
@@ -241,7 +241,7 @@ EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLayerStructureSetting(
 	  * ID   : BoolSample
 	  */
 	pLayerConfig->AddItem(
-		Gravisbell::NeuralNetwork::CreateLayerCofigItem_Bool(
+		Gravisbell::SettingData::Standard::CreateItem_Bool(
 			L"BoolSample",
 			CurrentLanguage::g_lpItemData_LayerStructure[L"BoolSample"].name.c_str(),
 			CurrentLanguage::g_lpItemData_LayerStructure[L"BoolSample"].text.c_str(),
@@ -251,7 +251,7 @@ EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLayerStructureSetting(
 	  * ID   : StringSample
 	  */
 	pLayerConfig->AddItem(
-		Gravisbell::NeuralNetwork::CreateLayerCofigItem_String(
+		Gravisbell::SettingData::Standard::CreateItem_String(
 			L"StringSample",
 			CurrentLanguage::g_lpItemData_LayerStructure[L"StringSample"].name.c_str(),
 			CurrentLanguage::g_lpItemData_LayerStructure[L"StringSample"].text.c_str(),
@@ -266,9 +266,9 @@ EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLayerStructureSetting(
   * @param  o_useBufferSize  Buffer size actually read.
   * @return If successful, the configuration information created from the buffer
   */
-EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)
+EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)
 {
-	Gravisbell::NeuralNetwork::ILayerConfigEx* pLayerConfig = (Gravisbell::NeuralNetwork::ILayerConfigEx*)CreateLayerStructureSetting();
+	Gravisbell::SettingData::Standard::IDataEx* pLayerConfig = (Gravisbell::SettingData::Standard::IDataEx*)CreateLayerStructureSetting();
 	if(pLayerConfig == NULL)
 		return NULL;
 
@@ -287,7 +287,7 @@ EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLayerStructureSettingF
 
 /** Create a learning setting.
   * @return If successful, new configuration information. */
-EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLearningSetting(void)
+EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSetting(void)
 {
 	GUID layerCode;
 	GetLayerCode(layerCode);
@@ -297,7 +297,7 @@ EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLearningSetting(void)
 
 
 	// Create Empty Setting Data
-	Gravisbell::NeuralNetwork::ILayerConfigEx* pLayerConfig = Gravisbell::NeuralNetwork::CreateEmptyLayerConfig(layerCode, versionCode);
+	Gravisbell::SettingData::Standard::IDataEx* pLayerConfig = Gravisbell::SettingData::Standard::CreateEmptyData(layerCode, versionCode);
 	if(pLayerConfig == NULL)
 		return NULL;
 
@@ -307,7 +307,7 @@ EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLearningSetting(void)
 	  * ID   : LearnCoeff
 	  */
 	pLayerConfig->AddItem(
-		Gravisbell::NeuralNetwork::CreateLayerCofigItem_Float(
+		Gravisbell::SettingData::Standard::CreateItem_Float(
 			L"LearnCoeff",
 			CurrentLanguage::g_lpItemData_Learn[L"LearnCoeff"].name.c_str(),
 			CurrentLanguage::g_lpItemData_Learn[L"LearnCoeff"].text.c_str(),
@@ -319,7 +319,7 @@ EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLearningSetting(void)
 	  *      : 1.0で前レイヤーの全出力を無視する
 	  */
 	pLayerConfig->AddItem(
-		Gravisbell::NeuralNetwork::CreateLayerCofigItem_Float(
+		Gravisbell::SettingData::Standard::CreateItem_Float(
 			L"DropOut",
 			CurrentLanguage::g_lpItemData_Learn[L"DropOut"].name.c_str(),
 			CurrentLanguage::g_lpItemData_Learn[L"DropOut"].text.c_str(),
@@ -334,9 +334,9 @@ EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLearningSetting(void)
   * @param  o_useBufferSize  Buffer size actually read.
   * @return If successful, the configuration information created from the buffer
   */
-EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)
+EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)
 {
-	Gravisbell::NeuralNetwork::ILayerConfigEx* pLayerConfig = (Gravisbell::NeuralNetwork::ILayerConfigEx*)CreateLearningSetting();
+	Gravisbell::SettingData::Standard::IDataEx* pLayerConfig = (Gravisbell::SettingData::Standard::IDataEx*)CreateLearningSetting();
 	if(pLayerConfig == NULL)
 		return NULL;
 

@@ -13,7 +13,7 @@
 #include<guiddef.h>
 
 #include<Common/ErrorCode.h>
-#include<NNLayerInterface/ILayerConfig.h>
+#include<SettingData/Standard/IData.h>
 #include<NNLayerInterface/INNLayer.h>
 
 namespace Gravisbell {

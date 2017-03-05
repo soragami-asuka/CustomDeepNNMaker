@@ -51,7 +51,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;NNLAYER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -66,7 +66,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;NNLAYER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -79,25 +79,25 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Common\Common.h" />
-    <ClInclude Include="..\..\Common\ErrorCode.h" />
-    <ClInclude Include="..\..\Common\Guiddef.h" />
-    <ClInclude Include="..\..\Common\IODataStruct.h" />
-    <ClInclude Include="..\..\Common\VersionCode.h" />
-    <ClInclude Include="..\..\NNLayerInterface\IBatchDataNoListGenerator.h" />
-    <ClInclude Include="..\..\NNLayerInterface\IDataLayer.h" />
-    <ClInclude Include="..\..\NNLayerInterface\IInputLayer.h" />
-    <ClInclude Include="..\..\NNLayerInterface\IIODataLayer.h" />
-    <ClInclude Include="..\..\NNLayerInterface\ILayerBase.h" />
-    <ClInclude Include="..\..\NNLayerInterface\ILayerConfig.h" />
-    <ClInclude Include="..\..\NNLayerInterface\IMultInputLayer.h" />
-    <ClInclude Include="..\..\NNLayerInterface\INNLayer.h" />
-    <ClInclude Include="..\..\NNLayerInterface\INNLayerDLL.h" />
-    <ClInclude Include="..\..\NNLayerInterface\INNLayerDLLManager.h" />
-    <ClInclude Include="..\..\NNLayerInterface\IOutputLayer.h" />
-    <ClInclude Include="..\..\NNLayerInterface\ISingleInputLayer.h" />
-    <ClInclude Include="..\..\NNLayerInterface\ISingleOutputLayer.h" />
-    <ClInclude Include="..\..\NNLayerInterface\NNlayerFunction.h" />
+    <ClInclude Include="..\..\include\Common\Common.h" />
+    <ClInclude Include="..\..\include\Common\ErrorCode.h" />
+    <ClInclude Include="..\..\include\Common\Guiddef.h" />
+    <ClInclude Include="..\..\include\Common\IODataStruct.h" />
+    <ClInclude Include="..\..\include\Common\VersionCode.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\IBatchDataNoListGenerator.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\IDataLayer.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\IInputLayer.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\IIODataLayer.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\ILayerBase.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\IMultInputLayer.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\INNLayer.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\INNLayerDLL.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\INNLayerDLLManager.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\IOutputLayer.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\ISingleInputLayer.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\ISingleOutputLayer.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\NNlayerFunction.h" />
+    <ClInclude Include="..\..\include\SettingData\Standard\IData.h" />
     <ClInclude Include="NNLayer_FeedforwardBase.h" />
     <ClInclude Include="NNLayer_Feedforward_DATA.hpp" />
     <ClInclude Include="NNLayer_Feedforward_FUNC.hpp" />
@@ -122,11 +122,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Library\NNLayerConfig\NNLayerConfig.vcxproj">
-      <Project>{79fd5f13-1407-43ab-834c-04c1aeccdbb5}</Project>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="NNLayer_Feedforward.rc" />

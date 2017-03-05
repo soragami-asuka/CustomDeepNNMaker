@@ -16,7 +16,7 @@
 #include<Common/ErrorCode.h>
 #include<Common/VersionCode.h>
 
-#include<NNLayerInterface/ILayerConfig.h>
+#include<SettingData/Standard/IData.h>
 #include<NNLayerInterface/INNLayer.h>
 
 #include"NNLayer_Feedforward_DATA.hpp"
@@ -38,7 +38,7 @@ EXPORT_API Gravisbell::ErrorCode GetVersionCode(Gravisbell::VersionCode& o_versi
 /** Create a layer structure setting.
   * @return If successful, new configuration information.
   */
-EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLayerStructureSetting(void);
+EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting(void);
 
 /** Create layer structure settings from buffer.
   * @param  i_lpBuffer       Start address of the read buffer.
@@ -46,12 +46,12 @@ EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLayerStructureSetting(
   * @param  o_useBufferSize  Buffer size actually read.
   * @return If successful, the configuration information created from the buffer
   */
-EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);
+EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);
 
 
 /** Create a learning setting.
   * @return If successful, new configuration information. */
-EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLearningSetting(void);
+EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSetting(void);
 
 /** Create learning settings from buffer.
   * @param  i_lpBuffer       Start address of the read buffer.
@@ -59,7 +59,7 @@ EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLearningSetting(void);
   * @param  o_useBufferSize  Buffer size actually read.
   * @return If successful, the configuration information created from the buffer
   */
-EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);
+EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);
 
 
 /** Create a layer for CPU processing.

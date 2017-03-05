@@ -18,8 +18,8 @@ namespace NeuralNetwork {
 	protected:
 		GUID guid;
 
-		ILayerConfig* pLayerStructure;	/**< レイヤー構造を定義したコンフィグクラス */
-		ILayerConfig* pLearnData;		/**< 学習設定を定義したコンフィグクラス */
+		SettingData::Standard::IData* pLayerStructure;	/**< レイヤー構造を定義したコンフィグクラス */
+		SettingData::Standard::IData* pLearnData;		/**< 学習設定を定義したコンフィグクラス */
 
 		NNLayer_Feedforward::LayerStructure layerStructure;	/**< レイヤー構造 */
 		NNLayer_Feedforward::LearnDataStructure learnData;	/**< 学習設定 */
@@ -62,9 +62,9 @@ namespace NeuralNetwork {
 		//===========================
 	public:
 		/** 設定情報を設定 */
-		ErrorCode SetLayerConfig(const ILayerConfig& config);
+		ErrorCode SetLayerConfig(const SettingData::Standard::IData& config);
 		/** レイヤーの設定情報を取得する */
-		const ILayerConfig* GetLayerConfig()const;
+		const SettingData::Standard::IData* GetLayerConfig()const;
 
 
 		//===========================

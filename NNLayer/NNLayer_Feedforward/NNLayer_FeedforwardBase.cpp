@@ -72,7 +72,7 @@ Gravisbell::ErrorCode NNLayer_FeedforwardBase::GetLayerCode(GUID& o_layerCode)co
 }
 
 /** Ý’èî•ñ‚ðÝ’è */
-Gravisbell::ErrorCode NNLayer_FeedforwardBase::SetLayerConfig(const ILayerConfig& config)
+Gravisbell::ErrorCode NNLayer_FeedforwardBase::SetLayerConfig(const SettingData::Standard::IData& config)
 {
 	Gravisbell::ErrorCode err = ERROR_CODE_NONE;
 
@@ -102,7 +102,7 @@ Gravisbell::ErrorCode NNLayer_FeedforwardBase::SetLayerConfig(const ILayerConfig
 	return ERROR_CODE_NONE;
 }
 /** ƒŒƒCƒ„[‚ÌÝ’èî•ñ‚ðŽæ“¾‚·‚é */
-const ILayerConfig* NNLayer_FeedforwardBase::GetLayerConfig()const
+const SettingData::Standard::IData* NNLayer_FeedforwardBase::GetLayerConfig()const
 {
 	return this->pLayerStructure;
 }
