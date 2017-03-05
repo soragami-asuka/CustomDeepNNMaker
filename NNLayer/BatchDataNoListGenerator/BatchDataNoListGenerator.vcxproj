@@ -52,7 +52,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;BATCHDATANOLISTGENERATOR_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\NNLayerInterface</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -68,7 +68,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;BATCHDATANOLISTGENERATOR_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\NNLayerInterface</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -81,6 +81,25 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Common\Common.h" />
+    <ClInclude Include="..\..\Common\ErrorCode.h" />
+    <ClInclude Include="..\..\Common\Guiddef.h" />
+    <ClInclude Include="..\..\Common\IODataStruct.h" />
+    <ClInclude Include="..\..\Common\VersionCode.h" />
+    <ClInclude Include="..\..\NNLayerInterface\IBatchDataNoListGenerator.h" />
+    <ClInclude Include="..\..\NNLayerInterface\IDataLayer.h" />
+    <ClInclude Include="..\..\NNLayerInterface\IInputLayer.h" />
+    <ClInclude Include="..\..\NNLayerInterface\IIODataLayer.h" />
+    <ClInclude Include="..\..\NNLayerInterface\ILayerBase.h" />
+    <ClInclude Include="..\..\NNLayerInterface\ILayerConfig.h" />
+    <ClInclude Include="..\..\NNLayerInterface\IMultInputLayer.h" />
+    <ClInclude Include="..\..\NNLayerInterface\INNLayer.h" />
+    <ClInclude Include="..\..\NNLayerInterface\INNLayerDLL.h" />
+    <ClInclude Include="..\..\NNLayerInterface\INNLayerDLLManager.h" />
+    <ClInclude Include="..\..\NNLayerInterface\IOutputLayer.h" />
+    <ClInclude Include="..\..\NNLayerInterface\ISingleInputLayer.h" />
+    <ClInclude Include="..\..\NNLayerInterface\ISingleOutputLayer.h" />
+    <ClInclude Include="..\..\NNLayerInterface\NNlayerFunction.h" />
     <ClInclude Include="BatchDataNoListGenerator.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />

@@ -1,42 +1,45 @@
 //=======================================
 // レイヤーDLLクラス
 //=======================================
-#ifndef __I_NN_LAYER_DLL_H__
-#define __I_NN_LAYER_DLL_H__
+#ifndef __GRAVISBELL_I_NN_LAYER_DLL_H__
+#define __GRAVISBELL_I_NN_LAYER_DLL_H__
 
 #include<guiddef.h>
 
+#include"Common/VersionCode.h"
+
 #include"INNLayer.h"
 
-namespace CustomDeepNNLibrary
-{
-	class INNLayerDLL
+namespace Gravisbell {
+namespace NeuralNetwork {
+
+	class ILayerDLL
 	{
 	public:
 		/** コンストラクタ */
-		INNLayerDLL(){}
+		ILayerDLL(){}
 		/** デストラクタ */
-		virtual ~INNLayerDLL(){}
+		virtual ~ILayerDLL(){}
 
 	public:
 		/** レイヤー識別コードを取得する.
 			@param o_layerCode	格納先バッファ
 			@return 成功した場合0 */
-		virtual ELayerErrorCode GetLayerCode(GUID& o_layerCode)const = 0;
+		virtual Gravisbell::ErrorCode GetLayerCode(GUID& o_layerCode)const = 0;
 		/** バージョンコードを取得する.
 			@param o_versionCode	格納先バッファ
 			@return 成功した場合0 */
-		virtual ELayerErrorCode GetVersionCode(CustomDeepNNLibrary::VersionCode& o_versionCode)const = 0;
+		virtual Gravisbell::ErrorCode GetVersionCode(Gravisbell::VersionCode& o_versionCode)const = 0;
 
 
 		/** レイヤー設定を作成する */
-		virtual INNLayerConfig* CreateLayerConfig(void)const = 0;
+		virtual ILayerConfig* CreateLayerConfig(void)const = 0;
 		/** レイヤー設定を作成する
 			@param i_lpBuffer	読み込みバッファの先頭アドレス.
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@param o_useBufferSize 実際に読み込んだバッファサイズ
 			@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-		virtual INNLayerConfig* CreateLayerConfigFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)const = 0;
+		virtual ILayerConfig* CreateLayerConfigFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)const = 0;
 
 		
 		/** CPU処理用のレイヤーを作成.
@@ -52,6 +55,8 @@ namespace CustomDeepNNLibrary
 		/** GPU処理用のレイヤーを作成 */
 		virtual INNLayer* CreateLayerGPU(GUID guid)const = 0;
 	};
-}
+
+}	// NeuralNetwork
+}	// Gravisbell
 
 #endif

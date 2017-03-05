@@ -3,27 +3,28 @@
 //==================================
 #include "stdafx.h"
 
-#include"NNLayerConfig.h"
-#include"NNLayerConfigItemBase.h"
+#include"LayerConfig.h"
+#include"LayerConfigItemBase.h"
 
 #include<string>
 #include<vector>
 
-namespace CustomDeepNNLibrary
-{
-	class NNLayerConfigItem_Float : public NNLayerConfigItemBase<INNLayerConfigItem_Float>
+namespace Gravisbell {
+namespace NeuralNetwork {
+
+	class LayerConfigItem_Float : public LayerConfigItemBase<ILayerConfigItem_Float>
 	{
 	private:
-		float minValue;
-		float maxValue;
-		float defaultValue;
+		F32 minValue;
+		F32 maxValue;
+		F32 defaultValue;
 
-		float value;
+		F32 value;
 
 	public:
 		/** コンストラクタ */
-		NNLayerConfigItem_Float(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[], float minValue, float maxValue, float defaultValue)
-			: NNLayerConfigItemBase(i_szID, i_szName, i_szText)
+		LayerConfigItem_Float(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[], F32 minValue, F32 maxValue, F32 defaultValue)
+			: LayerConfigItemBase(i_szID, i_szName, i_szText)
 			, minValue(minValue)
 			, maxValue(maxValue)
 			, defaultValue(defaultValue)
@@ -31,8 +32,8 @@ namespace CustomDeepNNLibrary
 		{
 		}
 		/** コピーコンストラクタ */
-		NNLayerConfigItem_Float(const NNLayerConfigItem_Float& item)
-			: NNLayerConfigItemBase(item)
+		LayerConfigItem_Float(const LayerConfigItem_Float& item)
+			: LayerConfigItemBase(item)
 			, minValue(item.minValue)
 			, maxValue(item.maxValue)
 			, defaultValue(item.defaultValue)
@@ -40,22 +41,22 @@ namespace CustomDeepNNLibrary
 		{
 		}
 		/** デストラクタ */
-		virtual ~NNLayerConfigItem_Float(){}
+		virtual ~LayerConfigItem_Float(){}
 		
 		/** 一致演算 */
-		bool operator==(const INNLayerConfigItemBase& item)const
+		bool operator==(const ILayerConfigItemBase& item)const
 		{
 			// 種別の確認
 			if(this->GetItemType() != item.GetItemType())
 				return false;
 
 			// アイテムを変換
-			const NNLayerConfigItem_Float* pItem = dynamic_cast<const NNLayerConfigItem_Float*>(&item);
+			const LayerConfigItem_Float* pItem = dynamic_cast<const LayerConfigItem_Float*>(&item);
 			if(pItem == NULL)
 				return false;
 
 			// ベース比較
-			if(NNLayerConfigItemBase::operator!=(*pItem))
+			if(LayerConfigItemBase::operator!=(*pItem))
 				return false;
 
 			if(this->minValue != pItem->minValue)
@@ -71,69 +72,74 @@ namespace CustomDeepNNLibrary
 			return true;
 		}
 		/** 不一致演算 */
-		bool operator!=(const INNLayerConfigItemBase& item)const
+		bool operator!=(const ILayerConfigItemBase& item)const
 		{
 			return !(*this == item);
 		}
 
 		/** 自身の複製を作成する */
-		INNLayerConfigItemBase* Clone()const
+		ILayerConfigItemBase* Clone()const
 		{
-			return new NNLayerConfigItem_Float(*this);
+			return new LayerConfigItem_Float(*this);
 		}
 
 	public:
 		/** 設定項目種別を取得する */
-		NNLayerConfigItemType GetItemType()const
+		LayerConfigItemType GetItemType()const
 		{
 			return CONFIGITEM_TYPE_FLOAT;
 		}
 
 	public:
 		/** 値を取得する */
-		float GetValue()const
+		F32 GetValue()const
 		{
 			return this->value;
 		}
 		/** 値を設定する
 			@param value	設定する値
 			@return 成功した場合0 */
-		ELayerErrorCode SetValue(float value)
+		ErrorCode SetValue(F32 value)
 		{
 			if(value < this->minValue)
-				return LAYER_ERROR_COMMON_OUT_OF_VALUERANGE;
+				return ERROR_CODE_COMMON_OUT_OF_VALUERANGE;
 			if(value > this->maxValue)
-				return LAYER_ERROR_COMMON_OUT_OF_VALUERANGE;
+				return ERROR_CODE_COMMON_OUT_OF_VALUERANGE;
 
 			this->value = value;
 
-			return LAYER_ERROR_NONE;
+			return ERROR_CODE_NONE;
 		}
 
 	public:
 		/** 設定可能最小値を取得する */
-		float GetMin()const
+		F32 GetMin()const
 		{
 			return this->minValue;
 		}
 		/** 設定可能最大値を取得する */
-		float GetMax()const
+		F32 GetMax()const
 		{
 			return this->maxValue;
 		}
 
 		/** デフォルトの設定値を取得する */
-		float GetDefault()const
+		F32 GetDefault()const
 		{
 			return this->defaultValue;
 		}
 		
 
 	public:
+		//================================
+		// ファイル保存関連.
+		// 文字列本体や列挙値のIDなど構造体には保存されない細かい情報を取り扱う.
+		//================================
+
 		/** 保存に必要なバイト数を取得する */
-		unsigned int GetUseBufferByteCount()const
+		U32 GetUseBufferByteCount()const
 		{
-			unsigned int byteCount = 0;
+			U32 byteCount = 0;
 
 			byteCount += sizeof(this->value);			// 値
 
@@ -149,10 +155,10 @@ namespace CustomDeepNNLibrary
 			if(i_bufferSize < (int)this->GetUseBufferByteCount())
 				return -1;
 
-			unsigned int bufferPos = 0;
+			U32 bufferPos = 0;
 
 			// 値
-			float value = *(float*)&i_lpBuffer[bufferPos];
+			F32 value = *(F32*)&i_lpBuffer[bufferPos];
 			bufferPos += sizeof(this->value);
 
 			this->SetValue(value);
@@ -164,19 +170,48 @@ namespace CustomDeepNNLibrary
 			@return 成功した場合0 */
 		int WriteToBuffer(BYTE* o_lpBuffer)const
 		{
-			unsigned int bufferPos = 0;
+			U32 bufferPos = 0;
 
 			// 値
-			*(float*)&o_lpBuffer[bufferPos] = this->value;
+			*(F32*)&o_lpBuffer[bufferPos] = this->value;
 			bufferPos += sizeof(this->value);
 
 			return bufferPos;
 		}
+
+	public:
+		//================================
+		// 構造体を利用したデータの取り扱い.
+		// 情報量が少ない代わりにアクセス速度が速い
+		//================================
+
+		/** 構造体に書き込む.
+			@return	使用したバイト数. */
+		S32 WriteToStruct(BYTE* o_lpBuffer)const
+		{
+			F32 value = this->GetValue();
+
+			*(F32*)o_lpBuffer = value;
+
+			return sizeof(F32);
+		}
+		/** 構造体から読み込む.
+			@return	使用したバイト数. */
+		S32 ReadFromStruct(const BYTE* i_lpBuffer)
+		{
+			F32 value = *(const F32*)i_lpBuffer;
+
+			this->SetValue(value);
+
+			return sizeof(F32);
+		}
 	};
 	
 	/** 設定項目(実数)を作成する */
-	extern "C" NNLAYERCONFIG_API INNLayerConfigItem_Float* CreateLayerCofigItem_Float(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[], float minValue, float maxValue, float defaultValue)
+	extern "C" NNLAYERCONFIG_API ILayerConfigItem_Float* CreateLayerCofigItem_Float(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[], F32 minValue, F32 maxValue, F32 defaultValue)
 	{
-		return new NNLayerConfigItem_Float(i_szID, i_szName, i_szText, minValue, maxValue, defaultValue);
+		return new LayerConfigItem_Float(i_szID, i_szName, i_szText, minValue, maxValue, defaultValue);
 	}
-}
+
+}	// NeuralNetwork
+}	// Gravisbell

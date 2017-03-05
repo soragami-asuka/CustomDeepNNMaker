@@ -8,11 +8,15 @@
 
 #include<boost/filesystem.hpp>
 
-#include<guiddef.h>
-#include"NNLayerConfig.h"
+#include"Common/ErrorCode.h"
+#include"Common/VersionCode.h"
+#include"Common/Guiddef.h"
 
-namespace CustomDeepNNLibrary
-{
+#include"LayerConfig.h"
+
+namespace Gravisbell {
+namespace NeuralNetwork {
+
 	class LayerConfigData
 	{
 	private:
@@ -23,8 +27,8 @@ namespace CustomDeepNNLibrary
 		std::wstring name;	/**< 名前 */
 		std::wstring text;	/**< 説明テキスト */
 
-		CustomDeepNNLibrary::INNLayerConfigEx* pStructure;	/**< レイヤー構造定義情報 */
-		CustomDeepNNLibrary::INNLayerConfigEx* pLearn;		/**< 学習設定情報 */
+		Gravisbell::NeuralNetwork::ILayerConfigEx* pStructure;	/**< レイヤー構造定義情報 */
+		Gravisbell::NeuralNetwork::ILayerConfigEx* pLearn;		/**< 学習設定情報 */
 
 	public:
 		/** コンストラクタ */
@@ -44,6 +48,8 @@ namespace CustomDeepNNLibrary
 			@return 成功した場合0が返る. */
 		int ConvertToCPPFile(const boost::filesystem::wpath& exportDirPath, const std::wstring& fileName)const;
 	};
+
+}
 }
 
 

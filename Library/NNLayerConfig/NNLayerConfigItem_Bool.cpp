@@ -3,15 +3,16 @@
 //==================================
 #include "stdafx.h"
 
-#include"NNLayerConfig.h"
-#include"NNLayerConfigItemBase.h"
+#include"LayerConfig.h"
+#include"LayerConfigItemBase.h"
 
 #include<string>
 #include<vector>
 
-namespace CustomDeepNNLibrary
-{
-	class NNLayerConfigItem_Bool : virtual public NNLayerConfigItemBase<INNLayerConfigItem_Bool>
+namespace Gravisbell {
+namespace NeuralNetwork {
+
+	class LayerConfigItem_Bool : virtual public LayerConfigItemBase<ILayerConfigItem_Bool>
 	{
 	private:
 		bool defaultValue;
@@ -20,33 +21,33 @@ namespace CustomDeepNNLibrary
 
 	public:
 		/** コンストラクタ */
-		NNLayerConfigItem_Bool(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[], bool defaultValue)
-			: NNLayerConfigItemBase(i_szID, i_szName, i_szText)
+		LayerConfigItem_Bool(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[], bool defaultValue)
+			: LayerConfigItemBase(i_szID, i_szName, i_szText)
 			, defaultValue(defaultValue)
 			, value	(defaultValue)
 		{
 		}
 		/** コピーコンストラクタ */
-		NNLayerConfigItem_Bool(const NNLayerConfigItem_Bool& item)
-			: NNLayerConfigItemBase(item)
+		LayerConfigItem_Bool(const LayerConfigItem_Bool& item)
+			: LayerConfigItemBase(item)
 			, defaultValue	(item.defaultValue)
 			, value			(item.value)
 		{
 		}
 		/** デストラクタ */
-		virtual ~NNLayerConfigItem_Bool(){}
+		virtual ~LayerConfigItem_Bool(){}
 		
 		/** 一致演算 */
-		bool operator==(const INNLayerConfigItemBase& item)const
+		bool operator==(const ILayerConfigItemBase& item)const
 		{
 			// 種別の確認
 			if(this->GetItemType() != item.GetItemType())
 				return false;
 
 			// アイテムを変換
-			const NNLayerConfigItem_Bool* pItem = dynamic_cast<const NNLayerConfigItem_Bool*>(&item);
+			const LayerConfigItem_Bool* pItem = dynamic_cast<const LayerConfigItem_Bool*>(&item);
 
-			if(NNLayerConfigItemBase::operator!=(*pItem))
+			if(LayerConfigItemBase::operator!=(*pItem))
 				return false;
 
 			if(this->defaultValue != pItem->defaultValue)
@@ -58,20 +59,20 @@ namespace CustomDeepNNLibrary
 			return true;
 		}
 		/** 不一致演算 */
-		bool operator!=(const INNLayerConfigItemBase& item)const
+		bool operator!=(const ILayerConfigItemBase& item)const
 		{
 			return !(*this == item);
 		}
 
 		/** 自身の複製を作成する */
-		INNLayerConfigItemBase* Clone()const
+		ILayerConfigItemBase* Clone()const
 		{
-			return new NNLayerConfigItem_Bool(*this);
+			return new LayerConfigItem_Bool(*this);
 		}
 
 	public:
 		/** 設定項目種別を取得する */
-		NNLayerConfigItemType GetItemType()const
+		LayerConfigItemType GetItemType()const
 		{
 			return CONFIGITEM_TYPE_BOOL;
 		}
@@ -85,11 +86,11 @@ namespace CustomDeepNNLibrary
 		/** 値を設定する
 			@param value	設定する値
 			@return 成功した場合0 */
-		ELayerErrorCode SetValue(bool value)
+		ErrorCode SetValue(bool value)
 		{
 			this->value = value;
 
-			return LAYER_ERROR_NONE;
+			return ERROR_CODE_NONE;
 		}
 
 	public:
@@ -101,10 +102,15 @@ namespace CustomDeepNNLibrary
 
 
 	public:
+		//================================
+		// ファイル保存関連.
+		// 文字列本体や列挙値のIDなど構造体には保存されない細かい情報を取り扱う.
+		//================================
+
 		/** 保存に必要なバイト数を取得する */
-		unsigned int GetUseBufferByteCount()const
+		U32 GetUseBufferByteCount()const
 		{
-			unsigned int byteCount = 0;
+			U32 byteCount = 0;
 
 			byteCount += sizeof(this->value);			// 値
 
@@ -120,7 +126,7 @@ namespace CustomDeepNNLibrary
 			if(i_bufferSize < (int)this->GetUseBufferByteCount())
 				return -1;
 
-			unsigned int bufferPos = 0;
+			U32 bufferPos = 0;
 
 			// 値
 			this->value = *(bool*)&i_lpBuffer[bufferPos];
@@ -134,7 +140,7 @@ namespace CustomDeepNNLibrary
 			@return 成功した場合0 */
 		int WriteToBuffer(BYTE* o_lpBuffer)const
 		{
-			unsigned int bufferPos = 0;
+			U32 bufferPos = 0;
 
 			// 値
 			*(bool*)&o_lpBuffer[bufferPos] = this->value;
@@ -142,11 +148,36 @@ namespace CustomDeepNNLibrary
 
 			return bufferPos;
 		}
+
+	public:
+		//================================
+		// 構造体を利用したデータの取り扱い.
+		// 情報量が少ない代わりにアクセス速度が速い
+		//================================
+
+		/** 構造体に書き込む.
+			@return	使用したバイト数. */
+		S32 WriteToStruct(BYTE* o_lpBuffer)const
+		{
+			*(bool*)o_lpBuffer = this->value;
+
+			return sizeof(bool);
+		}
+		/** 構造体から読み込む.
+			@return	使用したバイト数. */
+		S32 ReadFromStruct(const BYTE* i_lpBuffer)
+		{
+			this->value = *(const bool*)i_lpBuffer;
+
+			return sizeof(bool);
+		}
 	};
 	
 	/** 設定項目(実数)を作成する */
-	extern "C" NNLAYERCONFIG_API INNLayerConfigItem_Bool* CreateLayerCofigItem_Bool(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[], bool defaultValue)
+	extern "C" NNLAYERCONFIG_API ILayerConfigItem_Bool* CreateLayerCofigItem_Bool(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[], bool defaultValue)
 	{
-		return new NNLayerConfigItem_Bool(i_szID, i_szName, i_szText, defaultValue);
+		return new LayerConfigItem_Bool(i_szID, i_szName, i_szText, defaultValue);
 	}
-}
+
+}	// NeuralNetwork
+}	// Gravisbell

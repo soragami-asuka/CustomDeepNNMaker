@@ -1,14 +1,15 @@
 //=======================================
 // 入出力データ構造
 //=======================================
-#ifndef __IO_DATA_STRUCT__
-#define __IO_DATA_STRUCT__
+#ifndef __GRAVISBELL_IO_DATA_STRUCT__
+#define __GRAVISBELL_IO_DATA_STRUCT__
 
+#include"Common.h"
 
-namespace CustomDeepNNLibrary
-{
+namespace Gravisbell {
+
 	/** 入出力データの次元数 */
-	const unsigned __int32 IODATA_DIMENTION_COUNT = 3;
+	const U32 IODATA_DIMENTION_COUNT = 3;
 
 	/** 入出力データ構造 */
 	struct IODataStruct
@@ -18,16 +19,16 @@ namespace CustomDeepNNLibrary
 		{
 			struct
 			{
-				unsigned __int32 x;
-				unsigned __int32 y;
-				unsigned __int32 z;
+				U32 x;
+				U32 y;
+				U32 z;
 			};
-			unsigned __int32 lpDim[IODATA_DIMENTION_COUNT];
+			U32 lpDim[IODATA_DIMENTION_COUNT];
 		};
 		/** 1要素が持つデータ数 */
-		unsigned __int32 ch;
+		U32 ch;
 
-		IODataStruct(int ch=0, int x=1, int y=1, int z=1)
+		IODataStruct(U32 ch=0, U32 x=1, U32 y=1, U32 z=1)
 			:	x	(x)
 			,	y	(y)
 			,	z	(z)
@@ -35,7 +36,8 @@ namespace CustomDeepNNLibrary
 		{
 		}
 	};
-}
+
+}	// Gravisbell
 
 #endif
 

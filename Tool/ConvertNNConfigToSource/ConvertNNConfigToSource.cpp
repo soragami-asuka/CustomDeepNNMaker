@@ -28,7 +28,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	std::wstring fileName = argv[3];
 
 	// İ’èƒtƒ@ƒCƒ‹“Ç‚İ‚İ
-	CustomDeepNNLibrary::LayerConfigData configData;
+	Gravisbell::NeuralNetwork::LayerConfigData configData;
 	if(configData.ReadFromXMLFile(configFilePath) != 0)
 		return -1;
 

@@ -1,15 +1,17 @@
 //=======================================
 // レイヤーベース
 //=======================================
-#ifndef __I_INPUT_LAYER_H__
-#define __I_INPUT_LAYER_H__
+#ifndef __GRAVISBELL_I_INPUT_LAYER_H__
+#define __GRAVISBELL_I_INPUT_LAYER_H__
 
-#include"LayerErrorCode.h"
+#include"Common/ErrorCode.h"
+#include"Common/IODataStruct.h"
+
 #include"ILayerBase.h"
-#include"IODataStruct.h"
 
-namespace CustomDeepNNLibrary
-{
+namespace Gravisbell {
+namespace NeuralNetwork {
+
 	/** レイヤーベース */
 	class IInputLayer : public virtual ILayerBase
 	{
@@ -19,6 +21,8 @@ namespace CustomDeepNNLibrary
 		/** デストラクタ */
 		virtual ~IInputLayer(){}
 	};
-}
+
+}	// NeuralNetwork
+}	// Gravisbell
 
 #endif

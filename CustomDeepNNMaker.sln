@@ -1,26 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NNLayerInterface", "NNLayerInterface", "{1EF94D1D-6849-47C8-B0CE-FE926085E56F}"
-	ProjectSection(SolutionItems) = preProject
-		NNLayerInterface\IBatchDataNoListGenerator.h = NNLayerInterface\IBatchDataNoListGenerator.h
-		NNLayerInterface\IDataLayer.h = NNLayerInterface\IDataLayer.h
-		NNLayerInterface\IInputLayer.h = NNLayerInterface\IInputLayer.h
-		NNLayerInterface\IIODataLayer.h = NNLayerInterface\IIODataLayer.h
-		NNLayerInterface\ILayerBase.h = NNLayerInterface\ILayerBase.h
-		NNLayerInterface\INNLayer.h = NNLayerInterface\INNLayer.h
-		NNLayerInterface\INNLayerConfig.h = NNLayerInterface\INNLayerConfig.h
-		NNLayerInterface\INNLayerDLL.h = NNLayerInterface\INNLayerDLL.h
-		NNLayerInterface\INNLayerDLLManager.h = NNLayerInterface\INNLayerDLLManager.h
-		NNLayerInterface\IODataStruct.h = NNLayerInterface\IODataStruct.h
-		NNLayerInterface\IOutputLayer.h = NNLayerInterface\IOutputLayer.h
-		NNLayerInterface\ISingleInputLayer.h = NNLayerInterface\ISingleInputLayer.h
-		NNLayerInterface\LayerErrorCode.h = NNLayerInterface\LayerErrorCode.h
-		NNLayerInterface\NNlayerFunction.h = NNLayerInterface\NNlayerFunction.h
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NNLayer", "NNLayer", "{A71D4FA3-741D-4DE6-8A09-7A6823600D1D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NNLayer_Feedforward", "NNLayer\NNLayer_Feedforward\NNLayer_Feedforward.vcxproj", "{35D09026-0A7E-4E1A-9D41-479D16966953}"
@@ -42,8 +24,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tool", "Tool", "{296CBC04-87D1-4301-B004-B8143BD89D50}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConvertNNConfigToSource", "Tool\ConvertNNConfigToSource\ConvertNNConfigToSource.vcxproj", "{779451E2-6D91-4872-AD74-06B0ECCFB55F}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XMLUtility", "Library\XMLUtility\XMLUtility.vcxproj", "{3D4D654C-505E-438B-8FDB-15D7EFF7B070}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BatchDataNoListGenerator", "NNLayer\BatchDataNoListGenerator\BatchDataNoListGenerator.vcxproj", "{8609A0F5-AD98-4B79-B039-5492C1D26CE9}"
 EndProject
@@ -81,10 +61,6 @@ Global
 		{779451E2-6D91-4872-AD74-06B0ECCFB55F}.Debug|Win32.Build.0 = Debug|Win32
 		{779451E2-6D91-4872-AD74-06B0ECCFB55F}.Release|Win32.ActiveCfg = Release|Win32
 		{779451E2-6D91-4872-AD74-06B0ECCFB55F}.Release|Win32.Build.0 = Release|Win32
-		{3D4D654C-505E-438B-8FDB-15D7EFF7B070}.Debug|Win32.ActiveCfg = Debug|Win32
-		{3D4D654C-505E-438B-8FDB-15D7EFF7B070}.Debug|Win32.Build.0 = Debug|Win32
-		{3D4D654C-505E-438B-8FDB-15D7EFF7B070}.Release|Win32.ActiveCfg = Release|Win32
-		{3D4D654C-505E-438B-8FDB-15D7EFF7B070}.Release|Win32.Build.0 = Release|Win32
 		{8609A0F5-AD98-4B79-B039-5492C1D26CE9}.Debug|Win32.ActiveCfg = Debug|Win32
 		{8609A0F5-AD98-4B79-B039-5492C1D26CE9}.Debug|Win32.Build.0 = Debug|Win32
 		{8609A0F5-AD98-4B79-B039-5492C1D26CE9}.Release|Win32.ActiveCfg = Release|Win32
@@ -95,14 +71,13 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{35D09026-0A7E-4E1A-9D41-479D16966953} = {A71D4FA3-741D-4DE6-8A09-7A6823600D1D}
+		{79FD5F13-1407-43AB-834C-04C1AECCDBB5} = {D7D4DAE4-074F-4473-A80B-94E557D28FD0}
+		{2C6C0CD5-6B11-486F-9848-78DF13EAB15D} = {9DEE086C-8571-41DD-ADD4-7583EB13580A}
+		{AC9B4528-AB0B-4549-A844-CFDC8837A7C6} = {D7D4DAE4-074F-4473-A80B-94E557D28FD0}
 		{FE50F8D5-EFE1-4B8E-9BA8-1754980D6266} = {A71D4FA3-741D-4DE6-8A09-7A6823600D1D}
 		{3BAC7CB2-D36D-42F6-B8C0-FE5E1193C583} = {A71D4FA3-741D-4DE6-8A09-7A6823600D1D}
-		{8609A0F5-AD98-4B79-B039-5492C1D26CE9} = {A71D4FA3-741D-4DE6-8A09-7A6823600D1D}
-		{79FD5F13-1407-43AB-834C-04C1AECCDBB5} = {D7D4DAE4-074F-4473-A80B-94E557D28FD0}
-		{AC9B4528-AB0B-4549-A844-CFDC8837A7C6} = {D7D4DAE4-074F-4473-A80B-94E557D28FD0}
-		{3D4D654C-505E-438B-8FDB-15D7EFF7B070} = {D7D4DAE4-074F-4473-A80B-94E557D28FD0}
-		{2C6C0CD5-6B11-486F-9848-78DF13EAB15D} = {9DEE086C-8571-41DD-ADD4-7583EB13580A}
 		{779451E2-6D91-4872-AD74-06B0ECCFB55F} = {296CBC04-87D1-4301-B004-B8143BD89D50}
+		{8609A0F5-AD98-4B79-B039-5492C1D26CE9} = {A71D4FA3-741D-4DE6-8A09-7A6823600D1D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		VisualSVNWorkingCopyRoot = .

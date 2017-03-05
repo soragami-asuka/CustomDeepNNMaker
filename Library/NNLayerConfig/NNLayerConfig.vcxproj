@@ -51,7 +51,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;NNLAYERCONFIG_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\NNLayerInterface;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/D _CRT_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -80,11 +80,10 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\NNLayerInterface\INNLayerConfig.h" />
-    <ClInclude Include="INNLayerConfigEx.h" />
-    <ClInclude Include="INNLayerConfigItemEx_Enum.h" />
-    <ClInclude Include="NNLayerConfig.h" />
-    <ClInclude Include="NNLayerConfigItemBase.h" />
+    <ClInclude Include="ILayerConfigEx.h" />
+    <ClInclude Include="ILayerConfigItemEx_Enum.h" />
+    <ClInclude Include="LayerConfig.h" />
+    <ClInclude Include="LayerConfigItemBase.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -97,7 +96,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="NNLayerConfig.cpp" />
+    <ClCompile Include="LayerConfig.cpp" />
     <ClCompile Include="NNLayerConfigItem_Bool.cpp" />
     <ClCompile Include="NNLayerConfigItem_Enum.cpp" />
     <ClCompile Include="NNLayerConfigItem_Float.cpp" />

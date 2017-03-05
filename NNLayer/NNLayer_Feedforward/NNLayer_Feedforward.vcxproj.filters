@@ -16,6 +16,12 @@
     <Filter Include="FromXML">
       <UniqueIdentifier>{f7bec02c-98a9-476a-805a-1d3df31d8ffe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{043e60e1-332d-44c7-bfa5-cb8fbcfe9953}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NNLayerInterface">
+      <UniqueIdentifier>{f21f5997-4001-4a66-9d41-956d2d55fc51}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -25,9 +31,6 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="NNLayer_Feedforward.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NNLayer_FeedforwardBase.h">
@@ -42,15 +45,69 @@
     <ClInclude Include="NNLayer_Feedforward_DATA.hpp">
       <Filter>FromXML</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Common\Common.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\ErrorCode.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Guiddef.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\IODataStruct.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\VersionCode.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\IDataLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\IInputLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\IIODataLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\ILayerBase.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\ILayerConfig.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\IMultInputLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\INNLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\INNLayerDLL.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\INNLayerDLLManager.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\IOutputLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\ISingleInputLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\ISingleOutputLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\NNlayerFunction.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\IBatchDataNoListGenerator.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="NNLayer_Feedforward..cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NNLayer_FeedforwardBase.cpp">

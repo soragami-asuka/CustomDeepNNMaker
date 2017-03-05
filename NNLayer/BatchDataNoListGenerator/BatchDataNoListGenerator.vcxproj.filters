@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="NNLayerInterface">
+      <UniqueIdentifier>{1363a151-907e-4336-8f63-230b02abda0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{5858c8a9-9d46-48a8-b3d5-a4df3e65b9c1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -26,6 +32,63 @@
     </ClInclude>
     <ClInclude Include="BatchDataNoListGenerator.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\IDataLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\IInputLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\IIODataLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\ILayerBase.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\ILayerConfig.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\IMultInputLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\INNLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\INNLayerDLL.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\INNLayerDLLManager.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\IOutputLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\ISingleInputLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\ISingleOutputLayer.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\NNlayerFunction.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NNLayerInterface\IBatchDataNoListGenerator.h">
+      <Filter>NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Common.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\ErrorCode.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Guiddef.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\IODataStruct.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\VersionCode.h">
+      <Filter>Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

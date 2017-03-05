@@ -2,117 +2,109 @@
 // フィードフォワードニューラルネットワークの統合処理レイヤー
 // 結合、活性化を処理する
 //======================================
-#include<INNLayer.h>
+#include<NNLayerInterface/INNLayer.h>
 
 #include<vector>
 
-using namespace CustomDeepNNLibrary;
+#include"NNLayer_Feedforward_DATA.hpp"
 
-typedef float NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
+namespace Gravisbell {
+namespace NeuralNetwork {
 
-class NNLayer_FeedforwardBase : public CustomDeepNNLibrary::INNLayer
-{
-protected:
-	GUID guid;
+	typedef float NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	INNLayerConfig* pConfig;
+	class NNLayer_FeedforwardBase : public Gravisbell::NeuralNetwork::INNLayer
+	{
+	protected:
+		GUID guid;
 
-	std::vector<IOutputLayer*> lppInputFromLayer;		/**< 入力元レイヤーのリスト */
-	std::vector<IInputLayer*>  lppOutputToLayer;	/**< 出力先レイヤーのリスト */
+		ILayerConfig* pLayerStructure;	/**< レイヤー構造を定義したコンフィグクラス */
+		ILayerConfig* pLearnData;		/**< 学習設定を定義したコンフィグクラス */
 
-public:
-	/** コンストラクタ */
-	NNLayer_FeedforwardBase(GUID guid);
+		NNLayer_Feedforward::LayerStructure layerStructure;	/**< レイヤー構造 */
+		NNLayer_Feedforward::LearnDataStructure learnData;	/**< 学習設定 */
 
-	/** デストラクタ */
-	virtual ~NNLayer_FeedforwardBase();
+		std::vector<IOutputLayer*> lppInputFromLayer;		/**< 入力元レイヤーのリスト */
+		std::vector<IInputLayer*>  lppOutputToLayer;	/**< 出力先レイヤーのリスト */
 
-	//===========================
-	// レイヤー共通
-	//===========================
-public:
-	/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
-	unsigned int GetUseBufferByteCount()const;
+		unsigned int batchSize;	/**< バッチサイズ */
 
-	/** レイヤー固有のGUIDを取得する */
-	ELayerErrorCode GetGUID(GUID& o_guid)const;
+	public:
+		/** コンストラクタ */
+		NNLayer_FeedforwardBase(GUID guid);
 
-	/** レイヤーの種類識別コードを取得する.
-		@param o_layerCode	格納先バッファ
-		@return 成功した場合0 */
-	ELayerErrorCode GetLayerCode(GUID& o_layerCode)const;
+		/** デストラクタ */
+		virtual ~NNLayer_FeedforwardBase();
 
-	/** 設定情報を設定 */
-	ELayerErrorCode SetLayerConfig(const INNLayerConfig& config);
-	/** レイヤーの設定情報を取得する */
-	const INNLayerConfig* GetLayerConfig()const;
+		//===========================
+		// レイヤー共通
+		//===========================
+	public:
+		/** レイヤー種別の取得.
+			ELayerKind の組み合わせ. */
+		unsigned int GetLayerKindBase()const;
 
+		/** レイヤー固有のGUIDを取得する */
+		ErrorCode GetGUID(GUID& o_guid)const;
 
-	//===========================
-	// 入力レイヤー関連
-	//===========================
-public:
-	/** 入力バッファ数を取得する. */
-	unsigned int GetInputBufferCount()const;
+		/** レイヤーの種類識別コードを取得する.
+			@param o_layerCode	格納先バッファ
+			@return 成功した場合0 */
+		ErrorCode GetLayerCode(GUID& o_layerCode)const;
 
-public:
-	/** 入力元レイヤーへのリンクを追加する.
-		@param	pLayer	追加する入力元レイヤー
-		@return	成功した場合0 */
-	ELayerErrorCode AddInputFromLayer(IOutputLayer* pLayer);
-	/** 入力元レイヤーへのリンクを削除する.
-		@param	pLayer	削除する入力元レイヤー
-		@return	成功した場合0 */
-	ELayerErrorCode EraseInputFromLayer(IOutputLayer* pLayer);
-
-public:
-	/** 入力元レイヤー数を取得する */
-	unsigned int GetInputFromLayerCount()const;
-	/** 入力元レイヤーのアドレスを番号指定で取得する.
-		@param num	取得するレイヤーの番号.
-		@return	成功した場合入力元レイヤーのアドレス.失敗した場合はNULLが返る. */
-	IOutputLayer* GetInputFromLayerByNum(unsigned int num)const;
-
-	/** 入力元レイヤーが入力バッファのどの位置に居るかを返す.
-		※対象入力レイヤーの前にいくつの入力バッファが存在するか.
-		　学習差分の使用開始位置としても使用する.
-		@return 失敗した場合負の値が返る*/
-	int GetInputBufferPositionByLayer(const IOutputLayer* pLayer);
+		/** バッチサイズを取得する.
+			@return 同時に演算を行うバッチのサイズ */
+		unsigned int GetBatchSize()const;
 
 
-	//===========================
-	// 出力レイヤー関連
-	//===========================
-public:
-	/** 出力データ構造を取得する */
-	IODataStruct GetOutputDataStruct()const;
-
-	/** 出力バッファ数を取得する */
-	unsigned int GetOutputBufferCount()const;
-
-public:
-	/** 出力先レイヤーへのリンクを追加する.
-		@param	pLayer	追加する出力先レイヤー
-		@return	成功した場合0 */
-	ELayerErrorCode AddOutputToLayer(class IInputLayer* pLayer);
-	/** 出力先レイヤーへのリンクを削除する.
-		@param	pLayer	削除する出力先レイヤー
-		@return	成功した場合0 */
-	ELayerErrorCode EraseOutputToLayer(class IInputLayer* pLayer);
-
-public:
-	/** 出力先レイヤー数を取得する */
-	unsigned int GetOutputToLayerCount()const;
-	/** 出力先レイヤーのアドレスを番号指定で取得する.
-		@param num	取得するレイヤーの番号.
-		@return	成功した場合出力先レイヤーのアドレス.失敗した場合はNULLが返る. */
-	IInputLayer* GetOutputToLayerByNum(unsigned int num)const;
+		//===========================
+		// レイヤー設定
+		//===========================
+	public:
+		/** 設定情報を設定 */
+		ErrorCode SetLayerConfig(const ILayerConfig& config);
+		/** レイヤーの設定情報を取得する */
+		const ILayerConfig* GetLayerConfig()const;
 
 
-	//===========================
-	// 固有関数
-	//===========================
-public:
-	/** ニューロン数を取得する */
-	unsigned int GetNeuronCount()const;
-};
+		//===========================
+		// レイヤー保存
+		//===========================
+	public:
+		/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
+		unsigned int GetUseBufferByteCount()const;
+
+
+		//===========================
+		// 入力レイヤー関連
+		//===========================
+	public:
+		/** 入力データ構造を取得する.
+			@return	入力データ構造 */
+		virtual const IODataStruct GetInputDataStruct()const = 0;
+
+		/** 入力バッファ数を取得する. */
+		unsigned int GetInputBufferCount()const;
+
+
+		//===========================
+		// 出力レイヤー関連
+		//===========================
+	public:
+		/** 出力データ構造を取得する */
+		IODataStruct GetOutputDataStruct()const;
+
+		/** 出力バッファ数を取得する */
+		unsigned int GetOutputBufferCount()const;
+
+
+		//===========================
+		// 固有関数
+		//===========================
+	public:
+		/** ニューロン数を取得する */
+		unsigned int GetNeuronCount()const;
+	};
+
+}
+}

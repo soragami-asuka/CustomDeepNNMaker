@@ -10,9 +10,15 @@
 #define NNLAYERDLLMANAGER_API __declspec(dllimport)
 #endif
 
-#include"INNLayerDLLManager.h"
+#include"Common/ErrorCode.h"
+#include"Common/VersionCode.h"
 
-namespace CustomDeepNNLibrary
-{
-	extern "C" NNLAYERDLLMANAGER_API INNLayerDLLManager* CreateLayerDLLManager();
-}
+#include"NNLayerInterface/INNLayerDLLManager.h"
+
+namespace Gravisbell {
+namespace NeuralNetwork {
+
+	extern "C" NNLAYERDLLMANAGER_API ILayerDLLManager* CreateLayerDLLManager();
+
+}	// NeuralNetwork
+}	// Gravisbell

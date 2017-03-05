@@ -3,16 +3,17 @@
 //==================================
 #include "stdafx.h"
 
-#include"NNLayerConfig.h"
-#include"INNLayerConfigItemEx_Enum.h"
-#include"NNLayerConfigItemBase.h"
+#include"LayerConfig.h"
+#include"ILayerConfigItemEx_Enum.h"
+#include"LayerConfigItemBase.h"
 
 #include<string>
 #include<vector>
 
-namespace CustomDeepNNLibrary
-{
-	class NNLayerConfigItem_Enum : public NNLayerConfigItemBase<INNLayerConfigItemEx_Enum>
+namespace Gravisbell {
+namespace NeuralNetwork {
+
+	class LayerConfigItem_Enum : public LayerConfigItemBase<ILayerConfigItemEx_Enum>
 	{
 	private:
 		struct EnumItem
@@ -79,37 +80,37 @@ namespace CustomDeepNNLibrary
 
 	public:
 		/** コンストラクタ */
-		NNLayerConfigItem_Enum(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[])
-			: NNLayerConfigItemBase(i_szID, i_szName, i_szText)
+		LayerConfigItem_Enum(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[])
+			: LayerConfigItemBase(i_szID, i_szName, i_szText)
 		{
 		}
 		/** コピーコンストラクタ */
-		NNLayerConfigItem_Enum(const NNLayerConfigItem_Enum& item)
-			: NNLayerConfigItemBase(item)
+		LayerConfigItem_Enum(const LayerConfigItem_Enum& item)
+			: LayerConfigItemBase(item)
 			, lpEnumItem (item.lpEnumItem)
 			, value (item.value)
 			, defaultValue (item.defaultValue)
 		{
 		}
 		/** デストラクタ */
-		virtual ~NNLayerConfigItem_Enum(){}
+		virtual ~LayerConfigItem_Enum(){}
 		
 		/** 一致演算 */
-		bool operator==(const INNLayerConfigItemBase& item)const
+		bool operator==(const ILayerConfigItemBase& item)const
 		{
 			// 種別の確認
 			if(this->GetItemType() != item.GetItemType())
 				return false;
 
 			// アイテムを変換
-			const NNLayerConfigItem_Enum* pItem = dynamic_cast<const NNLayerConfigItem_Enum*>(&item);
+			const LayerConfigItem_Enum* pItem = dynamic_cast<const LayerConfigItem_Enum*>(&item);
 			if(pItem == NULL)
 				return false;
 
-			if(NNLayerConfigItemBase::operator!=(*pItem))
+			if(LayerConfigItemBase::operator!=(*pItem))
 				return false;
 
-			for(unsigned int itemNum=0; itemNum<this->lpEnumItem.size(); itemNum++)
+			for(U32 itemNum=0; itemNum<this->lpEnumItem.size(); itemNum++)
 			{
 				if(this->lpEnumItem[itemNum] != pItem->lpEnumItem[itemNum])
 					return false;
@@ -123,27 +124,27 @@ namespace CustomDeepNNLibrary
 			return true;
 		}
 		/** 不一致演算 */
-		bool operator!=(const INNLayerConfigItemBase& item)const
+		bool operator!=(const ILayerConfigItemBase& item)const
 		{
 			return !(*this == item);
 		}
 
 		/** 自身の複製を作成する */
-		INNLayerConfigItemBase* Clone()const
+		ILayerConfigItemBase* Clone()const
 		{
-			return new NNLayerConfigItem_Enum(*this);
+			return new LayerConfigItem_Enum(*this);
 		}
 
 	public:
 		/** 設定項目種別を取得する */
-		NNLayerConfigItemType GetItemType()const
+		LayerConfigItemType GetItemType()const
 		{
 			return CONFIGITEM_TYPE_ENUM;
 		}
 
 	public:
 		/** 値を取得する */
-		int GetValue()const
+		S32 GetValue()const
 		{
 			return this->GetNumByID(this->value.c_str());
 		}
@@ -151,28 +152,28 @@ namespace CustomDeepNNLibrary
 		/** 値を設定する
 			@param value	設定する値
 			@return 成功した場合0 */
-		ELayerErrorCode SetValue(int value)
+		ErrorCode SetValue(S32 value)
 		{
 			if(value < 0)
-				return LAYER_ERROR_COMMON_OUT_OF_VALUERANGE;
-			if(value >= (int)this->lpEnumItem.size())
-				return LAYER_ERROR_COMMON_OUT_OF_VALUERANGE;
+				return ERROR_CODE_COMMON_OUT_OF_VALUERANGE;
+			if(value >= (S32)this->lpEnumItem.size())
+				return ERROR_CODE_COMMON_OUT_OF_VALUERANGE;
 
 			this->value = this->lpEnumItem[value].id;
 
-			return LAYER_ERROR_NONE;
+			return ERROR_CODE_NONE;
 		}
 		/** 値を設定する(文字列指定)
 			@param i_szID	設定する値(文字列指定)
 			@return 成功した場合0 */
-		ELayerErrorCode SetValue(const wchar_t i_szEnumID[])
+		ErrorCode SetValue(const wchar_t i_szEnumID[])
 		{
 			return this->SetValue(this->GetNumByID(i_szEnumID));
 		}
 
 	public:
 		/** 列挙要素数を取得する */
-		unsigned int GetEnumCount()const
+		U32 GetEnumCount()const
 		{
 			return this->lpEnumItem.size();
 		}
@@ -180,11 +181,11 @@ namespace CustomDeepNNLibrary
 			@param num		要素番号
 			@param o_szBuf	格納先バッファ
 			@return 成功した場合0 */
-		int GetEnumID(int num, wchar_t o_szBuf[])const
+		S32 GetEnumID(S32 num, wchar_t o_szBuf[])const
 		{
 			if(num < 0)
 				return -1;
-			if(num >= (int)this->lpEnumItem.size())
+			if(num >= (S32)this->lpEnumItem.size())
 				return -1;
 			
 			wcscpy(o_szBuf, this->lpEnumItem[num].id.c_str());
@@ -195,11 +196,11 @@ namespace CustomDeepNNLibrary
 			@param num		要素番号
 			@param o_szBuf	格納先バッファ
 			@return 成功した場合0 */
-		int GetEnumName(int num, wchar_t o_szBuf[])const
+		S32 GetEnumName(S32 num, wchar_t o_szBuf[])const
 		{
 			if(num < 0)
 				return -1;
-			if(num >= (int)this->lpEnumItem.size())
+			if(num >= (S32)this->lpEnumItem.size())
 				return -1;
 			
 			wcscpy(o_szBuf, this->lpEnumItem[num].name.c_str());
@@ -210,11 +211,11 @@ namespace CustomDeepNNLibrary
 			@param num		要素番号
 			@param o_szBuf	格納先バッファ
 			@return 成功した場合0 */
-		int GetEnumText(int num, wchar_t o_szBuf[])const
+		S32 GetEnumText(S32 num, wchar_t o_szBuf[])const
 		{
 			if(num < 0)
 				return -1;
-			if(num >= (int)this->lpEnumItem.size())
+			if(num >= (S32)this->lpEnumItem.size())
 				return -1;
 			
 			wcscpy(o_szBuf, this->lpEnumItem[num].text.c_str());
@@ -225,21 +226,21 @@ namespace CustomDeepNNLibrary
 		/** IDを指定して列挙要素番号を取得する
 			@param i_szBuf　調べる列挙ID.
 			@return 成功した場合0<=num<GetEnumCountの値. 失敗した場合は負の値が返る. */
-		int GetNumByID(const wchar_t i_szEnumID[])const
+		S32 GetNumByID(const wchar_t i_szEnumID[])const
 		{
 			std::wstring enumID = i_szEnumID;
 
-			for(unsigned int itemNum=0; itemNum<this->lpEnumItem.size(); itemNum++)
+			for(U32 itemNum=0; itemNum<this->lpEnumItem.size(); itemNum++)
 			{
 				if(this->lpEnumItem[itemNum].id == enumID)
-					return (int)itemNum;
+					return (S32)itemNum;
 			}
 
 			return -1;
 		}
 
 		/** デフォルトの設定値を取得する */
-		int GetDefault()const
+		S32 GetDefault()const
 		{
 			return this->GetNumByID(this->defaultValue.c_str());
 		}
@@ -251,10 +252,10 @@ namespace CustomDeepNNLibrary
 			@param szEnumName	追加する名前
 			@param szComment	追加するコメント分.
 			@return 成功した場合、追加されたアイテムの番号が返る. 失敗した場合は負の値が返る. */
-		int AddEnumItem(const wchar_t szEnumID[], const wchar_t szEnumName[], const wchar_t szComment[])
+		S32 AddEnumItem(const wchar_t szEnumID[], const wchar_t szEnumName[], const wchar_t szComment[])
 		{
 			// 同一IDが存在するか確認
-			int sameID = this->GetNumByID(szEnumID);
+			S32 sameID = this->GetNumByID(szEnumID);
 			if(sameID >= 0)
 				return -1;
 
@@ -271,16 +272,16 @@ namespace CustomDeepNNLibrary
 		/** 列挙値を削除する.
 			@param num	削除する列挙番号
 			@return 成功した場合0 */
-		int EraseEnumItem(int num)
+		S32 EraseEnumItem(S32 num)
 		{
 			if(num < 0)
 				return -1;
-			if(num >= (int)this->lpEnumItem.size())
+			if(num >= (S32)this->lpEnumItem.size())
 				return -1;
 
 			// iteratorを進める
 			auto it = this->lpEnumItem.begin();
-			for(int i=0; i<num; i++)
+			for(S32 i=0; i<num; i++)
 				it++;
 
 			// 削除
@@ -291,7 +292,7 @@ namespace CustomDeepNNLibrary
 		/** 列挙値を削除する
 			@param szEnumID 削除する列挙ID
 			@return 成功した場合0 */
-		int EraseEnumItem(const wchar_t szEnumID[])
+		S32 EraseEnumItem(const wchar_t szEnumID[])
 		{
 			return this->EraseEnumItem(this->GetNumByID(szEnumID));
 		}
@@ -299,7 +300,7 @@ namespace CustomDeepNNLibrary
 		/** デフォルト値を設定する.	番号指定.
 			@param num デフォルト値に設定する番号. 
 			@return 成功した場合0 */
-		int SetDefaultItem(int num)
+		S32 SetDefaultItem(S32 num)
 		{
 			wchar_t szEnumID[ID_BUFFER_MAX];
 
@@ -314,7 +315,7 @@ namespace CustomDeepNNLibrary
 		/** デフォルト値を設定する.	ID指定. 
 			@param szID デフォルト値に設定するID. 
 			@return 成功した場合0 */
-		int SetDefaultItem(const wchar_t szEnumID[])
+		S32 SetDefaultItem(const wchar_t szEnumID[])
 		{
 			if(this->GetNumByID(szEnumID) < 0)
 				return -1;
@@ -326,12 +327,17 @@ namespace CustomDeepNNLibrary
 
 
 	public:
-		/** 保存に必要なバイト数を取得する */
-		unsigned int GetUseBufferByteCount()const
-		{
-			unsigned int byteCount = 0;
+		//================================
+		// ファイル保存関連.
+		// 文字列本体や列挙値のIDなど構造体には保存されない細かい情報を取り扱う.
+		//================================
 
-			byteCount += sizeof(unsigned int);		// 値のバッファサイズ
+		/** 保存に必要なバイト数を取得する */
+		U32 GetUseBufferByteCount()const
+		{
+			U32 byteCount = 0;
+
+			byteCount += sizeof(U32);		// 値のバッファサイズ
 			byteCount += this->value.size();		// 値
 
 			return byteCount;
@@ -341,22 +347,22 @@ namespace CustomDeepNNLibrary
 			@param i_lpBuffer	読み込みバッファの先頭アドレス.
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-		int ReadFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize)
+		S32 ReadFromBuffer(const BYTE* i_lpBuffer, S32 i_bufferSize)
 		{
-			if(i_bufferSize < (int)this->GetUseBufferByteCount())
+			if(i_bufferSize < (S32)this->GetUseBufferByteCount())
 				return -1;
 
-			unsigned int bufferPos = 0;
+			U32 bufferPos = 0;
 
 			// 値
 			{
 				// バッファサイズ
-				unsigned int bufferSize = *(unsigned int*)&i_lpBuffer[bufferPos];
-				bufferPos += sizeof(unsigned int);
+				U32 bufferSize = *(U32*)&i_lpBuffer[bufferPos];
+				bufferPos += sizeof(U32);
 
 				// 値
 				std::vector<wchar_t> szBuf(bufferSize+1, NULL);
-				for(unsigned int i=0; i<bufferSize; i++)
+				for(U32 i=0; i<bufferSize; i++)
 				{
 					szBuf[i] = i_lpBuffer[bufferPos++];
 				}
@@ -372,16 +378,16 @@ namespace CustomDeepNNLibrary
 		/** バッファに書き込む.
 			@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
 			@return 成功した場合0 */
-		int WriteToBuffer(BYTE* o_lpBuffer)const
+		S32 WriteToBuffer(BYTE* o_lpBuffer)const
 		{
-			unsigned int bufferPos = 0;
+			U32 bufferPos = 0;
 			
 			// 値
 			{
 				// バッファサイズ
-				unsigned int bufferSize = this->value.size();;
-				*(unsigned int*)&o_lpBuffer[bufferPos] = bufferSize;
-				bufferPos += sizeof(unsigned int);
+				U32 bufferSize = this->value.size();;
+				*(U32*)&o_lpBuffer[bufferPos] = bufferSize;
+				bufferPos += sizeof(U32);
 
 				// 値
 				memcpy(&o_lpBuffer[bufferPos], this->value.c_str(), bufferSize);
@@ -391,11 +397,40 @@ namespace CustomDeepNNLibrary
 
 			return bufferPos;
 		}
+
+	public:
+		//================================
+		// 構造体を利用したデータの取り扱い.
+		// 情報量が少ない代わりにアクセス速度が速い
+		//================================
+
+		/** 構造体に書き込む.
+			@return	使用したバイト数. */
+		S32 WriteToStruct(BYTE* o_lpBuffer)const
+		{
+			S32 value = this->GetValue();
+
+			*(S32*)o_lpBuffer = value;
+
+			return sizeof(S32);
+		}
+		/** 構造体から読み込む.
+			@return	使用したバイト数. */
+		S32 ReadFromStruct(const BYTE* i_lpBuffer)
+		{
+			S32 value = *(const S32*)i_lpBuffer;
+
+			this->SetValue(value);
+
+			return sizeof(S32);
+		}
 	};
 	
 	/** 設定項目(列挙値)を作成する */
-	extern "C" NNLAYERCONFIG_API INNLayerConfigItemEx_Enum* CreateLayerCofigItem_Enum(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[])
+	extern "C" NNLAYERCONFIG_API ILayerConfigItemEx_Enum* CreateLayerCofigItem_Enum(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[])
 	{
-		return new NNLayerConfigItem_Enum(i_szID, i_szName, i_szText);
+		return new LayerConfigItem_Enum(i_szID, i_szName, i_szText);
 	}
-}
+
+}	// NeuralNetwork
+}	// Gravisbell

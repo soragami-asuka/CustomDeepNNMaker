@@ -7,16 +7,17 @@
  *           : 結合層と活性化層を一体化.
  *           : 学習時に[学習係数][ドロップアウト率]を設定できる.
 --------------------------------------------*/
-#ifndef __CUSTOM_DEEP_NN_LAYER_DATA_NNLayer_Feedforward_H__
-#define __CUSTOM_DEEP_NN_LAYER_DATA_NNLayer_Feedforward_H__
+#ifndef __GRAVISBELL_NEURALNETWORK_LAYER_DATA_NNLayer_Feedforward_H__
+#define __GRAVISBELL_NEURALNETWORK_LAYER_DATA_NNLayer_Feedforward_H__
 
 #include<guiddef.h>
 
-#include<LayerErrorCode.h>
-#include<INNLayerConfig.h>
-#include<INNLayer.h>
+#include<Common/ErrorCode.h>
+#include<NNLayerInterface/ILayerConfig.h>
+#include<NNLayerInterface/INNLayer.h>
 
-namespace CustomDeepNNLibrary {
+namespace Gravisbell {
+namespace NeuralNetwork {
 namespace NNLayer_Feedforward {
 
 	/** Layer structure */
@@ -33,7 +34,7 @@ namespace NNLayer_Feedforward {
 		  * ID   : ActivationType
 		  * Text : 使用する活性化関数の種類を定義する
 		  */
-		const enum{
+		enum : S32{
 			/** Name : シグモイド関数
 			  * ID   : sigmoid
 			  * Text : y = 1 / (1 + e^(-x));
@@ -51,12 +52,12 @@ namespace NNLayer_Feedforward {
 		/** Name : Bool型のサンプル
 		  * ID   : BoolSample
 		  */
-		const bool BoolSample;
+		bool BoolSample;
 
 		/** Name : String型のサンプル
 		  * ID   : StringSample
 		  */
-		const wchar_t StringSample;
+		const wchar_t* StringSample;
 
 	};
 
@@ -78,7 +79,8 @@ namespace NNLayer_Feedforward {
 	};
 
 } // NNLayer_Feedforward
-} // CustomDeepNNLibrary
+} // NeuralNetwork
+} // Gravisbell
 
 
 #endif // __CUSTOM_DEEP_NN_LAYER_DATA_NNLayer_Feedforward_H__

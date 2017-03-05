@@ -1,15 +1,17 @@
 //=======================================
 // バッチ処理データ番号リスト生成クラス
 //=======================================
-#ifndef __I_BATCH_DATA_NO_LIST_GENERATOR_H__
-#define __I_BATCH_DATA_NO_LIST_GENERATOR_H__
+#ifndef __GRAVISBELL_I_BATCH_DATA_NO_LIST_GENERATOR_H__
+#define __GRAVISBELL_I_BATCH_DATA_NO_LIST_GENERATOR_H__
 
-#include"LayerErrorCode.h"
+#include"Common/ErrorCode.h"
+#include"Common/IODataStruct.h"
+
 #include"IOutputLayer.h"
-#include"IODataStruct.h"
 
-namespace CustomDeepNNLibrary
-{
+namespace Gravisbell {
+namespace NeuralNetwork {
+
 	/** 入力データレイヤー */
 	class IBatchDataNoListGenerator
 	{
@@ -26,11 +28,11 @@ namespace CustomDeepNNLibrary
 			@param batchSize	同時に演算を行うバッチのサイズ.
 			NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 			失敗した場合はCalculate以降の処理は実行不可. */
-		virtual ELayerErrorCode PreProcess(unsigned int dataCount, unsigned int batchSize) = 0;
+		virtual ErrorCode PreProcess(unsigned int dataCount, unsigned int batchSize) = 0;
 
 		/** 学習ループの初期化処理.データセットの学習開始前に実行する
 			失敗した場合はCalculate以降の処理は実行不可. */
-		virtual ELayerErrorCode PreProcessLearnLoop() = 0;
+		virtual ErrorCode PreProcessLearnLoop() = 0;
 
 
 	public:
@@ -52,6 +54,8 @@ namespace CustomDeepNNLibrary
 			@return	データ番号リストの配列が変える. [GetBatchSize()]の要素数 */
 		virtual const unsigned int* GetBatchDataNoListByNum(unsigned int no)const = 0;
 	};
-}
+
+}	// NeuralNetwork
+}	// Gravisbell
 
 #endif

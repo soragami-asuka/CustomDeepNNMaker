@@ -8,11 +8,12 @@
 #include<algorithm>
 #include <random>
 
-using namespace CustomDeepNNLibrary;
+using namespace Gravisbell;
+using namespace Gravisbell::NeuralNetwork;
 
 namespace
 {
-	class BatchDataNoListGeneratorCPU : public CustomDeepNNLibrary::IBatchDataNoListGenerator
+	class BatchDataNoListGeneratorCPU : public Gravisbell::NeuralNetwork::IBatchDataNoListGenerator
 	{
 	private:
 		unsigned int dataCount;
@@ -44,7 +45,7 @@ namespace
 			@param batchSize	同時に演算を行うバッチのサイズ.
 			NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 			失敗した場合はCalculate以降の処理は実行不可. */
-		ELayerErrorCode PreProcess(unsigned int dataCount, unsigned int batchSize)
+		Gravisbell::ErrorCode PreProcess(unsigned int dataCount, unsigned int batchSize)
 		{
 			this->dataCount = dataCount;
 			this->batchSize = batchSize;
@@ -67,7 +68,7 @@ namespace
 
 		/** 学習ループの初期化処理.データセットの学習開始前に実行する
 			失敗した場合はCalculate以降の処理は実行不可. */
-		ELayerErrorCode PreProcessLearnLoop()
+		Gravisbell::ErrorCode PreProcessLearnLoop()
 		{
 			// シャッフル
 			std::shuffle(this->lpAllDataNoList.begin(), this->it_addDataBegin, random_generator);
@@ -79,7 +80,7 @@ namespace
 				this->lpAllDataNoList[this->dataCount + i] = this->lpAllDataNoList[i];
 			}
 
-			return ELayerErrorCode::LAYER_ERROR_NONE;
+			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
 
 	public:
@@ -117,7 +118,7 @@ namespace
 
 
 /** バッチ処理データ番号リスト生成クラスを作成する. */
-extern "C" BatchDataNoListGenerator_API CustomDeepNNLibrary::IBatchDataNoListGenerator* CreateBatchDataNoListGeneratorCPU()
+extern "C" BatchDataNoListGenerator_API Gravisbell::NeuralNetwork::IBatchDataNoListGenerator* CreateBatchDataNoListGeneratorCPU()
 {
 	return new BatchDataNoListGeneratorCPU();
 }

@@ -7,29 +7,31 @@
 #include<vector>
 #include<list>
 
+// UUID関連用
 #include<rpc.h>
 #pragma comment(lib, "Rpcrt4.lib")
 
-namespace CustomDeepNNLibrary
-{
-	class IODataLayerCPU : public CustomDeepNNLibrary::IIODataLayer
+namespace Gravisbell {
+namespace NeuralNetwork {
+
+	class IODataLayerCPU : public IIODataLayer
 	{
 	private:
 		GUID guid;	/**< 識別ID */
-		CustomDeepNNLibrary::IODataStruct ioDataStruct;	/**< データ構造 */
+		Gravisbell::IODataStruct ioDataStruct;	/**< データ構造 */
 
-		std::vector<float*> lpBufferList;
-		std::vector<std::vector<float>> lpDInputBuffer;	/**< 誤差差分の保存バッファ */
+		std::vector<F32*> lpBufferList;
+		std::vector<std::vector<F32>> lpDInputBuffer;	/**< 誤差差分の保存バッファ */
 
-		unsigned int batchSize;	/**< バッチ処理サイズ */
-		const unsigned int* lpBatchDataNoList;	/**< バッチ処理データ番号リスト */
+		U32 batchSize;	/**< バッチ処理サイズ */
+		const U32* lpBatchDataNoList;	/**< バッチ処理データ番号リスト */
 
-		std::vector<float*> lpBatchDataPointer;			/**< バッチ処理データの配列先頭アドレスリスト */
-		std::vector<float*> lpBatchDInputBufferPointer;	/**< バッチ処理入力誤差差分の配列先導アドレスリスト */
+		std::vector<F32*> lpBatchDataPointer;			/**< バッチ処理データの配列先頭アドレスリスト */
+		std::vector<F32*> lpBatchDInputBufferPointer;	/**< バッチ処理入力誤差差分の配列先導アドレスリスト */
 
 	public:
 		/** コンストラクタ */
-		IODataLayerCPU(GUID guid, CustomDeepNNLibrary::IODataStruct ioDataStruct)
+		IODataLayerCPU(GUID guid, Gravisbell::IODataStruct ioDataStruct)
 			:	guid				(guid)
 			,	ioDataStruct		(ioDataStruct)
 			,	lpBatchDataNoList	(NULL)
@@ -47,28 +49,28 @@ namespace CustomDeepNNLibrary
 		//==============================
 	public:
 		/** レイヤー種別の取得 */
-		unsigned int GetLayerKind()const
+		U32 GetLayerKind()const
 		{
 			return ELayerKind::LAYER_KIND_CPU | ELayerKind::LAYER_KIND_SINGLE_INPUT | ELayerKind::LAYER_KIND_SINGLE_OUTPUT | ELayerKind::LAYER_KIND_DATA;
 		}
 
 		/** レイヤー固有のGUIDを取得する */
-		ELayerErrorCode GetGUID(GUID& o_guid)const
+		Gravisbell::ErrorCode GetGUID(GUID& o_guid)const
 		{
 			o_guid = this->guid;
 
-			return LAYER_ERROR_NONE;
+			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
 
 		/** レイヤー種別識別コードを取得する.
 			@param o_layerCode	格納先バッファ
 			@return 成功した場合0 */
-		ELayerErrorCode GetLayerCode(GUID& o_layerCode)const
+		Gravisbell::ErrorCode GetLayerCode(GUID& o_layerCode)const
 		{
 			// {6E99D406-B931-4DE0-AC3A-48A35E129820}
 			o_layerCode = { 0x6e99d406, 0xb931, 0x4de0, { 0xac, 0x3a, 0x48, 0xa3, 0x5e, 0x12, 0x98, 0x20 } };
 
-			return LAYER_ERROR_NONE;
+			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
 
 		//==============================
@@ -82,8 +84,8 @@ namespace CustomDeepNNLibrary
 		}
 
 		/** データのバッファサイズを取得する.
-			@return データのバッファサイズ.使用するfloat型配列の要素数. */
-		unsigned int GetBufferCount()const
+			@return データのバッファサイズ.使用するF32型配列の要素数. */
+		U32 GetBufferCount()const
 		{
 			return this->ioDataStruct.ch * this->ioDataStruct.x * this->ioDataStruct.y * this->ioDataStruct.z;
 		}
@@ -91,27 +93,27 @@ namespace CustomDeepNNLibrary
 		/** データを追加する.
 			@param	lpData	データ一組の配列. GetBufferSize()の戻り値の要素数が必要.
 			@return	追加された際のデータ管理番号. 失敗した場合は負の値. */
-		ELayerErrorCode AddData(const float lpData[])
+		Gravisbell::ErrorCode AddData(const F32 lpData[])
 		{
 			if(lpData == NULL)
-				return LAYER_ERROR_COMMON_NULL_REFERENCE;
+				return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
 
 			// バッファ確保
-			float* lpBuffer = new float[this->GetBufferCount()];
+			F32* lpBuffer = new F32[this->GetBufferCount()];
 			if(lpBuffer == NULL)
-				return LAYER_ERROR_COMMON_ALLOCATION_MEMORY;
+				return ErrorCode::ERROR_CODE_COMMON_ALLOCATION_MEMORY;
 
 			// コピー
-			memcpy(lpBuffer, lpData, sizeof(float)*this->GetBufferCount());
+			memcpy(lpBuffer, lpData, sizeof(F32)*this->GetBufferCount());
 
 			// リストに追加
 			lpBufferList.push_back(lpBuffer);
 
-			return LAYER_ERROR_NONE;
+			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
 
 		/** データ数を取得する */
-		unsigned int GetDataCount()const
+		U32 GetDataCount()const
 		{
 			return this->lpBufferList.size();
 		}
@@ -119,30 +121,30 @@ namespace CustomDeepNNLibrary
 			@param num		取得する番号
 			@param o_lpBufferList データの格納先配列. GetBufferSize()の戻り値の要素数が必要.
 			@return 成功した場合0 */
-		ELayerErrorCode GetDataByNum(unsigned int num, float o_lpBufferList[])const
+		Gravisbell::ErrorCode GetDataByNum(U32 num, F32 o_lpBufferList[])const
 		{
 			if(num >= this->lpBufferList.size())
-				return LAYER_ERROR_COMMON_OUT_OF_ARRAYRANGE;
+				return ErrorCode::ERROR_CODE_COMMON_OUT_OF_ARRAYRANGE;
 
 			if(o_lpBufferList == NULL)
-				return LAYER_ERROR_COMMON_NULL_REFERENCE;
+				return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
 
-			for(unsigned int i=0; i<this->GetBufferCount(); i++)
+			for(U32 i=0; i<this->GetBufferCount(); i++)
 			{
 				o_lpBufferList[i] = this->lpBufferList[num][i];
 			}
 
-			return LAYER_ERROR_NONE;
+			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
 		/** データを番号指定で消去する */
-		ELayerErrorCode EraseDataByNum(unsigned int num)
+		Gravisbell::ErrorCode EraseDataByNum(U32 num)
 		{
 			if(num >= this->lpBufferList.size())
-				return LAYER_ERROR_COMMON_OUT_OF_ARRAYRANGE;
+				return ErrorCode::ERROR_CODE_COMMON_OUT_OF_ARRAYRANGE;
 
 			// 番号の場所まで移動
 			auto it = this->lpBufferList.begin();
-			for(unsigned int i=0; i<num; i++)
+			for(U32 i=0; i<num; i++)
 				it++;
 
 			// 削除
@@ -150,38 +152,38 @@ namespace CustomDeepNNLibrary
 				delete *it;
 			this->lpBufferList.erase(it);
 
-			return LAYER_ERROR_NONE;
+			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
 
 		/** データを全消去する.
 			@return	成功した場合0 */
-		ELayerErrorCode ClearData()
+		Gravisbell::ErrorCode ClearData()
 		{
-			for(unsigned int i=0; i<lpBufferList.size(); i++)
+			for(U32 i=0; i<lpBufferList.size(); i++)
 			{
 				if(lpBufferList[i] != NULL)
 					delete lpBufferList[i];
 			}
 
-			return LAYER_ERROR_NONE;
+			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
 
 		/** バッチ処理データ番号リストを設定する.
 			設定された値を元にGetDInputBuffer(),GetOutputBuffer()の戻り値が決定する.
 			@param i_lpBatchDataNoList	設定するデータ番号リスト. [GetBatchSize()の戻り値]の要素数が必要 */
-		ELayerErrorCode SetBatchDataNoList(const unsigned int i_lpBatchDataNoList[])
+		Gravisbell::ErrorCode SetBatchDataNoList(const U32 i_lpBatchDataNoList[])
 		{
 			this->lpBatchDataNoList = i_lpBatchDataNoList;
 
-			for(unsigned int batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
 				if(this->lpBatchDataNoList[batchNum] > this->lpBufferList.size())
-					return ELayerErrorCode::LAYER_ERROR_COMMON_OUT_OF_ARRAYRANGE;
+					return Gravisbell::ErrorCode::ERROR_CODE_COMMON_OUT_OF_ARRAYRANGE;
 
 				this->lpBatchDataPointer[batchNum] = this->lpBufferList[this->lpBatchDataNoList[batchNum]];
 			}
 
-			return ELayerErrorCode::LAYER_ERROR_NONE;
+			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
 
 
@@ -194,7 +196,7 @@ namespace CustomDeepNNLibrary
 			@param batchSize	同時に演算を行うバッチのサイズ.
 			NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 			失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-		ELayerErrorCode PreProcessLearn(unsigned int batchSize)
+		Gravisbell::ErrorCode PreProcessLearn(U32 batchSize)
 		{
 			// バッチ処理データ配列の初期化
 			this->batchSize = batchSize;
@@ -203,38 +205,38 @@ namespace CustomDeepNNLibrary
 			// 誤差差分データ配列の初期化
 			this->lpDInputBuffer.resize(batchSize);
 			this->lpBatchDInputBufferPointer.resize(batchSize);
-			for(unsigned int i=0; i<this->lpDInputBuffer.size(); i++)
+			for(U32 i=0; i<this->lpDInputBuffer.size(); i++)
 			{
 				this->lpDInputBuffer[i].resize(this->GetInputBufferCount());
 				this->lpBatchDInputBufferPointer[i] = &this->lpDInputBuffer[i][0];
 			}
 
-			return ELayerErrorCode::LAYER_ERROR_NONE;
+			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
 
 		/** 演算前処理を実行する.(演算用)
 			@param batchSize	同時に演算を行うバッチのサイズ.
 			NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 			失敗した場合はCalculate以降の処理は実行不可. */
-		ELayerErrorCode PreProcessCalculate(unsigned int batchSize)
+		Gravisbell::ErrorCode PreProcessCalculate(U32 batchSize)
 		{
 			// バッチ処理データ配列の初期化
 			this->batchSize = batchSize;
 			this->lpBatchDataPointer.resize(batchSize);
 
-			return ELayerErrorCode::LAYER_ERROR_NONE;
+			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
 
 		/** 学習ループの初期化処理.データセットの学習開始前に実行する
 			失敗した場合はCalculate以降の処理は実行不可. */
-		ELayerErrorCode PreProcessLearnLoop(const INNLayerConfig& config)
+		Gravisbell::ErrorCode PreProcessLearnLoop(const ILayerConfig& config)
 		{
-			return ELayerErrorCode::LAYER_ERROR_NONE;
+			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
 
 		/** バッチサイズを取得する.
 			@return 同時に演算を行うバッチのサイズ */
-		unsigned int GetBatchSize()const
+		U32 GetBatchSize()const
 		{
 			return this->batchSize;
 		}
@@ -247,19 +249,19 @@ namespace CustomDeepNNLibrary
 		/** 学習誤差を計算する.
 			@param i_lppInputBuffer	入力データバッファ. [GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要
 			直前の計算結果を使用する */
-		ELayerErrorCode CalculateLearnError(const float** i_lppInputBuffer)
+		Gravisbell::ErrorCode CalculateLearnError(Gravisbell::CONST_BATCH_BUFFER_POINTER i_lppInputBuffer)
 		{
-			unsigned int inputBufferCount = this->GetInputBufferCount();
+			U32 inputBufferCount = this->GetInputBufferCount();
 
-			for(unsigned int batchNum=0; batchNum<this->batchSize; batchNum++)
+			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 			{
-				for(unsigned int inputNum=0; inputNum<inputBufferCount; inputNum++)
+				for(U32 inputNum=0; inputNum<inputBufferCount; inputNum++)
 				{
 					this->lpDInputBuffer[batchNum][inputNum] = this->lpBatchDataPointer[batchNum][inputNum] - i_lppInputBuffer[batchNum][inputNum];
 				}
 			}
 
-			return LAYER_ERROR_NONE;
+			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
 
 	public:
@@ -269,18 +271,9 @@ namespace CustomDeepNNLibrary
 		{
 			return this->GetDataStruct();
 		}
-		/** 入力データ構造を取得する
-			@param	o_inputDataStruct	入力データ構造の格納先
-			@return	成功した場合0 */
-		ELayerErrorCode GetInputDataStruct(IODataStruct& o_inputDataStruct)const
-		{
-			o_inputDataStruct = this->GetDataStruct();
-
-			return ELayerErrorCode::LAYER_ERROR_NONE;
-		}
 
 		/** 入力バッファ数を取得する. byte数では無くデータの数なので注意 */
-		unsigned int GetInputBufferCount()const
+		U32 GetInputBufferCount()const
 		{
 			return this->GetBufferCount();
 		}
@@ -294,22 +287,22 @@ namespace CustomDeepNNLibrary
 		}
 		/** 学習差分を取得する.
 			@param lpDOutputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
-		ELayerErrorCode GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const
+		Gravisbell::ErrorCode GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const
 		{
 			if(o_lpDInputBuffer == NULL)
-				return LAYER_ERROR_COMMON_NULL_REFERENCE;
+				return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
 			
-			const unsigned int batchSize = this->GetBatchSize();
-			const unsigned int inputBufferCount = this->GetOutputBufferCount();
+			const U32 batchSize = this->GetBatchSize();
+			const U32 inputBufferCount = this->GetOutputBufferCount();
 
-			for(unsigned int batchNum=0; batchNum<batchSize; batchNum++)
+			for(U32 batchNum=0; batchNum<batchSize; batchNum++)
 			{
-				memcpy(o_lpDInputBuffer[batchNum], this->lpBatchDataPointer[batchNum], sizeof(float)*inputBufferCount);
+				memcpy(o_lpDInputBuffer[batchNum], this->lpBatchDataPointer[batchNum], sizeof(F32)*inputBufferCount);
 			}
 
-			return LAYER_ERROR_NONE;
+			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 
-			return LAYER_ERROR_NONE;
+			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
 
 
@@ -324,7 +317,7 @@ namespace CustomDeepNNLibrary
 		}
 
 		/** 出力バッファ数を取得する. byte数では無くデータの数なので注意 */
-		unsigned int GetOutputBufferCount()const
+		U32 GetOutputBufferCount()const
 		{
 			return this->GetBufferCount();
 		}
@@ -339,28 +332,30 @@ namespace CustomDeepNNLibrary
 		/** 出力データバッファを取得する.
 			@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
 			@return 成功した場合0 */
-		ELayerErrorCode GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
+		Gravisbell::ErrorCode GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
 		{
 			if(o_lpOutputBuffer == NULL)
-				return LAYER_ERROR_COMMON_NULL_REFERENCE;
+				return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
 
-			const unsigned int batchSize = this->GetBatchSize();
-			const unsigned int outputBufferCount = this->GetOutputBufferCount();
+			const U32 batchSize = this->GetBatchSize();
+			const U32 outputBufferCount = this->GetOutputBufferCount();
 
-			for(unsigned int batchNum=0; batchNum<batchSize; batchNum++)
+			for(U32 batchNum=0; batchNum<batchSize; batchNum++)
 			{
-				memcpy(o_lpOutputBuffer[batchNum], this->lpBatchDataPointer[batchNum], sizeof(float)*outputBufferCount);
+				memcpy(o_lpOutputBuffer[batchNum], this->lpBatchDataPointer[batchNum], sizeof(F32)*outputBufferCount);
 			}
 
-			return LAYER_ERROR_NONE;
+			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
 	};
-}
+
+}	// NeuralNetwork
+}	// Gravisbell
 
 /** 入力信号データレイヤーを作成する.GUIDは自動割り当て.CPU制御
-	@param bufferSize	バッファのサイズ.※float型配列の要素数.
+	@param bufferSize	バッファのサイズ.※F32型配列の要素数.
 	@return	入力信号データレイヤーのアドレス */
-extern "C" IODataLayer_API CustomDeepNNLibrary::IIODataLayer* CreateIODataLayerCPU(CustomDeepNNLibrary::IODataStruct ioDataStruct)
+extern "C" IODataLayer_API Gravisbell::NeuralNetwork::IIODataLayer* CreateIODataLayerCPU(Gravisbell::IODataStruct ioDataStruct)
 {
 	UUID uuid;
 	::UuidCreate(&uuid);
@@ -369,9 +364,9 @@ extern "C" IODataLayer_API CustomDeepNNLibrary::IIODataLayer* CreateIODataLayerC
 }
 /** 入力信号データレイヤーを作成する.CPU制御
 	@param guid			レイヤーのGUID.
-	@param bufferSize	バッファのサイズ.※float型配列の要素数.
+	@param bufferSize	バッファのサイズ.※F32型配列の要素数.
 	@return	入力信号データレイヤーのアドレス */
-extern "C" IODataLayer_API CustomDeepNNLibrary::IIODataLayer* CreateIODataLayerCPUwithGUID(GUID guid, CustomDeepNNLibrary::IODataStruct ioDataStruct)
+extern "C" IODataLayer_API Gravisbell::NeuralNetwork::IIODataLayer* CreateIODataLayerCPUwithGUID(GUID guid, Gravisbell::IODataStruct ioDataStruct)
 {
-	return new CustomDeepNNLibrary::IODataLayerCPU(guid, ioDataStruct);
+	return new Gravisbell::NeuralNetwork::IODataLayerCPU(guid, ioDataStruct);
 }

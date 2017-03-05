@@ -13,7 +13,7 @@
 #include<string>
 #include<map>
 
-#include<NNLayerConfig.h>
+#include<Library/NNLayerConfig/LayerConfig.h>
 
 #include"NNLayer_Feedforward_FUNC.hpp"
 
@@ -22,7 +22,7 @@
 static const GUID g_guid = {0xbeba34ec, 0xc30c, 0x4565, {0x93, 0x86, 0x56, 0x08, 0x89, 0x81, 0xd2, 0xd7}};
 
 // VersionCode
-static const CustomDeepNNLibrary::VersionCode g_version = {   1,   0,   0,   0}; 
+static const Gravisbell::VersionCode g_version = {   1,   0,   0,   0}; 
 
 
 
@@ -165,39 +165,39 @@ namespace CurrentLanguage
   * @param  o_layerCode    Storage destination buffer.
   * @return On success 0. 
   */
-EXPORT_API CustomDeepNNLibrary::ELayerErrorCode GetLayerCode(GUID& o_layerCode)
+EXPORT_API Gravisbell::ErrorCode GetLayerCode(GUID& o_layerCode)
 {
 	o_layerCode = g_guid;
 
-	return CustomDeepNNLibrary::LAYER_ERROR_NONE;
+	return Gravisbell::ERROR_CODE_NONE;
 }
 
 /** Get version code.
   * @param  o_versionCode    Storage destination buffer.
   * @return On success 0. 
   */
-EXPORT_API CustomDeepNNLibrary::ELayerErrorCode GetVersionCode(CustomDeepNNLibrary::VersionCode& o_versionCode)
+EXPORT_API Gravisbell::ErrorCode GetVersionCode(Gravisbell::VersionCode& o_versionCode)
 {
 	o_versionCode = g_version;
 
-	return CustomDeepNNLibrary::LAYER_ERROR_NONE;
+	return Gravisbell::ERROR_CODE_NONE;
 }
 
 
 /** Create a layer structure setting.
   * @return If successful, new configuration information.
   */
-EXPORT_API CustomDeepNNLibrary::INNLayerConfig* CreateLayerStructureSetting(void)
+EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLayerStructureSetting(void)
 {
 	GUID layerCode;
 	GetLayerCode(layerCode);
 
-	CustomDeepNNLibrary::VersionCode versionCode;
+	Gravisbell::VersionCode versionCode;
 	GetVersionCode(versionCode);
 
 
 	// Create Empty Setting Data
-	CustomDeepNNLibrary::INNLayerConfigEx* pLayerConfig = CustomDeepNNLibrary::CreateEmptyLayerConfig(layerCode, versionCode);
+	Gravisbell::NeuralNetwork::ILayerConfigEx* pLayerConfig = Gravisbell::NeuralNetwork::CreateEmptyLayerConfig(layerCode, versionCode);
 	if(pLayerConfig == NULL)
 		return NULL;
 
@@ -209,7 +209,7 @@ EXPORT_API CustomDeepNNLibrary::INNLayerConfig* CreateLayerStructureSetting(void
 	  *      : 出力バッファ数に直結する.
 	  */
 	pLayerConfig->AddItem(
-		CustomDeepNNLibrary::CreateLayerCofigItem_Int(
+		Gravisbell::NeuralNetwork::CreateLayerCofigItem_Int(
 			L"NeuronCount",
 			CurrentLanguage::g_lpItemData_LayerStructure[L"NeuronCount"].name.c_str(),
 			CurrentLanguage::g_lpItemData_LayerStructure[L"NeuronCount"].text.c_str(),
@@ -220,7 +220,7 @@ EXPORT_API CustomDeepNNLibrary::INNLayerConfig* CreateLayerStructureSetting(void
 	  * Text : 使用する活性化関数の種類を定義する
 	  */
 	{
-		CustomDeepNNLibrary::INNLayerConfigItemEx_Enum* pItemEnum = CustomDeepNNLibrary::CreateLayerCofigItem_Enum(
+		Gravisbell::NeuralNetwork::ILayerConfigItemEx_Enum* pItemEnum = Gravisbell::NeuralNetwork::CreateLayerCofigItem_Enum(
 			L"ActivationType",
 			CurrentLanguage::g_lpItemData_LayerStructure[L"ActivationType"].name.c_str(),
 			CurrentLanguage::g_lpItemData_LayerStructure[L"ActivationType"].text.c_str());
@@ -241,7 +241,7 @@ EXPORT_API CustomDeepNNLibrary::INNLayerConfig* CreateLayerStructureSetting(void
 	  * ID   : BoolSample
 	  */
 	pLayerConfig->AddItem(
-		CustomDeepNNLibrary::CreateLayerCofigItem_Bool(
+		Gravisbell::NeuralNetwork::CreateLayerCofigItem_Bool(
 			L"BoolSample",
 			CurrentLanguage::g_lpItemData_LayerStructure[L"BoolSample"].name.c_str(),
 			CurrentLanguage::g_lpItemData_LayerStructure[L"BoolSample"].text.c_str(),
@@ -251,7 +251,7 @@ EXPORT_API CustomDeepNNLibrary::INNLayerConfig* CreateLayerStructureSetting(void
 	  * ID   : StringSample
 	  */
 	pLayerConfig->AddItem(
-		CustomDeepNNLibrary::CreateLayerCofigItem_String(
+		Gravisbell::NeuralNetwork::CreateLayerCofigItem_String(
 			L"StringSample",
 			CurrentLanguage::g_lpItemData_LayerStructure[L"StringSample"].name.c_str(),
 			CurrentLanguage::g_lpItemData_LayerStructure[L"StringSample"].text.c_str(),
@@ -266,9 +266,9 @@ EXPORT_API CustomDeepNNLibrary::INNLayerConfig* CreateLayerStructureSetting(void
   * @param  o_useBufferSize  Buffer size actually read.
   * @return If successful, the configuration information created from the buffer
   */
-EXPORT_API CustomDeepNNLibrary::INNLayerConfig* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)
+EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)
 {
-	CustomDeepNNLibrary::INNLayerConfigEx* pLayerConfig = (CustomDeepNNLibrary::INNLayerConfigEx*)CreateLayerStructureSetting();
+	Gravisbell::NeuralNetwork::ILayerConfigEx* pLayerConfig = (Gravisbell::NeuralNetwork::ILayerConfigEx*)CreateLayerStructureSetting();
 	if(pLayerConfig == NULL)
 		return NULL;
 
@@ -287,17 +287,17 @@ EXPORT_API CustomDeepNNLibrary::INNLayerConfig* CreateLayerStructureSettingFromB
 
 /** Create a learning setting.
   * @return If successful, new configuration information. */
-EXPORT_API CustomDeepNNLibrary::INNLayerConfig* CreateLearningSetting(void)
+EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLearningSetting(void)
 {
 	GUID layerCode;
 	GetLayerCode(layerCode);
 
-	CustomDeepNNLibrary::VersionCode versionCode;
+	Gravisbell::VersionCode versionCode;
 	GetVersionCode(versionCode);
 
 
 	// Create Empty Setting Data
-	CustomDeepNNLibrary::INNLayerConfigEx* pLayerConfig = CustomDeepNNLibrary::CreateEmptyLayerConfig(layerCode, versionCode);
+	Gravisbell::NeuralNetwork::ILayerConfigEx* pLayerConfig = Gravisbell::NeuralNetwork::CreateEmptyLayerConfig(layerCode, versionCode);
 	if(pLayerConfig == NULL)
 		return NULL;
 
@@ -307,7 +307,7 @@ EXPORT_API CustomDeepNNLibrary::INNLayerConfig* CreateLearningSetting(void)
 	  * ID   : LearnCoeff
 	  */
 	pLayerConfig->AddItem(
-		CustomDeepNNLibrary::CreateLayerCofigItem_Float(
+		Gravisbell::NeuralNetwork::CreateLayerCofigItem_Float(
 			L"LearnCoeff",
 			CurrentLanguage::g_lpItemData_Learn[L"LearnCoeff"].name.c_str(),
 			CurrentLanguage::g_lpItemData_Learn[L"LearnCoeff"].text.c_str(),
@@ -319,7 +319,7 @@ EXPORT_API CustomDeepNNLibrary::INNLayerConfig* CreateLearningSetting(void)
 	  *      : 1.0で前レイヤーの全出力を無視する
 	  */
 	pLayerConfig->AddItem(
-		CustomDeepNNLibrary::CreateLayerCofigItem_Float(
+		Gravisbell::NeuralNetwork::CreateLayerCofigItem_Float(
 			L"DropOut",
 			CurrentLanguage::g_lpItemData_Learn[L"DropOut"].name.c_str(),
 			CurrentLanguage::g_lpItemData_Learn[L"DropOut"].text.c_str(),
@@ -334,9 +334,9 @@ EXPORT_API CustomDeepNNLibrary::INNLayerConfig* CreateLearningSetting(void)
   * @param  o_useBufferSize  Buffer size actually read.
   * @return If successful, the configuration information created from the buffer
   */
-EXPORT_API CustomDeepNNLibrary::INNLayerConfig* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)
+EXPORT_API Gravisbell::NeuralNetwork::ILayerConfig* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)
 {
-	CustomDeepNNLibrary::INNLayerConfigEx* pLayerConfig = (CustomDeepNNLibrary::INNLayerConfigEx*)CreateLearningSetting();
+	Gravisbell::NeuralNetwork::ILayerConfigEx* pLayerConfig = (Gravisbell::NeuralNetwork::ILayerConfigEx*)CreateLearningSetting();
 	if(pLayerConfig == NULL)
 		return NULL;
 

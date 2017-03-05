@@ -1,15 +1,18 @@
 //=======================================
 // レイヤーベース
 //=======================================
-#ifndef __I_OUTPUT_LAYER_H__
-#define __I_OUTPUT_LAYER_H__
+#ifndef __GRAVISBELL_I_OUTPUT_LAYER_H__
+#define __GRAVISBELL_I_OUTPUT_LAYER_H__
 
-#include"LayerErrorCode.h"
+#include"Common/ErrorCode.h"
+#include"Common/IODataStruct.h"
+
 #include"ILayerBase.h"
-#include"IODataStruct.h"
 
-namespace CustomDeepNNLibrary
-{
+
+namespace Gravisbell {
+namespace NeuralNetwork {
+
 	/** レイヤーベース */
 	class IOutputLayer : public virtual ILayerBase
 	{
@@ -19,6 +22,8 @@ namespace CustomDeepNNLibrary
 		/** デストラクタ */
 		virtual ~IOutputLayer(){}
 	};
-}
+
+}	// NeuralNetwork
+}	// GravisBell
 
 #endif

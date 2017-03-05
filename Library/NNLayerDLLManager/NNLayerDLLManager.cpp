@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include"NNlayerFunction.h"
+#include "NNLayerInterface/NNlayerFunction.h"
 #include "NNLayerDLLManager.h"
 
 #include<string>
@@ -11,10 +11,11 @@
 
 #pragma comment(lib, "Rpcrt4.lib")
 
-namespace CustomDeepNNLibrary
-{
+namespace Gravisbell {
+namespace NeuralNetwork {
+
 	/** DLLクラス */
-	class NNLayerDLL : public INNLayerDLL
+	class NNLayerDLL : public ILayerDLL
 	{
 	protected:
 		HMODULE hModule;
@@ -54,27 +55,27 @@ namespace CustomDeepNNLibrary
 		/** レイヤー識別コードを取得する.
 			@param o_layerCode	格納先バッファ
 			@return 成功した場合0 */
-		ELayerErrorCode GetLayerCode(GUID& o_layerCode)const
+		ErrorCode GetLayerCode(GUID& o_layerCode)const
 		{
 			if(this->funcGetLayerCode == NULL)
-				return LAYER_ERROR_DLL_LOAD_FUNCTION;
+				return ERROR_CODE_DLL_LOAD_FUNCTION;
 
 			return this->funcGetLayerCode(o_layerCode);
 		}
 		/** バージョンコードを取得する.
 			@param o_versionCode	格納先バッファ
 			@return 成功した場合0 */
-		ELayerErrorCode GetVersionCode(CustomDeepNNLibrary::VersionCode& o_versionCode)const
+		ErrorCode GetVersionCode(VersionCode& o_versionCode)const
 		{
 			if(this->funcGetVersionCode == NULL)
-				return LAYER_ERROR_DLL_LOAD_FUNCTION;
+				return ERROR_CODE_DLL_LOAD_FUNCTION;
 
 			return this->funcGetVersionCode(o_versionCode);
 		}
 
 
 		/** レイヤー設定を作成する */
-		CustomDeepNNLibrary::INNLayerConfig* CreateLayerConfig(void)const
+		ILayerConfig* CreateLayerConfig(void)const
 		{
 			if(this->funcCreateLayerConfig == NULL)
 				return NULL;
@@ -86,7 +87,7 @@ namespace CustomDeepNNLibrary
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@param o_useBufferSize 実際に読み込んだバッファサイズ
 			@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-		CustomDeepNNLibrary::INNLayerConfig* CreateLayerConfigFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)const
+		ILayerConfig* CreateLayerConfigFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)const
 		{
 			if(this->funcCreateLayerConfigFromBuffer == NULL)
 				return NULL;
@@ -97,7 +98,7 @@ namespace CustomDeepNNLibrary
 		
 		/** CPU処理用のレイヤーを作成.
 			GUIDは自動割り当て. */
-		CustomDeepNNLibrary::INNLayer* CreateLayerCPU()const
+		INNLayer* CreateLayerCPU()const
 		{
 			UUID uuid;
 			::UuidCreate(&uuid);
@@ -106,7 +107,7 @@ namespace CustomDeepNNLibrary
 		}
 		/** CPU処理用のレイヤーを作成
 			@param guid	作成レイヤーのGUID */
-		CustomDeepNNLibrary::INNLayer* CreateLayerCPU(GUID guid)const
+		INNLayer* CreateLayerCPU(GUID guid)const
 		{
 			if(this->funcCreateLayerCPU == NULL)
 				return NULL;
@@ -116,7 +117,7 @@ namespace CustomDeepNNLibrary
 		
 		/** GPU処理用のレイヤーを作成.
 			GUIDは自動割り当て. */
-		CustomDeepNNLibrary::INNLayer* CreateLayerGPU()const
+		INNLayer* CreateLayerGPU()const
 		{
 			UUID uuid;
 			::UuidCreate(&uuid);
@@ -124,7 +125,7 @@ namespace CustomDeepNNLibrary
 			return this->CreateLayerGPU(uuid);
 		}
 		/** GPU処理用のレイヤーを作成 */
-		CustomDeepNNLibrary::INNLayer* CreateLayerGPU(GUID guid)const
+		INNLayer* CreateLayerGPU(GUID guid)const
 		{
 			if(this->funcCreateLayerGPU == NULL)
 				return NULL;
@@ -134,7 +135,7 @@ namespace CustomDeepNNLibrary
 
 	public:
 		/** DLLをファイルから作成する */
-		static NNLayerDLL* CreateFromFile(const std::wstring& filePath)
+		static NNLayerDLL* CreateFromFile(const ::std::wstring& filePath)
 		{
 			// バッファを作成
 			NNLayerDLL* pLayerDLL = new NNLayerDLL();
@@ -149,24 +150,24 @@ namespace CustomDeepNNLibrary
 					break;
 
 				// 関数読み込み
-				pLayerDLL->funcGetLayerCode = (CustomDeepNNLibrary::FuncGetLayerCode)GetProcAddress(pLayerDLL->hModule, "GetLayerCode");
+				pLayerDLL->funcGetLayerCode = (FuncGetLayerCode)GetProcAddress(pLayerDLL->hModule, "GetLayerCode");
 				if(pLayerDLL->funcGetLayerCode == NULL)
 					break;
-				pLayerDLL->funcGetVersionCode = (CustomDeepNNLibrary::FuncGetVersionCode)GetProcAddress(pLayerDLL->hModule, "GetVersionCode");
+				pLayerDLL->funcGetVersionCode = (FuncGetVersionCode)GetProcAddress(pLayerDLL->hModule, "GetVersionCode");
 				if(pLayerDLL->funcGetVersionCode == NULL)
 					break;
 
-				pLayerDLL->funcCreateLayerConfig = (CustomDeepNNLibrary::FuncCreateLayerConfig)GetProcAddress(pLayerDLL->hModule, "CreateLayerConfig");
+				pLayerDLL->funcCreateLayerConfig = (FuncCreateLayerConfig)GetProcAddress(pLayerDLL->hModule, "CreateLayerConfig");
 				if(pLayerDLL->funcCreateLayerConfig == NULL)
 					break;
-				pLayerDLL->funcCreateLayerConfigFromBuffer = (CustomDeepNNLibrary::FuncCreateLayerConfigFromBuffer)GetProcAddress(pLayerDLL->hModule, "CreateLayerConfigFromBuffer");
+				pLayerDLL->funcCreateLayerConfigFromBuffer = (FuncCreateLayerConfigFromBuffer)GetProcAddress(pLayerDLL->hModule, "CreateLayerConfigFromBuffer");
 				if(pLayerDLL->funcCreateLayerConfigFromBuffer == NULL)
 					break;
 
-				pLayerDLL->funcCreateLayerCPU= (CustomDeepNNLibrary::FuncCreateLayerCPU)GetProcAddress(pLayerDLL->hModule, "CreateLayerCPU");
+				pLayerDLL->funcCreateLayerCPU= (FuncCreateLayerCPU)GetProcAddress(pLayerDLL->hModule, "CreateLayerCPU");
 				if(pLayerDLL->funcCreateLayerCPU == NULL)
 					break;
-				pLayerDLL->funcCreateLayerGPU= (CustomDeepNNLibrary::FuncCreateLayerGPU)GetProcAddress(pLayerDLL->hModule, "CreateLayerGPU");
+				pLayerDLL->funcCreateLayerGPU= (FuncCreateLayerGPU)GetProcAddress(pLayerDLL->hModule, "CreateLayerGPU");
 				if(pLayerDLL->funcCreateLayerGPU == NULL)
 					break;
 
@@ -183,7 +184,7 @@ namespace CustomDeepNNLibrary
 	};
 
 	/** DLL管理クラス */
-	class NNLayerDLLManager: public INNLayerDLLManager
+	class NNLayerDLLManager: public ILayerDLLManager
 	{
 	private:
 		std::vector<NNLayerDLL*> lppNNLayerDLL;
@@ -208,11 +209,11 @@ namespace CustomDeepNNLibrary
 			@param szFilePath	読み込むファイルのパス.
 			@param o_addLayerCode	追加されたGUIDの格納先アドレス.
 			@return	成功した場合0が返る. */
-		ELayerErrorCode ReadLayerDLL(const wchar_t szFilePath[], GUID& o_addLayerCode)
+		ErrorCode ReadLayerDLL(const wchar_t szFilePath[], GUID& o_addLayerCode)
 		{
 			auto pLayerDLL = NNLayerDLL::CreateFromFile(szFilePath);
 			if(pLayerDLL == NULL)
-				return LAYER_ERROR_DLL_LOAD_FUNCTION;
+				return ERROR_CODE_DLL_LOAD_FUNCTION;
 
 			GUID guid;
 			pLayerDLL->GetLayerCode(guid);
@@ -223,7 +224,7 @@ namespace CustomDeepNNLibrary
 			{
 				// 既に追加済み
 				delete pLayerDLL;
-				return LAYER_ERROR_DLL_ADD_ALREADY_SAMEID;
+				return ERROR_CODE_DLL_ADD_ALREADY_SAMEID;
 			}
 
 			// 管理に追加
@@ -231,12 +232,12 @@ namespace CustomDeepNNLibrary
 
 			o_addLayerCode = guid;
 
-			return LAYER_ERROR_NONE;
+			return ERROR_CODE_NONE;
 		}
 		/** DLLを読み込んで、管理に追加する.
 			@param szFilePath	読み込むファイルのパス.
 			@return	成功した場合0が返る. */
-		ELayerErrorCode ReadLayerDLL(const wchar_t szFilePath[])
+		ErrorCode ReadLayerDLL(const wchar_t szFilePath[])
 		{
 			GUID layerCode;
 			return this->ReadLayerDLL(szFilePath, layerCode);
@@ -250,7 +251,7 @@ namespace CustomDeepNNLibrary
 		/** 管理しているレイヤーDLLを番号指定で取得する.
 			@param	num	取得するDLLの管理番号.
 			@return 成功した場合はDLLクラスのアドレス. 失敗した場合はNULL */
-		const INNLayerDLL* GetLayerDLLByNum(unsigned int num)const
+		const ILayerDLL* GetLayerDLLByNum(unsigned int num)const
 		{
 			if(num >= this->lppNNLayerDLL.size())
 				return NULL;
@@ -260,7 +261,7 @@ namespace CustomDeepNNLibrary
 		/** 管理しているレイヤーDLLをguid指定で取得する.
 			@param guid	取得するDLLのGUID.
 			@return 成功した場合はDLLクラスのアドレス. 失敗した場合はNULL */
-		const INNLayerDLL* GetLayerDLLByGUID(GUID i_layerCode)const
+		const ILayerDLL* GetLayerDLLByGUID(GUID i_layerCode)const
 		{
 			for(unsigned int i=0; i<this->lppNNLayerDLL.size(); i++)
 			{
@@ -282,7 +283,7 @@ namespace CustomDeepNNLibrary
 		}
 
 		/** レイヤーDLLを削除する. */
-		ELayerErrorCode EraseLayerDLL(GUID i_layerCode)
+		ErrorCode EraseLayerDLL(GUID i_layerCode)
 		{
 			auto it = this->lppNNLayerDLL.begin();
 			while(it != this->lppNNLayerDLL.end())
@@ -311,17 +312,19 @@ namespace CustomDeepNNLibrary
 				// 削除
 				delete *it;
 				this->lppNNLayerDLL.erase(it);
-				return LAYER_ERROR_NONE;
+				return ERROR_CODE_NONE;
 			}
-			return LAYER_ERROR_DLL_ERASE_NOTFOUND;
+			return ERROR_CODE_DLL_ERASE_NOTFOUND;
 		}
 	};
 
 
 	// DLL管理クラスを作成
-	extern "C" NNLAYERDLLMANAGER_API INNLayerDLLManager* CreateLayerDLLManager()
+	extern "C" NNLAYERDLLMANAGER_API ILayerDLLManager* CreateLayerDLLManager()
 	{
 		return new NNLayerDLLManager();
 	}
-}
+
+}	// NeuralNetwork
+}	// Gravisbell
 

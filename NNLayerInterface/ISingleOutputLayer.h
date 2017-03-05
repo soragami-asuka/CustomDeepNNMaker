@@ -1,16 +1,18 @@
 //=======================================
 // 単一出力レイヤー
 //=======================================
-#ifndef __I_SINGLE_OUTPUT_LAYER_H__
-#define __I_SINGLE_OUTPUT_LAYER_H__
+#ifndef __GRAVISBELL_I_SINGLE_OUTPUT_LAYER_H__
+#define __GRAVISBELL_I_SINGLE_OUTPUT_LAYER_H__
 
-#include"LayerErrorCode.h"
+#include"Common/ErrorCode.h"
+#include"Common/IODataStruct.h"
+
 #include"ILayerBase.h"
-#include"IODataStruct.h"
 #include"IOutputLayer.h"
 
-namespace CustomDeepNNLibrary
-{
+namespace Gravisbell {
+namespace NeuralNetwork {
+
 	/** レイヤーベース */
 	class ISingleOutputLayer : public virtual IOutputLayer
 	{
@@ -34,8 +36,10 @@ namespace CustomDeepNNLibrary
 		/** 出力データバッファを取得する.
 			@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
 			@return 成功した場合0 */
-		virtual ELayerErrorCode GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const = 0;
+		virtual Gravisbell::ErrorCode GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const = 0;
 	};
-}
+
+}	// NeuralNetwork
+}	// GravisBell
 
 #endif

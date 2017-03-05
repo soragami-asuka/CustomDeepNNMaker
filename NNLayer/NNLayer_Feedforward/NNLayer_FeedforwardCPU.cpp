@@ -5,8 +5,7 @@
 //======================================
 #include"stdafx.h"
 
-#include"NNLayer_Feedforward.h"
-#include"NNLayer_Feedforward.hpp"
+#include"NNLayer_Feedforward_DATA.hpp"
 #include"NNLayer_FeedforwardBase.h"
 
 

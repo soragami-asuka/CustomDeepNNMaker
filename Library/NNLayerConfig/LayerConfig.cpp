@@ -1,32 +1,33 @@
-// NNLayerConfig.cpp : DLL アプリケーション用にエクスポートされる関数を定義します。
+// LayerConfig.cpp : DLL アプリケーション用にエクスポートされる関数を定義します。
 //
 
 #include "stdafx.h"
-#include "NNLayerConfig.h"
+#include "LayerConfig.h"
 
 #include<string>
 #include<vector>
 
-namespace CustomDeepNNLibrary
-{
-	class NNLayerConfig : public INNLayerConfigEx
+namespace Gravisbell {
+namespace NeuralNetwork {
+
+	class LayerConfig : public ILayerConfigEx
 	{
 	private:
 		GUID layerCode;
 		VersionCode versionCode;
 
-		std::vector<INNLayerConfigItemBase*> lpLayerConfigItem;
+		std::vector<ILayerConfigItemBase*> lpLayerConfigItem;
 
 	public:
 		/** コンストラクタ */
-		NNLayerConfig(const GUID& layerCode, const VersionCode& versionCode)
-			: INNLayerConfigEx()
+		LayerConfig(const GUID& layerCode, const VersionCode& versionCode)
+			: ILayerConfigEx()
 			, layerCode		(layerCode)
 			, versionCode	(versionCode)
 		{
 		}
 		/** コピーコンストラクタ */
-		NNLayerConfig(const NNLayerConfig& config)
+		LayerConfig(const LayerConfig& config)
 			: layerCode	(config.layerCode)
 			, versionCode (config.versionCode)
 		{
@@ -36,7 +37,7 @@ namespace CustomDeepNNLibrary
 			}
 		}
 		/** デストラクタ */
-		virtual ~NNLayerConfig()
+		virtual ~LayerConfig()
 		{
 			for(unsigned int itemNum=0; itemNum<lpLayerConfigItem.size(); itemNum++)
 			{
@@ -46,9 +47,9 @@ namespace CustomDeepNNLibrary
 		}
 
 		/** 一致演算 */
-		bool operator==(const INNLayerConfig& config)const
+		bool operator==(const ILayerConfig& config)const
 		{
-			NNLayerConfig* pConfig = (NNLayerConfig*)&config;
+			LayerConfig* pConfig = (LayerConfig*)&config;
 
 			// レイヤーコードの確認
 			if(this->layerCode != pConfig->layerCode)
@@ -64,8 +65,8 @@ namespace CustomDeepNNLibrary
 			// 各アイテムの確認
 			for(unsigned int itemNum=0; itemNum<this->lpLayerConfigItem.size(); itemNum++)
 			{
-				INNLayerConfigItemBase* pItemL = this->lpLayerConfigItem[itemNum];
-				INNLayerConfigItemBase* pItemR = pConfig->lpLayerConfigItem[itemNum];
+				ILayerConfigItemBase* pItemL = this->lpLayerConfigItem[itemNum];
+				ILayerConfigItemBase* pItemR = pConfig->lpLayerConfigItem[itemNum];
 
 				// どちらか片方がNULLだった場合は終了
 				if((pItemL == NULL) ^ (pItemR == NULL))
@@ -83,26 +84,26 @@ namespace CustomDeepNNLibrary
 			return true;
 		}
 		/** 不一致演算 */
-		bool operator!=(const INNLayerConfig& config)const
+		bool operator!=(const ILayerConfig& config)const
 		{
 			return !(*this == config);
 		}
 
 		/** 自身の複製を作成する */
-		virtual INNLayerConfig* Clone()const
+		virtual ILayerConfig* Clone()const
 		{
-			return new NNLayerConfig(*this);
+			return new LayerConfig(*this);
 		}
 
 	public:
 		/** レイヤー識別コードを取得する.
 			@param o_layerCode	格納先バッファ
 			@return 成功した場合0 */
-		ELayerErrorCode GetLayerCode(GUID& o_guid)const
+		ErrorCode GetLayerCode(GUID& o_guid)const
 		{
 			o_guid = this->layerCode;
 
-			return LAYER_ERROR_NONE;
+			return ERROR_CODE_NONE;
 		}
 
 	public:
@@ -112,14 +113,21 @@ namespace CustomDeepNNLibrary
 			return this->lpLayerConfigItem.size();
 		}
 		/** 設定項目を番号指定で取得する */
-		const INNLayerConfigItemBase* GetItemByNum(unsigned int num)const
+		ILayerConfigItemBase* GetItemByNum(U32 i_num)
 		{
-			if(num >= this->lpLayerConfigItem.size())
+			if(i_num >= this->lpLayerConfigItem.size())
 				return NULL;
-			return this->lpLayerConfigItem[num];
+			return this->lpLayerConfigItem[i_num];
+		}
+		/** 設定項目を番号指定で取得する */
+		const ILayerConfigItemBase* GetItemByNum(U32 i_num)const
+		{
+			if(i_num >= this->lpLayerConfigItem.size())
+				return NULL;
+			return this->lpLayerConfigItem[i_num];
 		}
 		/** 設定項目をID指定で取得する */
-		const INNLayerConfigItemBase* GetItemByID(const wchar_t i_szIDBuf[])const
+		const ILayerConfigItemBase* GetItemByID(const wchar_t i_szIDBuf[])const
 		{
 			// 同一IDを検索
 			for(unsigned int i=0; i<this->lpLayerConfigItem.size(); i++)
@@ -127,7 +135,7 @@ namespace CustomDeepNNLibrary
 				wchar_t szID[CONFIGITEM_NAME_MAX];
 
 				// 対象項目のIDを取得
-				if(this->lpLayerConfigItem[i]->GetConfigID(szID) != ELayerErrorCode::LAYER_ERROR_NONE)
+				if(this->lpLayerConfigItem[i]->GetConfigID(szID) != ErrorCode::ERROR_CODE_NONE)
 					continue;
 
 				// 比較
@@ -139,7 +147,7 @@ namespace CustomDeepNNLibrary
 		
 		/** アイテムを追加する.
 			追加されたアイテムは内部でdeleteされる. */
-		int AddItem(INNLayerConfigItemBase* pItem)
+		int AddItem(ILayerConfigItemBase* pItem)
 		{
 			if(pItem == NULL)
 				return -1;
@@ -168,7 +176,7 @@ namespace CustomDeepNNLibrary
 			for(unsigned int itemNum=0; itemNum<this->lpLayerConfigItem.size(); itemNum++)
 			{
 				// アイテム種別
-				bufferSize += sizeof(NNLayerConfigItemType);
+				bufferSize += sizeof(LayerConfigItemType);
 
 				// アイテム
 				bufferSize += this->lpLayerConfigItem[itemNum]->GetUseBufferByteCount();
@@ -222,12 +230,12 @@ namespace CustomDeepNNLibrary
 
 
 
-			std::vector<INNLayerConfigItemBase*> lpTmpItem;
+			std::vector<ILayerConfigItemBase*> lpTmpItem;
 			for(unsigned int itemNum=0; itemNum<itemCount; itemNum++)
 			{
 				// アイテム種別
-				NNLayerConfigItemType itemType = *(NNLayerConfigItemType*)&i_lpBuffer[bufferPos];
-				bufferPos += sizeof(NNLayerConfigItemType);
+				LayerConfigItemType itemType = *(LayerConfigItemType*)&i_lpBuffer[bufferPos];
+				bufferPos += sizeof(LayerConfigItemType);
 
 				if(this->lpLayerConfigItem[itemNum]->GetItemType() != itemType)
 					return -1;
@@ -262,8 +270,8 @@ namespace CustomDeepNNLibrary
 			for(unsigned int itemNum=0; itemNum<this->lpLayerConfigItem.size(); itemNum++)
 			{
 				// アイテム種別
-				*(NNLayerConfigItemType*)&o_lpBuffer[bufferPos] = this->lpLayerConfigItem[itemNum]->GetItemType();
-				bufferPos += sizeof(NNLayerConfigItemType);
+				*(LayerConfigItemType*)&o_lpBuffer[bufferPos] = this->lpLayerConfigItem[itemNum]->GetItemType();
+				bufferPos += sizeof(LayerConfigItemType);
 
 				// アイテム
 				bufferPos += this->lpLayerConfigItem[itemNum]->WriteToBuffer(&o_lpBuffer[bufferPos]);
@@ -271,11 +279,51 @@ namespace CustomDeepNNLibrary
 
 			return bufferPos;
 		}
+
+	public:
+		/** 構造体にデータを格納する.
+			@param	o_lpBuffer	構造体の先頭アドレス. 構造体はConvertNNCofigToSourceから出力されたソースを使用する. */
+		ErrorCode WriteToStruct(BYTE* o_lpBuffer)const
+		{
+			unsigned int bufferPos = 0;
+			
+			// 各アイテム
+			for(unsigned int itemNum=0; itemNum<this->lpLayerConfigItem.size(); itemNum++)
+			{
+				const ILayerConfigItemBase* pItemBase = this->GetItemByNum(itemNum);
+				if(pItemBase == NULL)
+					continue;
+
+				bufferPos += pItemBase->WriteToStruct(&o_lpBuffer[bufferPos]);
+			}
+
+			return ErrorCode::ERROR_CODE_NONE;
+		}
+		/** 構造体からデータを読み込む.
+			@param	o_lpBuffer	構造体の先頭アドレス. 構造体はConvertNNCofigToSourceから出力されたソースを使用する. */
+		ErrorCode ReadFromStruct(const BYTE* i_lpBuffer)
+		{
+			unsigned int bufferPos = 0;
+			
+			// 各アイテム
+			for(unsigned int itemNum=0; itemNum<this->lpLayerConfigItem.size(); itemNum++)
+			{
+				ILayerConfigItemBase* pItemBase = this->GetItemByNum(itemNum);
+				if(pItemBase == NULL)
+					continue;
+
+				bufferPos += pItemBase->ReadFromStruct(&i_lpBuffer[bufferPos]);
+			}
+
+			return ErrorCode::ERROR_CODE_NONE;
+		}
 	};
 
 	/** 空のレイヤー設定情報を作成する */
-	extern "C" NNLAYERCONFIG_API INNLayerConfigEx* CreateEmptyLayerConfig(const GUID& layerCode, const VersionCode& versionCode)
+	extern "C" NNLAYERCONFIG_API ILayerConfigEx* CreateEmptyLayerConfig(const GUID& layerCode, const VersionCode& versionCode)
 	{
-		return new NNLayerConfig(layerCode, versionCode);
+		return new LayerConfig(layerCode, versionCode);
 	}
-}
+
+}	// NeuralNetwork
+}	// Gravisbell

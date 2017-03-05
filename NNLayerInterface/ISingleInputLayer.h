@@ -1,16 +1,18 @@
 //=======================================
 // 単一入力レイヤー
 //=======================================
-#ifndef __I_SINGLE_INPUT_LAYER_H__
-#define __I_SINGLE_INPUT_LAYER_H__
+#ifndef __GRAVISBELL_I_SINGLE_INPUT_LAYER_H__
+#define __GRAVISBELL_I_SINGLE_INPUT_LAYER_H__
 
-#include"LayerErrorCode.h"
+#include"Common/ErrorCode.h"
+#include"Common/IODataStruct.h"
+
 #include"ILayerBase.h"
-#include"IODataStruct.h"
 #include"IInputLayer.h"
 
-namespace CustomDeepNNLibrary
-{
+namespace Gravisbell {
+namespace NeuralNetwork {
+
 	/** レイヤーベース */
 	class ISingleInputLayer : public virtual IInputLayer
 	{
@@ -30,17 +32,15 @@ namespace CustomDeepNNLibrary
 		virtual CONST_BATCH_BUFFER_POINTER GetDInputBuffer()const = 0;
 		/** 学習差分を取得する.
 			@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
-		virtual ELayerErrorCode GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const = 0;
+		virtual Gravisbell::ErrorCode GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const = 0;
 
 	public:
 		/** 入力データ構造を取得する.
 			@return	入力データ構造 */
 		virtual const IODataStruct GetInputDataStruct()const = 0;
-		/** 入力データ構造を取得する
-			@param	o_inputDataStruct	入力データ構造の格納先
-			@return	成功した場合0 */
-		virtual ELayerErrorCode GetInputDataStruct(IODataStruct& o_inputDataStruct)const = 0;
 	};
-}
+
+}	// NeuralNetwork
+}	// Gravisbell
 
 #endif
