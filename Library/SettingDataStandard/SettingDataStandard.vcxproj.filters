@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{c6ccc7b2-701d-47a7-bb02-81825cf345bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Common">
+      <UniqueIdentifier>{e2ece142-1023-48be-9aba-039adef93f3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\NNLayerInterface">
+      <UniqueIdentifier>{d0dc0bc6-4112-4eef-be92-57124d41cdcd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\SettingData">
+      <UniqueIdentifier>{d6fee5fe-7d38-4c3d-ac97-d9ad006aa1f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\SettingData\Standard">
+      <UniqueIdentifier>{dfd0f1e1-95af-4345-a4c6-ca6fe1386733}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Common\ErrorCode.h">
+      <Filter>include\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Common\Guiddef.h">
+      <Filter>include\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Common\IODataStruct.h">
+      <Filter>include\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Common\VersionCode.h">
+      <Filter>include\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Common\Common.h">
+      <Filter>include\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\NNLayerInterface\IIODataLayer.h">
+      <Filter>include\NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\NNLayerInterface\ILayerBase.h">
+      <Filter>include\NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\NNLayerInterface\IMultInputLayer.h">
+      <Filter>include\NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\NNLayerInterface\INNLayer.h">
+      <Filter>include\NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\NNLayerInterface\INNLayerDLL.h">
+      <Filter>include\NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\NNLayerInterface\INNLayerDLLManager.h">
+      <Filter>include\NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\NNLayerInterface\IOutputLayer.h">
+      <Filter>include\NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\NNLayerInterface\ISingleInputLayer.h">
+      <Filter>include\NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\NNLayerInterface\ISingleOutputLayer.h">
+      <Filter>include\NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\NNLayerInterface\NNlayerFunction.h">
+      <Filter>include\NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\NNLayerInterface\IBatchDataNoListGenerator.h">
+      <Filter>include\NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\NNLayerInterface\IDataLayer.h">
+      <Filter>include\NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\NNLayerInterface\IInputLayer.h">
+      <Filter>include\NNLayerInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\SettingData\Standard\IData.h">
+      <Filter>include\SettingData\Standard</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemBase.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="IDataEx.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="SettingDataStandard.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="IItemEx_Enum.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingDataStandard.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Item_Bool.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Item_Enum.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Item_Float.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Item_Int.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Item_String.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

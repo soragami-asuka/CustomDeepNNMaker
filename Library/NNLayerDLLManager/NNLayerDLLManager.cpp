@@ -75,7 +75,7 @@ namespace NeuralNetwork {
 
 
 		/** レイヤー設定を作成する */
-		ILayerConfig* CreateLayerConfig(void)const
+		SettingData::Standard::IData* CreateLayerConfig(void)const
 		{
 			if(this->funcCreateLayerConfig == NULL)
 				return NULL;
@@ -87,7 +87,7 @@ namespace NeuralNetwork {
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@param o_useBufferSize 実際に読み込んだバッファサイズ
 			@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-		ILayerConfig* CreateLayerConfigFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)const
+		SettingData::Standard::IData* CreateLayerConfigFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)const
 		{
 			if(this->funcCreateLayerConfigFromBuffer == NULL)
 				return NULL;
