@@ -229,7 +229,7 @@ namespace NeuralNetwork {
 
 		/** 学習ループの初期化処理.データセットの学習開始前に実行する
 			失敗した場合はCalculate以降の処理は実行不可. */
-		Gravisbell::ErrorCode PreProcessLearnLoop(const ILayerConfig& config)
+		Gravisbell::ErrorCode PreProcessLearnLoop(const SettingData::Standard::IData& config)
 		{
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
@@ -267,7 +267,7 @@ namespace NeuralNetwork {
 	public:
 		/** 入力データ構造を取得する.
 			@return	入力データ構造 */
-		const IODataStruct GetInputDataStruct()const
+		IODataStruct GetInputDataStruct()const
 		{
 			return this->GetDataStruct();
 		}

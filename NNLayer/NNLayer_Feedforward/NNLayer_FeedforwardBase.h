@@ -16,7 +16,9 @@ namespace NeuralNetwork {
 	class NNLayer_FeedforwardBase : public Gravisbell::NeuralNetwork::INNLayer
 	{
 	protected:
-		GUID guid;
+		GUID guid;	/**< レイヤー識別用のGUID */
+
+		IODataStruct inputDataStruct;	/**< 入力データ構造 */
 
 		SettingData::Standard::IData* pLayerStructure;	/**< レイヤー構造を定義したコンフィグクラス */
 		SettingData::Standard::IData* pLearnData;		/**< 学習設定を定義したコンフィグクラス */
@@ -81,7 +83,7 @@ namespace NeuralNetwork {
 	public:
 		/** 入力データ構造を取得する.
 			@return	入力データ構造 */
-		virtual const IODataStruct GetInputDataStruct()const = 0;
+		virtual IODataStruct GetInputDataStruct()const;
 
 		/** 入力バッファ数を取得する. */
 		unsigned int GetInputBufferCount()const;

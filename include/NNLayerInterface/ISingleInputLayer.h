@@ -37,7 +37,7 @@ namespace NeuralNetwork {
 	public:
 		/** 入力データ構造を取得する.
 			@return	入力データ構造 */
-		virtual const IODataStruct GetInputDataStruct()const = 0;
+		virtual IODataStruct GetInputDataStruct()const = 0;
 	};
 
 }	// NeuralNetwork
