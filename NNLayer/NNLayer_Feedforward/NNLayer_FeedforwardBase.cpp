@@ -19,7 +19,7 @@ NNLayer_FeedforwardBase::NNLayer_FeedforwardBase(Gravisbell::GUID guid)
 	,	pLayerStructure	(NULL)
 	,	pLearnData		(NULL)
 	,	lppInputFromLayer	()		/**< 入力元レイヤーのリスト */
-	,	lppOutputToLayer()	/**< 出力先レイヤーのリスト */
+	,	lppOutputToLayer	()		/**< 出力先レイヤーのリスト */
 {
 }
 
@@ -37,6 +37,13 @@ NNLayer_FeedforwardBase::~NNLayer_FeedforwardBase()
 // レイヤー共通
 //===========================
 
+/** レイヤー種別の取得.
+	ELayerKind の組み合わせ. */
+unsigned int NNLayer_FeedforwardBase::GetLayerKindBase()const
+{
+	return Gravisbell::NeuralNetwork::LAYER_KIND_CALC | Gravisbell::NeuralNetwork::LAYER_KIND_SINGLE_INPUT | Gravisbell::NeuralNetwork::LAYER_KIND_SINGLE_OUTPUT;
+}
+
 /** レイヤー固有のGUIDを取得する */
 Gravisbell::ErrorCode NNLayer_FeedforwardBase::GetGUID(Gravisbell::GUID& o_guid)const
 {
@@ -52,6 +59,14 @@ Gravisbell::ErrorCode NNLayer_FeedforwardBase::GetLayerCode(Gravisbell::GUID& o_
 {
 	return ::GetLayerCode(o_layerCode);
 }
+
+/** バッチサイズを取得する.
+	@return 同時に演算を行うバッチのサイズ */
+unsigned int NNLayer_FeedforwardBase::GetBatchSize()const
+{
+	return this->batchSize;
+}
+
 
 /** 設定情報を設定 */
 Gravisbell::ErrorCode NNLayer_FeedforwardBase::SetLayerConfig(const SettingData::Standard::IData& config)

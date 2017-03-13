@@ -134,6 +134,11 @@
       <SubType>Designer</SubType>
     </Xml>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Library\SettingDataStandard\SettingDataStandard.vcxproj">
+      <Project>{79fd5f13-1407-43ab-834c-04c1aeccdbb5}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

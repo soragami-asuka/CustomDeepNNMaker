@@ -301,8 +301,6 @@ namespace NeuralNetwork {
 			}
 
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-
-			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
 
 

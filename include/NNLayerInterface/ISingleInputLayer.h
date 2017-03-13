@@ -23,8 +23,12 @@ namespace NeuralNetwork {
 		virtual ~ISingleInputLayer(){}
 
 	public:
+		/** 入力データ構造を取得する.
+			@return	入力データ構造 */
+		virtual IODataStruct GetInputDataStruct()const = 0;
+
 		/** 入力バッファ数を取得する. byte数では無くデータの数なので注意 */
-		virtual unsigned int GetInputBufferCount()const = 0;
+		virtual U32 GetInputBufferCount()const = 0;
 
 		/** 学習差分を取得する.
 			配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]
@@ -33,11 +37,6 @@ namespace NeuralNetwork {
 		/** 学習差分を取得する.
 			@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
 		virtual ErrorCode GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const = 0;
-
-	public:
-		/** 入力データ構造を取得する.
-			@return	入力データ構造 */
-		virtual IODataStruct GetInputDataStruct()const = 0;
 	};
 
 }	// NeuralNetwork

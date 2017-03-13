@@ -27,7 +27,7 @@ namespace NeuralNetwork {
 		virtual IODataStruct GetOutputDataStruct()const = 0;
 
 		/** 出力バッファ数を取得する. byte数では無くデータの数なので注意 */
-		virtual unsigned int GetOutputBufferCount()const = 0;
+		virtual U32 GetOutputBufferCount()const = 0;
 
 		/** 出力データバッファを取得する.
 			配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]

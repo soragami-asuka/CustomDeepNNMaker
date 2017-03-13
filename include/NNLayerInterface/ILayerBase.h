@@ -16,7 +16,7 @@ namespace Gravisbell {
 namespace NeuralNetwork {
 
 	/** レイヤー種別 */
-	enum ELayerKind
+	enum ELayerKind : U32
 	{
 		LAYER_KIND_CPU = 0x00 << 16,	/**< CPU処理レイヤー */
 		LAYER_KIND_GPU = 0x01 << 16,	/**< GPU処理レイヤー */

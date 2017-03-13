@@ -20,22 +20,30 @@ private:
 	std::vector<NEURON_TYPE>				lpBias;				/**< ニューロンのバイアス<ニューロン数> */
 
 	// 入出力バッファ
-	std::vector<std::vector<F32>>						lpOutputBuffer;		/**< 出力バッファ */
-	std::vector<std::vector<F32>>						lpDInputBuffer;		/**< 入力誤差差分<入力信号数> */
-
-	float learnCoeff;	/**< 学習係数 */
+	std::vector<std::vector<F32>>			lpOutputBuffer;		/**< 出力バッファ <バッチ数><ニューロン数> */
+	std::vector<std::vector<F32>>			lpDInputBuffer;		/**< 入力誤差差分 <バッチ数><入力信号数> */
+	
+	std::vector<F32*>						lppBatchOutputBuffer;		/**< バッチ処理用出力バッファ <バッチ数> */
+	std::vector<F32*>						lppBatchDInputBuffer;		/**< バッチ処理用入力誤差差分 <バッチ数> */
 
 	// Get関数を使うと処理不可がかさむので一時保存用. PreCalculateで値を格納.
 	U32 inputBufferCount;				/**< 入力バッファ数 */
 	U32 neuronCount;					/**< ニューロン数 */
 	U32 outputBufferCount;				/**< 出力バッファ数 */
-	std::vector<int> lpDOutputBufferPosition;	/**< 各出力先レイヤー内での出力差分バッファの位置 */
+
+	// 演算時の入力データ
+	CONST_BATCH_BUFFER_POINTER m_lppInputBuffer;	/**< 演算時の入力データ */
+	CONST_BATCH_BUFFER_POINTER m_lppDOutputBuffer;	/**< 入力誤差計算時の出力誤差データ */
 
 public:
 	/** コンストラクタ */
-	NNLayer_FeedforwardCPU(GUID guid)
-		:	NNLayer_FeedforwardBase(guid)
-		,	learnCoeff	(0.01f)
+	NNLayer_FeedforwardCPU(Gravisbell::GUID guid)
+		:	NNLayer_FeedforwardBase	(guid)
+		,	inputBufferCount		(0)		/**< 入力バッファ数 */
+		,	neuronCount				(0)		/**< ニューロン数 */
+		,	outputBufferCount		(0)		/**< 出力バッファ数 */
+		,	m_lppInputBuffer		(NULL)	/**< 演算時の入力データ */
+		,	m_lppDOutputBuffer		(NULL)	/**< 入力誤差計算時の出力誤差データ */
 	{
 	}
 	/** デストラクタ */
@@ -103,7 +111,7 @@ public:
 		// 入力データ構造の設定
 		this->inputDataStruct = i_inputDataStruct;
 
-		this->Initialize();
+		return this->Initialize();
 	}
 	/** 初期化. バッファからデータを読み込む
 		@param i_lpBuffer	読み込みバッファの先頭アドレス.
@@ -178,42 +186,17 @@ public:
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
 	ErrorCode PreProcessLearn(unsigned int batchSize)
 	{
-		this->batchSize = batchSize;
-
-		// 入力バッファ数を確認
-		this->inputBufferCount = this->GetInputBufferCount();
-		if(this->inputBufferCount == 0)
-			return ErrorCode::ERROR_CODE_FRAUD_INPUT_COUNT;
-		
-		// ニューロン数を確認
-		this->neuronCount = this->GetNeuronCount();
-		if(this->neuronCount == 0)
-			return ErrorCode::ERROR_CODE_FRAUD_NEURON_COUNT;
-
-		// 出力バッファ数を確認
-		this->outputBufferCount = this->GetOutputBufferCount();
-		if(this->outputBufferCount == 0)
-			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
-
-		// ニューロンバッファのサイズ確認
-		if(this->lppNeuron.size() != this->neuronCount)
-			return ErrorCode::ERROR_CODE_FRAUD_NEURON_COUNT;
-		if(this->lppNeuron[0].size() != this->inputBufferCount)
-			return ErrorCode::ERROR_CODE_FRAUD_NEURON_COUNT;
-
-
-		// 出力バッファを作成
-		this->lpOutputBuffer.resize(this->batchSize);
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
-		{
-			this->lpOutputBuffer[batchNum].resize(this->outputBufferCount);
-		}
+		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
+		if(errorCode != ErrorCode::ERROR_CODE_NONE)
+			return errorCode;
 
 		// 入力差分バッファを作成
 		this->lpDInputBuffer.resize(this->batchSize);
+		this->lppBatchDInputBuffer.resize(this->batchSize);
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 		{
 			this->lpDInputBuffer[batchNum].resize(this->inputBufferCount);
+			this->lppBatchDInputBuffer[batchNum] = &this->lpDInputBuffer[batchNum][0];
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
@@ -251,9 +234,11 @@ public:
 
 		// 出力バッファを作成
 		this->lpOutputBuffer.resize(this->batchSize);
+		this->lppBatchOutputBuffer.resize(this->batchSize);
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 		{
 			this->lpOutputBuffer[batchNum].resize(this->outputBufferCount);
+			this->lppBatchOutputBuffer[batchNum] = &this->lpOutputBuffer[batchNum][0];
 		}
 
 		// 入力差分バッファを作成
@@ -272,7 +257,7 @@ public:
 		this->pLearnData = data.Clone();
 
 		// 構造体に読み込む
-		this->pLearnData->WriteToStruct((BYTE*)&this->learnData);
+		return this->pLearnData->WriteToStruct((BYTE*)&this->learnData);
 	}
 
 
@@ -281,6 +266,8 @@ public:
 		@return 成功した場合0が返る */
 	ErrorCode Calculate(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer)
 	{
+		this->m_lppInputBuffer = i_lppInputBuffer;
+
 		for(unsigned int batchNum=0; batchNum<this->batchSize; batchNum++)
 		{
 			for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
@@ -303,20 +290,29 @@ public:
 	}
 
 	/** 出力データバッファを取得する.
-		配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
+		配列の要素数はGetOutputBufferCountの戻り値.
 		@return 出力データ配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER GetOutputBuffer()const
 	{
-		return &this->lpOutputBuffer[0];
+		return &this->lppBatchOutputBuffer[0];
 	}
 	/** 出力データバッファを取得する.
-		@param lpOutputBuffer	出力データ格納先配列. GetOutputBufferCountで取得した値の要素数が必要
+		@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
 		@return 成功した場合0 */
-	ELayerErrorCode GetOutputBuffer(float lpOutputBuffer[])const
+	ErrorCode GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
 	{
-		memcpy(lpOutputBuffer, &this->lpOutput[0], this->lpOutput.size() * sizeof(float));
+		if(o_lpOutputBuffer == NULL)
+			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
 
-		return LAYER_ERROR_NONE;
+		const U32 batchSize = this->GetBatchSize();
+		const U32 outputBufferCount = this->GetOutputBufferCount();
+
+		for(U32 batchNum=0; batchNum<batchSize; batchNum++)
+		{
+			memcpy(o_lpOutputBuffer[batchNum], this->lppBatchOutputBuffer[batchNum], sizeof(F32)*outputBufferCount);
+		}
+
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 
 public:
@@ -324,89 +320,83 @@ public:
 	// 学習処理
 	//================================
 	/** 学習誤差を計算する.
+		入力信号、出力信号は直前のCalculateの値を参照する.
+		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ELayerErrorCode CalculateLearnError()
+	ErrorCode CalculateLearnError(CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
-		// 出力誤差差分を計算
-		for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
+		for(unsigned int batchNum=0; batchNum<this->batchSize; batchNum++)
 		{
-			// 各出力先レイヤーの出力差分の合計値を求める
-			float sumDOutput = 0.0f;
-			for(unsigned int outputToLayerNum=0; outputToLayerNum<this->GetOutputToLayerCount(); outputToLayerNum++)
-			{
-				sumDOutput += this->GetOutputToLayerByNum(outputToLayerNum)->GetDInputBuffer()[this->lpDOutputBufferPosition[outputToLayerNum] + neuronNum];
-			}
-			this->lpDOutputBuffer[neuronNum] = sumDOutput;
-		}
-
-		// 入力誤差差分を計算
-		unsigned int inputNum = 0;
-		for(unsigned int inputLayerNum=0; inputLayerNum<this->GetInputFromLayerCount(); inputLayerNum++)
-		{
-			auto pInputLayer = this->GetInputFromLayerByNum(inputLayerNum);
-			for(unsigned int layerInputNum=0; layerInputNum<pInputLayer->GetOutputBufferCount(); layerInputNum++)
+			// 入力誤差差分を計算
+			for(unsigned int inputNum=0; inputNum<this->inputBufferCount; inputNum++)
 			{
 				float tmp = 0.0f;
 
 				for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
 				{
-					tmp += this->lpDOutputBuffer[neuronNum] * this->lppNeuron[neuronNum][inputNum];
+					tmp += i_lppDOutputBuffer[batchNum][neuronNum] * this->lppNeuron[neuronNum][inputNum];
 				}
 
-				this->lpDInputBuffer[inputNum] = pInputLayer->GetOutputBuffer()[layerInputNum] * (1.0f - pInputLayer->GetOutputBuffer()[layerInputNum]) * tmp;
-				inputNum++;
+				this->lpDInputBuffer[batchNum][inputNum] = this->m_lppInputBuffer[batchNum][inputNum] * (1.0f - this->m_lppInputBuffer[batchNum][inputNum]) * tmp;
 			}
 		}
 
-		return LAYER_ERROR_NONE;
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 
-	/** 誤差差分をレイヤーに反映させる */
-	ELayerErrorCode ReflectionLearnError(void)
+	/** 学習差分をレイヤーに反映させる.
+		入力信号、出力信号は直前のCalculateの値を参照する.
+		出力誤差差分、入力誤差差分は直前のCalculateLearnErrorの値を参照する. */
+	ErrorCode ReflectionLearnError(void)
 	{
-		for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
+		for(unsigned int batchNum=0; batchNum<this->batchSize; batchNum++)
 		{
-			// バイアス更新
-			this->lpBias[neuronNum] += this->learnCoeff * this->lpDOutputBuffer[neuronNum];
-
-			// 入力対応ニューロン更新
-			unsigned int inputNum = 0;
-			for(unsigned int inputLayerNum=0; inputLayerNum<this->GetInputFromLayerCount(); inputLayerNum++)
+			for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
 			{
-				auto pInputLayer = this->GetInputFromLayerByNum(inputLayerNum);
-				for(unsigned int layerInputNum=0; layerInputNum<pInputLayer->GetOutputBufferCount(); layerInputNum++)
+				// バイアス更新
+				this->lpBias[neuronNum] += this->learnData.LearnCoeff * this->m_lppDOutputBuffer[batchNum][neuronNum];
+
+				// 入力対応ニューロン更新
+				for(unsigned int inputNum=0; inputNum<this->inputBufferCount; inputNum++)
 				{
-					this->lppNeuron[neuronNum][inputNum] += this->learnCoeff * this->lpDOutputBuffer[neuronNum] * pInputLayer->GetOutputBuffer()[layerInputNum];
-					inputNum++;
+					this->lppNeuron[neuronNum][inputNum] += this->learnData.LearnCoeff * this->m_lppDOutputBuffer[batchNum][neuronNum] * this->m_lppInputBuffer[batchNum][inputNum];
 				}
 			}
 		}
 
-		return LAYER_ERROR_NONE;
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 
 	/** 学習差分を取得する.
-		配列の要素数はGetOutputBufferCountの戻り値.
+		配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]
 		@return	誤差差分配列の先頭ポインタ */
-	const float* GetDInputBuffer()const
+	CONST_BATCH_BUFFER_POINTER GetDInputBuffer()const
 	{
-		return &this->lpDInputBuffer[0];
+		return &this->lppBatchDInputBuffer[0];
 	}
 	/** 学習差分を取得する.
-		@param lpDOutputBuffer	学習差分を格納する配列. GetOutputBufferCountで取得した値の要素数が必要 */
-	ELayerErrorCode GetDInputBuffer(float o_lpDInputBuffer[])const
+		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
+	ErrorCode GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const
 	{
-		memcpy(o_lpDInputBuffer, &this->lpDInputBuffer[0], this->lpDInputBuffer.size() * sizeof(float));
+		if(o_lpDInputBuffer == NULL)
+			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
 
-		return LAYER_ERROR_NONE;
+		const U32 batchSize = this->GetBatchSize();
+		const U32 inputBufferCount = this->GetInputBufferCount();
+
+		for(U32 batchNum=0; batchNum<batchSize; batchNum++)
+		{
+			memcpy(o_lpDInputBuffer[batchNum], this->lppBatchDInputBuffer[batchNum], sizeof(F32)*inputBufferCount);
+		}
+
+		return ErrorCode::ERROR_CODE_NONE;
 	}
+
 };
 
 
 /** CPU処理用のレイヤーを作成 */
-EXPORT_API CustomDeepNNLibrary::INNLayer* CreateLayerCPU(GUID guid)
+EXPORT_API Gravisbell::NeuralNetwork::INNLayer* CreateLayerCPU(Gravisbell::GUID guid)
 {
 	return new NNLayer_FeedforwardCPU(guid);
-
-	return NULL;
 }

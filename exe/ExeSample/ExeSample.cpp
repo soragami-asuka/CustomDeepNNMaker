@@ -6,14 +6,16 @@
 #include<vector>
 #include<list>
 
-#include"INNLayerConfig.h"
-#include"IIODataLayer.h"
-#include"NNLayerFunction.h"
+#include"SettingData/Standard/IData.h"
+#include"NNLayerInterface\INNLayerDLL.h"
+#include"NNLayerInterface\IIODataLayer.h"
 
 #include"../Library/NNLayerDLLManager/NNLayerDLLManager.h"
 #include"../NNLayer/IODataLayer/IODataLayer.h"
 
 #include<Windows.h>
+
+#if 0
 
 /** CPU制御レイヤーを作成する */
 CustomDeepNNLibrary::INNLayer* CreateLayerCPU(const CustomDeepNNLibrary::INNLayerDLL* pLayerDLL, unsigned int neuronCount);
@@ -342,4 +344,20 @@ void NNTest_IN1_1_1_O1(CustomDeepNNLibrary::INNLayerDLLManager& dllManager, cons
 	// レイヤーを削除
 	for(auto pLayer : lpLayer)
 		delete pLayer;
+}
+
+#endif
+
+
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	Gravisbell::IODataStruct ioDataStruct(1, 1, 1, 1);
+
+	Gravisbell::NeuralNetwork::IIODataLayer* pIODataLayer = ::CreateIODataLayerCPU(ioDataStruct);
+
+	printf("Press any key to Continue\n");
+	getc(stdin);
+
+	return 0;
 }

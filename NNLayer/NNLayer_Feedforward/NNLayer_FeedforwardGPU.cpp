@@ -5,15 +5,18 @@
 //======================================
 #include"stdafx.h"
 
-#include"NNLayer_Feedforward.h"
+#include"NNLayer_Feedforward_DATA.hpp"
 #include"NNLayer_FeedforwardBase.h"
+#include"NNLayer_Feedforward_FUNC.hpp"
 
+using namespace Gravisbell;
+using namespace Gravisbell::NeuralNetwork;
 
 
 
 
 /** CPUˆ——p‚ÌƒŒƒCƒ„[‚ğì¬ */
-EXPORT_API CustomDeepNNLibrary::INNLayer* CreateLayerGPU(GUID guid)
+EXPORT_API Gravisbell::NeuralNetwork::INNLayer* CreateLayerGPU(Gravisbell::GUID guid)
 {
 //	return new NNLayer_FeedforwardCPU(guid);
 	return NULL;

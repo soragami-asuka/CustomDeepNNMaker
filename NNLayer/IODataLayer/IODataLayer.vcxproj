@@ -41,9 +41,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>Gravisbell.$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <TargetName>Gravisbell.$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -83,20 +85,19 @@
     <ClInclude Include="..\..\Common\Guiddef.h" />
     <ClInclude Include="..\..\Common\IODataStruct.h" />
     <ClInclude Include="..\..\Common\VersionCode.h" />
-    <ClInclude Include="..\..\NNLayerInterface\IBatchDataNoListGenerator.h" />
-    <ClInclude Include="..\..\NNLayerInterface\IDataLayer.h" />
-    <ClInclude Include="..\..\NNLayerInterface\IInputLayer.h" />
-    <ClInclude Include="..\..\NNLayerInterface\IIODataLayer.h" />
-    <ClInclude Include="..\..\NNLayerInterface\ILayerBase.h" />
-    <ClInclude Include="..\..\NNLayerInterface\ILayerConfig.h" />
-    <ClInclude Include="..\..\NNLayerInterface\IMultInputLayer.h" />
-    <ClInclude Include="..\..\NNLayerInterface\INNLayer.h" />
-    <ClInclude Include="..\..\NNLayerInterface\INNLayerDLL.h" />
-    <ClInclude Include="..\..\NNLayerInterface\INNLayerDLLManager.h" />
-    <ClInclude Include="..\..\NNLayerInterface\IOutputLayer.h" />
-    <ClInclude Include="..\..\NNLayerInterface\ISingleInputLayer.h" />
-    <ClInclude Include="..\..\NNLayerInterface\ISingleOutputLayer.h" />
-    <ClInclude Include="..\..\NNLayerInterface\NNlayerFunction.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\IBatchDataNoListGenerator.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\IDataLayer.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\IInputLayer.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\IIODataLayer.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\ILayerBase.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\IMultInputLayer.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\INNLayer.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\INNLayerDLL.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\INNLayerDLLManager.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\IOutputLayer.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\ISingleInputLayer.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\ISingleOutputLayer.h" />
+    <ClInclude Include="..\..\include\NNLayerInterface\NNlayerFunction.h" />
     <ClInclude Include="IODataLayer.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />

@@ -48,46 +48,43 @@
     <ClInclude Include="..\..\Common\Guiddef.h">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\IDataLayer.h">
+    <ClInclude Include="..\..\include\NNLayerInterface\IInputLayer.h">
       <Filter>NNLayerInterface</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\IInputLayer.h">
+    <ClInclude Include="..\..\include\NNLayerInterface\IIODataLayer.h">
       <Filter>NNLayerInterface</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\IIODataLayer.h">
+    <ClInclude Include="..\..\include\NNLayerInterface\ILayerBase.h">
       <Filter>NNLayerInterface</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\ILayerBase.h">
+    <ClInclude Include="..\..\include\NNLayerInterface\IMultInputLayer.h">
       <Filter>NNLayerInterface</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\IMultInputLayer.h">
+    <ClInclude Include="..\..\include\NNLayerInterface\INNLayer.h">
       <Filter>NNLayerInterface</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\INNLayer.h">
+    <ClInclude Include="..\..\include\NNLayerInterface\INNLayerDLL.h">
       <Filter>NNLayerInterface</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\ILayerConfig.h">
+    <ClInclude Include="..\..\include\NNLayerInterface\INNLayerDLLManager.h">
       <Filter>NNLayerInterface</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\INNLayerDLL.h">
+    <ClInclude Include="..\..\include\NNLayerInterface\IOutputLayer.h">
       <Filter>NNLayerInterface</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\INNLayerDLLManager.h">
+    <ClInclude Include="..\..\include\NNLayerInterface\ISingleInputLayer.h">
       <Filter>NNLayerInterface</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\IOutputLayer.h">
+    <ClInclude Include="..\..\include\NNLayerInterface\ISingleOutputLayer.h">
       <Filter>NNLayerInterface</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\ISingleInputLayer.h">
+    <ClInclude Include="..\..\include\NNLayerInterface\NNlayerFunction.h">
       <Filter>NNLayerInterface</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\ISingleOutputLayer.h">
+    <ClInclude Include="..\..\include\NNLayerInterface\IBatchDataNoListGenerator.h">
       <Filter>NNLayerInterface</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\NNlayerFunction.h">
-      <Filter>NNLayerInterface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\IBatchDataNoListGenerator.h">
+    <ClInclude Include="..\..\include\NNLayerInterface\IDataLayer.h">
       <Filter>NNLayerInterface</Filter>
     </ClInclude>
   </ItemGroup>
