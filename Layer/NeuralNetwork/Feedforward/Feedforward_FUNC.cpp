@@ -13,7 +13,7 @@
 #include<string>
 #include<map>
 
-#include<Library/SettingDataStandard/SettingDataStandard.h>
+#include<Library/SettingData/Standard/SettingData.h>
 
 #include"Feedforward_FUNC.hpp"
 

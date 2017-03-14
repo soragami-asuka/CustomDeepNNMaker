@@ -348,25 +348,25 @@ namespace IOData {
 		}
 	};
 
+	/** 入力信号データレイヤーを作成する.GUIDは自動割り当て.CPU制御
+		@param bufferSize	バッファのサイズ.※F32型配列の要素数.
+		@return	入力信号データレイヤーのアドレス */
+	extern IODataLayer_API Gravisbell::Layer::IOData::IIODataLayer* CreateIODataLayerCPU(Gravisbell::IODataStruct ioDataStruct)
+	{
+		UUID uuid;
+		::UuidCreate(&uuid);
+
+		return CreateIODataLayerCPUwithGUID(uuid, ioDataStruct);
+	}
+	/** 入力信号データレイヤーを作成する.CPU制御
+		@param guid			レイヤーのGUID.
+		@param bufferSize	バッファのサイズ.※F32型配列の要素数.
+		@return	入力信号データレイヤーのアドレス */
+	extern IODataLayer_API Gravisbell::Layer::IOData::IIODataLayer* CreateIODataLayerCPUwithGUID(GUID guid, Gravisbell::IODataStruct ioDataStruct)
+	{
+		return new Gravisbell::Layer::IOData::IODataLayerCPU(guid, ioDataStruct);
+	}
+
 }	// IOData
 }	// Layer
 }	// Gravisbell
-
-/** 入力信号データレイヤーを作成する.GUIDは自動割り当て.CPU制御
-	@param bufferSize	バッファのサイズ.※F32型配列の要素数.
-	@return	入力信号データレイヤーのアドレス */
-extern "C" IODataLayer_API Gravisbell::Layer::IOData::IIODataLayer* CreateIODataLayerCPU(Gravisbell::IODataStruct ioDataStruct)
-{
-	UUID uuid;
-	::UuidCreate(&uuid);
-
-	return CreateIODataLayerCPUwithGUID(uuid, ioDataStruct);
-}
-/** 入力信号データレイヤーを作成する.CPU制御
-	@param guid			レイヤーのGUID.
-	@param bufferSize	バッファのサイズ.※F32型配列の要素数.
-	@return	入力信号データレイヤーのアドレス */
-extern "C" IODataLayer_API Gravisbell::Layer::IOData::IIODataLayer* CreateIODataLayerCPUwithGUID(GUID guid, Gravisbell::IODataStruct ioDataStruct)
-{
-	return new Gravisbell::Layer::IOData::IODataLayerCPU(guid, ioDataStruct);
-}
