@@ -7,25 +7,26 @@
 #include<list>
 
 #include"SettingData/Standard/IData.h"
-#include"NNLayerInterface\INNLayerDLL.h"
-#include"NNLayerInterface\IIODataLayer.h"
+#include"Layer/NeuralNetwork/INNLayerDLL.h"
+#include"Layer/IOData/IIODataLayer.h"
 
-#include"../Library/NNLayerDLLManager/NNLayerDLLManager.h"
-#include"../NNLayer/IODataLayer/IODataLayer.h"
+#include"../Library/NeuralNetwork/LayerDLLManager/LayerDLLManager.h"
+#include"../Library/Common/BatchDataNoListGenerator/BatchDataNoListGenerator.h"
+#include"../Layer/IOData/IODataLayer/IODataLayer.h"
 
 #include<Windows.h>
 
-#if 0
+using namespace Gravisbell;
 
 /** CPU制御レイヤーを作成する */
-CustomDeepNNLibrary::INNLayer* CreateLayerCPU(const CustomDeepNNLibrary::INNLayerDLL* pLayerDLL, unsigned int neuronCount);
+Layer::NeuralNetwork::INNLayer* CreateLayerCPU(const Layer::NeuralNetwork::ILayerDLL* pLayerDLL, U32 neuronCount, U32 inputDataCount);
 
 /** ニューラルネットワークテスト.
 	入力層1
 	中間層1-1
 	出力層1
 	の標準4層NN. */
-void NNTest_IN1_1_1_O1(CustomDeepNNLibrary::INNLayerDLLManager& dllManager, const std::list<std::vector<float>>& lppInputA, const std::list<std::vector<float>>& lppTeachA);
+void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const std::list<std::vector<float>>& lppInputA, const std::list<std::vector<float>>& lppTeachA);
 
 
 int _tmain(int argc, _TCHAR* argv[])
@@ -35,10 +36,10 @@ int _tmain(int argc, _TCHAR* argv[])
 #endif
 
 	// DLL管理クラスを作成
-	CustomDeepNNLibrary::INNLayerDLLManager* pDLLManager = CustomDeepNNLibrary::CreateLayerDLLManager();
+	Layer::NeuralNetwork::ILayerDLLManager* pDLLManager = Layer::NeuralNetwork::CreateLayerDLLManager();
 
 	// DLLの読み込み
-	if(pDLLManager->ReadLayerDLL(L"NNLayer_Feedforward.dll") < 0)
+	if(pDLLManager->ReadLayerDLL(L"Gravisbell.Layer.NeuralNetwork.Feedforward.dll") < 0)
 	{
 		delete pDLLManager;
 		return -1;
@@ -128,18 +129,18 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 /** CPU制御レイヤーを作成する */
-CustomDeepNNLibrary::INNLayer* CreateLayerCPU(const CustomDeepNNLibrary::INNLayerDLL* pLayerDLL, unsigned int neuronCount)
+Layer::NeuralNetwork::INNLayer* CreateLayerCPU(const Layer::NeuralNetwork::ILayerDLL* pLayerDLL, U32 neuronCount, U32 inputDataCount)
 {
 	// 設定の作成
-	CustomDeepNNLibrary::INNLayerConfig* pConfig = pLayerDLL->CreateLayerConfig();
+	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerConfig();
 	if(pConfig == NULL)
 		return NULL;
-	CustomDeepNNLibrary::INNLayerConfigItem_Int* pItem = (CustomDeepNNLibrary::INNLayerConfigItem_Int*)pConfig->GetItemByNum(0);
+	SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByNum(0));
 	pItem->SetValue(neuronCount);
 
 	// レイヤーの作成
-	CustomDeepNNLibrary::INNLayer* pLayer = pLayerDLL->CreateLayerCPU();
-	if(pLayer->SetLayerConfig(*pConfig) != CustomDeepNNLibrary::LAYER_ERROR_NONE)
+	Layer::NeuralNetwork::INNLayer* pLayer = pLayerDLL->CreateLayerCPU();
+	if(pLayer->Initialize(*pConfig, IODataStruct(inputDataCount)) != ErrorCode::ERROR_CODE_NONE)
 		return NULL;
 
 	// 設定情報を削除
@@ -155,8 +156,11 @@ CustomDeepNNLibrary::INNLayer* CreateLayerCPU(const CustomDeepNNLibrary::INNLaye
 	中間層1-1
 	出力層1
 	の標準4層NN. */
-void NNTest_IN1_1_1_O1(CustomDeepNNLibrary::INNLayerDLLManager& dllManager, const std::list<std::vector<float>>& lppInputA, const std::list<std::vector<float>>& lppTeachA)
+void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const std::list<std::vector<float>>& lppInputA, const std::list<std::vector<float>>& lppTeachA)
 {
+	const U32 BATCH_SIZE = 32;
+
+
 	// レイヤーDLLの取得
 	auto pLayerDLL = dllManager.GetLayerDLLByNum(0);
 	if(pLayerDLL == NULL)
@@ -165,13 +169,13 @@ void NNTest_IN1_1_1_O1(CustomDeepNNLibrary::INNLayerDLLManager& dllManager, cons
 	}
 
 	// 全レイヤーリスト
-	std::list<CustomDeepNNLibrary::ILayerBase*> lpLayer;
+	std::list<Layer::ILayerBase*> lpLayer;
 
 	// 入出力レイヤーを作成
-	CustomDeepNNLibrary::IIODataLayer* pInputLayerA  = CreateIODataLayerCPU( CustomDeepNNLibrary::IODataStruct(8) );	// 出力A
+	Layer::IOData::IIODataLayer* pInputLayerA  = Layer::IOData::CreateIODataLayerCPU( IODataStruct(8) );	// 出力A
 	lpLayer.push_back(pInputLayerA);
 	// 学習データレイヤーを作成
-	CustomDeepNNLibrary::IIODataLayer* pTeachLayerA = CreateIODataLayerCPU( CustomDeepNNLibrary::IODataStruct(8) );	// 出力A
+	Layer::IOData::IIODataLayer* pTeachLayerA  = Layer::IOData::CreateIODataLayerCPU( IODataStruct(8) );	// 出力A
 
 	// 入出力レイヤーにデータを格納
 	for(auto& lpData : lppInputA)
@@ -181,11 +185,11 @@ void NNTest_IN1_1_1_O1(CustomDeepNNLibrary::INNLayerDLLManager& dllManager, cons
 
 
 	// 中間層レイヤーを作成
-	std::vector<CustomDeepNNLibrary::INNLayer*> lpCalcLayer;
+	std::vector<Layer::NeuralNetwork::INNLayer*> lpCalcLayer;
 
 	// 中間層1層目(合計2層目)を作成
 	{
-		auto pLayer = CreateLayerCPU(pLayerDLL, 20);
+		auto pLayer = CreateLayerCPU(pLayerDLL, 20, pInputLayerA->GetOutputBufferCount());
 		if(pLayer == NULL)
 		{
 			for(auto pLayer : lpLayer)
@@ -193,9 +197,6 @@ void NNTest_IN1_1_1_O1(CustomDeepNNLibrary::INNLayerDLLManager& dllManager, cons
 			delete pTeachLayerA;
 			return;
 		}
-
-		// 入力レイヤーを設定
-		pLayer->AddInputFromLayer(pInputLayerA);
 
 		// レイヤーを登録
 		lpCalcLayer.push_back(pLayer);
@@ -204,7 +205,7 @@ void NNTest_IN1_1_1_O1(CustomDeepNNLibrary::INNLayerDLLManager& dllManager, cons
 	
 	// 中間層2層目(合計3層目)を作成
 	{
-		auto pLayer = CreateLayerCPU(pLayerDLL, 20);
+		auto pLayer = CreateLayerCPU(pLayerDLL, 20, (*lpCalcLayer.rbegin())->GetOutputBufferCount());
 		if(pLayer == NULL)
 		{
 			for(auto pLayer : lpLayer)
@@ -213,16 +214,13 @@ void NNTest_IN1_1_1_O1(CustomDeepNNLibrary::INNLayerDLLManager& dllManager, cons
 			return;
 		}
 
-		// 入力レイヤーを設定
-		pLayer->AddInputFromLayer(lpCalcLayer[lpCalcLayer.size()-1]);
-
 		// レイヤーを登録
 		lpCalcLayer.push_back(pLayer);
 		lpLayer.push_back(pLayer);
 	}
 
 	// 出力層(合計4層目)を作成
-	auto pOutputLayer = CreateLayerCPU(pLayerDLL, pTeachLayerA->GetBufferCount());
+	auto pOutputLayer = CreateLayerCPU(pLayerDLL, pTeachLayerA->GetBufferCount(), (*lpCalcLayer.rbegin())->GetOutputBufferCount());
 	{
 		if(pOutputLayer == NULL)
 		{
@@ -232,9 +230,6 @@ void NNTest_IN1_1_1_O1(CustomDeepNNLibrary::INNLayerDLLManager& dllManager, cons
 			return;
 		}
 
-		// 入力レイヤーを設定
-		pOutputLayer->AddInputFromLayer(lpCalcLayer[lpCalcLayer.size()-1]);
-
 		// レイヤーを登録
 		lpCalcLayer.push_back(pOutputLayer);
 		lpLayer.push_back(pOutputLayer);
@@ -243,12 +238,12 @@ void NNTest_IN1_1_1_O1(CustomDeepNNLibrary::INNLayerDLLManager& dllManager, cons
 
 	// 学習データレイヤーを登録
 	lpLayer.push_back(pTeachLayerA);
-	lpCalcLayer[lpCalcLayer.size()-1]->AddOutputToLayer(pTeachLayerA);
+
 
 	// レイヤーを初期化する
 	for(auto pLayer : lpCalcLayer)
 	{
-		if(pLayer->Initialize() != CustomDeepNNLibrary::LAYER_ERROR_NONE)
+		if(pLayer->Initialize() != ErrorCode::ERROR_CODE_NONE)
 		{
 			// レイヤーを削除
 			for(auto pLayer : lpLayer)
@@ -260,7 +255,7 @@ void NNTest_IN1_1_1_O1(CustomDeepNNLibrary::INNLayerDLLManager& dllManager, cons
 	// 事前処理を実行する
 	for(auto pLayer : lpLayer)
 	{
-		if(pLayer->PreCalculate() != CustomDeepNNLibrary::LAYER_ERROR_NONE)
+		if(pLayer->PreProcessLearn(BATCH_SIZE) != ErrorCode::ERROR_CODE_NONE)
 		{
 			// レイヤーを削除
 			for(auto pLayer : lpLayer)
@@ -269,16 +264,26 @@ void NNTest_IN1_1_1_O1(CustomDeepNNLibrary::INNLayerDLLManager& dllManager, cons
 		}
 	}
 
+	// バッチNo生成クラスを作成
+	Gravisbell::Common::IBatchDataNoListGenerator* pBatchDataNoListGenerator = Gravisbell::Common::CreateBatchDataNoListGeneratorCPU();
+	pBatchDataNoListGenerator->PreProcess(pInputLayerA->GetDataCount(), BATCH_SIZE);
+
 	// 演算処理を実行する
 	for(unsigned int calcNum=0; calcNum<200; calcNum++)
 	{
-		for(unsigned int dataNum=0; dataNum<pInputLayerA->GetDataCount(); dataNum++)
+		// 学習ループ先頭処理
+		pBatchDataNoListGenerator->PreProcessLearnLoop();
+		for(auto pLayer : lpLayer)
+			pLayer->PreProcessLearnLoop();
+
+		for(unsigned int batchNum=0; batchNum<pBatchDataNoListGenerator->GetBatchDataNoListCount(); batchNum++)
 		{
 			// データ切り替え
-			pInputLayerA->ChangeUseDataByNum(dataNum);
-			pTeachLayerA->ChangeUseDataByNum(dataNum);
+			pInputLayerA->SetBatchDataNoList(pBatchDataNoListGenerator->GetBatchDataNoListByNum(batchNum));
+			pTeachLayerA->SetBatchDataNoList(pBatchDataNoListGenerator->GetBatchDataNoListByNum(batchNum));
 
 			// 演算
+			lpCalcLayer[0]->Calculate(
 			for(auto pLayer : lpCalcLayer)
 				pLayer->Calculate();
 
@@ -344,20 +349,7 @@ void NNTest_IN1_1_1_O1(CustomDeepNNLibrary::INNLayerDLLManager& dllManager, cons
 	// レイヤーを削除
 	for(auto pLayer : lpLayer)
 		delete pLayer;
-}
 
-#endif
-
-
-
-int _tmain(int argc, _TCHAR* argv[])
-{
-	Gravisbell::IODataStruct ioDataStruct(1, 1, 1, 1);
-
-	Gravisbell::NeuralNetwork::IIODataLayer* pIODataLayer = ::CreateIODataLayerCPU(ioDataStruct);
-
-	printf("Press any key to Continue\n");
-	getc(stdin);
-
-	return 0;
+	// バッチNO生成クラスを削除
+	delete pBatchDataNoListGenerator;
 }
