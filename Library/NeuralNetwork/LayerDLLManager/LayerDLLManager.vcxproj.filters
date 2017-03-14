@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{f14eb08b-7cc6-45e8-af91-21616bba2aba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Common">
+      <UniqueIdentifier>{0fbd9c4e-5c1c-47cb-ab9e-c933e8e0f261}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\SettingData">
+      <UniqueIdentifier>{e213c39b-2d43-41cc-bff0-0e76b07ec9b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\SettingData\Standard">
+      <UniqueIdentifier>{5267a292-08c0-43bb-8e8e-b61a0326bcbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Layer">
+      <UniqueIdentifier>{9a483a61-642a-42bd-ab02-1885217bbd03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Layer\IOData">
+      <UniqueIdentifier>{2d184822-df84-4e45-a13b-b3275f039e44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Layer\NeuralNetwork">
+      <UniqueIdentifier>{33eea30a-a033-4d09-8ee5-421f21a1f1af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Layer\IO">
+      <UniqueIdentifier>{896047b6-0573-486b-b3d9-ad3d36168dc9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="LayerDLLManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Common\Common.h">
+      <Filter>include\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Common\ErrorCode.h">
+      <Filter>include\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Common\Guiddef.h">
+      <Filter>include\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Common\IBatchDataNoListGenerator.h">
+      <Filter>include\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Common\IODataStruct.h">
+      <Filter>include\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Common\VersionCode.h">
+      <Filter>include\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h">
+      <Filter>include\SettingData\Standard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\ILayerBase.h">
+      <Filter>include\Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IOData\IDataLayer.h">
+      <Filter>include\Layer\IOData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer.h">
+      <Filter>include\Layer\IOData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayer.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerDLL.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IO\IInputLayer.h">
+      <Filter>include\Layer\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IO\IMultInputLayer.h">
+      <Filter>include\Layer\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IO\IOutputLayer.h">
+      <Filter>include\Layer\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IO\ISingleInputLayer.h">
+      <Filter>include\Layer\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IO\ISingleOutputLayer.h">
+      <Filter>include\Layer\IO</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="LayerDLLManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
