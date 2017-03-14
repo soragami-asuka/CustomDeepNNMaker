@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "NNLayerInterface/NNlayerFunction.h"
+#include "Layer/NeuralNetwork/NNlayerFunction.h"
 #include "NNLayerDLLManager.h"
 
 #include<string>
@@ -12,6 +12,7 @@
 #pragma comment(lib, "Rpcrt4.lib")
 
 namespace Gravisbell {
+namespace Layer {
 namespace NeuralNetwork {
 
 	/** DLLクラス */
@@ -320,11 +321,12 @@ namespace NeuralNetwork {
 
 
 	// DLL管理クラスを作成
-	extern "C" NNLAYERDLLMANAGER_API ILayerDLLManager* CreateLayerDLLManager()
+	extern NNLAYERDLLMANAGER_API ILayerDLLManager* CreateLayerDLLManager()
 	{
 		return new NNLayerDLLManager();
 	}
 
 }	// NeuralNetwork
+}	// Layer
 }	// Gravisbell
 

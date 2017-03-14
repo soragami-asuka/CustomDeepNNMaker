@@ -13,12 +13,14 @@
 #include"Common/ErrorCode.h"
 #include"Common/VersionCode.h"
 
-#include"NNLayerInterface/INNLayerDLLManager.h"
+#include"Layer/NeuralNetwork/INNLayerDLLManager.h"
 
 namespace Gravisbell {
+namespace Layer {
 namespace NeuralNetwork {
 
-	extern "C" NNLAYERDLLMANAGER_API ILayerDLLManager* CreateLayerDLLManager();
+	extern NNLAYERDLLMANAGER_API ILayerDLLManager* CreateLayerDLLManager();
 
 }	// NeuralNetwork
+}	// Layer
 }	// Gravisbell

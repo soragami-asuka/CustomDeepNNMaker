@@ -42,9 +42,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IntDir>$(SolutionName).$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IntDir>$(SolutionName).$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -84,21 +86,21 @@
     <ClInclude Include="..\..\include\Common\Common.h" />
     <ClInclude Include="..\..\include\Common\ErrorCode.h" />
     <ClInclude Include="..\..\include\Common\Guiddef.h" />
+    <ClInclude Include="..\..\include\Common\IBatchDataNoListGenerator.h" />
     <ClInclude Include="..\..\include\Common\IODataStruct.h" />
     <ClInclude Include="..\..\include\Common\VersionCode.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\IBatchDataNoListGenerator.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\IDataLayer.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\IInputLayer.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\IIODataLayer.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\ILayerBase.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\IMultInputLayer.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\INNLayer.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\INNLayerDLL.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\INNLayerDLLManager.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\IOutputLayer.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\ISingleInputLayer.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\ISingleOutputLayer.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\NNlayerFunction.h" />
+    <ClInclude Include="..\..\include\Layer\ILayerBase.h" />
+    <ClInclude Include="..\..\include\Layer\IOData\IDataLayer.h" />
+    <ClInclude Include="..\..\include\Layer\IOData\IIODataLayer.h" />
+    <ClInclude Include="..\..\include\Layer\IO\IInputLayer.h" />
+    <ClInclude Include="..\..\include\Layer\IO\IMultInputLayer.h" />
+    <ClInclude Include="..\..\include\Layer\IO\IOutputLayer.h" />
+    <ClInclude Include="..\..\include\Layer\IO\ISingleInputLayer.h" />
+    <ClInclude Include="..\..\include\Layer\IO\ISingleOutputLayer.h" />
+    <ClInclude Include="..\..\include\Layer\NeuralNetwork\INNLayer.h" />
+    <ClInclude Include="..\..\include\Layer\NeuralNetwork\INNLayerDLL.h" />
+    <ClInclude Include="..\..\include\Layer\NeuralNetwork\INNLayerDLLManager.h" />
+    <ClInclude Include="..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
     <ClInclude Include="..\..\include\SettingData\Standard\IData.h" />
     <ClInclude Include="IDataEx.h" />
     <ClInclude Include="IItemEx_Enum.h" />

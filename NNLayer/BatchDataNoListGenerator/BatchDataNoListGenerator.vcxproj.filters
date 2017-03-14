@@ -13,11 +13,26 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="NNLayerInterface">
-      <UniqueIdentifier>{1363a151-907e-4336-8f63-230b02abda0c}</UniqueIdentifier>
+    <Filter Include="include">
+      <UniqueIdentifier>{1cc7432c-cc45-4832-a1ab-e5aa6f902aab}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Common">
-      <UniqueIdentifier>{5858c8a9-9d46-48a8-b3d5-a4df3e65b9c1}</UniqueIdentifier>
+    <Filter Include="include\Common">
+      <UniqueIdentifier>{d0d72654-f936-4d20-8565-31435f8cf893}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\SettingData">
+      <UniqueIdentifier>{a2c14abb-7b32-4731-82cb-ad7988b3b90c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Layer">
+      <UniqueIdentifier>{97f5e9fe-05ab-4299-b598-d560cf9f75a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Layer\IOData">
+      <UniqueIdentifier>{ec5aa732-ad4a-41c3-a959-6d1d59bee0c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Layer\NeuralNetwork">
+      <UniqueIdentifier>{51223080-5c92-454f-b11e-4894a1b11e56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Layer\IO">
+      <UniqueIdentifier>{778f2add-5f26-4cda-85cc-d0097b00111d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -33,62 +48,59 @@
     <ClInclude Include="BatchDataNoListGenerator.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\IDataLayer.h">
-      <Filter>NNLayerInterface</Filter>
+    <ClInclude Include="..\..\include\Common\Guiddef.h">
+      <Filter>include\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\IInputLayer.h">
-      <Filter>NNLayerInterface</Filter>
+    <ClInclude Include="..\..\include\Common\IBatchDataNoListGenerator.h">
+      <Filter>include\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\IIODataLayer.h">
-      <Filter>NNLayerInterface</Filter>
+    <ClInclude Include="..\..\include\Common\IODataStruct.h">
+      <Filter>include\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\ILayerBase.h">
-      <Filter>NNLayerInterface</Filter>
+    <ClInclude Include="..\..\include\Common\VersionCode.h">
+      <Filter>include\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\ILayerConfig.h">
-      <Filter>NNLayerInterface</Filter>
+    <ClInclude Include="..\..\include\Common\Common.h">
+      <Filter>include\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\IMultInputLayer.h">
-      <Filter>NNLayerInterface</Filter>
+    <ClInclude Include="..\..\include\Common\ErrorCode.h">
+      <Filter>include\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\INNLayer.h">
-      <Filter>NNLayerInterface</Filter>
+    <ClInclude Include="..\..\include\Layer\ILayerBase.h">
+      <Filter>include\Layer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\INNLayerDLL.h">
-      <Filter>NNLayerInterface</Filter>
+    <ClInclude Include="..\..\include\Layer\IOData\IDataLayer.h">
+      <Filter>include\Layer\IOData</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\INNLayerDLLManager.h">
-      <Filter>NNLayerInterface</Filter>
+    <ClInclude Include="..\..\include\Layer\IOData\IIODataLayer.h">
+      <Filter>include\Layer\IOData</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\IOutputLayer.h">
-      <Filter>NNLayerInterface</Filter>
+    <ClInclude Include="..\..\include\Layer\NeuralNetwork\INNLayerDLL.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\ISingleInputLayer.h">
-      <Filter>NNLayerInterface</Filter>
+    <ClInclude Include="..\..\include\Layer\NeuralNetwork\INNLayerDLLManager.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\ISingleOutputLayer.h">
-      <Filter>NNLayerInterface</Filter>
+    <ClInclude Include="..\..\include\Layer\NeuralNetwork\NNlayerFunction.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\NNlayerFunction.h">
-      <Filter>NNLayerInterface</Filter>
+    <ClInclude Include="..\..\include\Layer\NeuralNetwork\INNLayer.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NNLayerInterface\IBatchDataNoListGenerator.h">
-      <Filter>NNLayerInterface</Filter>
+    <ClInclude Include="..\..\include\Layer\IO\IOutputLayer.h">
+      <Filter>include\Layer\IO</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\Common.h">
-      <Filter>Common</Filter>
+    <ClInclude Include="..\..\include\Layer\IO\ISingleInputLayer.h">
+      <Filter>include\Layer\IO</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\ErrorCode.h">
-      <Filter>Common</Filter>
+    <ClInclude Include="..\..\include\Layer\IO\ISingleOutputLayer.h">
+      <Filter>include\Layer\IO</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\Guiddef.h">
-      <Filter>Common</Filter>
+    <ClInclude Include="..\..\include\Layer\IO\IInputLayer.h">
+      <Filter>include\Layer\IO</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\IODataStruct.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\VersionCode.h">
-      <Filter>Common</Filter>
+    <ClInclude Include="..\..\include\Layer\IO\IMultInputLayer.h">
+      <Filter>include\Layer\IO</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
