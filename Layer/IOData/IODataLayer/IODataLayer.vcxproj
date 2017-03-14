@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{35D09026-0A7E-4E1A-9D41-479D16966953}</ProjectGuid>
+    <ProjectGuid>{FE50F8D5-EFE1-4B8E-9BA8-1754980D6266}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>NNLayer_Feedforward</RootNamespace>
+    <RootNamespace>IODataLayer</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -41,17 +41,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(SolutionName).Layer.IOData.$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <TargetName>$(SolutionName).$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;NNLAYER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;IODataLayer_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -65,8 +67,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;NNLAYER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;IODataLayer_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -82,26 +83,23 @@
     <ClInclude Include="..\..\include\Common\Common.h" />
     <ClInclude Include="..\..\include\Common\ErrorCode.h" />
     <ClInclude Include="..\..\include\Common\Guiddef.h" />
+    <ClInclude Include="..\..\include\Common\IBatchDataNoListGenerator.h" />
     <ClInclude Include="..\..\include\Common\IODataStruct.h" />
     <ClInclude Include="..\..\include\Common\VersionCode.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\IBatchDataNoListGenerator.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\IDataLayer.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\IInputLayer.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\IIODataLayer.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\ILayerBase.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\IMultInputLayer.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\INNLayer.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\INNLayerDLL.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\INNLayerDLLManager.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\IOutputLayer.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\ISingleInputLayer.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\ISingleOutputLayer.h" />
-    <ClInclude Include="..\..\include\NNLayerInterface\NNlayerFunction.h" />
+    <ClInclude Include="..\..\include\Layer\ILayerBase.h" />
+    <ClInclude Include="..\..\include\Layer\IOData\IDataLayer.h" />
+    <ClInclude Include="..\..\include\Layer\IOData\IIODataLayer.h" />
+    <ClInclude Include="..\..\include\Layer\IO\IInputLayer.h" />
+    <ClInclude Include="..\..\include\Layer\IO\IMultInputLayer.h" />
+    <ClInclude Include="..\..\include\Layer\IO\IOutputLayer.h" />
+    <ClInclude Include="..\..\include\Layer\IO\ISingleInputLayer.h" />
+    <ClInclude Include="..\..\include\Layer\IO\ISingleOutputLayer.h" />
+    <ClInclude Include="..\..\include\Layer\NeuralNetwork\INNLayer.h" />
+    <ClInclude Include="..\..\include\Layer\NeuralNetwork\INNLayerDLL.h" />
+    <ClInclude Include="..\..\include\Layer\NeuralNetwork\INNLayerDLLManager.h" />
+    <ClInclude Include="..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
     <ClInclude Include="..\..\include\SettingData\Standard\IData.h" />
-    <ClInclude Include="NNLayer_FeedforwardBase.h" />
-    <ClInclude Include="NNLayer_Feedforward_DATA.hpp" />
-    <ClInclude Include="NNLayer_Feedforward_FUNC.hpp" />
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="IODataLayer.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -114,30 +112,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="NNLayer_FeedforwardBase.cpp" />
-    <ClCompile Include="NNLayer_FeedforwardCPU.cpp" />
-    <ClCompile Include="NNLayer_FeedforwardGPU.cpp" />
-    <ClCompile Include="NNLayer_Feedforward_FUNC.cpp" />
+    <ClCompile Include="IODataLayerCPU.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="NNLayer_Feedforward.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Xml Include="Config.xml">
-      <SubType>Designer</SubType>
-    </Xml>
-    <Xml Include="LanguagePack-en.xml">
-      <SubType>Designer</SubType>
-    </Xml>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Library\SettingDataStandard\SettingDataStandard.vcxproj">
-      <Project>{79fd5f13-1407-43ab-834c-04c1aeccdbb5}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

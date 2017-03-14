@@ -1,5 +1,5 @@
 /*--------------------------------------------
- * FileName  : NNLayer_Feedforward_DATA.hpp
+ * FileName  : Feedforward_DATA.hpp
  * LayerName : 全結合ニューラルネットワークレイヤー
  * guid      : BEBA34EC-C30C-4565-9386-56088981D2D7
  * 
@@ -7,18 +7,19 @@
  *           : 結合層と活性化層を一体化.
  *           : 学習時に[学習係数][ドロップアウト率]を設定できる.
 --------------------------------------------*/
-#ifndef __GRAVISBELL_NEURALNETWORK_LAYER_DATA_NNLayer_Feedforward_H__
-#define __GRAVISBELL_NEURALNETWORK_LAYER_DATA_NNLayer_Feedforward_H__
+#ifndef __GRAVISBELL_NEURALNETWORK_LAYER_DATA_Feedforward_H__
+#define __GRAVISBELL_NEURALNETWORK_LAYER_DATA_Feedforward_H__
 
 #include<guiddef.h>
 
 #include<Common/ErrorCode.h>
 #include<SettingData/Standard/IData.h>
-#include<NNLayerInterface/INNLayer.h>
+#include<Layer/NeuralNetwork/INNLayer.h>
 
 namespace Gravisbell {
+namespace Layer {
 namespace NeuralNetwork {
-namespace NNLayer_Feedforward {
+namespace Feedforward {
 
 	/** Layer structure */
 	struct LayerStructure
@@ -78,9 +79,10 @@ namespace NNLayer_Feedforward {
 
 	};
 
-} // NNLayer_Feedforward
+} // Feedforward
 } // NeuralNetwork
+} // Layer
 } // Gravisbell
 
 
-#endif // __CUSTOM_DEEP_NN_LAYER_DATA_NNLayer_Feedforward_H__
+#endif // __CUSTOM_DEEP_NN_LAYER_DATA_Feedforward_H__

@@ -5,14 +5,14 @@
 //======================================
 #include"stdafx.h"
 
-#include"NNLayer_Feedforward_DATA.hpp"
-#include"NNLayer_FeedforwardBase.h"
-#include"NNLayer_Feedforward_FUNC.hpp"
+#include"Feedforward_DATA.hpp"
+#include"FeedforwardBase.h"
+#include"Feedforward_FUNC.hpp"
 
 using namespace Gravisbell;
-using namespace Gravisbell::NeuralNetwork;
+using namespace Gravisbell::Layer::NeuralNetwork;
 
-class NNLayer_FeedforwardCPU : public NNLayer_FeedforwardBase
+class FeedforwardCPU : public FeedforwardBase
 {
 private:
 	// 本体
@@ -37,8 +37,8 @@ private:
 
 public:
 	/** コンストラクタ */
-	NNLayer_FeedforwardCPU(Gravisbell::GUID guid)
-		:	NNLayer_FeedforwardBase	(guid)
+	FeedforwardCPU(Gravisbell::GUID guid)
+		:	FeedforwardBase	(guid)
 		,	inputBufferCount		(0)		/**< 入力バッファ数 */
 		,	neuronCount				(0)		/**< ニューロン数 */
 		,	outputBufferCount		(0)		/**< 出力バッファ数 */
@@ -47,7 +47,7 @@ public:
 	{
 	}
 	/** デストラクタ */
-	virtual ~NNLayer_FeedforwardCPU()
+	virtual ~FeedforwardCPU()
 	{
 	}
 
@@ -58,7 +58,7 @@ public:
 	/** レイヤー種別の取得 */
 	U32 GetLayerKind()const
 	{
-		return LAYER_KIND_CPU | GetLayerKindBase();
+		return Layer::ELayerKind::LAYER_KIND_CPU | GetLayerKindBase();
 	}
 
 	/** 初期化. 各ニューロンの値をランダムに初期化
@@ -396,7 +396,7 @@ public:
 
 
 /** CPU処理用のレイヤーを作成 */
-EXPORT_API Gravisbell::NeuralNetwork::INNLayer* CreateLayerCPU(Gravisbell::GUID guid)
+EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerCPU(Gravisbell::GUID guid)
 {
-	return new NNLayer_FeedforwardCPU(guid);
+	return new FeedforwardCPU(guid);
 }

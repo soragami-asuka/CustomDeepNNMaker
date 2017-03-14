@@ -2,18 +2,19 @@
 // フィードフォワードニューラルネットワークの統合処理レイヤー
 // 結合、活性化を処理する
 //======================================
-#include<NNLayerInterface/INNLayer.h>
+#include<Layer/NeuralNetwork/INNLayer.h>
 
 #include<vector>
 
-#include"NNLayer_Feedforward_DATA.hpp"
+#include"Feedforward_DATA.hpp"
 
 namespace Gravisbell {
+namespace Layer {
 namespace NeuralNetwork {
 
 	typedef float NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class NNLayer_FeedforwardBase : public Gravisbell::NeuralNetwork::INNLayer
+	class FeedforwardBase : public Gravisbell::Layer::NeuralNetwork::INNLayer
 	{
 	protected:
 		GUID guid;	/**< レイヤー識別用のGUID */
@@ -23,20 +24,17 @@ namespace NeuralNetwork {
 		SettingData::Standard::IData* pLayerStructure;	/**< レイヤー構造を定義したコンフィグクラス */
 		SettingData::Standard::IData* pLearnData;		/**< 学習設定を定義したコンフィグクラス */
 
-		NNLayer_Feedforward::LayerStructure layerStructure;	/**< レイヤー構造 */
-		NNLayer_Feedforward::LearnDataStructure learnData;	/**< 学習設定 */
-
-		std::vector<IOutputLayer*> lppInputFromLayer;		/**< 入力元レイヤーのリスト */
-		std::vector<IInputLayer*>  lppOutputToLayer;	/**< 出力先レイヤーのリスト */
+		Feedforward::LayerStructure layerStructure;	/**< レイヤー構造 */
+		Feedforward::LearnDataStructure learnData;	/**< 学習設定 */
 
 		unsigned int batchSize;	/**< バッチサイズ */
 
 	public:
 		/** コンストラクタ */
-		NNLayer_FeedforwardBase(GUID guid);
+		FeedforwardBase(GUID guid);
 
 		/** デストラクタ */
-		virtual ~NNLayer_FeedforwardBase();
+		virtual ~FeedforwardBase();
 
 		//===========================
 		// レイヤー共通
@@ -108,5 +106,6 @@ namespace NeuralNetwork {
 		unsigned int GetNeuronCount()const;
 	};
 
-}
-}
+}	// NeuralNetwork
+}	// Layer
+}	// Gravisbell

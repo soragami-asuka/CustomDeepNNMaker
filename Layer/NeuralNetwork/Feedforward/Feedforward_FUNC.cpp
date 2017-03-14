@@ -1,5 +1,5 @@
 /*--------------------------------------------
- * FileName  : NNLayer_Feedforward_FUNC.cpp
+ * FileName  : Feedforward_FUNC.cpp
  * LayerName : 全結合ニューラルネットワークレイヤー
  * guid      : BEBA34EC-C30C-4565-9386-56088981D2D7
  * 
@@ -15,7 +15,7 @@
 
 #include<Library/SettingDataStandard/SettingDataStandard.h>
 
-#include"NNLayer_Feedforward_FUNC.hpp"
+#include"Feedforward_FUNC.hpp"
 
 
 // {BEBA34EC-C30C-4565-9386-56088981D2D7}
