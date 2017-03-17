@@ -39,7 +39,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	Layer::NeuralNetwork::ILayerDLLManager* pDLLManager = Layer::NeuralNetwork::CreateLayerDLLManager();
 
 	// DLL‚Ì“Ç‚Ýž‚Ý
-	if(pDLLManager->ReadLayerDLL(L"Gravisbell.Layer.NeuralNetwork.Feedforward.dll") < 0)
+	if(pDLLManager->ReadLayerDLL(L"../../Debug/Gravisbell.Layer.NeuralNetwork.Feedforward.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 	{
 		delete pDLLManager;
 		return -1;
@@ -302,7 +302,8 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 		// ŠwKƒ‹[ƒvæ“ªˆ—
 		pBatchDataNoListGenerator->PreProcessLearnLoop();
 		pInputLayerA->PreProcessLearnLoop(*pLearnSettingIO);
-		for(auto pLayer : lpLayer)
+		pTeachLayerA->PreProcessLearnLoop(*pLearnSettingIO);
+		for(auto pLayer : lpCalcLayer)
 		{
 			pLayer->PreProcessLearnLoop(*pLearnSettingCalc);
 		}

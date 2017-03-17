@@ -325,6 +325,8 @@ public:
 		直前の計算結果を使用する */
 	ErrorCode CalculateLearnError(CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
+		this->m_lppDOutputBuffer = i_lppDOutputBuffer;
+
 		for(unsigned int batchNum=0; batchNum<this->batchSize; batchNum++)
 		{
 			// 入力誤差差分を計算
