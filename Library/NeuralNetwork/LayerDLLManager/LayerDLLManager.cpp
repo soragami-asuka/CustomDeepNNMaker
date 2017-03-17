@@ -23,9 +23,12 @@ namespace NeuralNetwork {
 
 		FuncGetLayerCode funcGetLayerCode;
 		FuncGetVersionCode funcGetVersionCode;
+		
+		FuncCreateLayerStructureSetting				funcCreateLayerStructureSetting;
+		FuncCreateLayerStructureSettingFromBuffer	funcCreateLayerStructureSettingFromBuffer;
 
-		FuncCreateLayerConfig funcCreateLayerConfig;
-		FuncCreateLayerConfigFromBuffer funcCreateLayerConfigFromBuffer;
+		FuncCreateLayerLearningSetting				funcCreateLearningSetting;
+		FuncCreateLayerLearningSettingFromBuffer	funcCreateLearningSettingFromBuffer;
 
 		FuncCreateLayerCPU funcCreateLayerCPU;
 		FuncCreateLayerGPU funcCreateLayerGPU;
@@ -34,12 +37,14 @@ namespace NeuralNetwork {
 		/** コンストラクタ */
 		NNLayerDLL()
 			:	hModule	(NULL)
-			,	funcGetLayerCode				(NULL)
-			,	funcGetVersionCode				(NULL)
-			,	funcCreateLayerConfig			(NULL)
-			,	funcCreateLayerConfigFromBuffer	(NULL)
-			,	funcCreateLayerCPU				(NULL)
-			,	funcCreateLayerGPU				(NULL)
+			,	funcGetLayerCode							(NULL)
+			,	funcGetVersionCode							(NULL)
+			,	funcCreateLayerStructureSetting				(NULL)
+			,	funcCreateLayerStructureSettingFromBuffer	(NULL)
+			,	funcCreateLearningSetting					(NULL)
+			,	funcCreateLearningSettingFromBuffer			(NULL)
+			,	funcCreateLayerCPU							(NULL)
+			,	funcCreateLayerGPU							(NULL)
 		{
 		}
 		/** デストラクタ */
@@ -75,25 +80,47 @@ namespace NeuralNetwork {
 		}
 
 
-		/** レイヤー設定を作成する */
-		SettingData::Standard::IData* CreateLayerConfig(void)const
+		/** レイヤー構造設定を作成する */
+		SettingData::Standard::IData* CreateLayerStructureSetting(void)const
 		{
-			if(this->funcCreateLayerConfig == NULL)
+			if(this->funcCreateLayerStructureSetting == NULL)
 				return NULL;
 
-			return this->funcCreateLayerConfig();
+			return this->funcCreateLayerStructureSetting();
 		}
-		/** レイヤー設定を作成する
+		/** レイヤー構造設定を作成する
 			@param i_lpBuffer	読み込みバッファの先頭アドレス.
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@param o_useBufferSize 実際に読み込んだバッファサイズ
 			@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-		SettingData::Standard::IData* CreateLayerConfigFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)const
+		SettingData::Standard::IData* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)const
 		{
-			if(this->funcCreateLayerConfigFromBuffer == NULL)
+			if(this->funcCreateLayerStructureSettingFromBuffer == NULL)
 				return NULL;
 
-			return this->funcCreateLayerConfigFromBuffer(i_lpBuffer, i_bufferSize, o_useBufferSize);
+			return this->funcCreateLayerStructureSettingFromBuffer(i_lpBuffer, i_bufferSize, o_useBufferSize);
+		}
+
+
+		/** レイヤー学習設定を作成する */
+		SettingData::Standard::IData* CreateLearningSetting(void)const
+		{
+			if(this->funcCreateLearningSetting == NULL)
+				return NULL;
+
+			return this->funcCreateLearningSetting();
+		}
+		/** レイヤー学習設定を作成する
+			@param i_lpBuffer	読み込みバッファの先頭アドレス.
+			@param i_bufferSize	読み込み可能バッファのサイズ.
+			@param o_useBufferSize 実際に読み込んだバッファサイズ
+			@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
+		SettingData::Standard::IData* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)const
+		{
+			if(this->funcCreateLearningSettingFromBuffer == NULL)
+				return NULL;
+
+			return this->funcCreateLearningSettingFromBuffer(i_lpBuffer, i_bufferSize, o_useBufferSize);
 		}
 
 		
@@ -151,20 +178,33 @@ namespace NeuralNetwork {
 					break;
 
 				// 関数読み込み
+				// レイヤーコード
 				pLayerDLL->funcGetLayerCode = (FuncGetLayerCode)GetProcAddress(pLayerDLL->hModule, "GetLayerCode");
 				if(pLayerDLL->funcGetLayerCode == NULL)
 					break;
+				// バージョンコード
 				pLayerDLL->funcGetVersionCode = (FuncGetVersionCode)GetProcAddress(pLayerDLL->hModule, "GetVersionCode");
 				if(pLayerDLL->funcGetVersionCode == NULL)
 					break;
 
-				pLayerDLL->funcCreateLayerConfig = (FuncCreateLayerConfig)GetProcAddress(pLayerDLL->hModule, "CreateLayerConfig");
-				if(pLayerDLL->funcCreateLayerConfig == NULL)
+				// レイヤー構造
+				pLayerDLL->funcCreateLayerStructureSetting = (FuncCreateLayerStructureSetting)GetProcAddress(pLayerDLL->hModule, "CreateLayerStructureSetting");
+				if(pLayerDLL->funcCreateLayerStructureSetting == NULL)
 					break;
-				pLayerDLL->funcCreateLayerConfigFromBuffer = (FuncCreateLayerConfigFromBuffer)GetProcAddress(pLayerDLL->hModule, "CreateLayerConfigFromBuffer");
-				if(pLayerDLL->funcCreateLayerConfigFromBuffer == NULL)
+				pLayerDLL->funcCreateLayerStructureSettingFromBuffer = (FuncCreateLayerStructureSettingFromBuffer)GetProcAddress(pLayerDLL->hModule, "CreateLayerStructureSettingFromBuffer");
+				if(pLayerDLL->funcCreateLayerStructureSettingFromBuffer == NULL)
 					break;
 
+				// 学習設定
+				pLayerDLL->funcCreateLearningSetting = (FuncCreateLayerStructureSetting)GetProcAddress(pLayerDLL->hModule, "CreateLearningSetting");
+				if(pLayerDLL->funcCreateLearningSetting == NULL)
+					break;
+				pLayerDLL->funcCreateLearningSettingFromBuffer = (FuncCreateLayerStructureSettingFromBuffer)GetProcAddress(pLayerDLL->hModule, "CreateLearningSettingFromBuffer");
+				if(pLayerDLL->funcCreateLearningSettingFromBuffer == NULL)
+					break;
+
+
+				// レイヤー作成
 				pLayerDLL->funcCreateLayerCPU= (FuncCreateLayerCPU)GetProcAddress(pLayerDLL->hModule, "CreateLayerCPU");
 				if(pLayerDLL->funcCreateLayerCPU == NULL)
 					break;

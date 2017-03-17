@@ -68,10 +68,7 @@ namespace IOData {
 			@return 成功した場合0 */
 		Gravisbell::ErrorCode GetLayerCode(GUID& o_layerCode)const
 		{
-			// {6E99D406-B931-4DE0-AC3A-48A35E129820}
-			o_layerCode = { 0x6e99d406, 0xb931, 0x4de0, { 0xac, 0x3a, 0x48, 0xa3, 0x5e, 0x12, 0x98, 0x20 } };
-
-			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
+			return Gravisbell::Layer::IOData::GetLayerCode(o_layerCode);
 		}
 
 		//==============================
@@ -248,8 +245,7 @@ namespace IOData {
 		//==============================
 	public:
 		/** 学習誤差を計算する.
-			@param i_lppInputBuffer	入力データバッファ. [GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要
-			直前の計算結果を使用する */
+			@param i_lppInputBuffer	入力データバッファ. [GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要 */
 		Gravisbell::ErrorCode CalculateLearnError(Gravisbell::CONST_BATCH_BUFFER_POINTER i_lppInputBuffer)
 		{
 			U32 inputBufferCount = this->GetInputBufferCount();

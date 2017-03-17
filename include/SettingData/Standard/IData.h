@@ -300,6 +300,8 @@ namespace Standard {
 		/** İ’è€–Ú‚ğ”Ô†w’è‚Åæ“¾‚·‚é */
 		virtual const IItemBase* GetItemByNum(U32 i_num)const = 0;
 		/** İ’è€–Ú‚ğIDw’è‚Åæ“¾‚·‚é */
+		virtual IItemBase* GetItemByID(const wchar_t i_szIDBuf[]) = 0;
+		/** İ’è€–Ú‚ğIDw’è‚Åæ“¾‚·‚é */
 		virtual const IItemBase* GetItemByID(const wchar_t i_szIDBuf[])const = 0;
 
 	public:

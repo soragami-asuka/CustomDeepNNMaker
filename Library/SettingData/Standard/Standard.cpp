@@ -119,9 +119,7 @@ namespace Standard {
 		/** 設定項目を番号指定で取得する */
 		IItemBase* GetItemByNum(U32 i_num)
 		{
-			if(i_num >= this->lpLayerConfigItem.size())
-				return NULL;
-			return this->lpLayerConfigItem[i_num];
+			return const_cast<IItemBase*>((static_cast<const Data&>(*this)).GetItemByNum(i_num));
 		}
 		/** 設定項目を番号指定で取得する */
 		const IItemBase* GetItemByNum(U32 i_num)const
@@ -129,6 +127,11 @@ namespace Standard {
 			if(i_num >= this->lpLayerConfigItem.size())
 				return NULL;
 			return this->lpLayerConfigItem[i_num];
+		}
+		/** 設定項目をID指定で取得する */
+		IItemBase* GetItemByID(const wchar_t i_szIDBuf[])
+		{
+			return const_cast<IItemBase*>((static_cast<const Data&>(*this)).GetItemByID(i_szIDBuf));
 		}
 		/** 設定項目をID指定で取得する */
 		const IItemBase* GetItemByID(const wchar_t i_szIDBuf[])const

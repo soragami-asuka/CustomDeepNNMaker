@@ -33,14 +33,24 @@ namespace NeuralNetwork {
 		virtual ErrorCode GetVersionCode(VersionCode& o_versionCode)const = 0;
 
 
-		/** レイヤー設定を作成する */
-		virtual SettingData::Standard::IData* CreateLayerConfig(void)const = 0;
-		/** レイヤー設定を作成する
+		/** レイヤー構造設定を作成する */
+		virtual SettingData::Standard::IData* CreateLayerStructureSetting(void)const = 0;
+		/** レイヤー構造設定を作成する
 			@param i_lpBuffer	読み込みバッファの先頭アドレス.
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@param o_useBufferSize 実際に読み込んだバッファサイズ
 			@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-		virtual SettingData::Standard::IData* CreateLayerConfigFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)const = 0;
+		virtual SettingData::Standard::IData* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)const = 0;
+
+
+		/** レイヤー学習設定を作成する */
+		virtual SettingData::Standard::IData* CreateLearningSetting(void)const = 0;
+		/** レイヤー学習設定を作成する
+			@param i_lpBuffer	読み込みバッファの先頭アドレス.
+			@param i_bufferSize	読み込み可能バッファのサイズ.
+			@param o_useBufferSize 実際に読み込んだバッファサイズ
+			@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
+		virtual SettingData::Standard::IData* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)const = 0;
 
 		
 		/** CPU処理用のレイヤーを作成.
