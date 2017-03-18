@@ -612,6 +612,8 @@ namespace
 						fwprintf(fp, L"			L\"%ls\",\n",   szEnumID);
 						fwprintf(fp, L"			L\"%ls\");\n", TextToSingleLine(szEnumText).c_str());
 					}
+					fwprintf(fp, L"\n");
+					fwprintf(fp, L"		pLayerConfig->AddItem(pItemEnum);\n");
 					fwprintf(fp, L"	}\n");
 				}
 				break;

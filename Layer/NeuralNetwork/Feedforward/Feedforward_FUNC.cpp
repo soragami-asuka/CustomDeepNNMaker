@@ -235,6 +235,8 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			L"ReLU（ランプ関数）",
 			L"ReLU",
 			L"y = max(0, x);\n範囲 0 <= y\n(x=0, y=0)を通る");
+
+		pLayerConfig->AddItem(pItemEnum);
 	}
 
 	/** Name : Bool型のサンプル
