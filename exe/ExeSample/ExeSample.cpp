@@ -39,7 +39,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	Layer::NeuralNetwork::ILayerDLLManager* pDLLManager = Layer::NeuralNetwork::CreateLayerDLLManager();
 
 	// DLL‚Ì“Ç‚İ‚İ
-	if(pDLLManager->ReadLayerDLL(L"../../Debug/Gravisbell.Layer.NeuralNetwork.Feedforward.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	if(pDLLManager->ReadLayerDLL(L"../../Release/Gravisbell.Layer.NeuralNetwork.Feedforward.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 	{
 		delete pDLLManager;
 		return -1;
@@ -207,7 +207,7 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 
 	// ’†ŠÔ‘w1‘w–Ú(‡Œv2‘w–Ú)‚ğì¬
 	{
-		auto pLayer = CreateLayerCPU(pLayerDLL, 20, pInputLayerA->GetOutputBufferCount());
+		auto pLayer = CreateLayerCPU(pLayerDLL, 80, pInputLayerA->GetOutputBufferCount());
 		if(pLayer == NULL)
 		{
 			for(auto pLayer : lpLayer)
@@ -225,7 +225,7 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 	
 	// ’†ŠÔ‘w2‘w–Ú(‡Œv3‘w–Ú)‚ğì¬
 	{
-		auto pLayer = CreateLayerCPU(pLayerDLL, 20, (*lpCalcLayer.rbegin())->GetOutputBufferCount());
+		auto pLayer = CreateLayerCPU(pLayerDLL, 80, (*lpCalcLayer.rbegin())->GetOutputBufferCount());
 		if(pLayer == NULL)
 		{
 			for(auto pLayer : lpLayer)
@@ -299,6 +299,8 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 	// ‰‰Zˆ—‚ğÀs‚·‚é
 	for(unsigned int calcNum=0; calcNum<500; calcNum++)
 	{
+		printf("%d‰ñ\n", calcNum);
+
 		// ŠwKƒ‹[ƒvæ“ªˆ—
 		pBatchDataNoListGenerator->PreProcessLearnLoop();
 		pInputLayerA->PreProcessLearnLoop(*pLearnSettingIO);
