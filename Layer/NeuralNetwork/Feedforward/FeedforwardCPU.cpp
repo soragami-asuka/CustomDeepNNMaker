@@ -35,6 +35,10 @@ private:
 	CONST_BATCH_BUFFER_POINTER m_lppInputBuffer;	/**< 演算時の入力データ */
 	CONST_BATCH_BUFFER_POINTER m_lppDOutputBuffer;	/**< 入力誤差計算時の出力誤差データ */
 
+	// 演算処理用のバッファ
+	bool onUseDropOut;											/**< ドロップアウト処理を実行するフラグ. */
+	std::vector<std::vector<NEURON_TYPE>>	 lppDropOutBuffer;	/**< ドロップアウト処理用の係数<ニューロン数, 入力数> */
+
 public:
 	/** コンストラクタ */
 	FeedforwardCPU(Gravisbell::GUID guid)
@@ -44,6 +48,7 @@ public:
 		,	outputBufferCount		(0)		/**< 出力バッファ数 */
 		,	m_lppInputBuffer		(NULL)	/**< 演算時の入力データ */
 		,	m_lppDOutputBuffer		(NULL)	/**< 入力誤差計算時の出力誤差データ */
+		,	onUseDropOut			(false)	
 	{
 	}
 	/** デストラクタ */
@@ -241,6 +246,10 @@ public:
 			this->lppBatchOutputBuffer[batchNum] = &this->lpOutputBuffer[batchNum][0];
 		}
 
+		// ドロップアウト処理を未使用に変更
+		this->onUseDropOut = false;
+		this->lppDropOutBuffer.clear();
+
 		// 入力差分バッファを作成
 		// はスキップ
 
@@ -256,8 +265,57 @@ public:
 			delete this->pLearnData;
 		this->pLearnData = data.Clone();
 
-		// 構造体に読み込む
-		return this->pLearnData->WriteToStruct((BYTE*)&this->learnData);
+		// ドロップアウト
+		{
+			auto pItem = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Float*>(data.GetItemByID(L"DropOut"));
+			if(pItem)
+				this->learnData.DropOut = pItem->GetValue();
+			else
+				this->learnData.DropOut = 0.0f;
+			
+			S32 dropOutRate = (S32)(learnData.DropOut * RAND_MAX);
+
+			if(dropOutRate > 0)
+			{
+				if(!this->onUseDropOut)
+				{
+					this->onUseDropOut = true;
+					// バッファの確保
+					this->lppDropOutBuffer.resize(this->neuronCount);
+					for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
+						this->lppDropOutBuffer[neuronNum].resize(this->inputBufferCount);
+				}
+
+				// バッファに1or0を入力
+				// 1 : DropOutしない
+				// 0 : DropOutする
+				for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
+				{
+					for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
+					{
+						if(rand() < dropOutRate)	// ドロップアウトする
+							this->lppDropOutBuffer[neuronNum][inputNum] = 0.0f;
+						else
+							this->lppDropOutBuffer[neuronNum][inputNum] = 1.0f;
+					}
+				}
+			}
+			else
+			{
+				this->onUseDropOut = false;
+				this->lppDropOutBuffer.clear();
+			}
+		}
+		// 学習係数
+		{
+			auto pItem = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Float*>(data.GetItemByID(L"LearnCoeff"));
+			if(pItem)
+				this->learnData.LearnCoeff = pItem->GetValue();
+			else
+				this->learnData.LearnCoeff = 1.0f;
+		}
+
+		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
 
 
@@ -268,21 +326,48 @@ public:
 	{
 		this->m_lppInputBuffer = i_lppInputBuffer;
 
-		for(unsigned int batchNum=0; batchNum<this->batchSize; batchNum++)
+		// ループ内でif分を実行すると処理不可がかさむので外で分ける.
+		if(!this->onUseDropOut)
 		{
-			for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
+			// DropOutを使用しない場合
+			for(unsigned int batchNum=0; batchNum<this->batchSize; batchNum++)
 			{
-				float tmp = 0;
-
-				// ニューロンの値を加算
-				for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
+				for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
 				{
-					tmp += i_lppInputBuffer[batchNum][inputNum] * this->lppNeuron[neuronNum][inputNum];
-				}
-				tmp += this->lpBias[neuronNum];
+					float tmp = 0;
 
-				// シグモイド関数を演算
-				this->lpOutputBuffer[batchNum][neuronNum] = 1 / (1+exp(-tmp));
+					// ニューロンの値を加算
+					for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
+					{
+						tmp += i_lppInputBuffer[batchNum][inputNum] * this->lppNeuron[neuronNum][inputNum];
+					}
+					tmp += this->lpBias[neuronNum];
+
+					// シグモイド関数を演算
+					this->lpOutputBuffer[batchNum][neuronNum] = 1 / (1+exp(-tmp));
+				}
+			}
+		}
+		else
+		{
+			// DropOutを使用する場合
+			for(unsigned int batchNum=0; batchNum<this->batchSize; batchNum++)
+			{
+				for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
+				{
+					float tmp = 0;
+
+					// ニューロンの値を加算
+					for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
+					{
+						// ※DropOutの有無で違うのはこの一行だけ
+						tmp += i_lppInputBuffer[batchNum][inputNum] * this->lppNeuron[neuronNum][inputNum] * this->lppDropOutBuffer[neuronNum][inputNum];
+					}
+					tmp += this->lpBias[neuronNum];
+
+					// シグモイド関数を演算
+					this->lpOutputBuffer[batchNum][neuronNum] = 1 / (1+exp(-tmp));
+				}
 			}
 		}
 
@@ -327,19 +412,44 @@ public:
 	{
 		this->m_lppDOutputBuffer = i_lppDOutputBuffer;
 
-		for(unsigned int batchNum=0; batchNum<this->batchSize; batchNum++)
+		// ループ内でif分を実行すると処理不可がかさむので外で分ける.
+		if(!this->onUseDropOut)
 		{
-			// 入力誤差差分を計算
-			for(unsigned int inputNum=0; inputNum<this->inputBufferCount; inputNum++)
+			// DropOut無し
+			for(unsigned int batchNum=0; batchNum<this->batchSize; batchNum++)
 			{
-				float tmp = 0.0f;
-
-				for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
+				// 入力誤差差分を計算
+				for(unsigned int inputNum=0; inputNum<this->inputBufferCount; inputNum++)
 				{
-					tmp += i_lppDOutputBuffer[batchNum][neuronNum] * this->lppNeuron[neuronNum][inputNum];
-				}
+					float tmp = 0.0f;
 
-				this->lpDInputBuffer[batchNum][inputNum] = this->m_lppInputBuffer[batchNum][inputNum] * (1.0f - this->m_lppInputBuffer[batchNum][inputNum]) * tmp;
+					for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
+					{
+						tmp += i_lppDOutputBuffer[batchNum][neuronNum] * this->lppNeuron[neuronNum][inputNum];
+					}
+
+					this->lpDInputBuffer[batchNum][inputNum] = this->m_lppInputBuffer[batchNum][inputNum] * (1.0f - this->m_lppInputBuffer[batchNum][inputNum]) * tmp;
+				}
+			}
+		}
+		else
+		{
+			// DropOut有り
+			for(unsigned int batchNum=0; batchNum<this->batchSize; batchNum++)
+			{
+				// 入力誤差差分を計算
+				for(unsigned int inputNum=0; inputNum<this->inputBufferCount; inputNum++)
+				{
+					float tmp = 0.0f;
+
+					for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
+					{
+						// DropOutの有無で違うのはこの一文だけ
+						tmp += i_lppDOutputBuffer[batchNum][neuronNum] * this->lppNeuron[neuronNum][inputNum] * this->lppDropOutBuffer[neuronNum][inputNum];
+					}
+
+					this->lpDInputBuffer[batchNum][inputNum] = this->m_lppInputBuffer[batchNum][inputNum] * (1.0f - this->m_lppInputBuffer[batchNum][inputNum]) * tmp;
+				}
 			}
 		}
 
@@ -351,18 +461,29 @@ public:
 		出力誤差差分、入力誤差差分は直前のCalculateLearnErrorの値を参照する. */
 	ErrorCode ReflectionLearnError(void)
 	{
-		for(unsigned int batchNum=0; batchNum<this->batchSize; batchNum++)
+		for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
 		{
-			for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
+			// バイアス更新
 			{
-				// バイアス更新
-				this->lpBias[neuronNum] += this->learnData.LearnCoeff * this->m_lppDOutputBuffer[batchNum][neuronNum];
-
-				// 入力対応ニューロン更新
-				for(unsigned int inputNum=0; inputNum<this->inputBufferCount; inputNum++)
+				F32 sumDOutput = 0.0f;
+				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 				{
-					this->lppNeuron[neuronNum][inputNum] += this->learnData.LearnCoeff * this->m_lppDOutputBuffer[batchNum][neuronNum] * this->m_lppInputBuffer[batchNum][inputNum];
+					 sumDOutput += this->m_lppDOutputBuffer[batchNum][neuronNum];
 				}
+
+				this->lpBias[neuronNum] += this->learnData.LearnCoeff * sumDOutput;
+			}
+
+			// 入力対応ニューロン更新
+			for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
+			{
+				F32 sumDOutput = 0.0f;
+				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+				{
+					sumDOutput += this->m_lppDOutputBuffer[batchNum][neuronNum] * this->m_lppInputBuffer[batchNum][inputNum];
+				}
+
+				this->lppNeuron[neuronNum][inputNum] += this->learnData.LearnCoeff * sumDOutput;
 			}
 		}
 

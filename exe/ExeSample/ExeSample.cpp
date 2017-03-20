@@ -183,7 +183,7 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 		// ドロップアウト率
 		auto pItemDropOut = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Float*>(pLearnSettingCalc->GetItemByID(L"DropOut"));
 		if(pItemDropOut)
-			pItemDropOut->SetValue(0.0f);
+			pItemDropOut->SetValue(0.2f);
 	}
 
 	// 全レイヤーリスト
@@ -297,7 +297,7 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 	pBatchDataNoListGenerator->PreProcess(pInputLayerA->GetDataCount(), BATCH_SIZE);
 
 	// 演算処理を実行する
-	for(unsigned int calcNum=0; calcNum<200; calcNum++)
+	for(unsigned int calcNum=0; calcNum<500; calcNum++)
 	{
 		// 学習ループ先頭処理
 		pBatchDataNoListGenerator->PreProcessLearnLoop();
