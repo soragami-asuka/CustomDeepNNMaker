@@ -73,12 +73,12 @@ Gravisbell::ErrorCode FeedforwardBase::SetLayerConfig(const SettingData::Standar
 
 	// レイヤーコードを確認
 	{
-		GUID config_guid;
+		Gravisbell::GUID config_guid;
 		err = config.GetLayerCode(config_guid);
 		if(err != ERROR_CODE_NONE)
 			return err;
 
-		GUID layer_guid;
+		Gravisbell::GUID layer_guid;
 		err = ::GetLayerCode(layer_guid);
 		if(err != ERROR_CODE_NONE)
 			return err;

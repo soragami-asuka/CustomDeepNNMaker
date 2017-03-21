@@ -277,9 +277,9 @@ public:
 
 			if(dropOutRate > 0)
 			{
-				if(!this->onUseDropOut)
+				this->onUseDropOut = true;
+				if(this->lppDropOutBuffer.empty())
 				{
-					this->onUseDropOut = true;
 					// バッファの確保
 					this->lppDropOutBuffer.resize(this->neuronCount);
 					for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
@@ -314,6 +314,14 @@ public:
 			else
 				this->learnData.LearnCoeff = 1.0f;
 		}
+
+		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
+	}
+	/** 演算ループの初期化処理.データセットの演算開始前に実行する
+		失敗した場合はCalculate以降の処理は実行不可. */
+	ErrorCode PreProcessCalculateLoop()
+	{
+		this->onUseDropOut = false;
 
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}

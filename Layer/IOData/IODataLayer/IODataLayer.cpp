@@ -13,7 +13,7 @@ namespace Layer {
 namespace IOData {
 	
 // {BEBA34EC-C30C-4565-9386-56088981D2D7}
-static const GUID g_guid = { 0x6e99d406, 0xb931, 0x4de0, { 0xac, 0x3a, 0x48, 0xa3, 0x5e, 0x12, 0x98, 0x20 } };
+static const Gravisbell::GUID g_guid(0x6e99d406, 0xb931, 0x4de0, 0xac, 0x3a, 0x48, 0xa3, 0x5e, 0x12, 0x98, 0x20);
 
 // VersionCode
 static const Gravisbell::VersionCode g_version = {   1,   0,   0,   0}; 
@@ -22,7 +22,7 @@ static const Gravisbell::VersionCode g_version = {   1,   0,   0,   0};
 /** レイヤーの識別コードを取得する.
   * @param  o_layerCode		格納先バッファ.
   */
-extern Gravisbell::ErrorCode GetLayerCode(GUID& o_layerCode)
+extern Gravisbell::ErrorCode GetLayerCode(Gravisbell::GUID& o_layerCode)
 {
 	o_layerCode = g_guid;
 

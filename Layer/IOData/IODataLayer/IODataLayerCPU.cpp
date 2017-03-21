@@ -6,10 +6,10 @@
 
 #include<vector>
 #include<list>
+#include<algorithm>
 
 // UUID関連用
-#include<rpc.h>
-#pragma comment(lib, "Rpcrt4.lib")
+#include<boost/uuid/uuid_generators.hpp>
 
 namespace Gravisbell {
 namespace Layer {
@@ -18,7 +18,7 @@ namespace IOData {
 	class IODataLayerCPU : public IIODataLayer
 	{
 	private:
-		GUID guid;	/**< 識別ID */
+		Gravisbell::GUID guid;	/**< 識別ID */
 		Gravisbell::IODataStruct ioDataStruct;	/**< データ構造 */
 
 		std::vector<F32*> lpBufferList;
@@ -30,9 +30,14 @@ namespace IOData {
 		std::vector<F32*> lpBatchDataPointer;			/**< バッチ処理データの配列先頭アドレスリスト */
 		std::vector<F32*> lpBatchDInputBufferPointer;	/**< バッチ処理入力誤差差分の配列先導アドレスリスト */
 
+		std::vector<F32> lpErrorValue_min;	/**< 最小誤差 */
+		std::vector<F32> lpErrorValue_max;	/**< 最大誤差 */
+		std::vector<F32> lpErrorValue_ave;	/**< 平均誤差 */
+		std::vector<F32> lpErrorValue_ave2;	/**< 平均二乗誤差 */
+
 	public:
 		/** コンストラクタ */
-		IODataLayerCPU(GUID guid, Gravisbell::IODataStruct ioDataStruct)
+		IODataLayerCPU(Gravisbell::GUID guid, Gravisbell::IODataStruct ioDataStruct)
 			:	guid				(guid)
 			,	ioDataStruct		(ioDataStruct)
 			,	lpBatchDataNoList	(NULL)
@@ -56,7 +61,7 @@ namespace IOData {
 		}
 
 		/** レイヤー固有のGUIDを取得する */
-		Gravisbell::ErrorCode GetGUID(GUID& o_guid)const
+		Gravisbell::ErrorCode GetGUID(Gravisbell::GUID& o_guid)const
 		{
 			o_guid = this->guid;
 
@@ -66,7 +71,7 @@ namespace IOData {
 		/** レイヤー種別識別コードを取得する.
 			@param o_layerCode	格納先バッファ
 			@return 成功した場合0 */
-		Gravisbell::ErrorCode GetLayerCode(GUID& o_layerCode)const
+		Gravisbell::ErrorCode GetLayerCode(Gravisbell::GUID& o_layerCode)const
 		{
 			return Gravisbell::Layer::IOData::GetLayerCode(o_layerCode);
 		}
@@ -196,9 +201,10 @@ namespace IOData {
 			失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
 		Gravisbell::ErrorCode PreProcessLearn(U32 batchSize)
 		{
-			// バッチ処理データ配列の初期化
-			this->batchSize = batchSize;
-			this->lpBatchDataPointer.resize(batchSize);
+			// 通常の演算用の処理を実行
+			ErrorCode err = PreProcessCalculate(batchSize);
+			if(err != ErrorCode::ERROR_CODE_NONE)
+				return err;
 
 			// 誤差差分データ配列の初期化
 			this->lpDInputBuffer.resize(batchSize);
@@ -222,6 +228,12 @@ namespace IOData {
 			this->batchSize = batchSize;
 			this->lpBatchDataPointer.resize(batchSize);
 
+			// 誤差計算処理
+			this->lpErrorValue_min.resize(this->GetBufferCount());
+			this->lpErrorValue_max.resize(this->GetBufferCount());
+			this->lpErrorValue_ave.resize(this->GetBufferCount());
+			this->lpErrorValue_ave2.resize(this->GetBufferCount());
+
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
 
@@ -229,6 +241,17 @@ namespace IOData {
 			失敗した場合はCalculate以降の処理は実行不可. */
 		Gravisbell::ErrorCode PreProcessLearnLoop(const SettingData::Standard::IData& config)
 		{
+			return this->PreProcessCalculateLoop();
+		}
+		/** 演算ループの初期化処理.データセットの演算開始前に実行する
+			失敗した場合はCalculate以降の処理は実行不可. */
+		Gravisbell::ErrorCode PreProcessCalculateLoop()
+		{
+			this->lpErrorValue_min.assign(this->lpErrorValue_min.size(),  FLT_MAX);
+			this->lpErrorValue_max.assign(this->lpErrorValue_max.size(),  0.0f);
+			this->lpErrorValue_ave.assign(this->lpErrorValue_ave.size(),  0.0f);
+			this->lpErrorValue_ave2.assign(this->lpErrorValue_ave2.size(), 0.0f);
+
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
 
@@ -254,11 +277,70 @@ namespace IOData {
 			{
 				for(U32 inputNum=0; inputNum<inputBufferCount; inputNum++)
 				{
-					this->lpDInputBuffer[batchNum][inputNum] = this->lpBatchDataPointer[batchNum][inputNum] - i_lppInputBuffer[batchNum][inputNum];
+					F32 error = this->lpBatchDataPointer[batchNum][inputNum] - i_lppInputBuffer[batchNum][inputNum];
+					F32 error_abs = abs(error);
+
+					if(this->lpDInputBuffer.size() > 0)
+						this->lpDInputBuffer[batchNum][inputNum] = error;
+
+					// 誤差を保存
+					this->lpErrorValue_min[inputNum]  = min(this->lpErrorValue_min[inputNum], error_abs);
+					this->lpErrorValue_max[inputNum]  = max(this->lpErrorValue_min[inputNum], error_abs);
+					this->lpErrorValue_ave[inputNum]  += error_abs;
+					this->lpErrorValue_ave2[inputNum] += error_abs * error_abs;
 				}
 			}
 
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
+		}
+
+
+		/** 誤差の値を取得する.
+			CalculateLearnError()を1回以上実行していない場合、正常に動作しない.
+			@param	o_min	最小誤差.
+			@param	o_max	最大誤差.
+			@param	o_ave	平均誤差.
+			@param	o_ave2	平均二乗誤差. */
+		ErrorCode GetCalculateErrorValue(F32& o_min, F32& o_max, F32& o_ave, F32& o_ave2)
+		{
+			o_min  = FLT_MAX;
+			o_max  = 0.0f;
+			o_ave  = 0.0f;
+			o_ave2 = 0.0f;
+
+			for(U32 inputNum=0; inputNum<this->GetBufferCount(); inputNum++)
+			{
+				o_min   = min(o_min, this->lpErrorValue_min[inputNum]);
+				o_max   = max(o_max, this->lpErrorValue_max[inputNum]);
+				o_ave  += this->lpErrorValue_ave[inputNum];
+				o_ave2 += this->lpErrorValue_ave2[inputNum];
+			}
+
+			o_ave  = o_ave / this->GetDataCount() / this->GetBufferCount();
+			o_ave2 = (F32)sqrt(o_ave2 / this->GetDataCount() / this->GetBufferCount());
+
+			return ErrorCode::ERROR_CODE_NONE;
+		}
+
+		/** 詳細な誤差の値を取得する.
+			各入出力の値毎に誤差を取る.
+			CalculateLearnError()を1回以上実行していない場合、正常に動作しない.
+			各配列の要素数は[GetBufferCount()]以上である必要がある.
+			@param	o_lpMin		最小誤差.
+			@param	o_lpMax		最大誤差.
+			@param	o_lpAve		平均誤差.
+			@param	o_lpAve2	平均二乗誤差. */
+		ErrorCode GetCalculateErrorValueDetail(F32 o_lpMin[], F32 o_lpMax[], F32 o_lpAve[], F32 o_lpAve2[])
+		{
+			for(U32 inputNum=0; inputNum<this->GetBufferCount(); inputNum++)
+			{
+				o_lpMin[inputNum]   = this->lpErrorValue_min[inputNum];
+				o_lpMax[inputNum]   = this->lpErrorValue_max[inputNum];
+				o_lpAve[inputNum]  += this->lpErrorValue_ave[inputNum] / this->GetDataCount();
+				o_lpAve2[inputNum] += (F32)sqrt(this->lpErrorValue_ave2[inputNum] / this->GetDataCount());
+			}
+			
+			return ErrorCode::ERROR_CODE_NONE;
 		}
 
 	public:
@@ -288,7 +370,7 @@ namespace IOData {
 		{
 			if(o_lpDInputBuffer == NULL)
 				return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-			
+
 			const U32 batchSize = this->GetBatchSize();
 			const U32 inputBufferCount = this->GetOutputBufferCount();
 
@@ -349,16 +431,15 @@ namespace IOData {
 		@return	入力信号データレイヤーのアドレス */
 	extern IODataLayer_API Gravisbell::Layer::IOData::IIODataLayer* CreateIODataLayerCPU(Gravisbell::IODataStruct ioDataStruct)
 	{
-		UUID uuid;
-		::UuidCreate(&uuid);
+		boost::uuids::uuid uuid = boost::uuids::random_generator()();
 
-		return CreateIODataLayerCPUwithGUID(uuid, ioDataStruct);
+		return CreateIODataLayerCPUwithGUID(uuid.data, ioDataStruct);
 	}
 	/** 入力信号データレイヤーを作成する.CPU制御
 		@param guid			レイヤーのGUID.
 		@param bufferSize	バッファのサイズ.※F32型配列の要素数.
 		@return	入力信号データレイヤーのアドレス */
-	extern IODataLayer_API Gravisbell::Layer::IOData::IIODataLayer* CreateIODataLayerCPUwithGUID(GUID guid, Gravisbell::IODataStruct ioDataStruct)
+	extern IODataLayer_API Gravisbell::Layer::IOData::IIODataLayer* CreateIODataLayerCPUwithGUID(Gravisbell::GUID guid, Gravisbell::IODataStruct ioDataStruct)
 	{
 		return new Gravisbell::Layer::IOData::IODataLayerCPU(guid, ioDataStruct);
 	}

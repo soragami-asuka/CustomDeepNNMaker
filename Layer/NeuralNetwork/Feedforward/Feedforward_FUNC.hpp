@@ -26,7 +26,7 @@
   * @param  o_layerCode    Storage destination buffer.
   * @return On success 0. 
   */
-EXPORT_API Gravisbell::ErrorCode GetLayerCode(GUID& o_layerCode);
+EXPORT_API Gravisbell::ErrorCode GetLayerCode(Gravisbell::GUID& o_layerCode);
 
 /** Get version code.
   * @param  o_versionCode    Storage destination buffer.
@@ -65,12 +65,12 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSettingFromBu
 /** Create a layer for CPU processing.
   * @param GUID of layer to create.
   */
-EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerCPU(GUID guid);
+EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerCPU(Gravisbell::GUID guid);
 
 /** Create a layer for GPU processing.
   * @param GUID of layer to create.
   */
-EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerGPU(GUID guid);
+EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerGPU(Gravisbell::GUID guid);
 
 
 

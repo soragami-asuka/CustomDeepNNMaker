@@ -20,7 +20,7 @@ namespace IOData {
   * @param  o_layerCode		格納先バッファ.
   * @return 成功した場合0. 
   */
-extern IODataLayer_API Gravisbell::ErrorCode GetLayerCode(GUID& o_layerCode);
+extern IODataLayer_API Gravisbell::ErrorCode GetLayerCode(Gravisbell::GUID& o_layerCode);
 
 /** バージョンコードを取得する.
   * @param  o_versionCode	格納先バッファ.
@@ -51,7 +51,7 @@ extern IODataLayer_API Gravisbell::Layer::IOData::IIODataLayer* CreateIODataLaye
 	@param guid			レイヤーのGUID.
 	@param ioDataStruct	入出力データ構造.
 	@return	入力信号データレイヤーのアドレス */
-extern IODataLayer_API Gravisbell::Layer::IOData::IIODataLayer* CreateIODataLayerCPUwithGUID(GUID guid, Gravisbell::IODataStruct ioDataStruct);
+extern IODataLayer_API Gravisbell::Layer::IOData::IIODataLayer* CreateIODataLayerCPUwithGUID(Gravisbell::GUID guid, Gravisbell::IODataStruct ioDataStruct);
 
 
 //======================================
@@ -66,7 +66,7 @@ extern IODataLayer_API Gravisbell::Layer::IOData::IIODataLayer* CreateIODataLaye
 	@param guid			レイヤーのGUID.
 	@param ioDataStruct	入出力データ構造.
 	@return	入力信号データレイヤーのアドレス */
-extern IODataLayer_API Gravisbell::Layer::IOData::IIODataLayer* CreateIODataLayerGPUwithGUID(GUID guid, Gravisbell::IODataStruct ioDataStruct);
+extern IODataLayer_API Gravisbell::Layer::IOData::IIODataLayer* CreateIODataLayerGPUwithGUID(Gravisbell::GUID guid, Gravisbell::IODataStruct ioDataStruct);
 
 
 }	// IOData

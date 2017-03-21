@@ -9,7 +9,6 @@
 --------------------------------------------*/
 #include"stdafx.h"
 
-#include<guiddef.h>
 #include<string>
 #include<map>
 
@@ -19,7 +18,7 @@
 
 
 // {BEBA34EC-C30C-4565-9386-56088981D2D7}
-static const GUID g_guid = {0xbeba34ec, 0xc30c, 0x4565, {0x93, 0x86, 0x56, 0x08, 0x89, 0x81, 0xd2, 0xd7}};
+static const Gravisbell::GUID g_guid(0xbeba34ec, 0xc30c, 0x4565, 0x93, 0x86, 0x56, 0x08, 0x89, 0x81, 0xd2, 0xd7);
 
 // VersionCode
 static const Gravisbell::VersionCode g_version = {   1,   0,   0,   0}; 
@@ -165,7 +164,7 @@ namespace CurrentLanguage
   * @param  o_layerCode    Storage destination buffer.
   * @return On success 0. 
   */
-EXPORT_API Gravisbell::ErrorCode GetLayerCode(GUID& o_layerCode)
+EXPORT_API Gravisbell::ErrorCode GetLayerCode(Gravisbell::GUID& o_layerCode)
 {
 	o_layerCode = g_guid;
 
@@ -189,7 +188,7 @@ EXPORT_API Gravisbell::ErrorCode GetVersionCode(Gravisbell::VersionCode& o_versi
   */
 EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting(void)
 {
-	GUID layerCode;
+	Gravisbell::GUID layerCode;
 	GetLayerCode(layerCode);
 
 	Gravisbell::VersionCode versionCode;
@@ -235,8 +234,6 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			L"ReLU（ランプ関数）",
 			L"ReLU",
 			L"y = max(0, x);\n範囲 0 <= y\n(x=0, y=0)を通る");
-
-		pLayerConfig->AddItem(pItemEnum);
 	}
 
 	/** Name : Bool型のサンプル
@@ -291,7 +288,7 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
   * @return If successful, new configuration information. */
 EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSetting(void)
 {
-	GUID layerCode;
+	Gravisbell::GUID layerCode;
 	GetLayerCode(layerCode);
 
 	Gravisbell::VersionCode versionCode;

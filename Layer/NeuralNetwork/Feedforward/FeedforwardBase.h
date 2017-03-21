@@ -17,7 +17,7 @@ namespace NeuralNetwork {
 	class FeedforwardBase : public Gravisbell::Layer::NeuralNetwork::INNLayer
 	{
 	protected:
-		GUID guid;	/**< レイヤー識別用のGUID */
+		Gravisbell::GUID guid;	/**< レイヤー識別用のGUID */
 
 		IODataStruct inputDataStruct;	/**< 入力データ構造 */
 
@@ -31,7 +31,7 @@ namespace NeuralNetwork {
 
 	public:
 		/** コンストラクタ */
-		FeedforwardBase(GUID guid);
+		FeedforwardBase(Gravisbell::GUID guid);
 
 		/** デストラクタ */
 		virtual ~FeedforwardBase();
@@ -45,12 +45,12 @@ namespace NeuralNetwork {
 		unsigned int GetLayerKindBase()const;
 
 		/** レイヤー固有のGUIDを取得する */
-		ErrorCode GetGUID(GUID& o_guid)const;
+		ErrorCode GetGUID(Gravisbell::GUID& o_guid)const;
 
 		/** レイヤーの種類識別コードを取得する.
 			@param o_layerCode	格納先バッファ
 			@return 成功した場合0 */
-		ErrorCode GetLayerCode(GUID& o_layerCode)const;
+		ErrorCode GetLayerCode(Gravisbell::GUID& o_layerCode)const;
 
 		/** バッチサイズを取得する.
 			@return 同時に演算を行うバッチのサイズ */
