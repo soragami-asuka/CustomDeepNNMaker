@@ -27,14 +27,14 @@ namespace IOData {
 
 		/** データのバッファサイズを取得する.
 			@return データのバッファサイズ.使用するfloat型配列の要素数. */
-		virtual unsigned int GetBufferCount()const = 0;
+		virtual U32 GetBufferCount()const = 0;
 
 		/** データを追加する.
 			@param	lpData	データ一組の配列. [GetBufferSize()の戻り値]の要素数が必要. */
 		virtual ErrorCode AddData(const float lpData[]) = 0;
 
 		/** データ数を取得する */
-		virtual unsigned int GetDataCount()const = 0;
+		virtual U32 GetDataCount()const = 0;
 		/** データを番号指定で取得する.
 			@param num		取得する番号
 			@param o_LpData データの格納先配列. [GetBufferSize()の戻り値]の要素数が必要. */

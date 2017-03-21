@@ -4,11 +4,10 @@
 #ifndef __GRAVISBELL_I_LAYER_BASE_H__
 #define __GRAVISBELL_I_LAYER_BASE_H__
 
-#include<guiddef.h>
-
 #include"../Common/Common.h"
 #include"../Common/ErrorCode.h"
 #include"../Common/IODataStruct.h"
+#include"../Common/Guiddef.h"
 
 #include"../SettingData/Standard/IData.h"
 
@@ -46,12 +45,12 @@ namespace Layer {
 		virtual unsigned int GetLayerKind()const = 0;
 
 		/** レイヤー固有のGUIDを取得する */
-		virtual ErrorCode GetGUID(GUID& o_guid)const = 0;
+		virtual ErrorCode GetGUID(Gravisbell::GUID& o_guid)const = 0;
 
 		/** レイヤー種別識別コードを取得する.
 			@param o_layerCode	格納先バッファ
 			@return 成功した場合0 */
-		virtual ErrorCode GetLayerCode(GUID& o_layerCode)const = 0;
+		virtual ErrorCode GetLayerCode(Gravisbell::GUID& o_layerCode)const = 0;
 
 	public:
 		/** 演算前処理を実行する.(学習用)
@@ -59,16 +58,19 @@ namespace Layer {
 			NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 			失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
 		virtual ErrorCode PreProcessLearn(unsigned int batchSize) = 0;
-
 		/** 演算前処理を実行する.(演算用)
 			@param batchSize	同時に演算を行うバッチのサイズ.
 			NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 			失敗した場合はCalculate以降の処理は実行不可. */
 		virtual ErrorCode PreProcessCalculate(unsigned int batchSize) = 0;
 
+
 		/** 学習ループの初期化処理.データセットの学習開始前に実行する
 			失敗した場合はCalculate以降の処理は実行不可. */
 		virtual ErrorCode PreProcessLearnLoop(const SettingData::Standard::IData& data) = 0;
+		/** 演算ループの初期化処理.データセットの演算開始前に実行する
+			失敗した場合はCalculate以降の処理は実行不可. */
+		virtual ErrorCode PreProcessCalculateLoop() = 0;
 
 
 		/** バッチサイズを取得する.

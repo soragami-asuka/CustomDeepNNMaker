@@ -8,6 +8,7 @@
 
 #include"../../Common/Common.h"
 #include"../../Common/ErrorCode.h"
+#include"../../Common/Guiddef.h"
 
 
 namespace Gravisbell {
@@ -290,7 +291,7 @@ namespace Standard {
 		/** レイヤー識別コードを取得する.
 			@param o_guid	格納先バッファ
 			@return 成功した場合0 */
-		virtual Gravisbell::ErrorCode GetLayerCode(GUID& o_guid)const = 0;
+		virtual Gravisbell::ErrorCode GetLayerCode(Gravisbell::GUID& o_guid)const = 0;
 
 	public:
 		/** 設定項目数を取得する */

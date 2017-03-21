@@ -26,7 +26,7 @@ namespace NeuralNetwork {
 			@param szFilePath		読み込むファイルのパス.
 			@param o_addLayerCode	追加されたGUIDの格納先アドレス.
 			@return	成功した場合0が返る. */
-		virtual ErrorCode ReadLayerDLL(const wchar_t szFilePath[], GUID& o_addLayerCode) = 0;
+		virtual ErrorCode ReadLayerDLL(const wchar_t szFilePath[], Gravisbell::GUID& o_addLayerCode) = 0;
 		/** DLLを読み込んで、管理に追加する.
 			@param szFilePath	読み込むファイルのパス.
 			@return	成功した場合0が返る. */
@@ -41,10 +41,10 @@ namespace NeuralNetwork {
 		/** 管理しているレイヤーDLLをguid指定で取得する.
 			@param guid	取得するDLLのGUID.
 			@return 成功した場合はDLLクラスのアドレス. 失敗した場合はNULL */
-		virtual const ILayerDLL* GetLayerDLLByGUID(GUID i_layerCode)const = 0;
+		virtual const ILayerDLL* GetLayerDLLByGUID(Gravisbell::GUID i_layerCode)const = 0;
 
 		/** レイヤーDLLを削除する. */
-		virtual ErrorCode EraseLayerDLL(GUID i_layerCode) = 0;
+		virtual ErrorCode EraseLayerDLL(Gravisbell::GUID i_layerCode) = 0;
 	};
 
 }	// NeuralNetwork

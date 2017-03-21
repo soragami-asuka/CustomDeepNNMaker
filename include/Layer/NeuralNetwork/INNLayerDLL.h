@@ -26,7 +26,7 @@ namespace NeuralNetwork {
 		/** レイヤー識別コードを取得する.
 			@param o_layerCode	格納先バッファ
 			@return 成功した場合0 */
-		virtual ErrorCode GetLayerCode(GUID& o_layerCode)const = 0;
+		virtual ErrorCode GetLayerCode(Gravisbell::GUID& o_layerCode)const = 0;
 		/** バージョンコードを取得する.
 			@param o_versionCode	格納先バッファ
 			@return 成功した場合0 */
@@ -58,13 +58,13 @@ namespace NeuralNetwork {
 		virtual INNLayer* CreateLayerCPU()const = 0;
 		/** CPU処理用のレイヤーを作成
 			@param guid	作成レイヤーのGUID */
-		virtual INNLayer* CreateLayerCPU(GUID guid)const = 0;
+		virtual INNLayer* CreateLayerCPU(Gravisbell::GUID guid)const = 0;
 		
 		/** GPU処理用のレイヤーを作成.
 			GUIDは自動割り当て. */
 		virtual INNLayer* CreateLayerGPU()const = 0;
 		/** GPU処理用のレイヤーを作成 */
-		virtual INNLayer* CreateLayerGPU(GUID guid)const = 0;
+		virtual INNLayer* CreateLayerGPU(Gravisbell::GUID guid)const = 0;
 	};
 
 }	// NeuralNetwork
