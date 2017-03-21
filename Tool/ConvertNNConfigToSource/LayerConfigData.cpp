@@ -476,7 +476,7 @@ namespace
 	/** データ構造をソースに変換して出力する */
 	int WriteStructureToCreateSource(FILE* fp, Gravisbell::SettingData::Standard::IData& structure, const std::wstring& dataCode)
 	{
-		fwprintf(fp, L"	GUID layerCode;\n");
+		fwprintf(fp, L"	Gravisbell::GUID layerCode;\n");
 		fwprintf(fp, L"	GetLayerCode(layerCode);\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"	Gravisbell::VersionCode versionCode;\n");
@@ -942,7 +942,7 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"  * @param  o_layerCode    Storage destination buffer.\n");
 		fwprintf(fp, L"  * @return On success 0. \n");
 		fwprintf(fp, L"  */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::ErrorCode GetLayerCode(GUID& o_layerCode);\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::ErrorCode GetLayerCode(Gravisbell::GUID& o_layerCode);\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"/** Get version code.\n");
 		fwprintf(fp, L"  * @param  o_versionCode    Storage destination buffer.\n");
@@ -981,12 +981,12 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"/** Create a layer for CPU processing.\n");
 		fwprintf(fp, L"  * @param GUID of layer to create.\n");
 		fwprintf(fp, L"  */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerCPU(GUID guid);\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerCPU(Gravisbell::GUID guid);\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"/** Create a layer for GPU processing.\n");
 		fwprintf(fp, L"  * @param GUID of layer to create.\n");
 		fwprintf(fp, L"  */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerGPU(GUID guid);\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerGPU(Gravisbell::GUID guid);\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");
@@ -1023,7 +1023,6 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"--------------------------------------------*/\n");
 		fwprintf(fp, L"#include\"stdafx.h\"\n");
 		fwprintf(fp, L"\n");
-		fwprintf(fp, L"#include<guiddef.h>\n");
 		fwprintf(fp, L"#include<string>\n");
 		fwprintf(fp, L"#include<map>\n");
 		fwprintf(fp, L"\n");
@@ -1038,7 +1037,7 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 			this->guid.Data3,
 			this->guid.Data4[0], this->guid.Data4[1],
 			this->guid.Data4[2], this->guid.Data4[3], this->guid.Data4[4], this->guid.Data4[5], this->guid.Data4[6], this->guid.Data4[7]);
-		fwprintf(fp, L"static const GUID g_guid = {0x%08x, 0x%04x, 0x%04x, {0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x}};\n",
+		fwprintf(fp, L"static const Gravisbell::GUID g_guid(0x%08x, 0x%04x, 0x%04x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x);\n",
 			this->guid.Data1,
 			this->guid.Data2,
 			this->guid.Data3,
@@ -1261,7 +1260,7 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"  * @param  o_layerCode    Storage destination buffer.\n");
 		fwprintf(fp, L"  * @return On success 0. \n");
 		fwprintf(fp, L"  */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::ErrorCode GetLayerCode(GUID& o_layerCode)\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::ErrorCode GetLayerCode(Gravisbell::GUID& o_layerCode)\n");
 		fwprintf(fp, L"{\n");
 		fwprintf(fp, L"	o_layerCode = g_guid;\n");
 		fwprintf(fp, L"\n");
