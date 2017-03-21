@@ -21,7 +21,7 @@ namespace SettingData {
 namespace Standard {
 
 	/** ‹ó‚ÌƒŒƒCƒ„[İ’èî•ñ‚ğì¬‚·‚é */
-	extern "C" GRAVISBELL_SETTINGDATA_API IDataEx* CreateEmptyData(const GUID& layerCode, const VersionCode& versionCode);
+	extern "C" GRAVISBELL_SETTINGDATA_API IDataEx* CreateEmptyData(const Gravisbell::GUID& layerCode, const VersionCode& versionCode);
 
 	/** İ’è€–Ú(À”)‚ğì¬‚·‚é */
 	extern "C" GRAVISBELL_SETTINGDATA_API IItem_Float* CreateItem_Float(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[], float minValue, float maxValue, float defaultValue);

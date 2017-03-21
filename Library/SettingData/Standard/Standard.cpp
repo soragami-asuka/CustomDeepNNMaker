@@ -6,6 +6,7 @@
 #include"SettingData.h"
 
 #include"Common/VersionCode.h"
+#include"Common/Guiddef.h"
 
 #include<string>
 #include<vector>
@@ -17,14 +18,14 @@ namespace Standard {
 	class Data : public IDataEx
 	{
 	private:
-		GUID layerCode;
+		Gravisbell::GUID layerCode;
 		VersionCode versionCode;
 
 		std::vector<IItemBase*> lpLayerConfigItem;
 
 	public:
 		/** コンストラクタ */
-		Data(const GUID& layerCode, const VersionCode& versionCode)
+		Data(const Gravisbell::GUID& layerCode, const VersionCode& versionCode)
 			: IDataEx()
 			, layerCode		(layerCode)
 			, versionCode	(versionCode)
@@ -103,7 +104,7 @@ namespace Standard {
 		/** レイヤー識別コードを取得する.
 			@param o_layerCode	格納先バッファ
 			@return 成功した場合0 */
-		ErrorCode GetLayerCode(GUID& o_guid)const
+		ErrorCode GetLayerCode(Gravisbell::GUID& o_guid)const
 		{
 			o_guid = this->layerCode;
 
@@ -204,8 +205,8 @@ namespace Standard {
 			unsigned int bufferPos = 0;
 
 			// レイヤーコード
-			GUID tmpLayerCode = *(GUID*)&i_lpBuffer[bufferPos];
-			bufferPos += sizeof(GUID);
+			Gravisbell::GUID tmpLayerCode = *(Gravisbell::GUID*)&i_lpBuffer[bufferPos];
+			bufferPos += sizeof(Gravisbell::GUID);
 
 			// チェック
 			if(this->layerCode != tmpLayerCode)
@@ -262,8 +263,8 @@ namespace Standard {
 			unsigned int bufferPos = 0;
 			
 			// レイヤーコード
-			*(GUID*)&o_lpBuffer[bufferPos] = this->layerCode;
-			bufferPos += sizeof(GUID);
+			*(Gravisbell::GUID*)&o_lpBuffer[bufferPos] = this->layerCode;
+			bufferPos += sizeof(Gravisbell::GUID);
 
 			// バージョンコード
 			*(VersionCode*)&o_lpBuffer[bufferPos] = this->versionCode;
@@ -327,7 +328,7 @@ namespace Standard {
 	};
 
 	/** 空のレイヤー設定情報を作成する */
-	extern "C" GRAVISBELL_SETTINGDATA_API IDataEx* CreateEmptyData(const GUID& layerCode, const VersionCode& versionCode)
+	extern "C" GRAVISBELL_SETTINGDATA_API IDataEx* CreateEmptyData(const Gravisbell::GUID& layerCode, const VersionCode& versionCode)
 	{
 		return new Data(layerCode, versionCode);
 	}

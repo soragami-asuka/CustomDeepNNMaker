@@ -7,9 +7,8 @@
 
 #include<string>
 #include<vector>
-#include<rpc.h>
 
-#pragma comment(lib, "Rpcrt4.lib")
+#include<boost/uuid/uuid_generators.hpp>
 
 namespace Gravisbell {
 namespace Layer {
@@ -61,7 +60,7 @@ namespace NeuralNetwork {
 		/** レイヤー識別コードを取得する.
 			@param o_layerCode	格納先バッファ
 			@return 成功した場合0 */
-		ErrorCode GetLayerCode(GUID& o_layerCode)const
+		ErrorCode GetLayerCode(Gravisbell::GUID& o_layerCode)const
 		{
 			if(this->funcGetLayerCode == NULL)
 				return ERROR_CODE_DLL_LOAD_FUNCTION;
@@ -128,14 +127,13 @@ namespace NeuralNetwork {
 			GUIDは自動割り当て. */
 		INNLayer* CreateLayerCPU()const
 		{
-			UUID uuid;
-			::UuidCreate(&uuid);
+			boost::uuids::uuid uuid = boost::uuids::random_generator()();
 
-			return this->CreateLayerCPU(uuid);
+			return this->CreateLayerCPU(uuid.data);
 		}
 		/** CPU処理用のレイヤーを作成
 			@param guid	作成レイヤーのGUID */
-		INNLayer* CreateLayerCPU(GUID guid)const
+		INNLayer* CreateLayerCPU(Gravisbell::GUID guid)const
 		{
 			if(this->funcCreateLayerCPU == NULL)
 				return NULL;
@@ -147,13 +145,12 @@ namespace NeuralNetwork {
 			GUIDは自動割り当て. */
 		INNLayer* CreateLayerGPU()const
 		{
-			UUID uuid;
-			::UuidCreate(&uuid);
+			boost::uuids::uuid uuid = boost::uuids::random_generator()();
 
-			return this->CreateLayerGPU(uuid);
+			return this->CreateLayerGPU(uuid.data);
 		}
 		/** GPU処理用のレイヤーを作成 */
-		INNLayer* CreateLayerGPU(GUID guid)const
+		INNLayer* CreateLayerGPU(Gravisbell::GUID guid)const
 		{
 			if(this->funcCreateLayerGPU == NULL)
 				return NULL;
@@ -250,13 +247,13 @@ namespace NeuralNetwork {
 			@param szFilePath	読み込むファイルのパス.
 			@param o_addLayerCode	追加されたGUIDの格納先アドレス.
 			@return	成功した場合0が返る. */
-		ErrorCode ReadLayerDLL(const wchar_t szFilePath[], GUID& o_addLayerCode)
+		ErrorCode ReadLayerDLL(const wchar_t szFilePath[], Gravisbell::GUID& o_addLayerCode)
 		{
 			auto pLayerDLL = NNLayerDLL::CreateFromFile(szFilePath);
 			if(pLayerDLL == NULL)
 				return ERROR_CODE_DLL_LOAD_FUNCTION;
 
-			GUID guid;
+			Gravisbell::GUID guid;
 			pLayerDLL->GetLayerCode(guid);
 
 			// 管理レイヤーDLLから検索
@@ -280,7 +277,7 @@ namespace NeuralNetwork {
 			@return	成功した場合0が返る. */
 		ErrorCode ReadLayerDLL(const wchar_t szFilePath[])
 		{
-			GUID layerCode;
+			Gravisbell::GUID layerCode;
 			return this->ReadLayerDLL(szFilePath, layerCode);
 		}
 
@@ -302,7 +299,7 @@ namespace NeuralNetwork {
 		/** 管理しているレイヤーDLLをguid指定で取得する.
 			@param guid	取得するDLLのGUID.
 			@return 成功した場合はDLLクラスのアドレス. 失敗した場合はNULL */
-		const ILayerDLL* GetLayerDLLByGUID(GUID i_layerCode)const
+		const ILayerDLL* GetLayerDLLByGUID(Gravisbell::GUID i_layerCode)const
 		{
 			for(unsigned int i=0; i<this->lppNNLayerDLL.size(); i++)
 			{
@@ -311,7 +308,7 @@ namespace NeuralNetwork {
 					continue;
 
 				// GUIDを取得する
-				GUID layerCode;
+				Gravisbell::GUID layerCode;
 				if(pLayerDLL->GetLayerCode(layerCode) != 0)
 					continue;
 
@@ -324,7 +321,7 @@ namespace NeuralNetwork {
 		}
 
 		/** レイヤーDLLを削除する. */
-		ErrorCode EraseLayerDLL(GUID i_layerCode)
+		ErrorCode EraseLayerDLL(Gravisbell::GUID i_layerCode)
 		{
 			auto it = this->lppNNLayerDLL.begin();
 			while(it != this->lppNNLayerDLL.end())
@@ -336,7 +333,7 @@ namespace NeuralNetwork {
 				}
 
 				// GUIDを取得する
-				GUID layerCode;
+				Gravisbell::GUID layerCode;
 				if((*it)->GetLayerCode(layerCode) != 0)
 				{
 					it++;
