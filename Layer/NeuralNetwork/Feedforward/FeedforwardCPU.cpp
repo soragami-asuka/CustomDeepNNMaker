@@ -37,7 +37,7 @@ private:
 
 	// 演算処理用のバッファ
 	bool onUseDropOut;											/**< ドロップアウト処理を実行するフラグ. */
-	std::vector<std::vector<NEURON_TYPE>>	 lppDropOutBuffer;	/**< ドロップアウト処理用の係数<ニューロン数, 入力数> */
+	std::vector<std::vector<NEURON_TYPE>>	lppDropOutBuffer;	/**< ドロップアウト処理用の係数<ニューロン数, 入力数> */
 
 public:
 	/** コンストラクタ */
@@ -351,8 +351,25 @@ public:
 					}
 					tmp += this->lpBias[neuronNum];
 
-					// シグモイド関数を演算
-					this->lpOutputBuffer[batchNum][neuronNum] = 1 / (1+exp(-tmp));
+					if(this->learnData.DropOut > 0.0f)
+						tmp *= (1.0f - this->learnData.DropOut);
+
+					// 活性化関数
+					if(this->layerStructure.ActivationType == Gravisbell::Layer::NeuralNetwork::Feedforward::LayerStructure::ActivationType_ReLU)
+					{
+						// ReLU
+						this->lpOutputBuffer[batchNum][neuronNum] = max(0.0f, tmp);
+					}
+					else
+					{
+						// シグモイド関数を演算
+						this->lpOutputBuffer[batchNum][neuronNum] = 1 / (1+exp(-tmp));
+					}
+					
+					#ifdef _DEBUG
+					if(isnan(this->lpOutputBuffer[batchNum][neuronNum]))
+						return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+					#endif
 				}
 			}
 		}
@@ -370,11 +387,30 @@ public:
 					{
 						// ※DropOutの有無で違うのはこの一行だけ
 						tmp += i_lppInputBuffer[batchNum][inputNum] * this->lppNeuron[neuronNum][inputNum] * this->lppDropOutBuffer[neuronNum][inputNum];
+						
+					#ifdef _DEBUG
+					if(isnan(tmp))
+						return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+					#endif
 					}
 					tmp += this->lpBias[neuronNum];
 
-					// シグモイド関数を演算
-					this->lpOutputBuffer[batchNum][neuronNum] = 1 / (1+exp(-tmp));
+					// 活性化関数
+					if(this->layerStructure.ActivationType == Gravisbell::Layer::NeuralNetwork::Feedforward::LayerStructure::ActivationType_ReLU)
+					{
+						// ReLU
+						this->lpOutputBuffer[batchNum][neuronNum] = max(0.0f, tmp);
+					}
+					else
+					{
+						// シグモイド関数を演算
+						this->lpOutputBuffer[batchNum][neuronNum] = 1 / (1+exp(-tmp));
+					}
+
+					#ifdef _DEBUG
+					if(isnan(this->lpOutputBuffer[batchNum][neuronNum]))
+						return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+					#endif
 				}
 			}
 		}
@@ -435,8 +471,26 @@ public:
 					{
 						tmp += i_lppDOutputBuffer[batchNum][neuronNum] * this->lppNeuron[neuronNum][inputNum];
 					}
+#ifdef _DEBUG
+					if(isnan(tmp))
+						return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+#endif
 
-					this->lpDInputBuffer[batchNum][inputNum] = this->m_lppInputBuffer[batchNum][inputNum] * (1.0f - this->m_lppInputBuffer[batchNum][inputNum]) * tmp;
+					// 活性化関数で分岐
+					if(this->layerStructure.ActivationType == Gravisbell::Layer::NeuralNetwork::Feedforward::LayerStructure::ActivationType_ReLU)
+					{
+						// ReLU
+						this->lpDInputBuffer[batchNum][inputNum] = (float)(this->m_lppInputBuffer[batchNum][inputNum] > 0.0f) * tmp;
+					}
+					else
+					{
+						// シグモイド
+						this->lpDInputBuffer[batchNum][inputNum] = min(1.0f, this->m_lppInputBuffer[batchNum][inputNum]) * (1.0f - min(1.0f, this->m_lppInputBuffer[batchNum][inputNum])) * tmp;
+					}
+					#ifdef _DEBUG
+						if(isnan(lpDInputBuffer[batchNum][inputNum]))
+							return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+					#endif
 				}
 			}
 		}
@@ -454,9 +508,39 @@ public:
 					{
 						// DropOutの有無で違うのはこの一文だけ
 						tmp += i_lppDOutputBuffer[batchNum][neuronNum] * this->lppNeuron[neuronNum][inputNum] * this->lppDropOutBuffer[neuronNum][inputNum];
+
+						#ifdef _DEBUG
+						if(isnan(i_lppDOutputBuffer[batchNum][neuronNum]))
+							return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+						if(isnan(this->lppNeuron[neuronNum][inputNum]))
+							return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+						#endif
 					}
 
-					this->lpDInputBuffer[batchNum][inputNum] = this->m_lppInputBuffer[batchNum][inputNum] * (1.0f - this->m_lppInputBuffer[batchNum][inputNum]) * tmp;
+					#ifdef _DEBUG
+					if(isnan(tmp))
+						return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+					#endif
+
+					// 活性化関数で分岐
+					if(this->layerStructure.ActivationType == Gravisbell::Layer::NeuralNetwork::Feedforward::LayerStructure::ActivationType_ReLU)
+					{
+						// ReLU
+						this->lpDInputBuffer[batchNum][inputNum] = (float)(1.0f * (this->m_lppInputBuffer[batchNum][inputNum] > 0.0f)) * tmp;
+						#ifdef _DEBUG
+						if(isnan(this->lpDInputBuffer[batchNum][inputNum]))
+							return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+						#endif
+					}
+					else
+					{
+						// シグモイド
+						this->lpDInputBuffer[batchNum][inputNum] = min(1.0f, this->m_lppInputBuffer[batchNum][inputNum]) * (1.0f - min(1.0f, this->m_lppInputBuffer[batchNum][inputNum])) * tmp;
+					}
+					#ifdef _DEBUG
+					if(isnan(lpDInputBuffer[batchNum][inputNum]))
+						return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+					#endif
 				}
 			}
 		}
@@ -478,8 +562,13 @@ public:
 				{
 					 sumDOutput += this->m_lppDOutputBuffer[batchNum][neuronNum];
 				}
+				
+				#ifdef _DEBUG
+				if(isnan(sumDOutput))
+					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+				#endif
 
-				this->lpBias[neuronNum] += this->learnData.LearnCoeff * sumDOutput;
+				this->lpBias[neuronNum] += this->learnData.LearnCoeff * sumDOutput;// / this->batchSize;
 			}
 
 			// 入力対応ニューロン更新
@@ -490,8 +579,13 @@ public:
 				{
 					sumDOutput += this->m_lppDOutputBuffer[batchNum][neuronNum] * this->m_lppInputBuffer[batchNum][inputNum];
 				}
+								
+				#ifdef _DEBUG
+				if(isnan(sumDOutput))
+					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+				#endif
 
-				this->lppNeuron[neuronNum][inputNum] += this->learnData.LearnCoeff * sumDOutput;
+				this->lppNeuron[neuronNum][inputNum] += this->learnData.LearnCoeff * sumDOutput;// / this->batchSize;
 			}
 		}
 

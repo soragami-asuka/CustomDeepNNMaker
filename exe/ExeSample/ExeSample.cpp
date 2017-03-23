@@ -19,7 +19,9 @@
 using namespace Gravisbell;
 
 /** CPU制御レイヤーを作成する */
-Layer::NeuralNetwork::INNLayer* CreateLayerCPU(const Layer::NeuralNetwork::ILayerDLL* pLayerDLL, U32 neuronCount, U32 inputDataCount);
+Layer::NeuralNetwork::INNLayer* CreateHiddenLayerCPU(const Layer::NeuralNetwork::ILayerDLL* pLayerDLL, U32 neuronCount, U32 inputDataCount);
+/** CPU制御レイヤーを作成する */
+Layer::NeuralNetwork::INNLayer* CreateOutputLayerCPU(const Layer::NeuralNetwork::ILayerDLL* pLayerDLL, U32 neuronCount, U32 inputDataCount);
 
 /** ニューラルネットワークテスト.
 	入力層1
@@ -39,7 +41,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	Layer::NeuralNetwork::ILayerDLLManager* pDLLManager = Layer::NeuralNetwork::CreateLayerDLLManager();
 
 	// DLLの読み込み
+#ifdef _DEBUG
+	if(pDLLManager->ReadLayerDLL(L"../../Debug/Gravisbell.Layer.NeuralNetwork.Feedforward.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+#else
 	if(pDLLManager->ReadLayerDLL(L"../../Release/Gravisbell.Layer.NeuralNetwork.Feedforward.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+#endif
 	{
 		delete pDLLManager;
 		return -1;
@@ -124,19 +130,31 @@ int _tmain(int argc, _TCHAR* argv[])
 	// 管理クラスを削除
 	delete pDLLManager;
 
+	printf("Press any key to continue");
+	getc(stdin);
+
 	return 0;
 }
 
 
 /** CPU制御レイヤーを作成する */
-Layer::NeuralNetwork::INNLayer* CreateLayerCPU(const Layer::NeuralNetwork::ILayerDLL* pLayerDLL, U32 neuronCount, U32 inputDataCount)
+Layer::NeuralNetwork::INNLayer* CreateHiddenLayerCPU(const Layer::NeuralNetwork::ILayerDLL* pLayerDLL, U32 neuronCount, U32 inputDataCount)
 {
 	// 設定の作成
 	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
 	if(pConfig == NULL)
 		return NULL;
-	SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByNum(0));
-	pItem->SetValue(neuronCount);
+	// ニューロン数
+	{
+		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"NeuronCount"));
+		pItem->SetValue(neuronCount);
+	}
+	// 活性化関数種別
+	{
+		SettingData::Standard::IItem_Enum* pItem = dynamic_cast<SettingData::Standard::IItem_Enum*>(pConfig->GetItemByID(L"ActivationType"));
+		pItem->SetValue(L"ReLU");
+//		pItem->SetValue(L"sigmoid");
+	}
 
 	// レイヤーの作成
 	Layer::NeuralNetwork::INNLayer* pLayer = pLayerDLL->CreateLayerCPU();
@@ -148,6 +166,36 @@ Layer::NeuralNetwork::INNLayer* CreateLayerCPU(const Layer::NeuralNetwork::ILaye
 
 	return pLayer;
 }
+/** CPU制御レイヤーを作成する */
+Layer::NeuralNetwork::INNLayer* CreateOutputLayerCPU(const Layer::NeuralNetwork::ILayerDLL* pLayerDLL, U32 neuronCount, U32 inputDataCount)
+{
+	// 設定の作成
+	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
+	if(pConfig == NULL)
+		return NULL;
+	// ニューロン数
+	{
+		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"NeuronCount"));
+		pItem->SetValue(neuronCount);
+	}
+	// 活性化関数種別
+	{
+		SettingData::Standard::IItem_Enum* pItem = dynamic_cast<SettingData::Standard::IItem_Enum*>(pConfig->GetItemByID(L"ActivationType"));
+//		pItem->SetValue(L"ReLU");
+		pItem->SetValue(L"sigmoid");
+	}
+
+	// レイヤーの作成
+	Layer::NeuralNetwork::INNLayer* pLayer = pLayerDLL->CreateLayerCPU();
+	if(pLayer->Initialize(*pConfig, IODataStruct(inputDataCount)) != ErrorCode::ERROR_CODE_NONE)
+		return NULL;
+
+	// 設定情報を削除
+	delete pConfig;
+
+	return pLayer;
+}
+
 
 
 
@@ -173,17 +221,41 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 	auto pLearnSettingIO = Gravisbell::Layer::IOData::CreateLearningSetting();
 	{
 	}
+	// 中間層(入力受け取り)
+	auto pLearnSettingCalcInput = pLayerDLL->CreateLearningSetting();
+	{
+		// 学習係数
+		auto pItemLearnCoeff = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Float*>(pLearnSettingCalcInput->GetItemByID(L"LearnCoeff"));
+		if(pItemLearnCoeff)
+			pItemLearnCoeff->SetValue(0.01f);
+		// ドロップアウト率
+		auto pItemDropOut = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Float*>(pLearnSettingCalcInput->GetItemByID(L"DropOut"));
+		if(pItemDropOut)
+			pItemDropOut->SetValue(0.2f);
+	}
 	// 中間層
 	auto pLearnSettingCalc = pLayerDLL->CreateLearningSetting();
 	{
 		// 学習係数
 		auto pItemLearnCoeff = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Float*>(pLearnSettingCalc->GetItemByID(L"LearnCoeff"));
 		if(pItemLearnCoeff)
-			pItemLearnCoeff->SetValue(0.1f);
+			pItemLearnCoeff->SetValue(0.01f);
 		// ドロップアウト率
 		auto pItemDropOut = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Float*>(pLearnSettingCalc->GetItemByID(L"DropOut"));
 		if(pItemDropOut)
-			pItemDropOut->SetValue(0.2f);
+			pItemDropOut->SetValue(0.5f);
+	}
+	// 出力層
+	auto pLearnSettingCalcOutput = pLayerDLL->CreateLearningSetting();
+	{
+		// 学習係数
+		auto pItemLearnCoeff = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Float*>(pLearnSettingCalcOutput->GetItemByID(L"LearnCoeff"));
+		if(pItemLearnCoeff)
+			pItemLearnCoeff->SetValue(0.01f);
+		// ドロップアウト率
+		auto pItemDropOut = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Float*>(pLearnSettingCalcOutput->GetItemByID(L"DropOut"));
+		if(pItemDropOut)
+			pItemDropOut->SetValue(0.0f);
 	}
 
 	// 全レイヤーリスト
@@ -207,7 +279,7 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 
 	// 中間層1層目(合計2層目)を作成
 	{
-		auto pLayer = CreateLayerCPU(pLayerDLL, 80, pInputLayerA->GetOutputBufferCount());
+		auto pLayer = CreateHiddenLayerCPU(pLayerDLL, 80, pInputLayerA->GetOutputBufferCount());
 		if(pLayer == NULL)
 		{
 			for(auto pLayer : lpLayer)
@@ -225,7 +297,7 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 	
 	// 中間層2層目(合計3層目)を作成
 	{
-		auto pLayer = CreateLayerCPU(pLayerDLL, 80, (*lpCalcLayer.rbegin())->GetOutputBufferCount());
+		auto pLayer = CreateHiddenLayerCPU(pLayerDLL, 80, (*lpCalcLayer.rbegin())->GetOutputBufferCount());
 		if(pLayer == NULL)
 		{
 			for(auto pLayer : lpLayer)
@@ -242,7 +314,7 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 	}
 
 	// 出力層(合計4層目)を作成
-	auto pOutputLayer = CreateLayerCPU(pLayerDLL, pTeachLayerA->GetBufferCount(), (*lpCalcLayer.rbegin())->GetOutputBufferCount());
+	auto pOutputLayer = CreateOutputLayerCPU(pLayerDLL, pTeachLayerA->GetBufferCount(), (*lpCalcLayer.rbegin())->GetOutputBufferCount());
 	{
 		if(pOutputLayer == NULL)
 		{
@@ -297,18 +369,20 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 	pBatchDataNoListGenerator->PreProcess(pInputLayerA->GetDataCount(), BATCH_SIZE);
 
 	// 演算処理を実行する
-	for(unsigned int calcNum=0; calcNum<500; calcNum++)
+	for(unsigned int calcNum=0; calcNum<200; calcNum++)
 	{
-		printf("%d回\n", calcNum);
+		printf("%4d回 ", calcNum);
 
 		// 学習ループ先頭処理
 		pBatchDataNoListGenerator->PreProcessLearnLoop();
 		pInputLayerA->PreProcessLearnLoop(*pLearnSettingIO);
 		pTeachLayerA->PreProcessLearnLoop(*pLearnSettingIO);
-		for(auto pLayer : lpCalcLayer)
+		lpCalcLayer[0]->PreProcessLearnLoop(*pLearnSettingCalcInput);
+		for(U32 layerNum=1; layerNum<lpCalcLayer.size()-1; layerNum++)
 		{
-			pLayer->PreProcessLearnLoop(*pLearnSettingCalc);
+			lpCalcLayer[layerNum]->PreProcessLearnLoop(*pLearnSettingCalc);
 		}
+		lpCalcLayer[lpCalcLayer.size()-1]->PreProcessLearnLoop(*pLearnSettingCalcOutput);
 
 		for(unsigned int batchNum=0; batchNum<pBatchDataNoListGenerator->GetBatchDataNoListCount(); batchNum++)
 		{
@@ -342,6 +416,13 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 			for(auto pLayer : lpCalcLayer)
 				pLayer->ReflectionLearnError();
 		}
+
+		// 誤差表示
+		{
+			F32 errorMin, errorMax, errorAve, errorAve2;
+			pTeachLayerA->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2);
+			printf("min=%.3f, max=%.3f, ave=%.3f, ave2=%.3f\n", errorMin, errorMax, errorAve, errorAve2);
+		}
 	}
 
 	// バッチサイズを1にして演算用に切り替え
@@ -353,10 +434,15 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 			for(auto pLayer : lpLayer)
 				delete pLayer;
 			delete pLearnSettingIO;
+			delete pLearnSettingCalcInput;
 			delete pLearnSettingCalc;
 			return;
 		}
 	}
+
+	// 計算ループ前処理を実行
+	for(auto pLayer : lpLayer)
+		pLayer->PreProcessCalculateLoop();
 
 	// サンプルを実行
 	for(unsigned int dataNum=0; dataNum<pInputLayerA->GetDataCount(); dataNum++)
@@ -372,7 +458,10 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 			lpCalcLayer[layerNum]->Calculate(lpCalcLayer[layerNum-1]->GetOutputBuffer());
 		}
 
+		// 出力層の誤差計算を行う
+		pTeachLayerA->CalculateLearnError(pOutputLayer->GetOutputBuffer());
 
+#if 0
 		printf("No.%d\n", dataNum);
 		// 入力を表示
 		printf("入力A ");
@@ -402,13 +491,24 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 		printf("\n");
 
 		printf("\n");
+#endif
+
+	}
+	
+	// 誤差表示
+	{
+		F32 errorMin, errorMax, errorAve, errorAve2;
+		pTeachLayerA->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2);
+		printf("min=%.3f, max=%.3f, ave=%.3f, ave2=%.3f\n", errorMin, errorMax, errorAve, errorAve2);
 	}
 
 	// レイヤーを削除
 	for(auto pLayer : lpLayer)
 		delete pLayer;
 	delete pLearnSettingIO;
+	delete pLearnSettingCalcInput;
 	delete pLearnSettingCalc;
+	delete pLearnSettingCalcOutput;
 
 	// バッチNo生成クラスを削除
 	delete pBatchDataNoListGenerator;

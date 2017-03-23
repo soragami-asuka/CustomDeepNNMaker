@@ -226,13 +226,13 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 
 		// 0
 		pItemEnum->AddEnumItem(
-			L"シグモイド関数",
 			L"sigmoid",
+			L"シグモイド関数",
 			L"y = 1 / (1 + e^(-x));\n範囲 0 < y < 1\n(x=0, y=0.5)を通る");
 		// 1
 		pItemEnum->AddEnumItem(
-			L"ReLU（ランプ関数）",
 			L"ReLU",
+			L"ReLU（ランプ関数）",
 			L"y = max(0, x);\n範囲 0 <= y\n(x=0, y=0)を通る");
 
 		pLayerConfig->AddItem(pItemEnum);

@@ -285,7 +285,7 @@ namespace IOData {
 
 					// Œë·‚ð•Û‘¶
 					this->lpErrorValue_min[inputNum]  = min(this->lpErrorValue_min[inputNum], error_abs);
-					this->lpErrorValue_max[inputNum]  = max(this->lpErrorValue_min[inputNum], error_abs);
+					this->lpErrorValue_max[inputNum]  = max(this->lpErrorValue_max[inputNum], error_abs);
 					this->lpErrorValue_ave[inputNum]  += error_abs;
 					this->lpErrorValue_ave2[inputNum] += error_abs * error_abs;
 				}

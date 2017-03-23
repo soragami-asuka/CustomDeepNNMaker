@@ -608,8 +608,8 @@ namespace
 
 						fwprintf(fp, L"		// %d\n", enumNum);
 						fwprintf(fp, L"		pItemEnum->AddEnumItem(\n");
-						fwprintf(fp, L"			L\"%ls\",\n",   szEnumName);
 						fwprintf(fp, L"			L\"%ls\",\n",   szEnumID);
+						fwprintf(fp, L"			L\"%ls\",\n",   szEnumName);
 						fwprintf(fp, L"			L\"%ls\");\n", TextToSingleLine(szEnumText).c_str());
 					}
 					fwprintf(fp, L"\n");

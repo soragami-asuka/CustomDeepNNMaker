@@ -19,6 +19,7 @@ namespace Gravisbell {
 		ERROR_CODE_COMMON_OUT_OF_VALUERANGE,	///< 値範囲の外
 		ERROR_CODE_COMMON_ALLOCATION_MEMORY,	///< メモリの確保に失敗
 		ERROR_CODE_COMMON_FILE_NOT_FOUND,		///< ファイルの参照に失敗
+		ERROR_CODE_COMMON_CALCULATE_NAN,		///< 演算中にNANが発生した
 
 		// DLL系エラー
 		ERROR_CODE_DLL = 0x02000000,
