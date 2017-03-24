@@ -278,6 +278,7 @@ namespace IOData {
 				for(U32 inputNum=0; inputNum<inputBufferCount; inputNum++)
 				{
 					F32 error = this->lpBatchDataPointer[batchNum][inputNum] - i_lppInputBuffer[batchNum][inputNum];
+					error = min(1.0f, max(-1.0f, error));
 					F32 error_abs = abs(error);
 
 					if(this->lpDInputBuffer.size() > 0)

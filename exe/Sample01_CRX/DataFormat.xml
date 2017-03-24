@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+データフォーマットに関する情報.
+-->
+
+<DataFormat version="1.0.0.0" default-language="ja">
+  <Name>CRX</Name>
+  <Text>クレジットカードの審査判定情報</Text>
+
+  <Structure>
+    <!--[id]は変数を識別するための一意の文字列-->
+    <!--[category]はデータ種別を識別するための値.-->
+    
+    <String id="A1"  category="input"  useType="bit_array"/>  <!--[useType]は文字列の使用方法についての記載. bit_arrayはデータ内に含まれている文字列を1,0の配列に変換する -->
+    <Float  id="A2"  category="input"  normalize="min_max" />
+    <Float  id="A3"  category="input"  normalize="min_max" />
+    <String id="A4"  category="input"  useType="bit_array_enum">  <!--bit_array_enumは指定されたデータ内に含まれている文字列をitemの値と比較して格納する. 文字列の有無に関わらずitemの数だけ要素が用意され、上から順に0,1,2となる. -->
+      <Enum>
+        <item default="true">u</item> <!-- [enum]に含まれていない値が見つかった場合はdefaultが設定されている値に格納される. defaultが設定されていない場合は0番に格納される. -->
+        <item>y</item>
+        <item>l</item>
+        <item>t</item>
+      </Enum>
+    </String>
+    <String id="A5"  category="input"  useType="bit_array"/>
+    <String id="A6"  category="input"  useType="bit_array"/>
+    <String id="A7"  category="input"  useType="bit_array"/>
+    <Float  id="A8"  category="input"  normalize="min_max" /> <!--[normalize]は正規化の手段. min_maxは全データのうち最小値と最大値を算出して0～1の範囲で正規化する. -->
+    <String id="A9"  category="input"  useType="bit_array"/>
+    <String id="A10" category="input"  useType="bit_array"/>
+    <Float  id="A11" category="input"  normalize="min_max" />
+    <String id="A12" category="input"  useType="bit_array"/>
+    <String id="A13" category="input"  useType="bit_array"/>
+    <Float  id="A14" category="input"  normalize="min_max" />
+    <Float  id="A15" category="input"  normalize="min_max" />
+    <Float  id="A16" category="output" normalize="min_max" />
+
+    <!--以下はその他の例-->
+    <!--
+    normalize="value" は指定された値の範囲で正規化する.
+    [min]の値を[output_min], [max]の値を[output_max]になるように正規化する.
+    [min]以下の値は[output_min]
+    [max]以上の値は[output_max]
+    に変換される.
+    [output_min]の値が省略された場合は0.0
+    [output_max]の値が省略された場合は1.0
+    をデフォルトとする.
+    <Float  id="A11" category="input" normalize="value">
+      <min>0.0</min>
+      <max>100.0</max>
+      <output_min>0.0</output_min>
+      <output_max>1.0</output_max>
+    </Float>
+    -->
+    <!--
+    normalize="average_deviation" は読み込まれた全データの平均値、標準偏差を元に標準化する
+    データの加算平均が([output_min]+[output_max])/2
+    加算平均-分散 が [output_min]
+    加算平均+分散 が [output_max]
+    になるように調整する.
+    計算式は
+    (x - AVE) / SD
+    AVE : 加算平均
+    SD  : 標準偏差
+    [output_min][output_max]から値がはみ出る可能性があるため注意.
+    <Float  id="A11" category="input" normalize="average_deviation">
+      <output_min>-1.0</output_min>
+      <output_max>1.0</output_max>
+    </Float>
+    -->
+
+  </Structure>
+</DataFormat>
