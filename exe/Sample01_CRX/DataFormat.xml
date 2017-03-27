@@ -7,7 +7,21 @@
   <Name>CRX</Name>
   <Text>クレジットカードの審査判定情報</Text>
 
-  <Structure>
+  <!--boolが使用された場合はfalse,trueの値設定. categoryを設定した場合は所定のデータ種別にに適用される. category未設定の場合はデフォルト値に割り当てられる。 デフォルト値が未定義の場合はfalse=0.0, true=1.0-->
+  <false>0.05</false>
+  <true>0.95</true>
+  <false category="output">0.00</false>
+  <true  category="output">1.00</true>
+ 
+  <!--X,Y,Zの要素数. 未定義の場合は1-->
+<!-- CSV形式の場合は未使用.
+  <x>1</x>
+  <y>1</y>
+  <z>1</z>
+-->
+
+  <!--Ch成分の内容.-->
+  <Channel>
     <!--[id]は変数を識別するための一意の文字列-->
     <!--[category]はデータ種別を識別するための値.-->
     
@@ -25,7 +39,7 @@
     <String id="A5"  category="input"  useType="bit_array"/>
     <String id="A6"  category="input"  useType="bit_array"/>
     <String id="A7"  category="input"  useType="bit_array"/>
-    <Float  id="A8"  category="input"  normalize="min_max" /> <!--[normalize]は正規化の手段. min_maxは全データのうち最小値と最大値を算出して0～1の範囲で正規化する. -->
+    <Float  id="A8"  category="input"  normalize="min_max" /> <!--[normalize]は正規化の手段. min_maxは全データのうち最小値と最大値を算出して[false]～[true]の範囲で正規化する. -->
     <String id="A9"  category="input"  useType="bit_array"/>
     <String id="A10" category="input"  useType="bit_array"/>
     <Float  id="A11" category="input"  normalize="min_max" />
@@ -42,8 +56,8 @@
     [min]以下の値は[output_min]
     [max]以上の値は[output_max]
     に変換される.
-    [output_min]の値が省略された場合は0.0
-    [output_max]の値が省略された場合は1.0
+    [output_min]の値が省略された場合は[false]の値を採用
+    [output_max]の値が省略された場合は[true]の値を採用
     をデフォルトとする.
     <Float  id="A11" category="input" normalize="value">
       <min>0.0</min>
@@ -54,20 +68,55 @@
     -->
     <!--
     normalize="average_deviation" は読み込まれた全データの平均値、標準偏差を元に標準化する
-    データの加算平均が([output_min]+[output_max])/2
-    加算平均-分散 が [output_min]
-    加算平均+分散 が [output_max]
-    になるように調整する.
+    データの加算平均が0
+    加算平均-分散 が  1.0
+    加算平均+分散 が -1.0
+    になるように調整した後、
+    [min]の値を[output_min], [max]の値を[output_max]になるように正規化する.
+    [min]以下の値は[output_min]
+    [max]以上の値は[output_max]
+
     計算式は
     (x - AVE) / SD
     AVE : 加算平均
     SD  : 標準偏差
-    [output_min][output_max]から値がはみ出る可能性があるため注意.
+    [output_min][output_max]から値がはみ出る可能性があるため注意.その場合[absolute_min][absolute_max]の値に丸め込まれる
+    
+    ※参考 Wikipediaより
+    偏差値60以上（あるいは40以下）は、全体の15.866％。
+    偏差値70以上（あるいは30以下）は、全体の2.275％。
+    偏差値80以上（あるいは20以下）は、全体の0.13499％。
+    偏差値90以上（あるいは10以下）は、全体の0.00315％。
+    偏差値100以上（あるいは0以下）は、全体の0.00002％。
+
+    ※偏差値の計算式は (x - AVE) / SD * 10 + 50
+    のため、上記式が1.0=偏差値60, 2.0=偏差値70となる
+
+    
     <Float  id="A11" category="input" normalize="average_deviation">
-      <output_min>-1.0</output_min>
+      <min>-1.0</min>
+      <max>1.0</max>
+      <output_min>0.0</output_min>
       <output_max>1.0</output_max>
     </Float>
+
+    ※分かりづらいので補足
+    min = -1.0
+    max =  1.0
+    output_min = 0.0
+    output_max = 1.0
+    の場合、
+    偏差値40が0.00, 偏差値60が1.00になる
+
+    min = -2.0
+    max =  2.0
+    output_min = 0.0
+    output_max = 1.0
+    の場合、
+    偏差値40が0.25, 偏差値60が0.75になり、
+    偏差値30が0.00, 偏差値70が1.00になる。
+
     -->
 
-  </Structure>
+  </Channel>
 </DataFormat>

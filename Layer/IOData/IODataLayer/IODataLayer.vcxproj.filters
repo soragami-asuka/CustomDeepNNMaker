@@ -40,6 +40,9 @@
     <Filter Include="include\DataFormat">
       <UniqueIdentifier>{6f1f45ce-c2fa-447c-aa10-5a66ba1b031c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\DataFormat\StringArray">
+      <UniqueIdentifier>{549de3ec-b86e-4e7f-bbea-5cf8ba5ac7e1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -110,6 +113,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\DataFormat\IDataFormatBase.h">
+      <Filter>include\DataFormat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\DataFormat\StringArray\IDataFromat.h">
+      <Filter>include\DataFormat\StringArray</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

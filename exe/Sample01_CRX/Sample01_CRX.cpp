@@ -15,6 +15,8 @@
 
 #include "stdafx.h"
 
+#include<float.h>
+
 
 int _tmain(int argc, _TCHAR* argv[])
 {
