@@ -49,12 +49,6 @@ namespace DataFormat {
 
 
 	public:
-		/** trueの場合の値設定を取得する */
-		virtual F32 GetTrueValue(const wchar_t i_szCategory[] = L"")const = 0;
-		/** falseの場合の値設定を取得する */
-		virtual F32 GetFalseValue(const wchar_t i_szCategory[] = L"")const = 0;
-
-	public:
 		/** データをバイナリ形式で追加する.
 			バイナリ形式はフォーマットの内容に関わらず[GetBufferCountZ()][GetBufferCountY()][GetBufferCountX()][GetBufferCountCH()]の配列データの先頭アドレスを渡す. */
 //		virtual Gravisbell::ErrorCode AddDataByBinary(const F32 i_buffer[]) = 0;
@@ -63,7 +57,7 @@ namespace DataFormat {
 		virtual U32 GetDataCount()const = 0;
 
 		/** データを取得する */
-		virtual const F32* GetDataByNum(U32 i_dataNo, const wchar_t i_szCategory[])const;
+		virtual const F32* GetDataByNum(U32 i_dataNo, const wchar_t i_szCategory[])const = 0;
 
 	public:
 		/** 正規化処理.

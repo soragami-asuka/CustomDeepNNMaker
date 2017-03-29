@@ -11,10 +11,11 @@
 
 #include"LayerConfigData.h"
 
-#include"ConfigString.h"
+#include"Library/Common/StringUtility/StringUtility.h"
 
 using namespace Gravisbell;
 using namespace Gravisbell::NeuralNetwork;
+using namespace StringUtility;
 
 namespace
 {

@@ -89,7 +89,6 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ConfigString.cpp" />
     <ClCompile Include="ConvertNNConfigToSource.cpp" />
     <ClCompile Include="LayerConfigData.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -98,6 +97,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Library\Common\StringUtility\StringUtility.vcxproj">
+      <Project>{99de1dbc-0a4c-48f6-adaf-75e29edf2f1f}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\Library\SettingData\Standard\Standard.vcxproj">
       <Project>{79fd5f13-1407-43ab-834c-04c1aeccdbb5}</Project>
     </ProjectReference>

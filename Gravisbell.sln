@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{D7D4DAE4-074F-4473-A80B-94E557D28FD0}"
 EndProject
@@ -40,6 +40,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataFormat", "DataFormat", "{7BFBA22C-8094-4455-99EC-B6C375FFA37B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataFormatStringArray", "Library\DataFormat\DataFormatStringArray\DataFormatStringArray.vcxproj", "{A08B9691-CB48-4671-A5CB-C70B3FBB175D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StringUtility", "Library\Common\StringUtility\StringUtility.vcxproj", "{99DE1DBC-0A4C-48F6-ADAF-75E29EDF2F1F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,6 +85,10 @@ Global
 		{A08B9691-CB48-4671-A5CB-C70B3FBB175D}.Debug|Win32.Build.0 = Debug|Win32
 		{A08B9691-CB48-4671-A5CB-C70B3FBB175D}.Release|Win32.ActiveCfg = Release|Win32
 		{A08B9691-CB48-4671-A5CB-C70B3FBB175D}.Release|Win32.Build.0 = Release|Win32
+		{99DE1DBC-0A4C-48F6-ADAF-75E29EDF2F1F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{99DE1DBC-0A4C-48F6-ADAF-75E29EDF2F1F}.Debug|Win32.Build.0 = Debug|Win32
+		{99DE1DBC-0A4C-48F6-ADAF-75E29EDF2F1F}.Release|Win32.ActiveCfg = Release|Win32
+		{99DE1DBC-0A4C-48F6-ADAF-75E29EDF2F1F}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -103,6 +109,7 @@ Global
 		{E7EB4E79-BBE1-42A0-AF62-1BC396CA5888} = {9DEE086C-8571-41DD-ADD4-7583EB13580A}
 		{7BFBA22C-8094-4455-99EC-B6C375FFA37B} = {D7D4DAE4-074F-4473-A80B-94E557D28FD0}
 		{A08B9691-CB48-4671-A5CB-C70B3FBB175D} = {7BFBA22C-8094-4455-99EC-B6C375FFA37B}
+		{99DE1DBC-0A4C-48F6-ADAF-75E29EDF2F1F} = {69F1082F-185D-4490-80C2-EFA5AC6F2EF7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		VisualSVNWorkingCopyRoot = .
