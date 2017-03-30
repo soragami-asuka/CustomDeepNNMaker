@@ -15,11 +15,19 @@
 
 #include "stdafx.h"
 
-#include<float.h>
+#include"Library/DataFormat/DataFormatStringArray/DataFormat.h"
 
 
 int _tmain(int argc, _TCHAR* argv[])
 {
+#ifdef _DEBUG
+	::_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_ALLOC_MEM_DF);
+#endif
+
+	auto pDataFormat = Gravisbell::DataFormat::StringArray::CreateDataFormatFromXML(L"DataFormat.xml");
+
+	delete pDataFormat;
+
 	return 0;
 }
 

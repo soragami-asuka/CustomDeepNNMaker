@@ -713,7 +713,7 @@ namespace StringArray {
 
 		// XMLファイルの読み込み
 		boost::property_tree::ptree pXmlTree;
-		boost::iostreams::file_descriptor_source fs(szXMLFilePath);
+		boost::iostreams::file_descriptor_source fs(UnicodeToShiftjis(szXMLFilePath));
 		boost::iostreams::stream<boost::iostreams::file_descriptor_source> fsstream(fs);
 		try
 		{
@@ -725,6 +725,7 @@ namespace StringArray {
 			return NULL;
 		}
 
+		CDataFormat* pDataFormat = NULL;
 		try
 		{
 			// 名前
@@ -735,7 +736,7 @@ namespace StringArray {
 			}
 			// テキスト
 			std::wstring text;
-			if(boost::optional<std::string> pValue = pXmlTree.get_optional<std::string>("Text"))
+			if(boost::optional<std::string> pValue = pXmlTree.get_optional<std::string>("DataFormat.Text"))
 			{
 				text = UTF8toUnicode(pValue.get());
 			}
@@ -743,56 +744,173 @@ namespace StringArray {
 			// bool値の値
 			std::map<std::wstring, BoolValue>	lpBoolValue;	/**< bool値をF32に変換する設定値の一覧.	<データ種別名, 変換データ> */
 			lpBoolValue[L""] = BoolValue();
-			for(const boost::property_tree::ptree::value_type &it : pXmlTree.get_child("BoolValue"))
+			for(const boost::property_tree::ptree::value_type &it : pXmlTree.get_child("DataFormat.BoolValue"))
 			{
 				if(it.first == "true" || it.first == "false")
 				{
 					// 属性からカテゴリを取得
 					std::wstring category = L"";
-					if(boost::optional<std::string> pValue = it.second.get_optional<std::string>("<xmlattr>.catgory"))
+					if(boost::optional<std::string> pValue = it.second.get_optional<std::string>("<xmlattr>.category"))
 					{
 						category = UTF8toUnicode(pValue.get());
 					}
 
 					if(it.first == "true")
-						lpBoolValue[category].trueValue = atoi(it.second.data().c_str());
+						lpBoolValue[category].trueValue = (F32)atof(it.second.data().c_str());
 					else if(it.first == "false")
-						lpBoolValue[category].falseValue = atoi(it.second.data().c_str());
+						lpBoolValue[category].falseValue = (F32)atof(it.second.data().c_str());
 				}
 			}
 
 
 			// データフォーマットを作成
-			CDataFormat* pDataFormat = new CDataFormat();
+			pDataFormat = new CDataFormat();
 
 
 			// Channelの読み込み
-			std::map<std::wstring, BoolValue>	lpBoolValue;	/**< bool値をF32に変換する設定値の一覧.	<データ種別名, 変換データ> */
-			lpBoolValue[L""] = BoolValue();
-			for(const boost::property_tree::ptree::value_type &it : pXmlTree.get_child("Channel"))
+			for(const boost::property_tree::ptree::value_type &it : pXmlTree.get_child("DataFormat.Channel"))
 			{
 				// idの取得
+				std::wstring id = L"";
+				if(boost::optional<std::string> pValue = it.second.get_optional<std::string>("<xmlattr>.id"))
+				{
+					id = UTF8toUnicode(pValue.get());
+				}
 				// categoryの取得
+				std::wstring category = L"";
+				if(boost::optional<std::string> pValue = it.second.get_optional<std::string>("<xmlattr>.category"))
+				{
+					category = UTF8toUnicode(pValue.get());
+				}
+
+				// bool型の値を取得
+				BoolValue boolValue = lpBoolValue[L""];
+				if(lpBoolValue.count(category))
+					boolValue = lpBoolValue[category];
 
 				if(it.first == "String")
 				{
+					enum UseType
+					{
+						USETYPE_BITARRAY,
+						USETYPE_BITARRAY_ENUM
+					};
+					UseType useType = USETYPE_BITARRAY;
+
 					// 使用方法を取得
+					if(boost::optional<std::string> pValue = it.second.get_optional<std::string>("<xmlattr>.useType"))
+					{
+						if(pValue.get() == "bit_array")
+							useType = USETYPE_BITARRAY;
+						else if(pValue.get() == "bit_array_enum")
+							useType = USETYPE_BITARRAY_ENUM;
+					}
+
+					switch(useType)
+					{
+					case USETYPE_BITARRAY:
+					default:
+						{
+							// フォーマットを追加
+							pDataFormat->AddDataFormatStringToBitArray(id.c_str(), category.c_str(), boolValue.falseValue, boolValue.trueValue); 
+						}
+						break;
+					case USETYPE_BITARRAY_ENUM:
+						{
+							// enum値を列挙
+							std::list<std::wstring> lpEnumString;
+							std::vector<const wchar_t*> lpEnumStringPointer;
+							std::wstring defaultString = L"";
+							if(auto& pTreeEnum = it.second.get_child_optional("Enum"))
+							{
+								for(const boost::property_tree::ptree::value_type &it_enum : pTreeEnum.get().get_child(""))
+								{
+									if(it_enum.first == "item")
+									{
+										lpEnumString.push_back(UTF8toUnicode(it_enum.second.data()));
+										lpEnumStringPointer.push_back(lpEnumString.rbegin()->c_str());
+
+										if(boost::optional<std::string> pValue = it_enum.second.get_optional<std::string>("<xmlattr>.default"))
+										{
+											if(pValue.get() == "true")
+												defaultString = UTF8toUnicode(it_enum.second.data());
+										}
+									}
+								}
+							}
+
+							// フォーマットを追加
+							pDataFormat->AddDataFormatStringToBitArrayEnum(id.c_str(), category.c_str(), lpEnumStringPointer.size(), &lpEnumStringPointer[0], defaultString.c_str(), boolValue.falseValue, boolValue.trueValue); 
+						}
+						break;
+					}
 				}
 				else if(it.first == "Float")
 				{
+					enum NormalizeType
+					{
+						NORMALIZETYPE_NONE,		// 正規化しない
+						NORMALIZETYPE_MINMAX,	// 全データの最小値、最大値を元に正規化する
+						NORMALIZETYPE_VALUE,	// 最小値、最大値を指定して正規化する
+						NORMALIZETYPE_SDEV,		// 全データの平均値、標準偏差を元に正規化する
+					};
+					NormalizeType normalizeType = NORMALIZETYPE_NONE;
+
 					// 正規化種別を取得
+					if(boost::optional<std::string> pValue = it.second.get_optional<std::string>("<xmlattr>.normalize"))
+					{
+						if(pValue.get() == "none")
+							normalizeType = NORMALIZETYPE_NONE;
+						else if(pValue.get() == "min_max")
+							normalizeType = NORMALIZETYPE_MINMAX;
+						else if(pValue.get() == "value")
+							normalizeType = NORMALIZETYPE_VALUE;
+						else if(pValue.get() == "average_deviation")
+							normalizeType = NORMALIZETYPE_SDEV;
+					}
+
+					// 設定最小値, 最大値を取得する
+					F32 minValue = 0.0f;
+					F32 maxValue = 1.0f;
+					if(boost::optional<float> pValue = it.second.get_optional<float>("min"))
+						minValue = pValue.get();
+					if(boost::optional<float> pValue = it.second.get_optional<float>("max"))
+						maxValue = pValue.get();
+
+					// 出力最小値、最大値を取得する
+					if(boost::optional<float> pValue = it.second.get_optional<float>("output_min"))
+						boolValue.falseValue = pValue.get();
+					if(boost::optional<float> pValue = it.second.get_optional<float>("output_max"))
+						boolValue.trueValue = pValue.get();
+
+					switch(normalizeType)
+					{
+					case NORMALIZETYPE_NONE:		// 正規化しない
+					default:
+						pDataFormat->AddDataFormatFloat(id.c_str(), category.c_str());
+						break;
+					case NORMALIZETYPE_MINMAX:	// 全データの最小値、最大値を元に正規化する
+						pDataFormat->AddDataFormatFloatNormalizeMinMax(id.c_str(), category.c_str(), boolValue.falseValue, boolValue.trueValue);
+						break;
+					case NORMALIZETYPE_VALUE:	// 最小値、最大値を指定して正規化する
+						pDataFormat->AddDataFormatFloatNormalizeValue(id.c_str(), category.c_str(), minValue, maxValue, boolValue.falseValue, boolValue.trueValue);
+						break;
+					case NORMALIZETYPE_SDEV:		// 全データの平均値、標準偏差を元に正規化する
+						pDataFormat->AddDataFormatFloatNormalizeAverageDeviation(id.c_str(), category.c_str(), minValue, maxValue, boolValue.falseValue, boolValue.trueValue);
+						break;
+					}
 				}
 			}
-
-			return pDataFormat;
 		}
 		catch(boost::exception& e)
 		{
 			e;
+			if(pDataFormat)
+				delete pDataFormat;
 			return NULL;
 		}
 
-		return NULL;
+		return pDataFormat;
 	}
 
 

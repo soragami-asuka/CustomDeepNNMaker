@@ -69,7 +69,7 @@
     </Float>
     -->
     <!--
-    normalize="average_deviation" は読み込まれた全データの平均値、標準偏差を元に標準化する
+    normalize="average_deviation" は読み込まれた全データの平均値、標準偏差を元に正規化する
     データの加算平均が0
     加算平均-分散 が  1.0
     加算平均+分散 が -1.0
