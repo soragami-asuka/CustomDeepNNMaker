@@ -298,6 +298,60 @@ namespace StringArray {
 		}
 	};
 
+	/** データフォーマットのアイテム(bool型) */
+	class CDataFormatItemBool : public CDataFormatItem, public CDataFormatItemMinMaxOutput
+	{
+	protected:
+		std::list<std::wstring> lpData;
+		std::vector<F32> lpNormalizeValue;	/**< 正規化したデータ */
+
+		std::set<std::wstring> lpFalseString;
+		std::set<std::wstring> lpTrueString;
+
+	public:
+		CDataFormatItemBool(const std::wstring& id, const std::wstring& category, const std::vector<std::wstring>& i_lpFalseString, const std::vector<std::wstring>& i_lpTrueString, F32 i_minOutput, F32 i_maxOutput)
+			:	CDataFormatItem				(id, category)
+			,	CDataFormatItemMinMaxOutput	(i_minOutput, i_maxOutput)
+		{
+			for(auto buf : i_lpFalseString)
+				this->lpFalseString.insert(buf);
+			for(auto buf : i_lpTrueString)
+				this->lpTrueString.insert(buf);
+		}
+		
+	public:
+		/** 使用バッファ数を返す */
+		U32 GetBufferCount()const{return 1;}
+
+		/** バッファを取得する */
+		F32 GetBuffer(U32 dataNum, U32 bufferNum)const
+		{
+			if(dataNum >= this->lpNormalizeValue.size())
+				return 0.0f;
+			if(bufferNum >= 1)
+				return 0.0f;
+
+			return lpNormalizeValue[bufferNum];
+		}
+
+		/** データを追加する */
+		ErrorCode AddData(const std::wstring& buf)
+		{
+			this->lpData.push_back(buf.c_str());
+
+			return ErrorCode::ERROR_CODE_NONE;
+		}
+
+		/** 正規化 */
+		virtual ErrorCode Normalize()
+		{
+			this->lpNormalizeValue.clear();
+
+
+
+		}
+	};
+
 	/** データフォーマットのアイテム(enum型) */
 	class CDataFormatItemEnumBitArray : public CDataFormatItem, public CDataFormatItemMinMaxOutput
 	{
