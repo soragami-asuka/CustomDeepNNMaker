@@ -49,7 +49,7 @@
     <String id="A13" category="input"  useType="bit_array"/>
     <Float  id="A14" category="input"  normalize="min_max" />
     <Float  id="A15" category="input"  normalize="min_max" />
-    <String id="A16" category="output" normalize="bit"> <!--文字列を取得して1or0を取得する-->
+    <String id="A16" category="output" useType="bit"> <!--文字列を取得して1or0を取得する-->
       <false> <!--false(0)として判定される文字列-->
         <item>-</item>
       </false>

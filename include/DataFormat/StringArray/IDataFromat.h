@@ -83,6 +83,13 @@ namespace StringArray {
 		//=============================================
 		// string型
 		//=============================================
+		/** string型データフォーマットを追加する. 正規化時に1,0の値に変換する
+			@param	i_szID			識別ID.
+			@param	i_szCategory	データ種別. */
+		virtual Gravisbell::ErrorCode AddDataFormatStringToBit(
+			const wchar_t i_szID[], const wchar_t i_szCategory[],
+			U32 i_falseDataCount, const wchar_t*const i_lpFalseData[], U32 i_trueDataCount, const wchar_t*const i_lpTrueData[],
+			F32 i_minOutput, F32 i_maxOutput) = 0;
 		/** string型データフォーマットを追加する. 正規化時に1,0の配列に変換する
 			@param	i_szID			識別ID.
 			@param	i_szCategory	データ種別. */

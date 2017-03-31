@@ -347,8 +347,15 @@ namespace StringArray {
 		{
 			this->lpNormalizeValue.clear();
 
+			for(auto data : this->lpData)
+			{
+				if(this->lpTrueString.count(data))
+					this->lpNormalizeValue.push_back(this->CalcOutputValue(1.0f));
+				else
+					this->lpNormalizeValue.push_back(this->CalcOutputValue(0.0f));
+			}
 
-
+			return ErrorCode::ERROR_CODE_NONE;
 		}
 	};
 
@@ -716,6 +723,26 @@ namespace StringArray {
 		//=============================================
 		// string型
 		//=============================================
+		/** string型データフォーマットを追加する. 正規化時に1,0の値に変換する
+			@param	i_szID			識別ID.
+			@param	i_szCategory	データ種別. */
+		virtual Gravisbell::ErrorCode AddDataFormatStringToBit(
+			const wchar_t i_szID[], const wchar_t i_szCategory[],
+			U32 i_falseDataCount, const wchar_t*const i_lpFalseData[], U32 i_trueDataCount, const wchar_t*const i_lpTrueData[],
+			F32 i_minOutput, F32 i_maxOutput)
+		{
+			std::vector<std::wstring> lpFalseData;
+			std::vector<std::wstring> lpTrueData;
+			for(U32 i=0; i<i_falseDataCount; i++)
+				lpFalseData.push_back(i_lpFalseData[i]);
+			for(U32 i=0; i<i_trueDataCount; i++)
+				lpTrueData.push_back(i_lpTrueData[i]);
+
+			this->lpDataFormat.push_back(new CDataFormatItemBool(i_szID, i_szCategory, lpFalseData, lpTrueData, i_minOutput, i_maxOutput));
+
+			return ErrorCode::ERROR_CODE_NONE;
+		}
+
 		/** string型データフォーマットを追加する. 正規化時に1,0の配列に変換する
 			@param	i_szID			識別ID.
 			@param	i_szCategory	データ種別. */
@@ -846,6 +873,7 @@ namespace StringArray {
 				{
 					enum UseType
 					{
+						USETYPE_BIT,
 						USETYPE_BITARRAY,
 						USETYPE_BITARRAY_ENUM
 					};
@@ -854,7 +882,9 @@ namespace StringArray {
 					// 使用方法を取得
 					if(boost::optional<std::string> pValue = it.second.get_optional<std::string>("<xmlattr>.useType"))
 					{
-						if(pValue.get() == "bit_array")
+						if(pValue.get() == "bit")
+							useType = USETYPE_BIT;
+						else if(pValue.get() == "bit_array")
 							useType = USETYPE_BITARRAY;
 						else if(pValue.get() == "bit_array_enum")
 							useType = USETYPE_BITARRAY_ENUM;
@@ -862,6 +892,44 @@ namespace StringArray {
 
 					switch(useType)
 					{
+					case USETYPE_BIT:
+						{
+							// false値を列挙
+							std::list<std::wstring> lpFalseString;
+							std::vector<const wchar_t*> lpFalseStringPointer;
+							if(auto& pTreeEnum = it.second.get_child_optional("false"))
+							{
+								for(const boost::property_tree::ptree::value_type &it_enum : pTreeEnum.get().get_child(""))
+								{
+									if(it_enum.first == "item")
+									{
+										lpFalseString.push_back(UTF8toUnicode(it_enum.second.data()));
+										lpFalseStringPointer.push_back(lpFalseString.rbegin()->c_str());
+									}
+								}
+							}
+							// True値を列挙
+							std::list<std::wstring> lpTrueString;
+							std::vector<const wchar_t*> lpTrueStringPointer;
+							if(auto& pTreeEnum = it.second.get_child_optional("true"))
+							{
+								for(const boost::property_tree::ptree::value_type &it_enum : pTreeEnum.get().get_child(""))
+								{
+									if(it_enum.first == "item")
+									{
+										lpTrueString.push_back(UTF8toUnicode(it_enum.second.data()));
+										lpTrueStringPointer.push_back(lpTrueString.rbegin()->c_str());
+									}
+								}
+							}
+
+							pDataFormat->AddDataFormatStringToBit(
+								id.c_str(), category.c_str(),
+								lpFalseStringPointer.size(), &lpFalseStringPointer[0], lpTrueStringPointer.size(), &lpTrueStringPointer[0],
+								boolValue.falseValue, boolValue.trueValue);
+						}
+						break;
+
 					case USETYPE_BITARRAY:
 					default:
 						{
@@ -869,6 +937,7 @@ namespace StringArray {
 							pDataFormat->AddDataFormatStringToBitArray(id.c_str(), category.c_str(), boolValue.falseValue, boolValue.trueValue); 
 						}
 						break;
+
 					case USETYPE_BITARRAY_ENUM:
 						{
 							// enum値を列挙
