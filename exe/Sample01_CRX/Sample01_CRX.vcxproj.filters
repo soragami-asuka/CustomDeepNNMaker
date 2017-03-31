@@ -35,5 +35,6 @@
   </ItemGroup>
   <ItemGroup>
     <Xml Include="DataFormat.xml" />
+    <Xml Include="LearningData\LearningData.xml" />
   </ItemGroup>
 </Project>

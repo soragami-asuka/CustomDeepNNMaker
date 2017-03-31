@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LearningData>
+  <NeuralNetwork>
+    <Input guid="">
+      <Structure>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
+        <ch>32</ch>
+      </Structure>
+    </Input>
+
+    <Output>
+      <Layer guid=""/>
+      <Structure>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
+        <ch>1</ch>
+      </Structure>
+    </Output>
+
+    <LayerList>
+      <Layer type="" guid="">
+        <input></input>
+        <input></input>
+      </Layer>
+      <Layer type="" guid=""/>
+      <Layer type="" guid=""/>
+      <Layer type="" guid=""/>
+    </LayerList>
+
+  </NeuralNetwork>
+</LearningData>

@@ -120,6 +120,9 @@
     <ClInclude Include="..\..\..\include\DataFormat\StringArray\IDataFromat.h">
       <Filter>include\DataFormat\StringArray</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INeuralNetwork.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

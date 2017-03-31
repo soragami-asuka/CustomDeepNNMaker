@@ -93,6 +93,7 @@
     <Xml Include="DataFormat.xml">
       <SubType>Designer</SubType>
     </Xml>
+    <Xml Include="LearningData\LearningData.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Library\DataFormat\DataFormatStringArray\DataFormatStringArray.vcxproj">
