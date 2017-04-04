@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{35D09026-0A7E-4E1A-9D41-479D16966953}</ProjectGuid>
+    <ProjectGuid>{4B29F8CD-B065-48D8-8B4A-3BAA89ABFD7E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Feedforward</RootNamespace>
+    <RootNamespace>FullyConnect_Activation</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -101,9 +101,9 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerDLL.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
     <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h" />
-    <ClInclude Include="FeedforwardBase.h" />
-    <ClInclude Include="Feedforward_DATA.hpp" />
-    <ClInclude Include="Feedforward_FUNC.hpp" />
+    <ClInclude Include="FullyConnect_Activation_Base.h" />
+    <ClInclude Include="FullyConnect_Activation_DATA.hpp" />
+    <ClInclude Include="FullyConnect_Activation_FUNC.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -117,17 +117,17 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="FeedforwardBase.cpp" />
-    <ClCompile Include="FeedforwardCPU.cpp" />
-    <ClCompile Include="FeedforwardGPU.cpp" />
-    <ClCompile Include="Feedforward_FUNC.cpp" />
+    <ClCompile Include="FullyConnect_Activation_Base.cpp" />
+    <ClCompile Include="FullyConnect_Activation_CPU.cpp" />
+    <ClCompile Include="FullyConnect_Activation_GPU.cpp" />
+    <ClCompile Include="FullyConnect_Activation_FUNC.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Feedforward.rc" />
+    <ResourceCompile Include="FullyConnect_Activation.rc" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="Config.xml">

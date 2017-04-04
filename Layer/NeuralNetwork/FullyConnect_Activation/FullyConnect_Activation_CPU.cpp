@@ -5,14 +5,14 @@
 //======================================
 #include"stdafx.h"
 
-#include"Feedforward_DATA.hpp"
-#include"FeedforwardBase.h"
-#include"Feedforward_FUNC.hpp"
+#include"FullyConnect_Activation_DATA.hpp"
+#include"FullyConnect_Activation_FUNC.hpp"
+#include"FullyConnect_Activation_Base.h"
 
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
 
-class FeedforwardCPU : public FeedforwardBase
+class FeedforwardCPU : public FullyConnect_Activation_Base
 {
 private:
 	// 本体
@@ -42,13 +42,13 @@ private:
 public:
 	/** コンストラクタ */
 	FeedforwardCPU(Gravisbell::GUID guid)
-		:	FeedforwardBase	(guid)
-		,	inputBufferCount		(0)		/**< 入力バッファ数 */
-		,	neuronCount				(0)		/**< ニューロン数 */
-		,	outputBufferCount		(0)		/**< 出力バッファ数 */
-		,	m_lppInputBuffer		(NULL)	/**< 演算時の入力データ */
-		,	m_lppDOutputBuffer		(NULL)	/**< 入力誤差計算時の出力誤差データ */
-		,	onUseDropOut			(false)	
+		:	FullyConnect_Activation_Base	(guid)
+		,	inputBufferCount				(0)		/**< 入力バッファ数 */
+		,	neuronCount						(0)		/**< ニューロン数 */
+		,	outputBufferCount				(0)		/**< 出力バッファ数 */
+		,	m_lppInputBuffer				(NULL)	/**< 演算時の入力データ */
+		,	m_lppDOutputBuffer				(NULL)	/**< 入力誤差計算時の出力誤差データ */
+		,	onUseDropOut					(false)	
 	{
 	}
 	/** デストラクタ */
@@ -355,7 +355,7 @@ public:
 						tmp *= (1.0f - this->learnData.DropOut);
 
 					// 活性化関数
-					if(this->layerStructure.ActivationType == Gravisbell::Layer::NeuralNetwork::Feedforward::LayerStructure::ActivationType_ReLU)
+					if(this->layerStructure.ActivationType == Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_ReLU)
 					{
 						// ReLU
 						this->lpOutputBuffer[batchNum][neuronNum] = max(0.0f, tmp);
@@ -396,7 +396,7 @@ public:
 					tmp += this->lpBias[neuronNum];
 
 					// 活性化関数
-					if(this->layerStructure.ActivationType == Gravisbell::Layer::NeuralNetwork::Feedforward::LayerStructure::ActivationType_ReLU)
+					if(this->layerStructure.ActivationType == Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_ReLU)
 					{
 						// ReLU
 						this->lpOutputBuffer[batchNum][neuronNum] = max(0.0f, tmp);
@@ -477,7 +477,7 @@ public:
 #endif
 
 					// 活性化関数で分岐
-					if(this->layerStructure.ActivationType == Gravisbell::Layer::NeuralNetwork::Feedforward::LayerStructure::ActivationType_ReLU)
+					if(this->layerStructure.ActivationType == Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_ReLU)
 					{
 						// ReLU
 						this->lpDInputBuffer[batchNum][inputNum] = (float)(this->m_lppInputBuffer[batchNum][inputNum] > 0.0f) * tmp;
@@ -523,7 +523,7 @@ public:
 					#endif
 
 					// 活性化関数で分岐
-					if(this->layerStructure.ActivationType == Gravisbell::Layer::NeuralNetwork::Feedforward::LayerStructure::ActivationType_ReLU)
+					if(this->layerStructure.ActivationType == Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_ReLU)
 					{
 						// ReLU
 						this->lpDInputBuffer[batchNum][inputNum] = (float)(1.0f * (this->m_lppInputBuffer[batchNum][inputNum] > 0.0f)) * tmp;

@@ -1,6 +1,6 @@
 /*--------------------------------------------
- * FileName  : Feedforward_FUNC.cpp
- * LayerName : 全結合ニューラルネットワークレイヤー
+ * FileName  : FullyConnect_Activation_FUNC.cpp
+ * LayerName : 全結合ニューラルネットワークレイヤー(活性化関数付き)
  * guid      : BEBA34EC-C30C-4565-9386-56088981D2D7
  * 
  * Text      : 全結合ニューラルネットワークレイヤー.
@@ -14,7 +14,7 @@
 
 #include<Library/SettingData/Standard/SettingData.h>
 
-#include"Feedforward_FUNC.hpp"
+#include"FullyConnect_Activation_FUNC.hpp"
 
 
 // {BEBA34EC-C30C-4565-9386-56088981D2D7}
@@ -39,7 +39,7 @@ namespace DefaultLanguage
     /** Base */
     static const StringData g_baseData = 
     {
-        L"全結合ニューラルネットワークレイヤー",
+        L"全結合ニューラルネットワークレイヤー(活性化関数付き)",
         L"全結合ニューラルネットワークレイヤー.\n結合層と活性化層を一体化.\n学習時に[学習係数][ドロップアウト率]を設定できる."
     };
 

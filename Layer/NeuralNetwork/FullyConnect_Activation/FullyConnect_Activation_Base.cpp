@@ -4,16 +4,16 @@
 //======================================
 #include"stdafx.h"
 
-#include"Feedforward_FUNC.hpp"
+#include"FullyConnect_Activation_FUNC.hpp"
 
-#include"FeedforwardBase.h"
+#include"FullyConnect_Activation_Base.h"
 
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
 
 
 /** コンストラクタ */
-FeedforwardBase::FeedforwardBase(Gravisbell::GUID guid)
+FullyConnect_Activation_Base::FullyConnect_Activation_Base(Gravisbell::GUID guid)
 	:	INNLayer()
 	,	guid			(guid)
 	,	pLayerStructure	(NULL)
@@ -22,7 +22,7 @@ FeedforwardBase::FeedforwardBase(Gravisbell::GUID guid)
 }
 
 /** デストラクタ */
-FeedforwardBase::~FeedforwardBase()
+FullyConnect_Activation_Base::~FullyConnect_Activation_Base()
 {
 	if(pLayerStructure != NULL)
 		delete pLayerStructure;
@@ -37,13 +37,13 @@ FeedforwardBase::~FeedforwardBase()
 
 /** レイヤー種別の取得.
 	ELayerKind の組み合わせ. */
-unsigned int FeedforwardBase::GetLayerKindBase()const
+unsigned int FullyConnect_Activation_Base::GetLayerKindBase()const
 {
 	return Gravisbell::Layer::ELayerKind::LAYER_KIND_NEURALNETWORK | Gravisbell::Layer::ELayerKind::LAYER_KIND_SINGLE_INPUT | Gravisbell::Layer::ELayerKind::LAYER_KIND_SINGLE_OUTPUT;
 }
 
 /** レイヤー固有のGUIDを取得する */
-Gravisbell::ErrorCode FeedforwardBase::GetGUID(Gravisbell::GUID& o_guid)const
+Gravisbell::ErrorCode FullyConnect_Activation_Base::GetGUID(Gravisbell::GUID& o_guid)const
 {
 	o_guid = this->guid;
 
@@ -53,21 +53,21 @@ Gravisbell::ErrorCode FeedforwardBase::GetGUID(Gravisbell::GUID& o_guid)const
 /** レイヤー識別コードを取得する.
 	@param o_layerCode	格納先バッファ
 	@return 成功した場合0 */
-Gravisbell::ErrorCode FeedforwardBase::GetLayerCode(Gravisbell::GUID& o_layerCode)const
+Gravisbell::ErrorCode FullyConnect_Activation_Base::GetLayerCode(Gravisbell::GUID& o_layerCode)const
 {
 	return ::GetLayerCode(o_layerCode);
 }
 
 /** バッチサイズを取得する.
 	@return 同時に演算を行うバッチのサイズ */
-unsigned int FeedforwardBase::GetBatchSize()const
+unsigned int FullyConnect_Activation_Base::GetBatchSize()const
 {
 	return this->batchSize;
 }
 
 
 /** 設定情報を設定 */
-Gravisbell::ErrorCode FeedforwardBase::SetLayerConfig(const SettingData::Standard::IData& config)
+Gravisbell::ErrorCode FullyConnect_Activation_Base::SetLayerConfig(const SettingData::Standard::IData& config)
 {
 	Gravisbell::ErrorCode err = ERROR_CODE_NONE;
 
@@ -97,7 +97,7 @@ Gravisbell::ErrorCode FeedforwardBase::SetLayerConfig(const SettingData::Standar
 	return ERROR_CODE_NONE;
 }
 /** レイヤーの設定情報を取得する */
-const SettingData::Standard::IData* FeedforwardBase::GetLayerConfig()const
+const SettingData::Standard::IData* FullyConnect_Activation_Base::GetLayerConfig()const
 {
 	return this->pLayerStructure;
 }
@@ -108,13 +108,13 @@ const SettingData::Standard::IData* FeedforwardBase::GetLayerConfig()const
 //===========================
 /** 入力データ構造を取得する.
 	@return	入力データ構造 */
-IODataStruct FeedforwardBase::GetInputDataStruct()const
+IODataStruct FullyConnect_Activation_Base::GetInputDataStruct()const
 {
 	return this->inputDataStruct;
 }
 
 /** 入力バッファ数を取得する. */
-unsigned int FeedforwardBase::GetInputBufferCount()const
+unsigned int FullyConnect_Activation_Base::GetInputBufferCount()const
 {
 	return this->inputDataStruct.x * this->inputDataStruct.y * this->inputDataStruct.z * this->inputDataStruct.ch;
 }
@@ -124,7 +124,7 @@ unsigned int FeedforwardBase::GetInputBufferCount()const
 // レイヤー保存
 //===========================
 /** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
-unsigned int FeedforwardBase::GetUseBufferByteCount()const
+unsigned int FullyConnect_Activation_Base::GetUseBufferByteCount()const
 {
 	unsigned int bufferSize = 0;
 
@@ -147,7 +147,7 @@ unsigned int FeedforwardBase::GetUseBufferByteCount()const
 // 出力レイヤー関連
 //===========================
 /** 出力データ構造を取得する */
-IODataStruct FeedforwardBase::GetOutputDataStruct()const
+IODataStruct FullyConnect_Activation_Base::GetOutputDataStruct()const
 {
 	IODataStruct outputDataStruct;
 
@@ -160,7 +160,7 @@ IODataStruct FeedforwardBase::GetOutputDataStruct()const
 }
 
 /** 出力バッファ数を取得する */
-unsigned int FeedforwardBase::GetOutputBufferCount()const
+unsigned int FullyConnect_Activation_Base::GetOutputBufferCount()const
 {
 	IODataStruct outputDataStruct = GetOutputDataStruct();
 
@@ -172,7 +172,7 @@ unsigned int FeedforwardBase::GetOutputBufferCount()const
 // 固有関数
 //===========================
 /** ニューロン数を取得する */
-unsigned int FeedforwardBase::GetNeuronCount()const
+unsigned int FullyConnect_Activation_Base::GetNeuronCount()const
 {
 	return this->layerStructure.NeuronCount;
 }

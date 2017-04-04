@@ -1,14 +1,14 @@
 /*--------------------------------------------
- * FileName  : Feedforward_DATA.hpp
- * LayerName : 全結合ニューラルネットワークレイヤー
+ * FileName  : FullyConnect_Activation_DATA.hpp
+ * LayerName : 全結合ニューラルネットワークレイヤー(活性化関数付き)
  * guid      : BEBA34EC-C30C-4565-9386-56088981D2D7
  * 
  * Text      : 全結合ニューラルネットワークレイヤー.
  *           : 結合層と活性化層を一体化.
  *           : 学習時に[学習係数][ドロップアウト率]を設定できる.
 --------------------------------------------*/
-#ifndef __GRAVISBELL_NEURALNETWORK_LAYER_FUNC_Feedforward_H__
-#define __GRAVISBELL_NEURALNETWORK_LAYER_FUNC_Feedforward_H__
+#ifndef __GRAVISBELL_NEURALNETWORK_LAYER_FUNC_FullyConnect_Activation_H__
+#define __GRAVISBELL_NEURALNETWORK_LAYER_FUNC_FullyConnect_Activation_H__
 
 #define EXPORT_API extern "C" __declspec(dllexport)
 
@@ -19,7 +19,7 @@
 #include<SettingData/Standard/IData.h>
 #include<Layer/NeuralNetwork/INNLayer.h>
 
-#include"Feedforward_DATA.hpp"
+#include"FullyConnect_Activation_DATA.hpp"
 
 
 /** Acquire the layer identification code.
@@ -74,4 +74,4 @@ EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerGPU(Gravisbell
 
 
 
-#endif // __GRAVISBELL_NEURAULNETWORK_LAYER_FUNC_Feedforward_H__
+#endif // __GRAVISBELL_NEURAULNETWORK_LAYER_FUNC_FullyConnect_Activation_H__

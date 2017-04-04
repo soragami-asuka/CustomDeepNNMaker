@@ -42,9 +42,9 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	// DLL‚Ì“Ç‚Ýž‚Ý
 #ifdef _DEBUG
-	if(pDLLManager->ReadLayerDLL(L"../../Debug/Gravisbell.Layer.NeuralNetwork.Feedforward.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	if(pDLLManager->ReadLayerDLL(L"../../Debug/Gravisbell.Layer.NeuralNetwork.FullyConnect_Activation.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 #else
-	if(pDLLManager->ReadLayerDLL(L"../../Release/Gravisbell.Layer.NeuralNetwork.Feedforward.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	if(pDLLManager->ReadLayerDLL(L"../../Release/Gravisbell.Layer.NeuralNetwork.FullyConnect_Activation.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 #endif
 	{
 		delete pDLLManager;

@@ -6,7 +6,7 @@
 
 #include<vector>
 
-#include"Feedforward_DATA.hpp"
+#include"FullyConnect_Activation_DATA.hpp"
 
 namespace Gravisbell {
 namespace Layer {
@@ -14,7 +14,7 @@ namespace NeuralNetwork {
 
 	typedef float NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class FeedforwardBase : public Gravisbell::Layer::NeuralNetwork::INNLayer
+	class FullyConnect_Activation_Base : public Gravisbell::Layer::NeuralNetwork::INNLayer
 	{
 	protected:
 		Gravisbell::GUID guid;	/**< レイヤー識別用のGUID */
@@ -24,17 +24,17 @@ namespace NeuralNetwork {
 		SettingData::Standard::IData* pLayerStructure;	/**< レイヤー構造を定義したコンフィグクラス */
 		SettingData::Standard::IData* pLearnData;		/**< 学習設定を定義したコンフィグクラス */
 
-		Feedforward::LayerStructure layerStructure;	/**< レイヤー構造 */
-		Feedforward::LearnDataStructure learnData;	/**< 学習設定 */
+		FullyConnect_Activation::LayerStructure layerStructure;	/**< レイヤー構造 */
+		FullyConnect_Activation::LearnDataStructure learnData;	/**< 学習設定 */
 
 		unsigned int batchSize;	/**< バッチサイズ */
 
 	public:
 		/** コンストラクタ */
-		FeedforwardBase(Gravisbell::GUID guid);
+		FullyConnect_Activation_Base(Gravisbell::GUID guid);
 
 		/** デストラクタ */
-		virtual ~FeedforwardBase();
+		virtual ~FullyConnect_Activation_Base();
 
 		//===========================
 		// レイヤー共通

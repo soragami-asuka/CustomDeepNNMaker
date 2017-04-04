@@ -5,9 +5,9 @@
 //======================================
 #include"stdafx.h"
 
-#include"Feedforward_DATA.hpp"
-#include"FeedforwardBase.h"
-#include"Feedforward_FUNC.hpp"
+#include"FullyConnect_Activation_DATA.hpp"
+#include"FullyConnect_Activation_FUNC.hpp"
+#include"FullyConnect_Activation_Base.h"
 
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
