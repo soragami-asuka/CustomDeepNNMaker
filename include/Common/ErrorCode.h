@@ -41,6 +41,7 @@ namespace Gravisbell {
 		// レイヤー追加系エラー
 		ERROR_CODE_ADDLAYER = 0x10010000,
 		ERROR_CODE_ADDLAYER_ALREADY_SAMEID,		///< 同じIDのレイヤーが既に登録済み
+		ERROR_CODE_ADDLAYER_UPPER_LIMIT,		///< レイヤーの追加上限に達している
 		// レイヤー削除系エラー
 		ERROR_CODE_ERASELAYER = 0x10020000,
 		ERROR_CODE_ERASELAYER_NOTFOUND,			///< 対象のID検索に失敗

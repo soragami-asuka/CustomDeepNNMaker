@@ -61,19 +61,20 @@ namespace IOData {
 		}
 
 		/** レイヤー固有のGUIDを取得する */
-		Gravisbell::ErrorCode GetGUID(Gravisbell::GUID& o_guid)const
+		Gravisbell::GUID GetGUID(void)const
 		{
-			o_guid = this->guid;
-
-			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
+			return this->guid;
 		}
 
 		/** レイヤー種別識別コードを取得する.
 			@param o_layerCode	格納先バッファ
 			@return 成功した場合0 */
-		Gravisbell::ErrorCode GetLayerCode(Gravisbell::GUID& o_layerCode)const
+		Gravisbell::GUID GetLayerCode(void)const
 		{
-			return Gravisbell::Layer::IOData::GetLayerCode(o_layerCode);
+			Gravisbell::GUID layerCode;
+			Gravisbell::Layer::IOData::GetLayerCode(layerCode);
+
+			return layerCode;
 		}
 
 		//==============================

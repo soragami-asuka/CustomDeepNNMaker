@@ -37,25 +37,26 @@ FullyConnect_Activation_Base::~FullyConnect_Activation_Base()
 
 /** レイヤー種別の取得.
 	ELayerKind の組み合わせ. */
-unsigned int FullyConnect_Activation_Base::GetLayerKindBase()const
+U32 FullyConnect_Activation_Base::GetLayerKindBase(void)const
 {
 	return Gravisbell::Layer::ELayerKind::LAYER_KIND_NEURALNETWORK | Gravisbell::Layer::ELayerKind::LAYER_KIND_SINGLE_INPUT | Gravisbell::Layer::ELayerKind::LAYER_KIND_SINGLE_OUTPUT;
 }
 
 /** レイヤー固有のGUIDを取得する */
-Gravisbell::ErrorCode FullyConnect_Activation_Base::GetGUID(Gravisbell::GUID& o_guid)const
+Gravisbell::GUID FullyConnect_Activation_Base::GetGUID(void)const
 {
-	o_guid = this->guid;
-
-	return ERROR_CODE_NONE;
+	return this->guid;
 }
 
 /** レイヤー識別コードを取得する.
 	@param o_layerCode	格納先バッファ
 	@return 成功した場合0 */
-Gravisbell::ErrorCode FullyConnect_Activation_Base::GetLayerCode(Gravisbell::GUID& o_layerCode)const
+Gravisbell::GUID FullyConnect_Activation_Base::GetLayerCode(void)const
 {
-	return ::GetLayerCode(o_layerCode);
+	Gravisbell::GUID layerCode;
+	::GetLayerCode(layerCode);
+
+	return layerCode;
 }
 
 /** バッチサイズを取得する.

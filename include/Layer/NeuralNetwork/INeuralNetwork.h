@@ -103,7 +103,7 @@ namespace NeuralNetwork {
 		/** 学習設定を取得する.
 			設定した値はPreProcessLearnLoopを呼び出した際に適用される.
 			@param	guid	取得対象レイヤーのGUID. */
-		virtual const SettingData::Standard::IData GetLearnSettingData(const Gravisbell::GUID& guid) = 0;
+		virtual const SettingData::Standard::IData* GetLearnSettingData(const Gravisbell::GUID& guid) = 0;
 
 		/** 学習設定を設定する.
 			設定した値はPreProcessLearnLoopを呼び出した際に適用される.

@@ -42,15 +42,15 @@ namespace NeuralNetwork {
 	public:
 		/** レイヤー種別の取得.
 			ELayerKind の組み合わせ. */
-		unsigned int GetLayerKindBase()const;
+		U32 GetLayerKindBase(void)const;
 
 		/** レイヤー固有のGUIDを取得する */
-		ErrorCode GetGUID(Gravisbell::GUID& o_guid)const;
+		Gravisbell::GUID GetGUID(void)const;
 
 		/** レイヤーの種類識別コードを取得する.
 			@param o_layerCode	格納先バッファ
 			@return 成功した場合0 */
-		ErrorCode GetLayerCode(Gravisbell::GUID& o_layerCode)const;
+		Gravisbell::GUID GetLayerCode(void)const;
 
 		/** バッチサイズを取得する.
 			@return 同時に演算を行うバッチのサイズ */

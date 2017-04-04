@@ -118,7 +118,7 @@ namespace NeuralNetwork {
 		/** 学習設定を取得する.
 			設定した値はPreProcessLearnLoopを呼び出した際に適用される.
 			@param	guid	取得対象レイヤーのGUID. */
-		const SettingData::Standard::IData GetLearnSettingData(const Gravisbell::GUID& guid);
+		const SettingData::Standard::IData* GetLearnSettingData(const Gravisbell::GUID& guid);
 
 		/** 学習設定を設定する.
 			設定した値はPreProcessLearnLoopを呼び出した際に適用される.
@@ -155,6 +155,14 @@ namespace NeuralNetwork {
 			@param	i_param		設定する値. */
 		ErrorCode SetLearnSettingData(const Gravisbell::GUID& guid, const wchar_t* i_dataID, const wchar_t* i_param);
 
+
+		//====================================
+		// 入出力バッファ関連
+		//====================================
+		/** 入力バッファを取得する */
+		virtual CONST_BATCH_BUFFER_POINTER GetInputBuffer()const = 0;
+		/** 出力差分バッファを取得する */
+		virtual CONST_BATCH_BUFFER_POINTER GetDOutputBuffer()const = 0;
 	};
 
 }	// NeuralNetwork

@@ -40,6 +40,9 @@
     <Filter Include="FromXML">
       <UniqueIdentifier>{3c5c001a-f489-4250-9912-c5aa672c2dd8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LayerConnect">
+      <UniqueIdentifier>{cb727a1f-1fc4-43b4-a563-262ab28721d8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -121,7 +124,7 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="LayerConnect.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>LayerConnect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -138,7 +141,13 @@
       <Filter>FromXML</Filter>
     </ClCompile>
     <ClCompile Include="LayerConnectInput.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>LayerConnect</Filter>
+    </ClCompile>
+    <ClCompile Include="LayerConnectOutput.cpp">
+      <Filter>LayerConnect</Filter>
+    </ClCompile>
+    <ClCompile Include="LayerConnectSingle2Single.cpp">
+      <Filter>LayerConnect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -43,15 +43,15 @@ namespace Layer {
 	public:
 		/** レイヤー種別の取得.
 			ELayerKind の組み合わせ. */
-		virtual unsigned int GetLayerKind()const = 0;
+		virtual U32 GetLayerKind(void)const = 0;
 
 		/** レイヤー固有のGUIDを取得する */
-		virtual ErrorCode GetGUID(Gravisbell::GUID& o_guid)const = 0;
+		virtual Gravisbell::GUID GetGUID(void)const = 0;
 
 		/** レイヤー種別識別コードを取得する.
 			@param o_layerCode	格納先バッファ
 			@return 成功した場合0 */
-		virtual ErrorCode GetLayerCode(Gravisbell::GUID& o_layerCode)const = 0;
+		virtual Gravisbell::GUID GetLayerCode(void)const = 0;
 
 	public:
 		/** 演算前処理を実行する.(学習用)
