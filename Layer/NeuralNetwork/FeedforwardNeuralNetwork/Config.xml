@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="1C38E21F-6F01-41B2-B40E-7F67267A3692" version="1.0.0.0" default-language="ja">
+  
+  <SourceName>FeedforwardNeuralNetwork</SourceName>
+  <Name>順伝播型ニューラルネットワーク-複数レイヤー結合</Name>
+  <Text>順伝播型ニューラルネットワーク.&#x0A;複数レイヤーを一体化し管理するためのクラス.&#x0A;</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+    <!--<int id="output_x">
+      <Name>出力信号の要素数：X</Name>
+      <Text>出力信号に設定されるX軸方向の要素数</Text>
+      <Min>1</Min>
+      <Max>65535</Max>
+      <Default>1</Default>
+    </int>
+    <int id="output_y">
+      <Name>出力信号の要素数：Y</Name>
+      <Text>出力信号に設定されるY軸方向の要素数</Text>
+      <Min>1</Min>
+      <Max>65535</Max>
+      <Default>1</Default>
+    </int>
+    <int id="output_z">
+      <Name>出力信号の要素数：Z</Name>
+      <Text>出力信号に設定されるZ軸方向の要素数</Text>
+      <Min>1</Min>
+      <Max>65535</Max>
+      <Default>1</Default>
+    </int>
+    <int id="output_ch">
+      <Name>出力信号の要素数：Channel</Name>
+      <Text>出力信号に設定されるChannelの要素数</Text>
+      <Min>1</Min>
+      <Max>65535</Max>
+      <Default>1</Default>
+    </int>-->
+  </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <Learn>
+
+  </Learn>
+
+</Config>

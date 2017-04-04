@@ -17,8 +17,9 @@ namespace Layer {
 	/** レイヤー種別 */
 	enum ELayerKind : U32
 	{
-		LAYER_KIND_CPU = 0x00 << 16,	/**< CPU処理レイヤー */
-		LAYER_KIND_GPU = 0x01 << 16,	/**< GPU処理レイヤー */
+		LAYER_KIND_CALCTYPE = 0x0F << 16,
+		LAYER_KIND_CPU		= 0x01 << 16,	/**< CPU処理レイヤー */
+		LAYER_KIND_GPU		= 0x02 << 16,	/**< GPU処理レイヤー */
 
 		LAYER_KIND_SINGLE_INPUT  = 0x01 << 0,	/**< 入力レイヤー */
 		LAYER_KIND_MULT_INPUT    = 0x01 << 1,	/**< 入力レイヤー */

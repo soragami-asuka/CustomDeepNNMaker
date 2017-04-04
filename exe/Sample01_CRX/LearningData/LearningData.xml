@@ -24,6 +24,7 @@
       <Layer type="" guid="">
         <input></input>
         <input></input>
+        <bypass></bypass>
       </Layer>
       <Layer type="" guid=""/>
       <Layer type="" guid=""/>
