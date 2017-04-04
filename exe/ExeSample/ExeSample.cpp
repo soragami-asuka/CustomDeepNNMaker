@@ -38,7 +38,7 @@ int _tmain(int argc, _TCHAR* argv[])
 #endif
 
 	// DLL管理クラスを作成
-	Layer::NeuralNetwork::ILayerDLLManager* pDLLManager = Layer::NeuralNetwork::CreateLayerDLLManager();
+	Layer::NeuralNetwork::ILayerDLLManager* pDLLManager = Layer::NeuralNetwork::CreateLayerDLLManagerCPU();
 
 	// DLLの読み込み
 #ifdef _DEBUG
@@ -157,7 +157,7 @@ Layer::NeuralNetwork::INNLayer* CreateHiddenLayerCPU(const Layer::NeuralNetwork:
 	}
 
 	// レイヤーの作成
-	Layer::NeuralNetwork::INNLayer* pLayer = pLayerDLL->CreateLayerCPU();
+	Layer::NeuralNetwork::INNLayer* pLayer = pLayerDLL->CreateLayer();
 	if(pLayer->Initialize(*pConfig, IODataStruct(inputDataCount)) != ErrorCode::ERROR_CODE_NONE)
 		return NULL;
 
@@ -186,7 +186,7 @@ Layer::NeuralNetwork::INNLayer* CreateOutputLayerCPU(const Layer::NeuralNetwork:
 	}
 
 	// レイヤーの作成
-	Layer::NeuralNetwork::INNLayer* pLayer = pLayerDLL->CreateLayerCPU();
+	Layer::NeuralNetwork::INNLayer* pLayer = pLayerDLL->CreateLayer();
 	if(pLayer->Initialize(*pConfig, IODataStruct(inputDataCount)) != ErrorCode::ERROR_CODE_NONE)
 		return NULL;
 

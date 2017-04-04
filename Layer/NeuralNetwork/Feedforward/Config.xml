@@ -11,8 +11,8 @@
 
 <Config guid="BEBA34EC-C30C-4565-9386-56088981D2D7" version="1.0.0.0" default-language="ja">
 
-  <SourceName>AllCoupledFeedForwardNeuralNetwork</SourceName>
-  <Name>全結合ニューラルネットワークレイヤー</Name>
+  <SourceName>FullyConnect_Activation</SourceName>
+  <Name>全結合ニューラルネットワークレイヤー(活性化関数付き)</Name>
   <Text>全結合ニューラルネットワークレイヤー.&#x0A;結合層と活性化層を一体化.&#x0A;学習時に[学習係数][ドロップアウト率]を設定できる.</Text>
 
   <!--レイヤーのデータ構造-->

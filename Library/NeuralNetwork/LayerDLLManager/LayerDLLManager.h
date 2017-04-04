@@ -19,7 +19,8 @@ namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-	extern LayerDLLManager_API ILayerDLLManager* CreateLayerDLLManager();
+	extern LayerDLLManager_API ILayerDLLManager* CreateLayerDLLManagerCPU();
+	extern LayerDLLManager_API ILayerDLLManager* CreateLayerDLLManagerGPU();
 
 }	// NeuralNetwork
 }	// Layer

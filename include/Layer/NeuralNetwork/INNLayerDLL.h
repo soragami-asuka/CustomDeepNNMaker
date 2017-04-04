@@ -53,18 +53,12 @@ namespace NeuralNetwork {
 		virtual SettingData::Standard::IData* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)const = 0;
 
 		
-		/** CPU処理用のレイヤーを作成.
+		/** レイヤーを作成.
 			GUIDは自動割り当て. */
-		virtual INNLayer* CreateLayerCPU()const = 0;
-		/** CPU処理用のレイヤーを作成
+		virtual INNLayer* CreateLayer()const = 0;
+		/** レイヤーを作成
 			@param guid	作成レイヤーのGUID */
-		virtual INNLayer* CreateLayerCPU(Gravisbell::GUID guid)const = 0;
-		
-		/** GPU処理用のレイヤーを作成.
-			GUIDは自動割り当て. */
-		virtual INNLayer* CreateLayerGPU()const = 0;
-		/** GPU処理用のレイヤーを作成 */
-		virtual INNLayer* CreateLayerGPU(Gravisbell::GUID guid)const = 0;
+		virtual INNLayer* CreateLayer(Gravisbell::GUID guid)const = 0;
 	};
 
 }	// NeuralNetwork

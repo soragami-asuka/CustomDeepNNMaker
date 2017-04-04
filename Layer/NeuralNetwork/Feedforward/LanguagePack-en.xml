@@ -8,9 +8,9 @@ DLLから参照する拡張パック扱い.
 
 <Config guid="BEBA34EC-C30C-4565-9386-56088981D2D7">
   <Language language="en">
-    <Name>All coupled Neural-Network Layer</Name>
+    <Name>Fully Connect Neural-Network Layer</Name>
     <Text>
-      All coupled neural network layer.
+      Fully connect neural network layer.
       Integration of bonding layer and activation layer.
       You can set [learning coefficient] [dropout rate] at learning.
     </Text>
