@@ -60,11 +60,12 @@ namespace NeuralNetwork {
 		//===========================
 		// レイヤー設定
 		//===========================
-	public:
+	protected:
 		/** 設定情報を設定 */
 		ErrorCode SetLayerConfig(const SettingData::Standard::IData& config);
+	public:
 		/** レイヤーの設定情報を取得する */
-		const SettingData::Standard::IData* GetLayerConfig()const;
+		const SettingData::Standard::IData* GetLayerStructure()const;
 
 
 		//===========================

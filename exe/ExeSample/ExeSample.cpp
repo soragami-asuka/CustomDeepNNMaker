@@ -7,7 +7,6 @@
 #include<list>
 
 #include"SettingData/Standard/IData.h"
-#include"Layer/NeuralNetwork/INNLayerDLL.h"
 #include"Layer/IOData/IIODataLayer.h"
 
 #include"../Library/NeuralNetwork/LayerDLLManager/LayerDLLManager.h"

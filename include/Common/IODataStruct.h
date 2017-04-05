@@ -35,6 +35,11 @@ namespace Gravisbell {
 			,	ch	(ch)
 		{
 		}
+
+		U32 GetDataCount()const
+		{
+			return this->x * this->y * this->z * this->ch;
+		}
 	};
 
 }	// Gravisbell

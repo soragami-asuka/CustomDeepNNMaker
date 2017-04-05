@@ -18,6 +18,7 @@
 
 #include<SettingData/Standard/IData.h>
 #include<Layer/NeuralNetwork/INNLayer.h>
+#include<Layer/NeuralNetwork/ILayerDLLManager.h>
 
 #include"FullyConnect_Activation_DATA.hpp"
 
@@ -65,12 +66,12 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSettingFromBu
 /** Create a layer for CPU processing.
   * @param GUID of layer to create.
   */
-EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerCPU(Gravisbell::GUID guid);
+EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerCPU(Gravisbell::GUID guid, const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager);
 
 /** Create a layer for GPU processing.
   * @param GUID of layer to create.
   */
-EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerGPU(Gravisbell::GUID guid);
+EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerGPU(Gravisbell::GUID guid, const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager);
 
 
 

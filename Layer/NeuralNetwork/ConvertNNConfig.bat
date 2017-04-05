@@ -1,8 +1,7 @@
 ﻿
-set CONFIG_FILEPATH="./FeedforwardNeuralNetwork/Config.xml"
-set EXPORT_DIRPATH="./FeedforwardNeuralNetwork/"
-set EXPORT_NAME="FeedforwardNeuralNetwork"
 
-call ConvertNNConfigToSource.exe %CONFIG_FILEPATH% %EXPORT_DIRPATH% %EXPORT_NAME%
+call ConvertNNConfigToSource.exe "./FeedforwardNeuralNetwork/Config.xml" "./FeedforwardNeuralNetwork/" "FeedforwardNeuralNetwork"
+call ConvertNNConfigToSource.exe "./FullyConnect_Activation/Config.xml" "./FullyConnect_Activation/" "FullyConnect_Activation"
+
 
 pause

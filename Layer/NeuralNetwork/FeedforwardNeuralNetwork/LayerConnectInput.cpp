@@ -4,7 +4,7 @@
 //======================================
 #include"stdafx.h"
 
-#include"LayerConnect.h"
+#include"LayerConnectInput.h"
 #include"FeedforwardNeuralNetwork_Base.h"
 
 namespace Gravisbell {
@@ -34,6 +34,19 @@ namespace NeuralNetwork {
 		return (this->neuralNetwork.GetLayerKind() & Gravisbell::Layer::LAYER_KIND_CALCTYPE) | Gravisbell::Layer::LAYER_KIND_SINGLE_OUTPUT;
 	}
 
+	/** 学習設定のポインタを取得する.
+		取得したデータを直接書き換えることで次の学習ループに反映されるが、NULLが返ってくることもあるので注意. */
+	Gravisbell::SettingData::Standard::IData* LayerConnectInput::GetLearnSettingData()
+	{
+		return NULL;
+	}
+
+	/** 出力データ構造を取得する.
+		@return	出力データ構造 */
+	IODataStruct LayerConnectInput::GetOutputDataStruct()const
+	{
+		return this->neuralNetwork.GetInputDataStruct();
+	}
 	/** 出力データバッファを取得する.
 		配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
 		@return 出力データ配列の先頭ポインタ */
@@ -95,6 +108,17 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_ADDLAYER_UPPER_LIMIT;
 	}
 
+	/** レイヤーから入力レイヤーを削除する */
+	ErrorCode LayerConnectInput::EraseInputLayer(const Gravisbell::GUID& guid)
+	{
+		return ErrorCode::ERROR_CODE_ERASELAYER_NOTFOUND;
+	}
+	/** レイヤーからバイパスレイヤーを削除する */
+	ErrorCode LayerConnectInput::EraseBypassLayer(const Gravisbell::GUID& guid)
+	{
+		return ErrorCode::ERROR_CODE_ERASELAYER_NOTFOUND;
+	}
+
 	/** レイヤーの入力レイヤー設定をリセットする.
 		@param	layerGUID	リセットするレイヤーのGUID. */
 	ErrorCode LayerConnectInput::ResetInputLayer()
@@ -114,7 +138,7 @@ namespace NeuralNetwork {
 	{
 		return 0;
 	}
-	/** レイヤーに接続している入力レイヤーのGUIDを番号指定で取得する.
+	/** レイヤーに接続している入力レイヤーを番号指定で取得する.
 		@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
 	ILayerConnect* LayerConnectInput::GetInputLayerByNum(U32 i_inputNum)
 	{
@@ -126,13 +150,12 @@ namespace NeuralNetwork {
 	{
 		return 0;
 	}
-	/** レイヤーに接続しているバイパスレイヤーのGUIDを番号指定で取得する.
+	/** レイヤーに接続しているバイパスレイヤーを番号指定で取得する.
 		@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
 	ILayerConnect* LayerConnectInput::GetBypassLayerByNum(U32 i_inputNum)
 	{
 		return NULL;
 	}
-
 
 	/** 出力先レイヤーを追加する */
 	ErrorCode LayerConnectInput::AddOutputToLayer(ILayerConnect* pOutputToLayer)
@@ -158,11 +181,34 @@ namespace NeuralNetwork {
 		}
 		return ErrorCode::ERROR_CODE_ERASELAYER_NOTFOUND;
 	}
+	
+	/** レイヤーの接続を解除 */
+	ErrorCode LayerConnectInput::Disconnect(void)
+	{
+		// 出力先レイヤーから自分を削除
+		for(auto it : this->lppOutputToLayer)
+			it.pLayer->EraseInputLayer(this->GetGUID());
+
+		// 出力先レイヤーを全削除
+		this->lppOutputToLayer.clear();
+
+		this->ResetInputLayer();
+		this->ResetBypassLayer();
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
 
 
 	//=======================================
 	// 演算関連
 	//=======================================
+	
+	/** レイヤーの初期化処理.
+		接続状況は維持したままレイヤーの中身を初期化する. */
+	ErrorCode LayerConnectInput::Initialize(void)
+	{
+		return ErrorCode::ERROR_CODE_NONE;
+	}
 
 	/** 接続の確立を行う */
 	ErrorCode LayerConnectInput::EstablishmentConnection(void)
@@ -205,7 +251,7 @@ namespace NeuralNetwork {
 
 	/** 学習ループの初期化処理.データセットの学習開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode LayerConnectInput::PreProcessLearnLoop(const SettingData::Standard::IData& data)
+	ErrorCode LayerConnectInput::PreProcessLearnLoop()
 	{
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -231,6 +277,23 @@ namespace NeuralNetwork {
 	ErrorCode LayerConnectInput::ReflectionLearnError(void)
 	{
 		return ErrorCode::ERROR_CODE_NONE;
+	}
+
+	//==================================
+	// 保存関連
+	//==================================
+	/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
+	U32 LayerConnectInput::GetUseBufferByteCount()const
+	{
+		return 0;
+	}
+
+	/** レイヤーをバッファに書き込む.
+		@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
+		@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
+	S32 LayerConnectInput::WriteToBuffer(BYTE* o_lpBuffer)const
+	{
+		return -1;
 	}
 
 }	// Gravisbell

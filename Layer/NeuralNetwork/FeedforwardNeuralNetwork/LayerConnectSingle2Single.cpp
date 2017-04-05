@@ -4,7 +4,7 @@
 //======================================
 #include"stdafx.h"
 
-#include"LayerConnect.h"
+#include"LayerConnectSingle2Single.h"
 #include"FeedforwardNeuralNetwork_Base.h"
 
 namespace Gravisbell {
@@ -13,8 +13,9 @@ namespace NeuralNetwork {
 
 	
 	/** コンストラクタ */
-	LayerConnectSingle2Single::LayerConnectSingle2Single(INNLayer* pLayer)
-		:	pLayer	(pLayer)
+	LayerConnectSingle2Single::LayerConnectSingle2Single(INNLayer* pLayer, Gravisbell::SettingData::Standard::IData* pLearnSettingData)
+		:	pLayer				(pLayer)
+		,	pLearnSettingData	(pLearnSettingData)
 	{
 	}
 	/** デストラクタ */
@@ -22,6 +23,8 @@ namespace NeuralNetwork {
 	{
 		if(pLayer != NULL)
 			delete pLayer;
+		if(pLearnSettingData != NULL)
+			delete pLearnSettingData;
 	}
 
 	/** GUIDを取得する */
@@ -35,7 +38,20 @@ namespace NeuralNetwork {
 	{
 		return this->pLayer->GetLayerKind();
 	}
+	
+	/** 学習設定のポインタを取得する.
+		取得したデータを直接書き換えることで次の学習ループに反映されるが、NULLが返ってくることもあるので注意. */
+	Gravisbell::SettingData::Standard::IData* LayerConnectSingle2Single::GetLearnSettingData()
+	{
+		return NULL;
+	}
 
+	/** 出力データ構造を取得する.
+		@return	出力データ構造 */
+	IODataStruct LayerConnectSingle2Single::GetOutputDataStruct()const
+	{
+		return this->pLayer->GetOutputDataStruct();
+	}
 	/** 出力データバッファを取得する.
 		配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
 		@return 出力データ配列の先頭ポインタ */
@@ -134,6 +150,33 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_ADDLAYER_UPPER_LIMIT;
 	}
 
+
+	/** レイヤーから入力レイヤーを削除する */
+	ErrorCode LayerConnectSingle2Single::EraseInputLayer(const Gravisbell::GUID& guid)
+	{
+		auto it = this->lppInputFromLayer.begin();
+		while(it != this->lppInputFromLayer.end())
+		{
+			if((*it)->GetGUID() == guid)
+			{
+				it = this->lppInputFromLayer.erase(it);
+				return ErrorCode::ERROR_CODE_NONE;
+			}
+			else
+			{
+				it++;
+			}
+		}
+
+		return ErrorCode::ERROR_CODE_ERASELAYER_NOTFOUND;
+	}
+	/** レイヤーからバイパスレイヤーを削除する */
+	ErrorCode LayerConnectSingle2Single::EraseBypassLayer(const Gravisbell::GUID& guid)
+	{
+		return ErrorCode::ERROR_CODE_ERASELAYER_NOTFOUND;
+	}
+
+
 	/** レイヤーの入力レイヤー設定をリセットする.
 		@param	layerGUID	リセットするレイヤーのGUID. */
 	ErrorCode LayerConnectSingle2Single::ResetInputLayer()
@@ -196,11 +239,34 @@ namespace NeuralNetwork {
 	{
 		return ErrorCode::ERROR_CODE_ERASELAYER_NOTFOUND;
 	}
+	
+	/** レイヤーの接続を解除 */
+	ErrorCode LayerConnectSingle2Single::Disconnect(void)
+	{
+		// 出力先レイヤーから自分を削除
+		for(auto it : this->lppOutputToLayer)
+			it.pLayer->EraseInputLayer(this->GetGUID());
 
+		// 出力先レイヤーを全削除
+		this->lppOutputToLayer.clear();
+
+		// 自身の入力レイヤー/バイパスレイヤーを削除
+		this->ResetInputLayer();
+		this->ResetBypassLayer();
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
 
 	//=======================================
 	// 演算関連
 	//=======================================
+
+	/** レイヤーの初期化処理.
+		接続状況は維持したままレイヤーの中身を初期化する. */
+	ErrorCode LayerConnectSingle2Single::Initialize(void)
+	{
+		return this->pLayer->Initialize();
+	}
 
 	/** 接続の確立を行う */
 	ErrorCode LayerConnectSingle2Single::EstablishmentConnection(void)
@@ -209,22 +275,20 @@ namespace NeuralNetwork {
 		if(this->lppInputFromLayer.empty())
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
 		if(this->lppInputFromLayer.size() > 1)
-			return ERROR_CODE_FRAUD_INPUT_COUNT;
+			return ErrorCode::ERROR_CODE_FRAUD_INPUT_COUNT;
+
+		// 入力元レイヤーのバッファ数を確認
+		if(this->lppInputFromLayer[0]->GetOutputDataStruct().GetDataCount() != this->pLayer->GetInputBufferCount())
+			return ErrorCode::ERROR_CODE_FRAUD_INPUT_COUNT;
 
 		// 出力先レイヤー数の確認
 		if(this->lppOutputToLayer.empty())
-			return ERROR_CODE_COMMON_NULL_REFERENCE;
+			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
 		if(this->lppOutputToLayer.size() > 1)
-			return ERROR_CODE_FRAUD_INPUT_COUNT;
+			return ErrorCode::ERROR_CODE_FRAUD_INPUT_COUNT;
 
 		// 出力先レイヤーの位置を登録
-		auto it = this->lppOutputToLayer.begin();
-		while(it != this->lppOutputToLayer.end())
-		{
-			it->position = it->pLayer->GetDInputPositionByGUID(this->GetGUID());
-
-			it++;
-		}
+		this->lppOutputToLayer[0].position = this->lppOutputToLayer[0].pLayer->GetDInputPositionByGUID(this->GetGUID());
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -248,9 +312,12 @@ namespace NeuralNetwork {
 
 	/** 学習ループの初期化処理.データセットの学習開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode LayerConnectSingle2Single::PreProcessLearnLoop(const SettingData::Standard::IData& data)
+	ErrorCode LayerConnectSingle2Single::PreProcessLearnLoop()
 	{
-		return this->pLayer->PreProcessLearnLoop(data);
+		if(this->pLearnSettingData == NULL)
+			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
+
+		return this->pLayer->PreProcessLearnLoop(*this->pLearnSettingData);
 	}
 	/** 演算ループの初期化処理.データセットの演算開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
@@ -274,7 +341,25 @@ namespace NeuralNetwork {
 	{
 		return this->pLayer->ReflectionLearnError();
 	}
-	
+
+
+	//==================================
+	// 保存関連
+	//==================================
+	/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
+	U32 LayerConnectSingle2Single::GetUseBufferByteCount()const
+	{
+		return this->pLayer->GetUseBufferByteCount();
+	}
+
+	/** レイヤーをバッファに書き込む.
+		@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
+		@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
+	S32 LayerConnectSingle2Single::WriteToBuffer(BYTE* o_lpBuffer)const
+	{
+		return this->pLayer->WriteToBuffer(o_lpBuffer);
+	}
+
 }	// Gravisbell
 }	// Layer
 }	// NeuralNetwork

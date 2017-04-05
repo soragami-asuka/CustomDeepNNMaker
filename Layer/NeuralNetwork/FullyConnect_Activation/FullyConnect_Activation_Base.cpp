@@ -98,7 +98,7 @@ Gravisbell::ErrorCode FullyConnect_Activation_Base::SetLayerConfig(const Setting
 	return ERROR_CODE_NONE;
 }
 /** ƒŒƒCƒ„[‚ÌÝ’èî•ñ‚ðŽæ“¾‚·‚é */
-const SettingData::Standard::IData* FullyConnect_Activation_Base::GetLayerConfig()const
+const SettingData::Standard::IData* FullyConnect_Activation_Base::GetLayerStructure()const
 {
 	return this->pLayerStructure;
 }

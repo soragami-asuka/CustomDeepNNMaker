@@ -20,6 +20,8 @@ namespace Gravisbell {
 		ERROR_CODE_COMMON_ALLOCATION_MEMORY,	///< メモリの確保に失敗
 		ERROR_CODE_COMMON_FILE_NOT_FOUND,		///< ファイルの参照に失敗
 		ERROR_CODE_COMMON_CALCULATE_NAN,		///< 演算中にNANが発生した
+		ERROR_CODE_COMMON_NOT_EXIST,			///< 存在しない
+		ERROR_CODE_COMMON_NOT_COMPATIBLE,		///< 未対応
 
 		// DLL系エラー
 		ERROR_CODE_DLL = 0x02000000,
@@ -42,6 +44,8 @@ namespace Gravisbell {
 		ERROR_CODE_ADDLAYER = 0x10010000,
 		ERROR_CODE_ADDLAYER_ALREADY_SAMEID,		///< 同じIDのレイヤーが既に登録済み
 		ERROR_CODE_ADDLAYER_UPPER_LIMIT,		///< レイヤーの追加上限に達している
+		ERROR_CODE_ADDLAYER_NOT_COMPATIBLE,		///< 未対応
+		ERROR_CODE_ADDLAYER_NOT_EXIST,			///< レイヤーが存在しない
 		// レイヤー削除系エラー
 		ERROR_CODE_ERASELAYER = 0x10020000,
 		ERROR_CODE_ERASELAYER_NOTFOUND,			///< 対象のID検索に失敗

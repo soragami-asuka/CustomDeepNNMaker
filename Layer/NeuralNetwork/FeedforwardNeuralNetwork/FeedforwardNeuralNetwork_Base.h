@@ -2,7 +2,11 @@
 // フィードフォワードニューラルネットワークの処理レイヤー
 // 複数のレイヤーを内包し、処理する
 //======================================
+#ifndef __GRAVISBELL_FEEDFORWARD_NEURALNETWORK_H__
+#define __GRAVISBELL_FEEDFORWARD_NEURALNETWORK_H__
+
 #include<Layer/NeuralNetwork/INeuralNetwork.h>
+#include<Layer/NeuralNetwork/ILayerDLLManager.h>
 
 
 #include"FeedforwardNeuralNetwork_FUNC.hpp"
@@ -12,6 +16,8 @@
 #include<list>
 
 #include"LayerConnect.h"
+#include"LayerConnectInput.h"
+#include"LayerConnectOutput.h"
 
 namespace Gravisbell {
 namespace Layer {
@@ -21,26 +27,49 @@ namespace NeuralNetwork {
 	class FeedforwardNeuralNetwork_Base : public INeuralNetwork
 	{
 	private:
+		const ILayerDLLManager& layerDLLManager;	/**< レイヤーDLL管理クラス. */
+
 		std::map<Gravisbell::GUID, ILayerConnect*>	lpLayerInfo;	/**< 全レイヤーの管理クラス. <レイヤーGUID, レイヤー接続情報のアドレス> */
 
-		std::list<ILayerConnect*> lpCalculateLayer0List;		/**< レイヤーを処理順に並べたリスト.  */
+		std::list<ILayerConnect*> lpCalculateLayerList;		/**< レイヤーを処理順に並べたリスト.  */
 
-		ILayerConnect* pOutputLayer;	/**< 出力信号に設定されているレイヤーのアドレス. */
+		LayerConnectInput  inputLayer;	/**< 入力信号の代替レイヤーのアドレス. */
+		LayerConnectOutput outputLayer;	/**< 出力信号の代替レイヤーのアドレス. */
+
+
+		const Gravisbell::GUID guid;			/**< レイヤー識別用のGUID */
+		const Gravisbell::GUID inputLayerGUID;	/**< 入力信号に割り当てられているGUID.入力信号レイヤーの代用として使用する. */
+
+		IODataStruct inputDataStruct;	/**< 入力データ構造 */
+
+		SettingData::Standard::IData* pLayerStructure;	/**< レイヤー構造を定義したコンフィグクラス */
+		SettingData::Standard::IData* pLearnData;		/**< 学習設定を定義したコンフィグクラス */
+
+		U32 batchSize;	/**< バッチサイズ */
+
+		// 演算時の入力データ
+		CONST_BATCH_BUFFER_POINTER m_lppInputBuffer;	/**< 演算時の入力データ */
+		CONST_BATCH_BUFFER_POINTER m_lppDOutputBuffer;	/**< 入力誤差計算時の出力誤差データ */
 
 	public:
-		/** コンストラクタ */
-		FeedforwardNeuralNetwork_Base();
+		//====================================
+		// コンストラクタ/デストラクタ
+		//====================================
+		/** コンストラクタ
+			@param	i_inputGUID	入力信号に割り当てられたGUID.自分で作ることができないので外部で作成して引き渡す. */
+		FeedforwardNeuralNetwork_Base(const ILayerDLLManager& layerDLLManager, const Gravisbell::GUID& i_guid, const Gravisbell::GUID& i_inputLayerGUID);
 		/** デストラクタ */
 		virtual ~FeedforwardNeuralNetwork_Base();
 
-	public:
+
 		//====================================
 		// レイヤーの追加
 		//====================================
+	public:
 		/** レイヤーを追加する.
 			追加したレイヤーの所有権はNeuralNetworkに移るため、メモリの開放処理などは全てINeuralNetwork内で行われる.
 			@param pLayer	追加するレイヤーのアドレス. */
-		ErrorCode AddLayer(INNLayer* pLayer);
+		ErrorCode AddLayer(ILayerBase* pLayer);
 		/** レイヤーを削除する.
 			@param i_guid	削除するレイヤーのGUID */
 		ErrorCode EraseLayer(const Gravisbell::GUID& i_guid);
@@ -48,28 +77,26 @@ namespace NeuralNetwork {
 		ErrorCode EraseAllLayer();
 
 		/** 登録されているレイヤー数を取得する */
-		ErrorCode GetLayerCount()const;
-		/** レイヤーを番号指定で取得する */
-		const INNLayer* GetLayerByNum(const U32 i_layerNum);
-		/** レイヤーをGUID指定で取得する */
-		const INNLayer* GetLayerByGUID(const Gravisbell::GUID& i_guid);
+		U32 GetLayerCount()const;
+		/** レイヤーのGUIDを番号指定で取得する */
+		ErrorCode GetLayerGUIDbyNum(U32 i_layerNum, Gravisbell::GUID& o_guid);
 
 
 		//====================================
 		// 入出力レイヤー
 		//====================================
+	public:
 		/** 入力信号に割り当てられているGUIDを取得する */
 		GUID GetInputGUID()const;
 
-		/** 出力信号に割り当てらているレイヤーのGUIDを取得する */
-		GUID GetOutputLayerGUID()const;
 		/** 出力信号レイヤーを設定する */
-		GUID SetOutputLayerGUID(const Gravisbell::GUID& i_guid);
+		ErrorCode SetOutputLayerGUID(const Gravisbell::GUID& i_guid);
 
 
 		//====================================
 		// レイヤーの接続
 		//====================================
+	public:
 		/** レイヤーに入力レイヤーを追加する.
 			@param	receiveLayer	入力を受け取るレイヤー
 			@param	postLayer		入力を渡す(出力する)レイヤー. */
@@ -93,7 +120,7 @@ namespace NeuralNetwork {
 			@param	i_layerGUID		接続されているレイヤーのGUID.
 			@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定.
 			@param	o_postLayerGUID	レイヤーに接続しているレイヤーのGUID格納先. */
-		ErrorCode GetInputLayerByNum(const Gravisbell::GUID& i_layerGUID, U32 i_inputNum, Gravisbell::GUID& o_postLayerGUID)const;
+		ErrorCode GetInputLayerGUIDbyNum(const Gravisbell::GUID& i_layerGUID, U32 i_inputNum, Gravisbell::GUID& o_postLayerGUID)const;
 
 		/** レイヤーに接続しているバイパスレイヤーの数を取得する.
 			@param	i_layerGUID		接続されているレイヤーのGUID. */
@@ -102,7 +129,7 @@ namespace NeuralNetwork {
 			@param	i_layerGUID		接続されているレイヤーのGUID.
 			@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定.
 			@param	o_postLayerGUID	レイヤーに接続しているレイヤーのGUID格納先. */
-		ErrorCode GetBypassLayerByNum(const Gravisbell::GUID& i_layerGUID, U32 i_inputNum, Gravisbell::GUID& o_postLayerGUID)const;
+		ErrorCode GetBypassLayerGUIDbyNum(const Gravisbell::GUID& i_layerGUID, U32 i_inputNum, Gravisbell::GUID& o_postLayerGUID)const;
 
 
 		/** レイヤーの接続状態に異常がないかチェックする.
@@ -115,56 +142,204 @@ namespace NeuralNetwork {
 		//====================================
 		// 学習設定
 		//====================================
+	public:
 		/** 学習設定を取得する.
 			設定した値はPreProcessLearnLoopを呼び出した際に適用される.
 			@param	guid	取得対象レイヤーのGUID. */
-		const SettingData::Standard::IData* GetLearnSettingData(const Gravisbell::GUID& guid);
+		const SettingData::Standard::IData* GetLearnSettingData(const Gravisbell::GUID& guid)const;
+		SettingData::Standard::IData* GetLearnSettingData(const Gravisbell::GUID& guid);
 
-		/** 学習設定を設定する.
-			設定した値はPreProcessLearnLoopを呼び出した際に適用される.
-			@param	guid	取得対象レイヤーのGUID
-			@param	data	設定する学習設定 */
-		ErrorCode SetLearnSettingData(const Gravisbell::GUID& guid, const SettingData::Standard::IData& data);
+		/** 学習設定のアイテムを取得する.
+			@param	guid		取得対象レイヤーのGUID.	指定が無い場合は全てのレイヤーに対して実行する.
+			@param	i_dataID	設定する値のID. */
+		SettingData::Standard::IItemBase* GetLearnSettingDataItem(const Gravisbell::GUID& guid, const wchar_t* i_dataID);
 
 		/** 学習設定を設定する.
 			設定した値はPreProcessLearnLoopを呼び出した際に適用される.
 			int型、float型、enum型が対象.
-			@param	guid		取得対象レイヤーのGUID
+			@param	guid		取得対象レイヤーのGUID.	指定が無い場合は全てのレイヤーに対して実行する.
 			@param	i_dataID	設定する値のID.
 			@param	i_param		設定する値. */
+		ErrorCode SetLearnSettingData(const wchar_t* i_dataID, S32 i_param);
 		ErrorCode SetLearnSettingData(const Gravisbell::GUID& guid, const wchar_t* i_dataID, S32 i_param);
 		/** 学習設定を設定する.
 			設定した値はPreProcessLearnLoopを呼び出した際に適用される.
 			int型、float型が対象.
-			@param	guid		取得対象レイヤーのGUID
+			@param	guid		取得対象レイヤーのGUID.	指定が無い場合は全てのレイヤーに対して実行する.
 			@param	i_dataID	設定する値のID.
 			@param	i_param		設定する値. */
+		ErrorCode SetLearnSettingData(const wchar_t* i_dataID, F32 i_param);
 		ErrorCode SetLearnSettingData(const Gravisbell::GUID& guid, const wchar_t* i_dataID, F32 i_param);
 		/** 学習設定を設定する.
 			設定した値はPreProcessLearnLoopを呼び出した際に適用される.
 			bool型が対象.
-			@param	guid		取得対象レイヤーのGUID
+			@param	guid		取得対象レイヤーのGUID.	指定が無い場合は全てのレイヤーに対して実行する.
 			@param	i_dataID	設定する値のID.
 			@param	i_param		設定する値. */
+		ErrorCode SetLearnSettingData(const wchar_t* i_dataID, bool i_param);
 		ErrorCode SetLearnSettingData(const Gravisbell::GUID& guid, const wchar_t* i_dataID, bool i_param);
 		/** 学習設定を設定する.
 			設定した値はPreProcessLearnLoopを呼び出した際に適用される.
 			string型が対象.
-			@param	guid		取得対象レイヤーのGUID
+			@param	guid		取得対象レイヤーのGUID.	指定が無い場合は全てのレイヤーに対して実行する.
 			@param	i_dataID	設定する値のID.
 			@param	i_param		設定する値. */
+		ErrorCode SetLearnSettingData(const wchar_t* i_dataID, const wchar_t* i_param);
 		ErrorCode SetLearnSettingData(const Gravisbell::GUID& guid, const wchar_t* i_dataID, const wchar_t* i_param);
 
 
 		//====================================
 		// 入出力バッファ関連
 		//====================================
+	public:
 		/** 入力バッファを取得する */
-		virtual CONST_BATCH_BUFFER_POINTER GetInputBuffer()const = 0;
+		CONST_BATCH_BUFFER_POINTER GetInputBuffer()const;
 		/** 出力差分バッファを取得する */
-		virtual CONST_BATCH_BUFFER_POINTER GetDOutputBuffer()const = 0;
+		CONST_BATCH_BUFFER_POINTER GetDOutputBuffer()const;
+		
+		/** 出力データバッファを取得する.
+			配列の要素数はGetOutputBufferCountの戻り値.
+			@return 出力データ配列の先頭ポインタ */
+		CONST_BATCH_BUFFER_POINTER GetOutputBuffer()const;
+		/** 出力データバッファを取得する.
+			@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
+			@return 成功した場合0 */
+		virtual ErrorCode GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const = 0;
+
+		/** 学習差分を取得する.
+			配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]
+			@return	誤差差分配列の先頭ポインタ */
+		CONST_BATCH_BUFFER_POINTER GetDInputBuffer()const;
+		/** 学習差分を取得する.
+			@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
+		virtual ErrorCode GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const = 0;
+
+
+		//===========================
+		// レイヤー共通
+		//===========================
+	public:
+		/** レイヤー種別の取得.
+			ELayerKind の組み合わせ. */
+		U32 GetLayerKindBase(void)const;
+
+		/** レイヤー固有のGUIDを取得する */
+		Gravisbell::GUID GetGUID(void)const;
+
+		/** レイヤーの種類識別コードを取得する.
+			@param o_layerCode	格納先バッファ
+			@return 成功した場合0 */
+		Gravisbell::GUID GetLayerCode(void)const;
+
+		/** バッチサイズを取得する.
+			@return 同時に演算を行うバッチのサイズ */
+		U32 GetBatchSize()const;
+
+
+		//================================
+		// 初期化処理
+		//================================
+	public:
+		/** 初期化. 各ニューロンの値をランダムに初期化
+			@return	成功した場合0 */
+		ErrorCode Initialize(void);
+		/** 初期化. 各ニューロンの値をランダムに初期化
+			@param	i_config			設定情報
+			@oaram	i_inputDataStruct	入力データ構造情報
+			@return	成功した場合0 */
+		ErrorCode Initialize(const SettingData::Standard::IData& i_data, const IODataStruct& i_inputDataStruct);
+		/** 初期化. バッファからデータを読み込む
+			@param i_lpBuffer	読み込みバッファの先頭アドレス.
+			@param i_bufferSize	読み込み可能バッファのサイズ.
+			@return	成功した場合0 */
+		ErrorCode InitializeFromBuffer(BYTE* i_lpBuffer, int i_bufferSize);
+
+
+		//===========================
+		// レイヤー設定
+		//===========================
+	public:
+		/** レイヤーの設定情報を取得する */
+		const SettingData::Standard::IData* GetLayerStructure()const;
+
+
+		//===========================
+		// レイヤー保存
+		//===========================
+	public:
+		/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
+		U32 GetUseBufferByteCount()const;
+
+		/** レイヤーをバッファに書き込む.
+			@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
+			@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
+		S32 WriteToBuffer(BYTE* o_lpBuffer)const;
+
+
+		//===========================
+		// 入力レイヤー関連
+		//===========================
+	public:
+		/** 入力データ構造を取得する.
+			@return	入力データ構造 */
+		IODataStruct GetInputDataStruct()const;
+
+		/** 入力バッファ数を取得する. */
+		U32 GetInputBufferCount()const;
+
+
+		//===========================
+		// 出力レイヤー関連
+		//===========================
+	public:
+		/** 出力データ構造を取得する */
+		IODataStruct GetOutputDataStruct()const;
+
+		/** 出力バッファ数を取得する */
+		U32 GetOutputBufferCount()const;
+
+
+		//================================
+		// 演算処理
+		//================================
+	public:
+		/** 演算前処理を実行する.(学習用)
+			@param batchSize	同時に演算を行うバッチのサイズ.
+			NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
+			失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
+		ErrorCode PreProcessLearn(U32 batchSize);
+		
+		/** 学習ループの初期化処理.データセットの学習開始前に実行する
+			失敗した場合はCalculate以降の処理は実行不可. */
+		ErrorCode PreProcessLearnLoop(const SettingData::Standard::IData& data);
+		/** 演算ループの初期化処理.データセットの演算開始前に実行する
+			失敗した場合はCalculate以降の処理は実行不可. */
+		ErrorCode PreProcessCalculateLoop();
+
+		/** 演算処理を実行する.
+			@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
+			@return 成功した場合0が返る */
+		ErrorCode Calculate(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer);
+
+
+		//================================
+		// 学習処理
+		//================================
+	public:
+		/** 学習誤差を計算する.
+			入力信号、出力信号は直前のCalculateの値を参照する.
+			@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
+			直前の計算結果を使用する */
+		ErrorCode CalculateLearnError(CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer);
+		/** 学習差分をレイヤーに反映させる.
+			入力信号、出力信号は直前のCalculateの値を参照する.
+			出力誤差差分、入力誤差差分は直前のCalculateLearnErrorの値を参照する. */
+		ErrorCode ReflectionLearnError(void);
 	};
 
 }	// NeuralNetwork
 }	// Layer
 }	// Gravisbell
+
+
+#endif	// __GRAVISBELL_FEEDFORWARD_NEURALNETWORK_H__

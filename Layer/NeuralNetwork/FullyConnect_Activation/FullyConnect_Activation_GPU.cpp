@@ -16,7 +16,7 @@ using namespace Gravisbell::Layer::NeuralNetwork;
 
 
 /** CPUˆ——p‚ÌƒŒƒCƒ„[‚ğì¬ */
-EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerGPU(Gravisbell::GUID guid)
+EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerGPU(Gravisbell::GUID guid, const ILayerDLLManager* pLayerDLLManager)
 {
 //	return new FeedforwardCPU(guid);
 	return NULL;

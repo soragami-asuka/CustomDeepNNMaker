@@ -8,6 +8,7 @@
 #include"../../Common/VersionCode.h"
 #include"../../Common/ErrorCode.h"
 
+#include"ILayerDLLManager.h"
 #include"INNLayer.h"
 
 
@@ -46,10 +47,10 @@ namespace NeuralNetwork {
 
 
 	/** CPU処理用のレイヤーを作成 */
-	typedef INNLayer* (*FuncCreateLayerCPU)(Gravisbell::GUID guid);
+	typedef INNLayer* (*FuncCreateLayerCPU)(Gravisbell::GUID guid, const ILayerDLLManager* pLayerDLLManager);
 
 	/** GPU処理用のレイヤーを作成 */
-	typedef INNLayer* (*FuncCreateLayerGPU)(Gravisbell::GUID guid);
+	typedef INNLayer* (*FuncCreateLayerGPU)(Gravisbell::GUID guid, const ILayerDLLManager* pLayerDLLManager);
 
 }	// NeuralNetwork
 }	// Layer

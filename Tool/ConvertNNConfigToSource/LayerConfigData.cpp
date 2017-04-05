@@ -935,6 +935,7 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"#include<SettingData/Standard/IData.h>\n");
 		fwprintf(fp, L"#include<Layer/NeuralNetwork/INNLayer.h>\n");
+		fwprintf(fp, L"#include<Layer/NeuralNetwork/ILayerDLLManager.h>\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"#include\"%ls\"\n", dataHeaderFilePath.filename().wstring().c_str());
 		fwprintf(fp, L"\n");
@@ -982,12 +983,12 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"/** Create a layer for CPU processing.\n");
 		fwprintf(fp, L"  * @param GUID of layer to create.\n");
 		fwprintf(fp, L"  */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerCPU(Gravisbell::GUID guid);\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerCPU(Gravisbell::GUID guid, const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager);\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"/** Create a layer for GPU processing.\n");
 		fwprintf(fp, L"  * @param GUID of layer to create.\n");
 		fwprintf(fp, L"  */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerGPU(Gravisbell::GUID guid);\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerGPU(Gravisbell::GUID guid, const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager);\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");

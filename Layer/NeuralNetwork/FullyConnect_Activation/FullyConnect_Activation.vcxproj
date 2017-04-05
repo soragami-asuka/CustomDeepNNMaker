@@ -95,10 +95,10 @@
     <ClInclude Include="..\..\..\include\Layer\IO\IOutputLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\IO\ISingleInputLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\IO\ISingleOutputLayer.h" />
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INeuralNetwork.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerDLL.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
     <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h" />
     <ClInclude Include="FullyConnect_Activation_Base.h" />

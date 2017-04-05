@@ -151,7 +151,7 @@ namespace Standard {
 			@param i_lpBuffer	読み込みバッファの先頭アドレス.
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-		int ReadFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize)
+		S32 ReadFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize)
 		{
 			if(i_bufferSize < (int)this->GetUseBufferByteCount())
 				return -1;
@@ -168,8 +168,8 @@ namespace Standard {
 		}
 		/** バッファに書き込む.
 			@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
-			@return 成功した場合0 */
-		int WriteToBuffer(BYTE* o_lpBuffer)const
+			@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
+		S32 WriteToBuffer(BYTE* o_lpBuffer)const
 		{
 			U32 bufferPos = 0;
 

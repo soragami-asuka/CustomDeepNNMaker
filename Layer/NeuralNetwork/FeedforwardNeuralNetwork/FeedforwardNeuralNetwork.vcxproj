@@ -98,13 +98,16 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INeuralNetwork.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerDLL.h" />
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
     <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h" />
     <ClInclude Include="FeedforwardNeuralNetwork_Base.h" />
     <ClInclude Include="FeedforwardNeuralNetwork_DATA.hpp" />
     <ClInclude Include="FeedforwardNeuralNetwork_FUNC.hpp" />
     <ClInclude Include="LayerConnect.h" />
+    <ClInclude Include="LayerConnectInput.h" />
+    <ClInclude Include="LayerConnectOutput.h" />
+    <ClInclude Include="LayerConnectSingle2Single.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -118,6 +121,7 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="FeedforwardNeuralNetwork.cpp" />
+    <ClCompile Include="FeedforwardNeuralNetwork_Base.cpp" />
     <ClCompile Include="FeedforwardNeuralNetwork_FUNC.cpp" />
     <ClCompile Include="LayerConnectInput.cpp" />
     <ClCompile Include="LayerConnectOutput.cpp" />

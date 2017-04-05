@@ -93,9 +93,6 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayer.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerDLL.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
@@ -126,6 +123,18 @@
     <ClInclude Include="LayerConnect.h">
       <Filter>LayerConnect</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="LayerConnectInput.h">
+      <Filter>LayerConnect</Filter>
+    </ClInclude>
+    <ClInclude Include="LayerConnectOutput.h">
+      <Filter>LayerConnect</Filter>
+    </ClInclude>
+    <ClInclude Include="LayerConnectSingle2Single.h">
+      <Filter>LayerConnect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -148,6 +157,9 @@
     </ClCompile>
     <ClCompile Include="LayerConnectSingle2Single.cpp">
       <Filter>LayerConnect</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedforwardNeuralNetwork_Base.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

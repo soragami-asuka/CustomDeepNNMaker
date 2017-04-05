@@ -87,9 +87,6 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayer.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerDLL.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
@@ -122,6 +119,9 @@
     </ClInclude>
     <ClInclude Include="FullyConnect_Activation_Base.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

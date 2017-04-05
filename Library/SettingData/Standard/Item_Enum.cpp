@@ -378,7 +378,7 @@ namespace Standard {
 		}
 		/** バッファに書き込む.
 			@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
-			@return 成功した場合0 */
+			@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
 		S32 WriteToBuffer(BYTE* o_lpBuffer)const
 		{
 			U32 bufferPos = 0;

@@ -7,7 +7,7 @@
 #include"../../Common/Guiddef.h"
 #include"../../Common/ErrorCode.h"
 
-#include"INNLayerDLL.h"
+#include"ILayerDLL.h"
 
 namespace Gravisbell {
 namespace Layer {

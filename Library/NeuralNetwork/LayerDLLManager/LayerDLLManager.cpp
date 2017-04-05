@@ -31,9 +31,11 @@ namespace NeuralNetwork {
 
 		FuncCreateLayerCPU funcCreateLayer;
 
+		const ILayerDLLManager& layerDLLManager;
+
 	public:
 		/** コンストラクタ */
-		NNLayerDLL()
+		NNLayerDLL(const ILayerDLLManager& i_layerDLLManager)
 			:	hModule	(NULL)
 			,	funcGetLayerCode							(NULL)
 			,	funcGetVersionCode							(NULL)
@@ -42,6 +44,7 @@ namespace NeuralNetwork {
 			,	funcCreateLearningSetting					(NULL)
 			,	funcCreateLearningSettingFromBuffer			(NULL)
 			,	funcCreateLayer								(NULL)
+			,	layerDLLManager								(i_layerDLLManager)
 		{
 		}
 		/** デストラクタ */
@@ -136,15 +139,15 @@ namespace NeuralNetwork {
 			if(this->funcCreateLayer == NULL)
 				return NULL;
 
-			return this->funcCreateLayer(guid);
+			return this->funcCreateLayer(guid, &this->layerDLLManager);
 		}
 
 	private:
 		/** DLLをファイルから作成する(共通部分抜き出し) */
-		static NNLayerDLL* CreateFromFileCommon(const ::std::wstring& filePath)
+		static NNLayerDLL* CreateFromFileCommon(const ::std::wstring& filePath, const ILayerDLLManager& i_layerDLLManager)
 		{
 			// バッファを作成
-			NNLayerDLL* pLayerDLL = new NNLayerDLL();
+			NNLayerDLL* pLayerDLL = new NNLayerDLL(i_layerDLLManager);
 			if(pLayerDLL == NULL)
 				return NULL;
 
@@ -194,10 +197,10 @@ namespace NeuralNetwork {
 
 	public:
 		/** DLLをファイルから作成する */
-		static NNLayerDLL* CreateFromFileCPU(const ::std::wstring& filePath)
+		static NNLayerDLL* CreateFromFileCPU(const ::std::wstring& filePath, const ILayerDLLManager& i_layerDLLManager)
 		{
 			// 共通部分を作成
-			NNLayerDLL* pLayerDLL = CreateFromFileCommon(filePath);
+			NNLayerDLL* pLayerDLL = CreateFromFileCommon(filePath, i_layerDLLManager);
 			if(pLayerDLL == NULL)
 				return NULL;
 
@@ -219,10 +222,10 @@ namespace NeuralNetwork {
 			return NULL;
 		}
 		/** DLLをファイルから作成する */
-		static NNLayerDLL* CreateFromFileGPU(const ::std::wstring& filePath)
+		static NNLayerDLL* CreateFromFileGPU(const ::std::wstring& filePath, const ILayerDLLManager& i_layerDLLManager)
 		{
 			// 共通部分を作成
-			NNLayerDLL* pLayerDLL = CreateFromFileCommon(filePath);
+			NNLayerDLL* pLayerDLL = CreateFromFileCommon(filePath, i_layerDLLManager);
 			if(pLayerDLL == NULL)
 				return NULL;
 
@@ -377,7 +380,7 @@ namespace NeuralNetwork {
 			@return	成功した場合0が返る. */
 		ErrorCode ReadLayerDLL(const wchar_t szFilePath[], Gravisbell::GUID& o_addLayerCode)
 		{
-			auto pLayerDLL = NNLayerDLL::CreateFromFileCPU(szFilePath);
+			auto pLayerDLL = NNLayerDLL::CreateFromFileCPU(szFilePath, *this);
 			if(pLayerDLL == NULL)
 				return ERROR_CODE_DLL_LOAD_FUNCTION;
 
@@ -421,7 +424,7 @@ namespace NeuralNetwork {
 			@return	成功した場合0が返る. */
 		ErrorCode ReadLayerDLL(const wchar_t szFilePath[], Gravisbell::GUID& o_addLayerCode)
 		{
-			auto pLayerDLL = NNLayerDLL::CreateFromFileGPU(szFilePath);
+			auto pLayerDLL = NNLayerDLL::CreateFromFileGPU(szFilePath, *this);
 			if(pLayerDLL == NULL)
 				return ERROR_CODE_DLL_LOAD_FUNCTION;
 
