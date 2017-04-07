@@ -32,7 +32,9 @@ namespace NeuralNetwork {
 			@return 成功した場合0 */
 		virtual ErrorCode GetVersionCode(VersionCode& o_versionCode)const = 0;
 
-
+		//==============================
+		// レイヤー構造作成
+		//==============================
 		/** レイヤー構造設定を作成する */
 		virtual SettingData::Standard::IData* CreateLayerStructureSetting(void)const = 0;
 		/** レイヤー構造設定を作成する
@@ -40,9 +42,12 @@ namespace NeuralNetwork {
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@param o_useBufferSize 実際に読み込んだバッファサイズ
 			@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-		virtual SettingData::Standard::IData* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)const = 0;
+		virtual SettingData::Standard::IData* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)const = 0;
 
 
+		//==============================
+		// 学習設定作成
+		//==============================
 		/** レイヤー学習設定を作成する */
 		virtual SettingData::Standard::IData* CreateLearningSetting(void)const = 0;
 		/** レイヤー学習設定を作成する
@@ -50,15 +55,31 @@ namespace NeuralNetwork {
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@param o_useBufferSize 実際に読み込んだバッファサイズ
 			@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-		virtual SettingData::Standard::IData* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)const = 0;
+		virtual SettingData::Standard::IData* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)const = 0;
 
+
+		//==============================
+		// レイヤー作成
+		//==============================
+		/** レイヤーデータを作成.
+			GUIDは自動割り当て.
+			@param	i_layerStructure	レイヤー構造.
+			@param	i_inputDataStruct	入力データ構造. */
+		virtual INNLayer* CreateLayerData(const SettingData::Standard::IData& i_layerStructure, const IODataStruct& i_inputDataStruct)const = 0;
+		/** レイヤーデータを作成
+			@param guid	作成レイヤーのGUID
+			@param	i_layerStructure	レイヤー構造.
+			@param	i_inputDataStruct	入力データ構造. */
+		virtual INNLayer* CreateLayerData(const Gravisbell::GUID& guid, const SettingData::Standard::IData& i_layerStructure, const IODataStruct& i_inputDataStruct)const = 0;
 		
 		/** レイヤーを作成.
-			GUIDは自動割り当て. */
-		virtual INNLayer* CreateLayer()const = 0;
+			GUIDは自動割り当て.
+			@param	i_lpBuffer		読み取り用バッファ.
+			@param	i_bufferSize	使用可能なバッファサイズ. */
+		virtual INNLayer* CreateLayerDataFromBuffer(const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)const = 0;
 		/** レイヤーを作成
 			@param guid	作成レイヤーのGUID */
-		virtual INNLayer* CreateLayer(Gravisbell::GUID guid)const = 0;
+		virtual INNLayer* CreateLayerDataFromBuffer(const Gravisbell::GUID& guid, const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)const = 0;
 	};
 
 }	// NeuralNetwork

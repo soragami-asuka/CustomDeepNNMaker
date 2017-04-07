@@ -27,16 +27,6 @@ namespace NeuralNetwork {
 		/** 初期化. 各ニューロンの値をランダムに初期化
 			@return	成功した場合0 */
 		virtual ErrorCode Initialize(void) = 0;
-		/** 初期化. 各ニューロンの値をランダムに初期化
-			@param	i_config			設定情報
-			@oaram	i_inputDataStruct	入力データ構造情報
-			@return	成功した場合0 */
-		virtual ErrorCode Initialize(const SettingData::Standard::IData& i_data, const IODataStruct& i_inputDataStruct) = 0;
-		/** 初期化. バッファからデータを読み込む
-			@param i_lpBuffer	読み込みバッファの先頭アドレス.
-			@param i_bufferSize	読み込み可能バッファのサイズ.
-			@return	成功した場合0 */
-		virtual ErrorCode InitializeFromBuffer(BYTE* i_lpBuffer, int i_bufferSize) = 0;
 
 		/** レイヤーの設定情報を取得する */
 		virtual const SettingData::Standard::IData* GetLayerStructure()const = 0;

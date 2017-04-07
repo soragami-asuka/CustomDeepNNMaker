@@ -9,6 +9,8 @@
 #include"../Common/IODataStruct.h"
 #include"../Common/Guiddef.h"
 
+#include"./ILayerData.h"
+
 #include"../SettingData/Standard/IData.h"
 
 namespace Gravisbell {
@@ -18,16 +20,17 @@ namespace Layer {
 	enum ELayerKind : U32
 	{
 		LAYER_KIND_IOTYPE		 = 0xFF << 0,
-		LAYER_KIND_SINGLE_INPUT  = 0x01 << 0,	/**< 入力レイヤー */
-		LAYER_KIND_MULT_INPUT    = 0x02 << 0,	/**< 入力レイヤー */
-		LAYER_KIND_SINGLE_OUTPUT = 0x04 << 0,	/**< 出力レイヤー */
-		LAYER_KIND_MULT_OUTPUT   = 0x08 << 0,	/**< 出力レイヤー */
+		LAYER_KIND_SINGLE_INPUT  = (0x00 << 0) << 0,	/**< 入力レイヤー */
+		LAYER_KIND_MULT_INPUT    = (0x01 << 0) << 0,	/**< 入力レイヤー */
+		LAYER_KIND_SINGLE_OUTPUT = (0x00 << 1) << 0,	/**< 出力レイヤー */
+		LAYER_KIND_MULT_OUTPUT   = (0x01 << 1) << 0,	/**< 出力レイヤー */
 
 		LAYER_KIND_USETYPE		 = 0xFF << 8,
 		LAYER_KIND_DATA			 = 0x01 << 8,	/**< データレイヤー.入出力 */
 		LAYER_KIND_NEURALNETWORK = 0x02 << 8,	/**< ニューラルネットワークレイヤー */
 		
 		LAYER_KIND_CALCTYPE = 0x0F << 16,
+		LAYER_KIND_UNKNOWN	= 0x00 << 16,	/**< CPU処理レイヤー */
 		LAYER_KIND_CPU		= 0x01 << 16,	/**< CPU処理レイヤー */
 		LAYER_KIND_GPU		= 0x02 << 16,	/**< GPU処理レイヤー */
 	};

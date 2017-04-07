@@ -46,11 +46,9 @@ namespace NeuralNetwork {
 	typedef SettingData::Standard::IData* (*FuncCreateLayerLearningSettingFromBuffer)(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);
 
 
-	/** CPU処理用のレイヤーを作成 */
-	typedef INNLayer* (*FuncCreateLayerCPU)(Gravisbell::GUID guid, const ILayerDLLManager* pLayerDLLManager);
-
-	/** GPU処理用のレイヤーを作成 */
-	typedef INNLayer* (*FuncCreateLayerGPU)(Gravisbell::GUID guid, const ILayerDLLManager* pLayerDLLManager);
+	/** レイヤーを作成 */
+	typedef INNLayer* (*FuncCreateLayerData)		  (const ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const SettingData::Standard::IData& i_layerStructure, const IODataStruct& i_inputDataStruct);
+	typedef INNLayer* (*FuncCreateLayerDataFromBuffer)(const ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize);
 
 }	// NeuralNetwork
 }	// Layer

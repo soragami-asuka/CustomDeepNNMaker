@@ -29,7 +29,8 @@ namespace NeuralNetwork {
 		FuncCreateLayerLearningSetting				funcCreateLearningSetting;
 		FuncCreateLayerLearningSettingFromBuffer	funcCreateLearningSettingFromBuffer;
 
-		FuncCreateLayerCPU funcCreateLayer;
+		FuncCreateLayerData				funcCreateLayerData;
+		FuncCreateLayerDataFromBuffer	funcCreateLayerDataFromBuffer;;
 
 		const ILayerDLLManager& layerDLLManager;
 
@@ -43,7 +44,8 @@ namespace NeuralNetwork {
 			,	funcCreateLayerStructureSettingFromBuffer	(NULL)
 			,	funcCreateLearningSetting					(NULL)
 			,	funcCreateLearningSettingFromBuffer			(NULL)
-			,	funcCreateLayer								(NULL)
+			,	funcCreateLayerData							(NULL)
+			,	funcCreateLayerDataFromBuffer				(NULL)
 			,	layerDLLManager								(i_layerDLLManager)
 		{
 		}
@@ -79,7 +81,10 @@ namespace NeuralNetwork {
 			return this->funcGetVersionCode(o_versionCode);
 		}
 
-
+		//==============================
+		// レイヤー構造作成
+		//==============================
+	public:
 		/** レイヤー構造設定を作成する */
 		SettingData::Standard::IData* CreateLayerStructureSetting(void)const
 		{
@@ -102,6 +107,10 @@ namespace NeuralNetwork {
 		}
 
 
+		//==============================
+		// 学習設定作成
+		//==============================
+	public:
 		/** レイヤー学習設定を作成する */
 		SettingData::Standard::IData* CreateLearningSetting(void)const
 		{
@@ -123,23 +132,54 @@ namespace NeuralNetwork {
 			return this->funcCreateLearningSettingFromBuffer(i_lpBuffer, i_bufferSize, o_useBufferSize);
 		}
 
-		
-		/** CPU処理用のレイヤーを作成.
-			GUIDは自動割り当て. */
-		INNLayer* CreateLayer()const
+
+		//==============================
+		// レイヤー作成
+		//==============================
+	public:
+		/** レイヤーデータを作成.
+			GUIDは自動割り当て.
+			@param	i_layerStructure	レイヤー構造.
+			@param	i_inputDataStruct	入力データ構造. */
+		virtual INNLayer* CreateLayerData(const SettingData::Standard::IData& i_layerStructure, const IODataStruct& i_inputDataStruct)const
 		{
 			boost::uuids::uuid uuid = boost::uuids::random_generator()();
 
-			return this->CreateLayer(uuid.data);
+			return this->CreateLayerData(uuid.data, i_layerStructure, i_inputDataStruct);
 		}
-		/** CPU処理用のレイヤーを作成
-			@param guid	作成レイヤーのGUID */
-		INNLayer* CreateLayer(Gravisbell::GUID guid)const
+		/** レイヤーデータを作成
+			@param guid	作成レイヤーのGUID
+			@param	i_layerStructure	レイヤー構造.
+			@param	i_inputDataStruct	入力データ構造. */
+		INNLayer* CreateLayerData(const Gravisbell::GUID& guid, const SettingData::Standard::IData& i_layerStructure, const IODataStruct& i_inputDataStruct)const
 		{
-			if(this->funcCreateLayer == NULL)
+			if(this->funcCreateLayerData == NULL)
 				return NULL;
 
-			return this->funcCreateLayer(guid, &this->layerDLLManager);
+			return this->funcCreateLayerData(&this->layerDLLManager, guid, i_layerStructure, i_inputDataStruct);
+		}
+
+
+		/** CPU処理用のレイヤーを作成.
+			GUIDは自動割り当て.
+			@param	i_layerStructure	レイヤー構造.
+			@param	i_inputDataStruct	入力データ構造. */
+		virtual INNLayer* CreateLayerDataFromBuffer(const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)const
+		{
+			boost::uuids::uuid uuid = boost::uuids::random_generator()();
+
+			return this->CreateLayerDataFromBuffer(uuid.data, i_lpBuffer, i_bufferSize, o_useBufferSize);
+		}
+		/** CPU処理用のレイヤーを作成
+			@param guid	作成レイヤーのGUID
+			@param	i_layerStructure	レイヤー構造.
+			@param	i_inputDataStruct	入力データ構造. */
+		INNLayer* CreateLayerDataFromBuffer(const Gravisbell::GUID& guid, const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)const
+		{
+			if(this->funcCreateLayerData == NULL)
+				return NULL;
+
+			return this->funcCreateLayerDataFromBuffer(&this->layerDLLManager, guid, i_lpBuffer, i_bufferSize, o_useBufferSize);
 		}
 
 	private:
@@ -206,10 +246,15 @@ namespace NeuralNetwork {
 
 			do
 			{
-				// レイヤー作成
-				pLayerDLL->funcCreateLayer= (FuncCreateLayerCPU)GetProcAddress(pLayerDLL->hModule, "CreateLayerCPU");
-				if(pLayerDLL->funcCreateLayer == NULL)
+				// レイヤーデータ作成
+				pLayerDLL->funcCreateLayerData= (FuncCreateLayerData)GetProcAddress(pLayerDLL->hModule, "CreateLayerDataCPU");
+				if(pLayerDLL->funcCreateLayerData == NULL)
 					break;
+				// レイヤーデータ作成
+				pLayerDLL->funcCreateLayerDataFromBuffer = (FuncCreateLayerDataFromBuffer)GetProcAddress(pLayerDLL->hModule, "CreateLayerDataCPUfromBuffer");
+				if(pLayerDLL->funcCreateLayerDataFromBuffer == NULL)
+					break;
+
 
 				return pLayerDLL;
 			}
@@ -231,9 +276,13 @@ namespace NeuralNetwork {
 
 			do
 			{
-				// レイヤー作成
-				pLayerDLL->funcCreateLayer= (FuncCreateLayerGPU)GetProcAddress(pLayerDLL->hModule, "CreateLayerGPU");
-				if(pLayerDLL->funcCreateLayer == NULL)
+				// レイヤーデータ作成
+				pLayerDLL->funcCreateLayerData= (FuncCreateLayerData)GetProcAddress(pLayerDLL->hModule, "CreateLayerDataGPU");
+				if(pLayerDLL->funcCreateLayerData == NULL)
+					break;
+				// レイヤーデータ作成
+				pLayerDLL->funcCreateLayerDataFromBuffer = (FuncCreateLayerDataFromBuffer)GetProcAddress(pLayerDLL->hModule, "CreateLayerDataGPUfromBuffer");
+				if(pLayerDLL->funcCreateLayerDataFromBuffer == NULL)
 					break;
 
 				return pLayerDLL;

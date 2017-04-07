@@ -123,6 +123,21 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\ILayerData.h">
+      <Filter>include\Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerData.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="FullyConnect_Activation_LayerData_Base.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="FullyConnect_Activation_LayerData_CPU.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="FullyConnect_Activation_CPU.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -141,6 +156,12 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="FullyConnect_Activation_GPU.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="FullyConnect_Activation_LayerData_Base.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="FullyConnect_Activation_LayerData_CPU.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

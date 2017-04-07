@@ -9,40 +9,21 @@
 #include"FullyConnect_Activation_FUNC.hpp"
 #include"FullyConnect_Activation_Base.h"
 
+#include"FullyConnect_Activation_CPU.h"
+#include"FullyConnect_Activation_LayerData_CPU.h"
+
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
 
-class FeedforwardCPU : public FullyConnect_Activation_Base
-{
-private:
-	// 本体
-	std::vector<std::vector<NEURON_TYPE>>	lppNeuron;			/**< 各ニューロンの係数<ニューロン数, 入力数> */
-	std::vector<NEURON_TYPE>				lpBias;				/**< ニューロンのバイアス<ニューロン数> */
+namespace Gravisbell {
+namespace Layer {
+namespace NeuralNetwork {
 
-	// 入出力バッファ
-	std::vector<std::vector<F32>>			lpOutputBuffer;		/**< 出力バッファ <バッチ数><ニューロン数> */
-	std::vector<std::vector<F32>>			lpDInputBuffer;		/**< 入力誤差差分 <バッチ数><入力信号数> */
-	
-	std::vector<F32*>						lppBatchOutputBuffer;		/**< バッチ処理用出力バッファ <バッチ数> */
-	std::vector<F32*>						lppBatchDInputBuffer;		/**< バッチ処理用入力誤差差分 <バッチ数> */
 
-	// Get関数を使うと処理不可がかさむので一時保存用. PreCalculateで値を格納.
-	U32 inputBufferCount;				/**< 入力バッファ数 */
-	U32 neuronCount;					/**< ニューロン数 */
-	U32 outputBufferCount;				/**< 出力バッファ数 */
-
-	// 演算時の入力データ
-	CONST_BATCH_BUFFER_POINTER m_lppInputBuffer;	/**< 演算時の入力データ */
-	CONST_BATCH_BUFFER_POINTER m_lppDOutputBuffer;	/**< 入力誤差計算時の出力誤差データ */
-
-	// 演算処理用のバッファ
-	bool onUseDropOut;											/**< ドロップアウト処理を実行するフラグ. */
-	std::vector<std::vector<NEURON_TYPE>>	lppDropOutBuffer;	/**< ドロップアウト処理用の係数<ニューロン数, 入力数> */
-
-public:
 	/** コンストラクタ */
-	FeedforwardCPU(Gravisbell::GUID guid)
+	FullyConnect_Activation_CPU::FullyConnect_Activation_CPU(Gravisbell::GUID guid, FullyConnect_Activation_LayerData_CPU& i_layerData)
 		:	FullyConnect_Activation_Base	(guid)
+		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount				(0)		/**< 入力バッファ数 */
 		,	neuronCount						(0)		/**< ニューロン数 */
 		,	outputBufferCount				(0)		/**< 出力バッファ数 */
@@ -52,104 +33,41 @@ public:
 	{
 	}
 	/** デストラクタ */
-	virtual ~FeedforwardCPU()
+	FullyConnect_Activation_CPU::~FullyConnect_Activation_CPU()
 	{
 	}
 
-public:
+
 	//================================
 	// 基本処理
 	//================================
 	/** レイヤー種別の取得 */
-	U32 GetLayerKind()const
+	U32 FullyConnect_Activation_CPU::GetLayerKind()const
 	{
 		return Layer::ELayerKind::LAYER_KIND_CPU | GetLayerKindBase();
 	}
 
 	/** 初期化. 各ニューロンの値をランダムに初期化
 		@return	成功した場合0 */
-	ErrorCode Initialize(void)
+	ErrorCode FullyConnect_Activation_CPU::Initialize(void)
 	{
-		// 入力バッファ数を確認
-		unsigned int inputBufferCount = this->GetInputBufferCount();
-		if(inputBufferCount == 0)
-			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_VALUERANGE;
-
-		// ニューロン数を確認
-		unsigned int neuronCount = this->GetNeuronCount();
-		if(neuronCount == 0)
-			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_VALUERANGE;
-
-		// バッファを確保しつつ、初期値を設定
-		this->lppNeuron.resize(neuronCount);
-		this->lpBias.resize(neuronCount);
-		for(unsigned int neuronNum=0; neuronNum<lppNeuron.size(); neuronNum++)
-		{
-			float maxArea = sqrt(6.0f / (0.5f*inputBufferCount + 0.5f*neuronCount));
-
-			// バイアス
-			this->lpBias[neuronNum] = ((float)rand()/RAND_MAX - 0.5f) * 2.0f * maxArea;
-
-			// ニューロン
-			lppNeuron[neuronNum].resize(inputBufferCount);
-			for(unsigned int inputNum=0; inputNum<lppNeuron[neuronNum].size(); inputNum++)
-			{
-				lppNeuron[neuronNum][inputNum] = ((float)rand()/RAND_MAX - 0.5f) * 2.0f * maxArea;
-			}
-		}
-
-		return ErrorCode::ERROR_CODE_NONE;
+		return this->layerData.Initialize();
 	}
-	/** 初期化. 各ニューロンの値をランダムに初期化
-		@param	i_config			設定情報
-		@oaram	i_inputDataStruct	入力データ構造情報
-		@return	成功した場合0 */
-	ErrorCode Initialize(const SettingData::Standard::IData& i_data, const IODataStruct& i_inputDataStruct)
+
+
+	//===========================
+	// レイヤーデータ関連
+	//===========================
+	/** レイヤーデータを取得する */
+	FullyConnect_Activation_LayerData_Base& FullyConnect_Activation_CPU::GetLayerData()
 	{
-		ErrorCode err;
-
-		// 設定情報の登録
-		err = this->SetLayerConfig(i_data);
-		if(err != ErrorCode::ERROR_CODE_NONE)
-			return err;
-
-		// 入力データ構造の設定
-		this->inputDataStruct = i_inputDataStruct;
-
-		return this->Initialize();
+		return this->layerData;
 	}
-	/** 初期化. バッファからデータを読み込む
-		@param i_lpBuffer	読み込みバッファの先頭アドレス.
-		@param i_bufferSize	読み込み可能バッファのサイズ.
-		@return	成功した場合0 */
-	ErrorCode InitializeFromBuffer(BYTE* i_lpBuffer, int i_bufferSize)
+	const FullyConnect_Activation_LayerData_Base& FullyConnect_Activation_CPU::GetLayerData()const
 	{
-		int readBufferByte = 0;
-
-		// 設定情報を読み込む
-		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(i_lpBuffer, i_bufferSize, readBufferByte);
-		if(pLayerStructure == NULL)
-			return ErrorCode::ERROR_CODE_INITLAYER_READ_CONFIG;
-		this->SetLayerConfig(*pLayerStructure);
-		delete pLayerStructure;
-
-		// 初期化する
-		this->Initialize();
-
-		// ニューロン係数
-		for(unsigned int neuronNum=0; neuronNum<this->lppNeuron.size(); neuronNum++)
-		{
-			memcpy(&this->lppNeuron[neuronNum][0], &i_lpBuffer[readBufferByte], this->lppNeuron[neuronNum].size() * sizeof(NEURON_TYPE));
-			readBufferByte += this->lppNeuron[neuronNum].size() * sizeof(NEURON_TYPE);
-		}
-
-		// バイアス
-		memcpy(&this->lpBias[0], &i_lpBuffer[readBufferByte], this->lpBias.size() * sizeof(NEURON_TYPE));
-		readBufferByte += this->lpBias.size() * sizeof(NEURON_TYPE);
-
-
-		return ErrorCode::ERROR_CODE_NONE;
+		return this->layerData;
 	}
+
 
 	//===========================
 	// レイヤー保存
@@ -157,31 +75,12 @@ public:
 	/** レイヤーをバッファに書き込む.
 		@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
 		@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
-	S32 WriteToBuffer(BYTE* o_lpBuffer)const
+	S32 FullyConnect_Activation_CPU::WriteToBuffer(BYTE* o_lpBuffer)const
 	{
-		if(this->pLayerStructure == NULL)
-			return ErrorCode::ERROR_CODE_NONREGIST_CONFIG;
-
-		int writeBufferByte = 0;
-
-		// 設定情報
-		writeBufferByte += this->pLayerStructure->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
-
-		// ニューロン係数
-		for(unsigned int neuronNum=0; neuronNum<this->lppNeuron.size(); neuronNum++)
-		{
-			memcpy(&o_lpBuffer[writeBufferByte], &this->lppNeuron[neuronNum][0], this->lppNeuron[neuronNum].size() * sizeof(NEURON_TYPE));
-			writeBufferByte += this->lppNeuron[neuronNum].size() * sizeof(NEURON_TYPE);
-		}
-
-		// バイアス
-		memcpy(&o_lpBuffer[writeBufferByte], &this->lpBias[0], this->lpBias.size() * sizeof(NEURON_TYPE));
-		writeBufferByte += this->lpBias.size() * sizeof(NEURON_TYPE);
-
-		return writeBufferByte;
+		return this->layerData.WriteToBuffer(o_lpBuffer);
 	}
 
-public:
+
 	//================================
 	// 演算処理
 	//================================
@@ -189,7 +88,7 @@ public:
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode PreProcessLearn(unsigned int batchSize)
+	ErrorCode FullyConnect_Activation_CPU::PreProcessLearn(unsigned int batchSize)
 	{
 		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
@@ -207,11 +106,12 @@ public:
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
+
 	/** 演算前処理を実行する.(演算用)
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode PreProcessCalculate(unsigned int batchSize)
+	ErrorCode FullyConnect_Activation_CPU::PreProcessCalculate(unsigned int batchSize)
 	{
 		this->batchSize = batchSize;
 
@@ -231,9 +131,9 @@ public:
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
 		// ニューロンバッファのサイズ確認
-		if(this->lppNeuron.size() != this->neuronCount)
+		if(this->layerData.lppNeuron.size() != this->neuronCount)
 			return ErrorCode::ERROR_CODE_FRAUD_NEURON_COUNT;
-		if(this->lppNeuron[0].size() != this->inputBufferCount)
+		if(this->layerData.lppNeuron[0].size() != this->inputBufferCount)
 			return ErrorCode::ERROR_CODE_FRAUD_NEURON_COUNT;
 
 
@@ -259,7 +159,7 @@ public:
 
 	/** 学習ループの初期化処理.データセットの学習開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode PreProcessLearnLoop(const SettingData::Standard::IData& data)
+	ErrorCode FullyConnect_Activation_CPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
 	{
 		if(this->pLearnData != NULL)
 			delete this->pLearnData;
@@ -268,7 +168,7 @@ public:
 		// ドロップアウト
 		{
 			auto pItem = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Float*>(data.GetItemByID(L"DropOut"));
-			if(pItem)
+			 if(pItem)
 				this->learnData.DropOut = pItem->GetValue();
 			else
 				this->learnData.DropOut = 0.0f;
@@ -319,7 +219,7 @@ public:
 	}
 	/** 演算ループの初期化処理.データセットの演算開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode PreProcessCalculateLoop()
+	ErrorCode FullyConnect_Activation_CPU::PreProcessCalculateLoop()
 	{
 		this->onUseDropOut = false;
 
@@ -330,7 +230,7 @@ public:
 	/** 演算処理を実行する.
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 		@return 成功した場合0が返る */
-	ErrorCode Calculate(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer)
+	ErrorCode FullyConnect_Activation_CPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer)
 	{
 		this->m_lppInputBuffer = i_lppInputBuffer;
 
@@ -347,15 +247,15 @@ public:
 					// ニューロンの値を加算
 					for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
 					{
-						tmp += i_lppInputBuffer[batchNum][inputNum] * this->lppNeuron[neuronNum][inputNum];
+						tmp += i_lppInputBuffer[batchNum][inputNum] * this->layerData.lppNeuron[neuronNum][inputNum];
 					}
-					tmp += this->lpBias[neuronNum];
+					tmp += this->layerData.lpBias[neuronNum];
 
 					if(this->learnData.DropOut > 0.0f)
 						tmp *= (1.0f - this->learnData.DropOut);
 
 					// 活性化関数
-					if(this->layerStructure.ActivationType == Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_ReLU)
+					if(this->layerData.layerStructure.ActivationType == Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_ReLU)
 					{
 						// ReLU
 						this->lpOutputBuffer[batchNum][neuronNum] = max(0.0f, tmp);
@@ -386,17 +286,17 @@ public:
 					for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
 					{
 						// ※DropOutの有無で違うのはこの一行だけ
-						tmp += i_lppInputBuffer[batchNum][inputNum] * this->lppNeuron[neuronNum][inputNum] * this->lppDropOutBuffer[neuronNum][inputNum];
+						tmp += i_lppInputBuffer[batchNum][inputNum] * this->layerData.lppNeuron[neuronNum][inputNum] * this->lppDropOutBuffer[neuronNum][inputNum];
 						
 					#ifdef _DEBUG
 					if(isnan(tmp))
 						return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
 					#endif
 					}
-					tmp += this->lpBias[neuronNum];
+					tmp += this->layerData.lpBias[neuronNum];
 
 					// 活性化関数
-					if(this->layerStructure.ActivationType == Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_ReLU)
+					if(this->layerData.layerStructure.ActivationType == Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_ReLU)
 					{
 						// ReLU
 						this->lpOutputBuffer[batchNum][neuronNum] = max(0.0f, tmp);
@@ -418,17 +318,18 @@ public:
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
+
 	/** 出力データバッファを取得する.
 		配列の要素数はGetOutputBufferCountの戻り値.
 		@return 出力データ配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER GetOutputBuffer()const
+	CONST_BATCH_BUFFER_POINTER FullyConnect_Activation_CPU::GetOutputBuffer()const
 	{
 		return &this->lppBatchOutputBuffer[0];
 	}
 	/** 出力データバッファを取得する.
 		@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
 		@return 成功した場合0 */
-	ErrorCode GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
+	ErrorCode FullyConnect_Activation_CPU::GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
 	{
 		if(o_lpOutputBuffer == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
@@ -444,7 +345,7 @@ public:
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
-public:
+
 	//================================
 	// 学習処理
 	//================================
@@ -452,7 +353,7 @@ public:
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode CalculateLearnError(CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode FullyConnect_Activation_CPU::CalculateLearnError(CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		this->m_lppDOutputBuffer = i_lppDOutputBuffer;
 
@@ -469,7 +370,7 @@ public:
 
 					for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
 					{
-						tmp += i_lppDOutputBuffer[batchNum][neuronNum] * this->lppNeuron[neuronNum][inputNum];
+						tmp += i_lppDOutputBuffer[batchNum][neuronNum] * this->layerData.lppNeuron[neuronNum][inputNum];
 					}
 #ifdef _DEBUG
 					if(isnan(tmp))
@@ -477,7 +378,7 @@ public:
 #endif
 
 					// 活性化関数で分岐
-					if(this->layerStructure.ActivationType == Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_ReLU)
+					if(this->layerData.layerStructure.ActivationType == Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_ReLU)
 					{
 						// ReLU
 						this->lpDInputBuffer[batchNum][inputNum] = (float)(this->m_lppInputBuffer[batchNum][inputNum] > 0.0f) * tmp;
@@ -507,7 +408,7 @@ public:
 					for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
 					{
 						// DropOutの有無で違うのはこの一文だけ
-						tmp += i_lppDOutputBuffer[batchNum][neuronNum] * this->lppNeuron[neuronNum][inputNum] * this->lppDropOutBuffer[neuronNum][inputNum];
+						tmp += i_lppDOutputBuffer[batchNum][neuronNum] * this->layerData.lppNeuron[neuronNum][inputNum] * this->lppDropOutBuffer[neuronNum][inputNum];
 
 						#ifdef _DEBUG
 						if(isnan(i_lppDOutputBuffer[batchNum][neuronNum]))
@@ -523,7 +424,7 @@ public:
 					#endif
 
 					// 活性化関数で分岐
-					if(this->layerStructure.ActivationType == Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_ReLU)
+					if(this->layerData.layerStructure.ActivationType == Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_ReLU)
 					{
 						// ReLU
 						this->lpDInputBuffer[batchNum][inputNum] = (float)(1.0f * (this->m_lppInputBuffer[batchNum][inputNum] > 0.0f)) * tmp;
@@ -548,10 +449,11 @@ public:
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
+
 	/** 学習差分をレイヤーに反映させる.
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		出力誤差差分、入力誤差差分は直前のCalculateLearnErrorの値を参照する. */
-	ErrorCode ReflectionLearnError(void)
+	ErrorCode FullyConnect_Activation_CPU::ReflectionLearnError(void)
 	{
 		for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
 		{
@@ -568,7 +470,7 @@ public:
 					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
 				#endif
 
-				this->lpBias[neuronNum] += this->learnData.LearnCoeff * sumDOutput;// / this->batchSize;
+				this->layerData.lpBias[neuronNum] += this->learnData.LearnCoeff * sumDOutput;// / this->batchSize;
 			}
 
 			// 入力対応ニューロン更新
@@ -585,7 +487,7 @@ public:
 					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
 				#endif
 
-				this->lppNeuron[neuronNum][inputNum] += this->learnData.LearnCoeff * sumDOutput;// / this->batchSize;
+				this->layerData.lppNeuron[neuronNum][inputNum] += this->learnData.LearnCoeff * sumDOutput;// / this->batchSize;
 			}
 		}
 
@@ -595,13 +497,13 @@ public:
 	/** 学習差分を取得する.
 		配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]
 		@return	誤差差分配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER GetDInputBuffer()const
+	CONST_BATCH_BUFFER_POINTER FullyConnect_Activation_CPU::GetDInputBuffer()const
 	{
 		return &this->lppBatchDInputBuffer[0];
 	}
 	/** 学習差分を取得する.
 		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
-	ErrorCode GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const
+	ErrorCode FullyConnect_Activation_CPU::GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const
 	{
 		if(o_lpDInputBuffer == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
@@ -617,11 +519,7 @@ public:
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
-};
 
-
-/** CPU処理用のレイヤーを作成 */
-EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayer* CreateLayerCPU(Gravisbell::GUID guid, const ILayerDLLManager* pLayerDLLManager)
-{
-	return new FeedforwardCPU(guid);
-}
+} // Gravisbell;
+} // Layer;
+} // NeuralNetwork;
