@@ -119,6 +119,14 @@ namespace NeuralNetwork {
 		/** 出力先レイヤーを削除する */
 		virtual ErrorCode EraseOutputToLayer(const Gravisbell::GUID& guid) = 0;
 
+		/** レイヤーに接続している出力先レイヤーの数を取得する.
+			@param	i_layerGUID		接続されているレイヤーのGUID. */
+		virtual U32 GetOutputToLayerCount()const = 0;
+		/** レイヤーに接続している出力先レイヤーを番号指定で取得する.
+			@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
+		virtual ILayerConnect* GetOutputToLayerByNum(U32 i_num) = 0;
+
+
 	public:
 		/** レイヤーの初期化処理.
 			接続状況は維持したままレイヤーの中身を初期化する. */

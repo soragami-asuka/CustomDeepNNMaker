@@ -27,6 +27,12 @@ namespace NeuralNetwork {
 		,	inputLayer		(*this)	/**< 入力信号の代替レイヤーのアドレス. */
 		,	outputLayer		(*this)	/**< 出力信号の代替レイヤーのアドレス. */
 	{
+
+	}
+	/** コンストラクタ */
+	FeedforwardNeuralNetwork_Base::FeedforwardNeuralNetwork_Base(const ILayerDLLManager& layerDLLManager, const Gravisbell::GUID& i_guid)
+		:	FeedforwardNeuralNetwork_Base(layerDLLManager, i_guid, Gravisbell::GUID(0x2d2805a3, 0x97cc, 0x4ab4, 0x94, 0x2e, 0x69, 0x39, 0xfd, 0x62, 0x35, 0xb1) )
+	{
 	}
 	/** デストラクタ */
 	FeedforwardNeuralNetwork_Base::~FeedforwardNeuralNetwork_Base()
@@ -654,6 +660,9 @@ namespace NeuralNetwork {
 		@return	成功した場合0 */
 	ErrorCode FeedforwardNeuralNetwork_Base::InitializeFromBuffer(BYTE* i_lpBuffer, int i_bufferSize)
 	{
+#ifdef _DEBUG
+		return ErrorCode::ERROR_CODE_NONE;
+#endif
 	}
 
 
@@ -673,6 +682,9 @@ namespace NeuralNetwork {
 	/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
 	U32 FeedforwardNeuralNetwork_Base::GetUseBufferByteCount()const
 	{
+#ifdef _DEBUG
+		return 0;
+#endif
 	}
 
 	/** レイヤーをバッファに書き込む.
@@ -709,6 +721,9 @@ namespace NeuralNetwork {
 			// レイヤー接続情報
 		}
 
+#ifdef _DEBUG
+		return -1;
+#endif
 	}
 
 
@@ -748,37 +763,168 @@ namespace NeuralNetwork {
 	//================================
 	// 演算処理
 	//================================
+	/** 接続の確立を行う */
+	ErrorCode FeedforwardNeuralNetwork_Base::EstablishmentConnection(void)
+	{
+		ErrorCode err = ErrorCode::ERROR_CODE_NONE;
+
+		// 接続リストをクリア
+		this->lpCalculateLayerList.clear();
+
+		// レイヤーのGUIDリストを生成
+		std::set<Gravisbell::GUID> lpLayerGUID;	// 全レイヤーリスト
+		err = this->outputLayer.CreateLayerList(lpLayerGUID);
+		if(err != ErrorCode::ERROR_CODE_NONE)
+			return err;
+
+		// 処理順リストの作成
+		std::set<Gravisbell::GUID> lpAddedList;	// 追加済レイヤーリスト
+		std::set<ILayerConnect*> lpAddWaitList;	// 追加待機状態リスト
+		// 最初の1回目を実行
+		err = this->outputLayer.CreateCalculateList(lpLayerGUID, lpCalculateLayerList, lpAddedList, lpAddWaitList);
+		if(err != ErrorCode::ERROR_CODE_NONE)
+			return err;
+		// 待機状態のレイヤーがある限り実行する
+		while(lpAddWaitList.size())
+		{
+			bool onAddElse = false;	// 一つ以上のレイヤーを追加することができた
+			for(auto it : lpAddWaitList)
+			{
+				bool onHaveNonAddedOutputLayer = false;	// 追加済でないレイヤーを出力対象に保持しているフラグ
+				for(U32 outputLayerNum=0; outputLayerNum<it->GetOutputToLayerCount(); outputLayerNum++)
+				{
+					auto pOutputToLayer = it->GetOutputToLayerByNum(outputLayerNum);
+
+					// レイヤー一覧に含まれていることを確認
+					if(lpLayerGUID.count(pOutputToLayer->GetGUID()) == 0)
+						continue;
+
+					// 追加待機状態に含まれていないことを確認
+					if(lpAddWaitList.count(pOutputToLayer) > 0)
+						continue;
+
+					onHaveNonAddedOutputLayer = true;
+					break;
+				}
+
+				if(onHaveNonAddedOutputLayer == false)
+				{
+					// 追加待機状態に含まれている出力レイヤーが存在しないため、演算リストに追加可能
+
+					// 追加待機解除
+					lpAddWaitList.erase(it);
+
+					// 演算リストに追加
+					it->CreateCalculateList(lpLayerGUID, this->lpCalculateLayerList, lpAddedList, lpAddWaitList);
+
+					onAddElse = true;
+					break;
+				}
+			}
+
+			if(!onAddElse)
+			{
+				// いずれかのレイヤーを追加することができなかった = 再起処理になっているため、エラー
+				return ERROR_CODE_COMMON_NOT_COMPATIBLE;
+			}
+		}
+
+
+		// 接続の確立
+		for(auto& it : this->lpCalculateLayerList)
+		{
+			err = it->EstablishmentConnection();
+			if(err != ErrorCode::ERROR_CODE_NONE)
+				return err;
+		}
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+
 	/** 演算前処理を実行する.(学習用)
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
 	ErrorCode FeedforwardNeuralNetwork_Base::PreProcessLearn(U32 batchSize)
 	{
+		ErrorCode err = ErrorCode::ERROR_CODE_NONE;
+
 		// 接続の確立を行う
+		err = this->EstablishmentConnection();
+		if(err != ErrorCode::ERROR_CODE_NONE)
+			return err;
 
 		// 学習の事前処理を実行
+		auto it = this->lpCalculateLayerList.begin();
+		while(it != this->lpCalculateLayerList.end())
+		{
+			err = (*it)->PreProcessLearn(batchSize);
+			if(err != ErrorCode::ERROR_CODE_NONE)
+				return err;
 
+			it++;
+		}
+
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 	/** 演算前処理を実行する.(演算用)
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode PreProcessCalculate(unsigned int batchSize)
+	ErrorCode FeedforwardNeuralNetwork_Base::PreProcessCalculate(unsigned int batchSize)
 	{
+		ErrorCode err = ErrorCode::ERROR_CODE_NONE;
+
 		// 接続の確立を行う
+		err = this->EstablishmentConnection();
+		if(err != ErrorCode::ERROR_CODE_NONE)
+			return err;
 
 		// 演算の事前処理を実行
+		auto it = this->lpCalculateLayerList.begin();
+		while(it != this->lpCalculateLayerList.end())
+		{
+			ErrorCode err = (*it)->PreProcessCalculate(batchSize);
+			if(err != ErrorCode::ERROR_CODE_NONE)
+				return err;
+
+			it++;
+		}
+		
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 		
 	/** 学習ループの初期化処理.データセットの学習開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
 	ErrorCode FeedforwardNeuralNetwork_Base::PreProcessLearnLoop(const SettingData::Standard::IData& data)
 	{
+		auto it = this->lpCalculateLayerList.begin();
+		while(it != this->lpCalculateLayerList.end())
+		{
+			ErrorCode err = (*it)->PreProcessLearnLoop();
+			if(err != ErrorCode::ERROR_CODE_NONE)
+				return err;
+
+			it++;
+		}
+
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 	/** 演算ループの初期化処理.データセットの演算開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
 	ErrorCode FeedforwardNeuralNetwork_Base::PreProcessCalculateLoop()
 	{
+		auto it = this->lpCalculateLayerList.begin();
+		while(it != this->lpCalculateLayerList.end())
+		{
+			ErrorCode err = (*it)->PreProcessCalculateLoop();
+			if(err != ErrorCode::ERROR_CODE_NONE)
+				return err;
+
+			it++;
+		}
+
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 
 	/** 演算処理を実行する.
@@ -790,6 +936,17 @@ namespace NeuralNetwork {
 		this->m_lppInputBuffer = i_lppInputBuffer;
 
 		// 演算を実行
+		auto it = this->lpCalculateLayerList.begin();
+		while(it != this->lpCalculateLayerList.end())
+		{
+			ErrorCode err = (*it)->Calculate();
+			if(err != ErrorCode::ERROR_CODE_NONE)
+				return err;
+
+			it++;
+		}
+
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 
 
@@ -803,9 +960,20 @@ namespace NeuralNetwork {
 	ErrorCode FeedforwardNeuralNetwork_Base::CalculateLearnError(CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		// 出力差分バッファを一時保存
+		this->m_lppDOutputBuffer = i_lppDOutputBuffer;
 
 		// 学習誤差計算を実行
+		auto it = this->lpCalculateLayerList.rbegin();
+		while(it != this->lpCalculateLayerList.rend())
+		{
+			ErrorCode err = (*it)->Calculate();
+			if(err != ErrorCode::ERROR_CODE_NONE)
+				return err;
 
+			it++;
+		}
+
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 	/** 学習差分をレイヤーに反映させる.
 		入力信号、出力信号は直前のCalculateの値を参照する.
@@ -813,7 +981,17 @@ namespace NeuralNetwork {
 	ErrorCode FeedforwardNeuralNetwork_Base::ReflectionLearnError(void)
 	{
 		// 学習誤差反映を実行
+		auto it = this->lpCalculateLayerList.begin();
+		while(it != this->lpCalculateLayerList.end())
+		{
+			ErrorCode err = (*it)->ReflectionLearnError();
+			if(err != ErrorCode::ERROR_CODE_NONE)
+				return err;
 
+			it++;
+		}
+
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 
 

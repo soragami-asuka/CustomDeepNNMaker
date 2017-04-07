@@ -58,6 +58,8 @@ namespace NeuralNetwork {
 		/** コンストラクタ
 			@param	i_inputGUID	入力信号に割り当てられたGUID.自分で作ることができないので外部で作成して引き渡す. */
 		FeedforwardNeuralNetwork_Base(const ILayerDLLManager& layerDLLManager, const Gravisbell::GUID& i_guid, const Gravisbell::GUID& i_inputLayerGUID);
+		/** コンストラクタ */
+		FeedforwardNeuralNetwork_Base(const ILayerDLLManager& layerDLLManager, const Gravisbell::GUID& i_guid);
 		/** デストラクタ */
 		virtual ~FeedforwardNeuralNetwork_Base();
 
@@ -302,12 +304,21 @@ namespace NeuralNetwork {
 		//================================
 		// 演算処理
 		//================================
+	protected:
+		/** 接続の確立を行う */
+		ErrorCode EstablishmentConnection(void);
+
 	public:
 		/** 演算前処理を実行する.(学習用)
 			@param batchSize	同時に演算を行うバッチのサイズ.
 			NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 			失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
 		ErrorCode PreProcessLearn(U32 batchSize);
+		/** 演算前処理を実行する.(演算用)
+			@param batchSize	同時に演算を行うバッチのサイズ.
+			NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
+			失敗した場合はCalculate以降の処理は実行不可. */
+		ErrorCode PreProcessCalculate(unsigned int batchSize);
 		
 		/** 学習ループの初期化処理.データセットの学習開始前に実行する
 			失敗した場合はCalculate以降の処理は実行不可. */

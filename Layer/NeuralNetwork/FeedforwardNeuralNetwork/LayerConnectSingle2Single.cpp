@@ -81,6 +81,9 @@ namespace NeuralNetwork {
 		@param	i_lpLayerGUID	接続しているGUIDのリスト.入力方向に確認する. */
 	ErrorCode LayerConnectSingle2Single::CreateLayerList(std::set<Gravisbell::GUID>& io_lpLayerGUID)const
 	{
+		if(io_lpLayerGUID.count(this->GetGUID()))
+			return ErrorCode::ERROR_CODE_NONE;
+
 		io_lpLayerGUID.insert(this->GetGUID());
 		for(auto pInputFromLayer : this->lppInputFromLayer)
 			pInputFromLayer->CreateLayerList(io_lpLayerGUID);
@@ -228,18 +231,59 @@ namespace NeuralNetwork {
 		return NULL;
 	}
 
+	
+	//==========================================
+	// 出力レイヤー関連
+	//==========================================
 
 	/** 出力先レイヤーを追加する */
 	ErrorCode LayerConnectSingle2Single::AddOutputToLayer(ILayerConnect* pOutputToLayer)
 	{
-		return ErrorCode::ERROR_CODE_ADDLAYER_UPPER_LIMIT;
+		if(!this->lppOutputToLayer.empty())
+			return ErrorCode::ERROR_CODE_ADDLAYER_UPPER_LIMIT;
+		this->lppOutputToLayer.push_back(pOutputToLayer);
+
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 	/** 出力先レイヤーを削除する */
 	ErrorCode LayerConnectSingle2Single::EraseOutputToLayer(const Gravisbell::GUID& guid)
 	{
+		auto it = this->lppOutputToLayer.begin();
+		while(it != this->lppOutputToLayer.end())
+		{
+			if((*it).pLayer->GetGUID() == guid)
+			{
+				this->lppOutputToLayer.erase(it);
+				return ErrorCode::ERROR_CODE_NONE;
+			}
+			it++;
+		}
 		return ErrorCode::ERROR_CODE_ERASELAYER_NOTFOUND;
 	}
+
 	
+	/** レイヤーに接続している出力先レイヤーの数を取得する.
+		@param	i_layerGUID		接続されているレイヤーのGUID. */
+	U32 LayerConnectSingle2Single::GetOutputToLayerCount()const
+	{
+		return this->lppOutputToLayer.size();
+	}
+	/** レイヤーに接続している出力先レイヤーを番号指定で取得する.
+		@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
+	ILayerConnect* LayerConnectSingle2Single::GetOutputToLayerByNum(U32 i_num)
+	{
+		if(i_num >= this->lppOutputToLayer.size())
+			return NULL;
+
+		return this->lppOutputToLayer[i_num].pLayer;
+	}
+
+
+
+	//=======================================
+	// 接続関連
+	//=======================================
+
 	/** レイヤーの接続を解除 */
 	ErrorCode LayerConnectSingle2Single::Disconnect(void)
 	{

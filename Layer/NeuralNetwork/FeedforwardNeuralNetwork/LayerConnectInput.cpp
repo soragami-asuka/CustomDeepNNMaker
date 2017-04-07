@@ -157,6 +157,11 @@ namespace NeuralNetwork {
 		return NULL;
 	}
 
+
+	//==========================================
+	// 出力レイヤー関連
+	//==========================================
+
 	/** 出力先レイヤーを追加する */
 	ErrorCode LayerConnectInput::AddOutputToLayer(ILayerConnect* pOutputToLayer)
 	{
@@ -181,6 +186,23 @@ namespace NeuralNetwork {
 		}
 		return ErrorCode::ERROR_CODE_ERASELAYER_NOTFOUND;
 	}
+	
+	/** レイヤーに接続している出力先レイヤーの数を取得する.
+		@param	i_layerGUID		接続されているレイヤーのGUID. */
+	U32 LayerConnectInput::GetOutputToLayerCount()const
+	{
+		return this->lppOutputToLayer.size();
+	}
+	/** レイヤーに接続している出力先レイヤーを番号指定で取得する.
+		@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
+	ILayerConnect* LayerConnectInput::GetOutputToLayerByNum(U32 i_num)
+	{
+		if(i_num >= this->lppOutputToLayer.size())
+			return NULL;
+
+		return this->lppOutputToLayer[i_num].pLayer;
+	}
+
 	
 	/** レイヤーの接続を解除 */
 	ErrorCode LayerConnectInput::Disconnect(void)

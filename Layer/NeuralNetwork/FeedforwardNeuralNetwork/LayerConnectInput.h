@@ -103,13 +103,23 @@ namespace NeuralNetwork {
 		ErrorCode Disconnect(void);
 
 
-	protected:
+		//==========================================
+		// 出力レイヤー関連
+		//==========================================
+	public:
 		/** 出力先レイヤーを追加する */
 		ErrorCode AddOutputToLayer(ILayerConnect* pOutputToLayer);
 		/** 出力先レイヤーを削除する */
 		ErrorCode EraseOutputToLayer(const Gravisbell::GUID& guid);
 
-		
+		/** レイヤーに接続している出力先レイヤーの数を取得する.
+			@param	i_layerGUID		接続されているレイヤーのGUID. */
+		U32 GetOutputToLayerCount()const;
+		/** レイヤーに接続している出力先レイヤーを番号指定で取得する.
+			@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
+		ILayerConnect* GetOutputToLayerByNum(U32 i_num);
+
+
 	public:
 		/** レイヤーの初期化処理.
 			接続状況は維持したままレイヤーの中身を初期化する. */
