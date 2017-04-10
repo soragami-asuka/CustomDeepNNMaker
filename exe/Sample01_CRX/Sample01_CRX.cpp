@@ -20,7 +20,15 @@
 
 
 #include"Library/DataFormat/DataFormatStringArray/DataFormat.h"
+#include"Library/NeuralNetwork/LayerDLLManager/LayerDLLManager.h"
+#include"Layer/IOData/IODataLayer/IODataLayer.h"
 
+using namespace Gravisbell;
+
+/** サンプルデータの読み込み */
+DataFormat::IDataFormatBase* LoadSampleData(const std::wstring& formatFilePath, const std::wstring& dataFilePath);
+/** レイヤーDLL管理クラスの作成 */
+Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManager(void);
 
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -28,19 +36,52 @@ int _tmain(int argc, _TCHAR* argv[])
 	::_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_ALLOC_MEM_DF);
 #endif
 
+
+	// サンプルデータの読み込み
+	Gravisbell::DataFormat::IDataFormatBase* pSampleData = ::LoadSampleData(L"DataFormat.xml", L"../../SampleData/crx.csv");
+
+	// レイヤーDLL管理クラスを作成
+	Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager = ::CreateLayerDLLManager();
+	if(pLayerDLLManager == NULL)
+	{
+		delete pSampleData;
+	}
+
+	// 入出力信号レイヤーを作成
+	Layer::IOData::IIODataLayer* pInputLayer  = Layer::IOData::CreateIODataLayerCPU( pSampleData->GetDataStruct(L"input") );	// 入力信号
+	Layer::IOData::IIODataLayer* pOutputLayer = Layer::IOData::CreateIODataLayerCPU( pSampleData->GetDataStruct(L"output") );	// 出力信号
+	for(U32 dataNum=0; dataNum<pSampleData->GetDataCount(); dataNum++)
+	{
+		pInputLayer->AddData(pSampleData->GetDataByNum(dataNum, L"input"));
+		pOutputLayer->AddData(pSampleData->GetDataByNum(dataNum, L"output"));
+	}
+
+	// メモリ開放
+	delete pInputLayer;
+	delete pOutputLayer;
+	delete pLayerDLLManager;
+	delete pSampleData;
+
+	return 0;
+}
+
+
+/** サンプルデータの読み込み */
+Gravisbell::DataFormat::IDataFormatBase* LoadSampleData(const std::wstring& formatFilePath, const std::wstring& dataFilePath)
+{
 	// フォーマットを読み込み
-	auto pDataFormat = Gravisbell::DataFormat::StringArray::CreateDataFormatFromXML(L"DataFormat.xml");
+	auto pDataFormat = Gravisbell::DataFormat::StringArray::CreateDataFormatFromXML(formatFilePath.c_str());
 	if(pDataFormat == NULL)
-		return -1;
+		return NULL;
 
 	// CSVファイルを読み込んでフォーマットに追加
 	{
 		// ファイルオープン
-		FILE* fp = fopen("../../SampleData/crx.csv", "r");
+		FILE* fp = _wfopen(dataFilePath.c_str(), L"r");
 		if(fp == NULL)
 		{
 			delete pDataFormat;
-			return -1;
+			return NULL;
 		}
 
 		wchar_t szBuf[1024];
@@ -65,16 +106,42 @@ int _tmain(int argc, _TCHAR* argv[])
 		// ファイルクローズ
 		fclose(fp);
 	}
-
-
 	// 正規化
 	pDataFormat->Normalize();
 
-
-	// フォーマットを削除
-	delete pDataFormat;
-
-
-	return 0;
+	return pDataFormat;
 }
+/** レイヤーDLL管理クラスの作成 */
+Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManager(void)
+{
+	// DLL管理クラスを作成
+	Layer::NeuralNetwork::ILayerDLLManager* pDLLManager = Layer::NeuralNetwork::CreateLayerDLLManagerCPU();
 
+	// DLLの読み込み.
+	// FullyConnect
+	{
+	#ifdef _DEBUG
+		if(pDLLManager->ReadLayerDLL(L"../../Debug/Gravisbell.Layer.NeuralNetwork.FullyConnect_Activation.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	#else
+		if(pDLLManager->ReadLayerDLL(L"../../Release/Gravisbell.Layer.NeuralNetwork.FullyConnect_Activation.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	#endif
+		{
+			delete pDLLManager;
+			return NULL;
+		}
+	}
+	// Feedforward
+	{
+	#ifdef _DEBUG
+		if(pDLLManager->ReadLayerDLL(L"../../Debug/Gravisbell.Layer.NeuralNetwork.FeedforwardNeuralNetwork.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	#else
+		if(pDLLManager->ReadLayerDLL(L"../../Release/Gravisbell.Layer.NeuralNetwork.FeedforwardNeuralNetwork.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	#endif
+		{
+			delete pDLLManager;
+			return NULL;
+		}
+	}
+
+	return pDLLManager;
+}

@@ -96,8 +96,14 @@
     <Xml Include="LearningData\LearningData.xml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Layer\IOData\IODataLayer\IODataLayer.vcxproj">
+      <Project>{fe50f8d5-efe1-4b8e-9ba8-1754980d6266}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\Library\DataFormat\DataFormatStringArray\DataFormatStringArray.vcxproj">
       <Project>{a08b9691-cb48-4671-a5cb-c70b3fbb175d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Library\NeuralNetwork\LayerDLLManager\LayerDLLManager.vcxproj">
+      <Project>{ac9b4528-ab0b-4549-a844-cfdc8837a7c6}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

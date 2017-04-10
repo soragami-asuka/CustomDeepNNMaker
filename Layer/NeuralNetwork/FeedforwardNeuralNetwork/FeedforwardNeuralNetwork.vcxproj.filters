@@ -135,6 +135,18 @@
     <ClInclude Include="LayerConnectSingle2Single.h">
       <Filter>LayerConnect</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerConnectData.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerData.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedforwardNeuralNetwork_LayerData_Base.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedforwardNeuralNetwork_CPU.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -165,6 +177,12 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="FeedforwardNeuralNetwork_GPU.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedforwardNeuralNetwork_LayerData_CPU.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedforwardNeuralNetwork_LayerData_Base.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

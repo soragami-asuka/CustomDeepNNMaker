@@ -22,7 +22,19 @@ namespace Layer {
 		ILayerData(){}
 		/** デストラクタ */
 		virtual ~ILayerData(){}
+		
+		//===========================
+		// 初期化
+		//===========================
+	public:
+		/** 初期化. 各ニューロンの値をランダムに初期化
+			@return	成功した場合0 */
+		virtual ErrorCode Initialize(void) = 0;
 
+
+		//===========================
+		// 共通制御
+		//===========================
 	public:
 		/** レイヤー固有のGUIDを取得する */
 		virtual Gravisbell::GUID GetGUID(void)const = 0;

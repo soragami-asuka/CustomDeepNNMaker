@@ -506,8 +506,6 @@ namespace StringArray {
 
 		std::set<std::wstring> lpCategoryName;	/**< データ種別名一覧 */
 
-		U32 dataCount;	/**< データ数 */
-
 		std::map<std::wstring, std::vector<F32>> lpTmpOutput;	/**< 出力データ格納用の一時バッファ */
 		std::vector<CDataFormatItem*> lpDataFormat;	/**< データフォーマットの一覧 */
 
@@ -521,7 +519,6 @@ namespace StringArray {
 		CDataFormat(const wchar_t i_szName[], const wchar_t i_szText[])
 		:	name		(i_szName)
 		,	text		(i_szText)
-		,	dataCount	(0)
 		{
 		}
 		/** デストラクタ */
@@ -604,13 +601,13 @@ namespace StringArray {
 		/** データ数を取得する */
 		U32 GetDataCount()const
 		{
-			return this->dataCount;
+			return this->lpTmpOutput.size();
 		}
 
 		/** データを取得する */
 		const F32* GetDataByNum(U32 i_dataNo, const wchar_t i_szCategory[])const
 		{
-			if(i_dataNo >= this->dataCount)
+			if(i_dataNo >= this->lpTmpOutput.size())
 				return NULL;
 
 			auto it = this->lpTmpOutput.find(i_szCategory);
@@ -666,6 +663,7 @@ namespace StringArray {
 		Gravisbell::ErrorCode AddDataFormatFloat(const wchar_t i_szID[], const wchar_t i_szCategory[])
 		{
 			this->lpDataFormat.push_back(new CDataFormatItemFloat(i_szID, i_szCategory));
+			this->lpCategoryName.insert(i_szCategory);
 
 			return ErrorCode::ERROR_CODE_NONE;
 		}
@@ -679,6 +677,7 @@ namespace StringArray {
 		Gravisbell::ErrorCode AddDataFormatFloatNormalizeMinMax(const wchar_t i_szID[], const wchar_t i_szCategory[], F32 i_minOutput, F32 i_maxOutput)
 		{
 			this->lpDataFormat.push_back(new CDataFormatItemFloatNormalizeMinMax(i_szID, i_szCategory, i_minOutput, i_maxOutput));
+			this->lpCategoryName.insert(i_szCategory);
 
 			return ErrorCode::ERROR_CODE_NONE;
 		}
@@ -694,6 +693,7 @@ namespace StringArray {
 		Gravisbell::ErrorCode AddDataFormatFloatNormalizeValue(const wchar_t i_szID[], const wchar_t i_szCategory[], F32 i_minValue, F32 i_maxValue, F32 i_minOutput, F32 i_maxOutput)
 		{
 			this->lpDataFormat.push_back(new CDataFormatItemFloatNormalizeValue(i_szID, i_szCategory, i_minValue, i_maxValue, i_minOutput, i_maxOutput));
+			this->lpCategoryName.insert(i_szCategory);
 
 			return ErrorCode::ERROR_CODE_NONE;
 		}
@@ -715,6 +715,7 @@ namespace StringArray {
 		Gravisbell::ErrorCode AddDataFormatFloatNormalizeAverageDeviation(const wchar_t i_szID[], const wchar_t i_szCategory[], F32 i_minValue, F32 i_maxValue, F32 i_minOutput, F32 i_maxOutput)
 		{
 			this->lpDataFormat.push_back(new CDataFormatItemFloatNormalizeAverageDeviation(i_szID, i_szCategory, i_minValue, i_maxValue, i_minOutput, i_maxOutput));
+			this->lpCategoryName.insert(i_szCategory);
 
 			return ErrorCode::ERROR_CODE_NONE;
 		}
@@ -739,6 +740,7 @@ namespace StringArray {
 				lpTrueData.push_back(i_lpTrueData[i]);
 
 			this->lpDataFormat.push_back(new CDataFormatItemBool(i_szID, i_szCategory, lpFalseData, lpTrueData, i_minOutput, i_maxOutput));
+			this->lpCategoryName.insert(i_szCategory);
 
 			return ErrorCode::ERROR_CODE_NONE;
 		}
@@ -749,6 +751,7 @@ namespace StringArray {
 		Gravisbell::ErrorCode AddDataFormatStringToBitArray(const wchar_t i_szID[], const wchar_t i_szCategory[], F32 i_minOutput, F32 i_maxOutput)
 		{
 			this->lpDataFormat.push_back(new CDataFormatItemEnumBitArray(i_szID, i_szCategory, i_minOutput, i_maxOutput));
+			this->lpCategoryName.insert(i_szCategory);
 
 			return ErrorCode::ERROR_CODE_NONE;
 		}
@@ -765,6 +768,7 @@ namespace StringArray {
 				lpEnumData.push_back(i_lpEnumData[i]);
 
 			this->lpDataFormat.push_back(new CDataFormatItemEnumBitArrayEnum(i_szID, i_szCategory, lpEnumData, (std::wstring)i_defaultData, i_minOutput, i_maxOutput));
+			this->lpCategoryName.insert(i_szCategory);
 
 			return ErrorCode::ERROR_CODE_NONE;
 		}

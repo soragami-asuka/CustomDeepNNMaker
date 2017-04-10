@@ -5,6 +5,7 @@
 #include"stdafx.h"
 
 #include"FeedforwardNeuralNetwork_Base.h"
+#include"FeedforwardNeuralNetwork_LayerData_Base.h"
 
 #include"LayerConnectInput.h"
 #include"LayerConnectOutput.h"
@@ -20,19 +21,13 @@ namespace NeuralNetwork {
 	// コンストラクタ/デストラクタ
 	//====================================
 	/** コンストラクタ */
-	FeedforwardNeuralNetwork_Base::FeedforwardNeuralNetwork_Base(const ILayerDLLManager& layerDLLManager, const Gravisbell::GUID& i_guid, const Gravisbell::GUID& i_inputLayerGUID)
-		:	layerDLLManager	(layerDLLManager)
+	FeedforwardNeuralNetwork_Base::FeedforwardNeuralNetwork_Base(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData)
+		:	layerData		(i_layerData)
 		,	guid			(i_guid)			/**< レイヤー識別用のGUID */
-		,	inputLayerGUID	(i_inputLayerGUID)	/**< 入力信号に割り当てられているGUID.入力信号レイヤーの代用として使用する. */
 		,	inputLayer		(*this)	/**< 入力信号の代替レイヤーのアドレス. */
 		,	outputLayer		(*this)	/**< 出力信号の代替レイヤーのアドレス. */
 	{
 
-	}
-	/** コンストラクタ */
-	FeedforwardNeuralNetwork_Base::FeedforwardNeuralNetwork_Base(const ILayerDLLManager& layerDLLManager, const Gravisbell::GUID& i_guid)
-		:	FeedforwardNeuralNetwork_Base(layerDLLManager, i_guid, Gravisbell::GUID(0x2d2805a3, 0x97cc, 0x4ab4, 0x94, 0x2e, 0x69, 0x39, 0xfd, 0x62, 0x35, 0xb1) )
-	{
 	}
 	/** デストラクタ */
 	FeedforwardNeuralNetwork_Base::~FeedforwardNeuralNetwork_Base()
@@ -52,10 +47,6 @@ namespace NeuralNetwork {
 				it = this->lpLayerInfo.erase(it);
 			}
 		}
-
-		// レイヤー構造の削除
-		if(this->pLayerStructure)
-			delete this->pLayerStructure;
 
 		// 学習データの削除
 		if(this->pLearnData)
@@ -87,7 +78,7 @@ namespace NeuralNetwork {
 				INNLayer* pNNLayer = dynamic_cast<INNLayer*>(pLayer);
 				if(pNNLayer)
 				{
-					this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectSingle2Single(pNNLayer, this->layerDLLManager.GetLayerDLLByGUID(pLayer->GetLayerCode())->CreateLearningSetting());
+					this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectSingle2Single(pNNLayer, this->layerData.GetLayerDLLManager().GetLayerDLLByGUID(pLayer->GetLayerCode())->CreateLearningSetting());
 				}
 				else
 				{
@@ -169,7 +160,7 @@ namespace NeuralNetwork {
 	/** 入力信号に割り当てられているGUIDを取得する */
 	GUID FeedforwardNeuralNetwork_Base::GetInputGUID()const
 	{
-		return this->inputLayerGUID;
+		return this->layerData.GetInputGUID();
 	}
 
 	/** 出力信号レイヤーを設定する */
@@ -620,50 +611,6 @@ namespace NeuralNetwork {
 		}
 		return ErrorCode::ERROR_CODE_NONE;
 	}
-	/** 初期化. 各ニューロンの値をランダムに初期化
-		@param	i_config			設定情報
-		@oaram	i_inputDataStruct	入力データ構造情報
-		@return	成功した場合0 */
-	ErrorCode FeedforwardNeuralNetwork_Base::Initialize(const SettingData::Standard::IData& i_data, const IODataStruct& i_inputDataStruct)
-	{
-		// 学習設定を保存
-		if(this->pLayerStructure)
-			delete this->pLayerStructure;
-		this->pLayerStructure = i_data.Clone();
-
-		// 入力データ構造を保存
-		this->inputDataStruct = i_inputDataStruct;
-
-		// レイヤー処理順序定義の削除
-		this->lpCalculateLayerList.clear();
-
-		// レイヤー接続情報の削除
-		{
-			auto it = this->lpLayerInfo.begin();
-			while(it != this->lpLayerInfo.end())
-			{
-				if(it->second)
-				{
-					it->second->Disconnect();
-					delete it->second;
-				}
-				it = this->lpLayerInfo.erase(it);
-			}
-		}
-
-		// 共通の初期化処理を実行
-		return this->Initialize();
-	}
-	/** 初期化. バッファからデータを読み込む
-		@param i_lpBuffer	読み込みバッファの先頭アドレス.
-		@param i_bufferSize	読み込み可能バッファのサイズ.
-		@return	成功した場合0 */
-	ErrorCode FeedforwardNeuralNetwork_Base::InitializeFromBuffer(BYTE* i_lpBuffer, int i_bufferSize)
-	{
-#ifdef _DEBUG
-		return ErrorCode::ERROR_CODE_NONE;
-#endif
-	}
 
 
 	//===========================
@@ -672,7 +619,7 @@ namespace NeuralNetwork {
 	/** レイヤーの設定情報を取得する */
 	const SettingData::Standard::IData* FeedforwardNeuralNetwork_Base::GetLayerStructure()const
 	{
-		return this->pLayerStructure;
+		return this->layerData.GetLayerStructure();
 	}
 
 
@@ -682,9 +629,7 @@ namespace NeuralNetwork {
 	/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
 	U32 FeedforwardNeuralNetwork_Base::GetUseBufferByteCount()const
 	{
-#ifdef _DEBUG
-		return 0;
-#endif
+		return this->layerData.GetUseBufferByteCount();
 	}
 
 	/** レイヤーをバッファに書き込む.
@@ -692,38 +637,7 @@ namespace NeuralNetwork {
 		@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
 	S32 FeedforwardNeuralNetwork_Base::WriteToBuffer(BYTE* o_lpBuffer)const
 	{
-		if(this->pLayerStructure == NULL)
-			return ErrorCode::ERROR_CODE_NONREGIST_CONFIG;
-
-		// 設定情報
-
-		// レイヤーの数
-
-		// 各レイヤー本体
-		for(auto& it : lpLayerInfo)
-		{
-			// レイヤー種別コード
-
-			// レイヤーGUID
-
-			// レイヤー本体
-		}
-
-		// レイヤー接続情報
-		{
-			// レイヤー接続情報一覧を作成
-			for(auto& it : lpLayerInfo)
-			{
-			}
-
-			// レイヤー接続情報数
-
-			// レイヤー接続情報
-		}
-
-#ifdef _DEBUG
-		return -1;
-#endif
+		return this->layerData.WriteToBuffer(o_lpBuffer);
 	}
 
 
@@ -734,13 +648,13 @@ namespace NeuralNetwork {
 		@return	入力データ構造 */
 	IODataStruct FeedforwardNeuralNetwork_Base::GetInputDataStruct()const
 	{
-		return this->inputDataStruct;
+		return this->layerData.GetInputDataStruct();
 	}
 
 	/** 入力バッファ数を取得する. */
 	U32 FeedforwardNeuralNetwork_Base::GetInputBufferCount()const
 	{
-		return this->inputDataStruct.GetDataCount();
+		return this->layerData.GetInputBufferCount();
 	}
 
 

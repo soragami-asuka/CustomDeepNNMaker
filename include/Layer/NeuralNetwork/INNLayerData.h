@@ -21,7 +21,7 @@ namespace NeuralNetwork {
 		/** デストラクタ */
 		virtual ~INNLayerData(){}
 
-		
+
 		//===========================
 		// レイヤー設定
 		//===========================
@@ -50,7 +50,7 @@ namespace NeuralNetwork {
 		virtual IODataStruct GetOutputDataStruct()const = 0;
 
 		/** 出力バッファ数を取得する */
-		virtual unsigned int GetOutputBufferCount()const = 0;
+		virtual U32 GetOutputBufferCount()const = 0;
 
 
 	public:

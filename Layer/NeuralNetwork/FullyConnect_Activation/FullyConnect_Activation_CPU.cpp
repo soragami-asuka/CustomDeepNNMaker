@@ -413,7 +413,7 @@ namespace NeuralNetwork {
 						#ifdef _DEBUG
 						if(isnan(i_lppDOutputBuffer[batchNum][neuronNum]))
 							return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
-						if(isnan(this->lppNeuron[neuronNum][inputNum]))
+						if(isnan(this->layerData.lppNeuron[neuronNum][inputNum]))
 							return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
 						#endif
 					}

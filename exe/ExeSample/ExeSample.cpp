@@ -5,6 +5,7 @@
 
 #include<vector>
 #include<list>
+#include<boost/uuid/uuid_generators.hpp>
 
 #include"SettingData/Standard/IData.h"
 #include"Layer/IOData/IIODataLayer.h"
@@ -12,15 +13,16 @@
 #include"../Library/NeuralNetwork/LayerDLLManager/LayerDLLManager.h"
 #include"../Library/Common/BatchDataNoListGenerator/BatchDataNoListGenerator.h"
 #include"../Layer/IOData/IODataLayer/IODataLayer.h"
+#include"Layer/NeuralNetwork/INNLayerData.h"
 
 #include<Windows.h>
 
 using namespace Gravisbell;
 
 /** CPU制御レイヤーを作成する */
-Layer::NeuralNetwork::INNLayer* CreateHiddenLayerCPU(const Layer::NeuralNetwork::ILayerDLL* pLayerDLL, U32 neuronCount, U32 inputDataCount);
+Layer::NeuralNetwork::INNLayerData* CreateHiddenLayerCPU(const Layer::NeuralNetwork::ILayerDLL* pLayerDLL, U32 neuronCount, U32 inputDataCount);
 /** CPU制御レイヤーを作成する */
-Layer::NeuralNetwork::INNLayer* CreateOutputLayerCPU(const Layer::NeuralNetwork::ILayerDLL* pLayerDLL, U32 neuronCount, U32 inputDataCount);
+Layer::NeuralNetwork::INNLayerData* CreateOutputLayerCPU(const Layer::NeuralNetwork::ILayerDLL* pLayerDLL, U32 neuronCount, U32 inputDataCount);
 
 /** ニューラルネットワークテスト.
 	入力層1
@@ -137,7 +139,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 /** CPU制御レイヤーを作成する */
-Layer::NeuralNetwork::INNLayer* CreateHiddenLayerCPU(const Layer::NeuralNetwork::ILayerDLL* pLayerDLL, U32 neuronCount, U32 inputDataCount)
+Layer::NeuralNetwork::INNLayerData* CreateHiddenLayerCPU(const Layer::NeuralNetwork::ILayerDLL* pLayerDLL, U32 neuronCount, U32 inputDataCount)
 {
 	// 設定の作成
 	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
@@ -156,8 +158,8 @@ Layer::NeuralNetwork::INNLayer* CreateHiddenLayerCPU(const Layer::NeuralNetwork:
 	}
 
 	// レイヤーの作成
-	Layer::NeuralNetwork::INNLayer* pLayer = pLayerDLL->CreateLayer();
-	if(pLayer->Initialize(*pConfig, IODataStruct(inputDataCount)) != ErrorCode::ERROR_CODE_NONE)
+	Layer::NeuralNetwork::INNLayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, IODataStruct(inputDataCount));
+	if(pLayer == NULL)
 		return NULL;
 
 	// 設定情報を削除
@@ -166,7 +168,7 @@ Layer::NeuralNetwork::INNLayer* CreateHiddenLayerCPU(const Layer::NeuralNetwork:
 	return pLayer;
 }
 /** CPU制御レイヤーを作成する */
-Layer::NeuralNetwork::INNLayer* CreateOutputLayerCPU(const Layer::NeuralNetwork::ILayerDLL* pLayerDLL, U32 neuronCount, U32 inputDataCount)
+Layer::NeuralNetwork::INNLayerData* CreateOutputLayerCPU(const Layer::NeuralNetwork::ILayerDLL* pLayerDLL, U32 neuronCount, U32 inputDataCount)
 {
 	// 設定の作成
 	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
@@ -185,8 +187,8 @@ Layer::NeuralNetwork::INNLayer* CreateOutputLayerCPU(const Layer::NeuralNetwork:
 	}
 
 	// レイヤーの作成
-	Layer::NeuralNetwork::INNLayer* pLayer = pLayerDLL->CreateLayer();
-	if(pLayer->Initialize(*pConfig, IODataStruct(inputDataCount)) != ErrorCode::ERROR_CODE_NONE)
+	Layer::NeuralNetwork::INNLayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, IODataStruct(inputDataCount));
+	if(pLayer == NULL)
 		return NULL;
 
 	// 設定情報を削除
@@ -259,6 +261,7 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 
 	// 全レイヤーリスト
 	std::list<Layer::ILayerBase*> lpLayer;
+	std::list<Layer::ILayerData*> lpLayerData;
 
 	// 入出力レイヤーを作成
 	Layer::IOData::IIODataLayer* pInputLayerA  = Layer::IOData::CreateIODataLayerCPU( IODataStruct(8) );	// 出力A
@@ -278,16 +281,23 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 
 	// 中間層1層目(合計2層目)を作成
 	{
-		auto pLayer = CreateHiddenLayerCPU(pLayerDLL, 80, pInputLayerA->GetOutputBufferCount());
-		if(pLayer == NULL)
+		// レイヤーデータ作成
+		auto pLayerData = CreateHiddenLayerCPU(pLayerDLL, 80, pInputLayerA->GetOutputBufferCount());
+		if(pLayerData == NULL)
 		{
 			for(auto pLayer : lpLayer)
 				delete pLayer;
+			for(auto pLayerData : lpLayerData)
+				delete pLayerData;
 			delete pTeachLayerA;
 			delete pLearnSettingIO;
 			delete pLearnSettingCalc;
 			return;
 		}
+		lpLayerData.push_back(pLayerData);
+
+		// レイヤー作成
+		auto pLayer = pLayerData->CreateLayer(boost::uuids::random_generator()().data);
 
 		// レイヤーを登録
 		lpCalcLayer.push_back(pLayer);
@@ -296,16 +306,23 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 	
 	// 中間層2層目(合計3層目)を作成
 	{
-		auto pLayer = CreateHiddenLayerCPU(pLayerDLL, 80, (*lpCalcLayer.rbegin())->GetOutputBufferCount());
-		if(pLayer == NULL)
+		// レイヤーデータ作成
+		auto pLayerData = CreateHiddenLayerCPU(pLayerDLL, 80, (*lpCalcLayer.rbegin())->GetOutputBufferCount());
+		if(pLayerData == NULL)
 		{
 			for(auto pLayer : lpLayer)
 				delete pLayer;
+			for(auto pLayerData : lpLayerData)
+				delete pLayerData;
 			delete pTeachLayerA;
 			delete pLearnSettingIO;
 			delete pLearnSettingCalc;
 			return;
 		}
+		lpLayerData.push_back(pLayerData);
+
+		// レイヤー作成
+		auto pLayer = pLayerData->CreateLayer(boost::uuids::random_generator()().data);
 
 		// レイヤーを登録
 		lpCalcLayer.push_back(pLayer);
@@ -313,17 +330,25 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 	}
 
 	// 出力層(合計4層目)を作成
-	auto pOutputLayer = CreateOutputLayerCPU(pLayerDLL, pTeachLayerA->GetBufferCount(), (*lpCalcLayer.rbegin())->GetOutputBufferCount());
+	Gravisbell::Layer::NeuralNetwork::INNLayer* pOutputLayer = NULL;
 	{
-		if(pOutputLayer == NULL)
+		auto pLayerData = CreateOutputLayerCPU(pLayerDLL, pTeachLayerA->GetBufferCount(), (*lpCalcLayer.rbegin())->GetOutputBufferCount());
+
+		if(pLayerData == NULL)
 		{
 			for(auto pLayer : lpLayer)
 				delete pLayer;
+			for(auto pLayerData : lpLayerData)
+				delete pLayerData;
 			delete pTeachLayerA;
 			delete pLearnSettingIO;
 			delete pLearnSettingCalc;
 			return;
 		}
+		lpLayerData.push_back(pLayerData);
+
+		// レイヤー作成
+		pOutputLayer = pLayerData->CreateLayer(boost::uuids::random_generator()().data);
 
 		// レイヤーを登録
 		lpCalcLayer.push_back(pOutputLayer);
@@ -343,6 +368,8 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 			// レイヤーを削除
 			for(auto pLayer : lpLayer)
 				delete pLayer;
+			for(auto pLayerData : lpLayerData)
+				delete pLayerData;
 			delete pLearnSettingIO;
 			delete pLearnSettingCalc;
 			return;
@@ -357,6 +384,8 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 			// レイヤーを削除
 			for(auto pLayer : lpLayer)
 				delete pLayer;
+			for(auto pLayerData : lpLayerData)
+				delete pLayerData;
 			delete pLearnSettingIO;
 			delete pLearnSettingCalc;
 			return;
@@ -368,7 +397,7 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 	pBatchDataNoListGenerator->PreProcess(pInputLayerA->GetDataCount(), BATCH_SIZE);
 
 	// 演算処理を実行する
-	for(unsigned int calcNum=0; calcNum<200; calcNum++)
+	for(unsigned int calcNum=0; calcNum<20; calcNum++)
 	{
 		printf("%4d回 ", calcNum);
 
@@ -432,6 +461,8 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 			// レイヤーを削除
 			for(auto pLayer : lpLayer)
 				delete pLayer;
+			for(auto pLayerData : lpLayerData)
+				delete pLayerData;
 			delete pLearnSettingIO;
 			delete pLearnSettingCalcInput;
 			delete pLearnSettingCalc;
@@ -504,6 +535,8 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 	// レイヤーを削除
 	for(auto pLayer : lpLayer)
 		delete pLayer;
+	for(auto pLayerData : lpLayerData)
+		delete pLayerData;
 	delete pLearnSettingIO;
 	delete pLearnSettingCalcInput;
 	delete pLearnSettingCalc;

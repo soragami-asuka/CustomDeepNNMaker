@@ -2,8 +2,8 @@
 // フィードフォワードニューラルネットワークの処理レイヤー
 // 複数のレイヤーを内包し、処理する
 //======================================
-#ifndef __GRAVISBELL_FEEDFORWARD_NEURALNETWORK_H__
-#define __GRAVISBELL_FEEDFORWARD_NEURALNETWORK_H__
+#ifndef __GRAVISBELL_FEEDFORWARD_NEURALNETWORK_BASE_H__
+#define __GRAVISBELL_FEEDFORWARD_NEURALNETWORK_BASE_H__
 
 #include<Layer/NeuralNetwork/INeuralNetwork.h>
 #include<Layer/NeuralNetwork/ILayerDLLManager.h>
@@ -27,7 +27,8 @@ namespace NeuralNetwork {
 	class FeedforwardNeuralNetwork_Base : public INeuralNetwork
 	{
 	private:
-		const ILayerDLLManager& layerDLLManager;	/**< レイヤーDLL管理クラス. */
+		// データ本体
+		class FeedforwardNeuralNetwork_LayerData_Base& layerData;
 
 		std::map<Gravisbell::GUID, ILayerConnect*>	lpLayerInfo;	/**< 全レイヤーの管理クラス. <レイヤーGUID, レイヤー接続情報のアドレス> */
 
@@ -36,13 +37,8 @@ namespace NeuralNetwork {
 		LayerConnectInput  inputLayer;	/**< 入力信号の代替レイヤーのアドレス. */
 		LayerConnectOutput outputLayer;	/**< 出力信号の代替レイヤーのアドレス. */
 
-
 		const Gravisbell::GUID guid;			/**< レイヤー識別用のGUID */
-		const Gravisbell::GUID inputLayerGUID;	/**< 入力信号に割り当てられているGUID.入力信号レイヤーの代用として使用する. */
 
-		IODataStruct inputDataStruct;	/**< 入力データ構造 */
-
-		SettingData::Standard::IData* pLayerStructure;	/**< レイヤー構造を定義したコンフィグクラス */
 		SettingData::Standard::IData* pLearnData;		/**< 学習設定を定義したコンフィグクラス */
 
 		U32 batchSize;	/**< バッチサイズ */
@@ -57,9 +53,7 @@ namespace NeuralNetwork {
 		//====================================
 		/** コンストラクタ
 			@param	i_inputGUID	入力信号に割り当てられたGUID.自分で作ることができないので外部で作成して引き渡す. */
-		FeedforwardNeuralNetwork_Base(const ILayerDLLManager& layerDLLManager, const Gravisbell::GUID& i_guid, const Gravisbell::GUID& i_inputLayerGUID);
-		/** コンストラクタ */
-		FeedforwardNeuralNetwork_Base(const ILayerDLLManager& layerDLLManager, const Gravisbell::GUID& i_guid);
+		FeedforwardNeuralNetwork_Base(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData);
 		/** デストラクタ */
 		virtual ~FeedforwardNeuralNetwork_Base();
 
@@ -245,16 +239,6 @@ namespace NeuralNetwork {
 		/** 初期化. 各ニューロンの値をランダムに初期化
 			@return	成功した場合0 */
 		ErrorCode Initialize(void);
-		/** 初期化. 各ニューロンの値をランダムに初期化
-			@param	i_config			設定情報
-			@oaram	i_inputDataStruct	入力データ構造情報
-			@return	成功した場合0 */
-		ErrorCode Initialize(const SettingData::Standard::IData& i_data, const IODataStruct& i_inputDataStruct);
-		/** 初期化. バッファからデータを読み込む
-			@param i_lpBuffer	読み込みバッファの先頭アドレス.
-			@param i_bufferSize	読み込み可能バッファのサイズ.
-			@return	成功した場合0 */
-		ErrorCode InitializeFromBuffer(BYTE* i_lpBuffer, int i_bufferSize);
 
 
 		//===========================

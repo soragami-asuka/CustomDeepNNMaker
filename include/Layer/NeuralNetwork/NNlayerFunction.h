@@ -10,6 +10,7 @@
 
 #include"ILayerDLLManager.h"
 #include"INNLayer.h"
+#include"INNLayerData.h"
 
 
 namespace Gravisbell {
@@ -47,8 +48,8 @@ namespace NeuralNetwork {
 
 
 	/** ÉåÉCÉÑÅ[ÇçÏê¨ */
-	typedef INNLayer* (*FuncCreateLayerData)		  (const ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const SettingData::Standard::IData& i_layerStructure, const IODataStruct& i_inputDataStruct);
-	typedef INNLayer* (*FuncCreateLayerDataFromBuffer)(const ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize);
+	typedef INNLayerData* (*FuncCreateLayerData)		  (const ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const SettingData::Standard::IData& i_layerStructure, const IODataStruct& i_inputDataStruct);
+	typedef INNLayerData* (*FuncCreateLayerDataFromBuffer)(const ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize);
 
 }	// NeuralNetwork
 }	// Layer
