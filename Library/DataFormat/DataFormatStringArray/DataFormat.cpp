@@ -506,19 +506,22 @@ namespace StringArray {
 
 		std::set<std::wstring> lpCategoryName;	/**< データ種別名一覧 */
 
+		U32 dataCount;
+
 		std::map<std::wstring, std::vector<F32>> lpTmpOutput;	/**< 出力データ格納用の一時バッファ */
 		std::vector<CDataFormatItem*> lpDataFormat;	/**< データフォーマットの一覧 */
 
 	public:
 		/** コンストラクタ */
 		CDataFormat()
-		:	CDataFormat(L"", L"")
+		:	CDataFormat	(L"", L"")
 		{
 		}
 		/** コンストラクタ */
 		CDataFormat(const wchar_t i_szName[], const wchar_t i_szText[])
 		:	name		(i_szName)
 		,	text		(i_szText)
+		,	dataCount	(0)
 		{
 		}
 		/** デストラクタ */
@@ -601,18 +604,34 @@ namespace StringArray {
 		/** データ数を取得する */
 		U32 GetDataCount()const
 		{
-			return this->lpTmpOutput.size();
+			return this->dataCount;
 		}
 
 		/** データを取得する */
 		const F32* GetDataByNum(U32 i_dataNo, const wchar_t i_szCategory[])const
 		{
-			if(i_dataNo >= this->lpTmpOutput.size())
+			if(i_dataNo >= this->dataCount)
 				return NULL;
 
+			// 一時バッファを取得
 			auto it = this->lpTmpOutput.find(i_szCategory);
 			if(it == this->lpTmpOutput.end())
 				return NULL;
+			F32* lpBuf = const_cast<F32*>(&it->second[0]);
+
+			// バッファをコピー
+			U32 bufPos = 0;
+			for(U32 formatNum=0; formatNum<this->lpDataFormat.size(); formatNum++)
+			{
+				if(this->lpDataFormat[formatNum]->GetCategory() == i_szCategory)
+				{
+					for(U32 bufNum=0; bufNum<this->lpDataFormat[formatNum]->GetBufferCount(); bufNum++)
+					{
+						lpBuf[bufPos + bufNum] = this->lpDataFormat[formatNum]->GetBuffer(i_dataNo, bufNum);
+					}
+					bufPos += this->lpDataFormat[formatNum]->GetBufferCount();
+				}
+			}
 
 			return &it->second[0];
 		}
@@ -781,6 +800,8 @@ namespace StringArray {
 			{
 				this->lpDataFormat[i]->AddData(i_szBuffer[i]);
 			}
+
+			this->dataCount++;
 
 			return ErrorCode::ERROR_CODE_NONE;
 		}
