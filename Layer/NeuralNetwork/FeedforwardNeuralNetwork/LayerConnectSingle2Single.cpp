@@ -43,7 +43,7 @@ namespace NeuralNetwork {
 		取得したデータを直接書き換えることで次の学習ループに反映されるが、NULLが返ってくることもあるので注意. */
 	Gravisbell::SettingData::Standard::IData* LayerConnectSingle2Single::GetLearnSettingData()
 	{
-		return NULL;
+		return this->pLearnSettingData;
 	}
 
 	/** 出力データ構造を取得する.
@@ -367,7 +367,7 @@ namespace NeuralNetwork {
 		失敗した場合はCalculate以降の処理は実行不可. */
 	ErrorCode LayerConnectSingle2Single::PreProcessCalculateLoop()
 	{
-		return this->PreProcessCalculateLoop();
+		return this->pLayer->PreProcessCalculateLoop();
 	}
 
 	/** 演算処理を実行する. */

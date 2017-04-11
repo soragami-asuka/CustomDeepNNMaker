@@ -192,13 +192,21 @@ namespace NeuralNetwork {
 		if(it_receive == this->lpLayerInfo.end())
 			return ErrorCode::ERROR_CODE_ADDLAYER_NOT_EXIST;
 
-		// 出力側レイヤーが存在することを確認
-		auto it_post = this->lpLayerInfo.find(postLayer);
-		if(it_post == this->lpLayerInfo.end())
-			return ErrorCode::ERROR_CODE_ADDLAYER_NOT_EXIST;
+		if(postLayer == this->GetInputGUID())
+		{
+			// 入力レイヤーの場合
+			return it_receive->second->AddInputLayerToLayer(&this->inputLayer);
+		}
+		else
+		{
+			// 出力側レイヤーが存在することを確認
+			auto it_post = this->lpLayerInfo.find(postLayer);
+			if(it_post == this->lpLayerInfo.end())
+				return ErrorCode::ERROR_CODE_ADDLAYER_NOT_EXIST;
 
-		// 追加処理
-		return it_receive->second->AddInputLayerToLayer(it_post->second);
+			// 追加処理
+			return it_receive->second->AddInputLayerToLayer(it_post->second);
+		}
 	}
 	/** レイヤーにバイパスレイヤーを追加する.
 		@param	receiveLayer	入力を受け取るレイヤー
@@ -210,13 +218,21 @@ namespace NeuralNetwork {
 		if(it_receive == this->lpLayerInfo.end())
 			return ErrorCode::ERROR_CODE_ADDLAYER_NOT_EXIST;
 
-		// 出力側レイヤーが存在することを確認
-		auto it_post = this->lpLayerInfo.find(postLayer);
-		if(it_post == this->lpLayerInfo.end())
-			return ErrorCode::ERROR_CODE_ADDLAYER_NOT_EXIST;
+		if(postLayer == this->GetInputGUID())
+		{
+			// 入力レイヤーの場合
+			return it_receive->second->AddBypassLayerToLayer(&this->inputLayer);
+		}
+		else
+		{
+			// 出力側レイヤーが存在することを確認
+			auto it_post = this->lpLayerInfo.find(postLayer);
+			if(it_post == this->lpLayerInfo.end())
+				return ErrorCode::ERROR_CODE_ADDLAYER_NOT_EXIST;
 
-		// 追加処理
-		return it_receive->second->AddBypassLayerToLayer(it_post->second);
+			// 追加処理
+			return it_receive->second->AddBypassLayerToLayer(it_post->second);
+		}
 	}
 
 	/** レイヤーの入力レイヤー設定をリセットする.
@@ -880,7 +896,7 @@ namespace NeuralNetwork {
 		auto it = this->lpCalculateLayerList.rbegin();
 		while(it != this->lpCalculateLayerList.rend())
 		{
-			ErrorCode err = (*it)->Calculate();
+			ErrorCode err = (*it)->CalculateLearnError();
 			if(err != ErrorCode::ERROR_CODE_NONE)
 				return err;
 

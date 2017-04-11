@@ -241,10 +241,14 @@ namespace NeuralNetwork {
 	/** 作成された新規ニューラルネットワークに対して内部レイヤーを追加する */
 	ErrorCode FeedforwardNeuralNetwork_LayerData_Base::AddConnectionLayersToNeuralNetwork(class FeedforwardNeuralNetwork_Base& neuralNetwork)
 	{
+		ErrorCode err;
+
 		// 全レイヤーを追加する
 		for(auto it : this->lpConnectInfo)
 		{
-			neuralNetwork.AddLayer(it.second.pLayerData->CreateLayer(it.first));
+			err = neuralNetwork.AddLayer(it.second.pLayerData->CreateLayer(it.first));
+			if(err != ErrorCode::ERROR_CODE_NONE)
+				return err;
 		}
 
 		// レイヤー間の接続を設定する
@@ -252,12 +256,25 @@ namespace NeuralNetwork {
 		{
 			// 入力レイヤー
 			for(auto inputGUID : it_connectInfo.second.lpInputLayerGUID)
-				neuralNetwork.AddInputLayerToLayer(it_connectInfo.first, inputGUID);
+			{
+				err = neuralNetwork.AddInputLayerToLayer(it_connectInfo.first, inputGUID);
+				if(err != ErrorCode::ERROR_CODE_NONE)
+					return err;
+			}
 
 			// バイパスレイヤー
-			for(auto bypassGUID : it_connectInfo.second.lpInputLayerGUID)
-				neuralNetwork.AddBypassLayerToLayer(it_connectInfo.first, bypassGUID);
+			for(auto bypassGUID : it_connectInfo.second.lpBypassLayerGUID)
+			{
+				err = neuralNetwork.AddBypassLayerToLayer(it_connectInfo.first, bypassGUID);
+				if(err != ErrorCode::ERROR_CODE_NONE)
+					return err;
+			}
 		}
+
+		// 出力レイヤーを接続する
+		err = neuralNetwork.SetOutputLayerGUID(this->outputLayerGUID);
+		if(err != ErrorCode::ERROR_CODE_NONE)
+			return err;
 
 		// レイヤー間の接続状態を確認
 		Gravisbell::GUID errorLayerGUID;
@@ -408,7 +425,7 @@ namespace NeuralNetwork {
 	{
 		// レイヤーの存在を確認
 		auto it_receive = this->lpConnectInfo.find(receiveLayer);
-		if(it_receive != this->lpConnectInfo.end())
+		if(it_receive == this->lpConnectInfo.end())
 			return ErrorCode::ERROR_CODE_ADDLAYER_NOT_EXIST;
 
 		// 同一レイヤーが追加済でないことを確認
@@ -427,7 +444,7 @@ namespace NeuralNetwork {
 	{
 		// レイヤーの存在を確認
 		auto it_receive = this->lpConnectInfo.find(receiveLayer);
-		if(it_receive != this->lpConnectInfo.end())
+		if(it_receive == this->lpConnectInfo.end())
 			return ErrorCode::ERROR_CODE_ADDLAYER_NOT_EXIST;
 
 		// 同一レイヤーが追加済でないことを確認
@@ -446,7 +463,7 @@ namespace NeuralNetwork {
 	{
 		// レイヤーの存在を確認
 		auto it_layer = this->lpConnectInfo.find(i_layerGUID);
-		if(it_layer != this->lpConnectInfo.end())
+		if(it_layer == this->lpConnectInfo.end())
 			return ErrorCode::ERROR_CODE_ADDLAYER_NOT_EXIST;
 
 		// 削除処理
@@ -460,7 +477,7 @@ namespace NeuralNetwork {
 	{
 		// レイヤーの存在を確認
 		auto it_layer = this->lpConnectInfo.find(i_layerGUID);
-		if(it_layer != this->lpConnectInfo.end())
+		if(it_layer == this->lpConnectInfo.end())
 			return ErrorCode::ERROR_CODE_ADDLAYER_NOT_EXIST;
 
 		// 削除処理
@@ -475,7 +492,7 @@ namespace NeuralNetwork {
 	{
 		// レイヤーの存在を確認
 		auto it_layer = this->lpConnectInfo.find(i_layerGUID);
-		if(it_layer != this->lpConnectInfo.end())
+		if(it_layer == this->lpConnectInfo.end())
 			return 0;
 
 		return it_layer->second.lpInputLayerGUID.size();
@@ -486,7 +503,7 @@ namespace NeuralNetwork {
 	{
 		// レイヤーの存在を確認
 		auto it_layer = this->lpConnectInfo.find(i_layerGUID);
-		if(it_layer != this->lpConnectInfo.end())
+		if(it_layer == this->lpConnectInfo.end())
 			return 0;
 
 		return it_layer->second.lpBypassLayerGUID.size();
@@ -496,7 +513,7 @@ namespace NeuralNetwork {
 	{
 		// レイヤーの存在を確認
 		auto it_layer = this->lpConnectInfo.find(i_layerGUID);
-		if(it_layer != this->lpConnectInfo.end())
+		if(it_layer == this->lpConnectInfo.end())
 			return ErrorCode::ERROR_CODE_ADDLAYER_NOT_EXIST;
 
 		// 対象レイヤーを入力レイヤーに持つレイヤー数を数える
@@ -518,7 +535,7 @@ namespace NeuralNetwork {
 	{
 		// レイヤーの存在を確認
 		auto it_layer = this->lpConnectInfo.find(i_layerGUID);
-		if(it_layer != this->lpConnectInfo.end())
+		if(it_layer == this->lpConnectInfo.end())
 			return ErrorCode::ERROR_CODE_ADDLAYER_NOT_EXIST;
 
 		// 入力レイヤーの数を確認
@@ -542,7 +559,7 @@ namespace NeuralNetwork {
 	{
 		// レイヤーの存在を確認
 		auto it_layer = this->lpConnectInfo.find(i_layerGUID);
-		if(it_layer != this->lpConnectInfo.end())
+		if(it_layer == this->lpConnectInfo.end())
 			return ErrorCode::ERROR_CODE_ADDLAYER_NOT_EXIST;
 
 		// 入力レイヤーの数を確認
@@ -566,7 +583,7 @@ namespace NeuralNetwork {
 	{
 		// レイヤーの存在を確認
 		auto it_layer = this->lpConnectInfo.find(i_layerGUID);
-		if(it_layer != this->lpConnectInfo.end())
+		if(it_layer == this->lpConnectInfo.end())
 			return ErrorCode::ERROR_CODE_ADDLAYER_NOT_EXIST;
 
 		// 対象レイヤーを入力レイヤーに持つレイヤー数を数えて番号が一致したら終了
