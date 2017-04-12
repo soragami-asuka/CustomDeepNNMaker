@@ -166,8 +166,8 @@ namespace StringArray {
 		virtual ErrorCode Normalize()
 		{
 			// Å¬’l‚ÆÅ‘å’l‚ð‹‚ß‚é
-			F32 minValue = -FLT_MAX;
-			F32 maxValue =  FLT_MAX;
+			F32 minValue =  FLT_MAX;
+			F32 maxValue = -FLT_MAX;
 			{
 				auto it = this->lpData.begin();
 				while(it != this->lpData.end())

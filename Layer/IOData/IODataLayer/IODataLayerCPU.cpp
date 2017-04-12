@@ -35,6 +35,8 @@ namespace IOData {
 		std::vector<F32> lpErrorValue_ave;	/**< 平均誤差 */
 		std::vector<F32> lpErrorValue_ave2;	/**< 平均二乗誤差 */
 
+		std::vector<S32> lpMaxErrorDataNo;
+
 	public:
 		/** コンストラクタ */
 		IODataLayerCPU(Gravisbell::GUID guid, Gravisbell::IODataStruct ioDataStruct)
@@ -235,6 +237,8 @@ namespace IOData {
 			this->lpErrorValue_ave.resize(this->GetBufferCount());
 			this->lpErrorValue_ave2.resize(this->GetBufferCount());
 
+			this->lpMaxErrorDataNo.resize(this->GetBufferCount());
+
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
 
@@ -252,6 +256,8 @@ namespace IOData {
 			this->lpErrorValue_max.assign(this->lpErrorValue_max.size(),  0.0f);
 			this->lpErrorValue_ave.assign(this->lpErrorValue_ave.size(),  0.0f);
 			this->lpErrorValue_ave2.assign(this->lpErrorValue_ave2.size(), 0.0f);
+
+			this->lpMaxErrorDataNo.assign(this->lpMaxErrorDataNo.size(), -1);
 
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
@@ -284,6 +290,9 @@ namespace IOData {
 
 					if(this->lpDInputBuffer.size() > 0)
 						this->lpDInputBuffer[batchNum][inputNum] = error;
+
+					if(this->lpErrorValue_max[inputNum] < error_abs)
+						this->lpMaxErrorDataNo[inputNum] = this->lpBatchDataNoList[batchNum];
 
 					// 誤差を保存
 					this->lpErrorValue_min[inputNum]  = min(this->lpErrorValue_min[inputNum], error_abs);
@@ -320,6 +329,10 @@ namespace IOData {
 
 			o_ave  = o_ave / this->GetDataCount() / this->GetBufferCount();
 			o_ave2 = (F32)sqrt(o_ave2 / this->GetDataCount() / this->GetBufferCount());
+
+			//for(U32 inputNum=0; inputNum<this->GetBufferCount(); inputNum++)
+			//	printf("%d,", this->lpMaxErrorDataNo[inputNum]);
+			//printf("\n");
 
 			return ErrorCode::ERROR_CODE_NONE;
 		}

@@ -45,6 +45,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FullyConnect_Activation", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FeedforwardNeuralNetwork", "Layer\NeuralNetwork\FeedforwardNeuralNetwork\FeedforwardNeuralNetwork.vcxproj", "{4B0F0996-50E0-498C-AEEB-B06EE5FD4E54}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sample02_TRI", "exe\Sample02_TRI\Sample02_TRI.vcxproj", "{C4A928D7-75C1-44E9-8A9E-EEE058F3338D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -95,6 +97,10 @@ Global
 		{4B0F0996-50E0-498C-AEEB-B06EE5FD4E54}.Debug|Win32.Build.0 = Debug|Win32
 		{4B0F0996-50E0-498C-AEEB-B06EE5FD4E54}.Release|Win32.ActiveCfg = Release|Win32
 		{4B0F0996-50E0-498C-AEEB-B06EE5FD4E54}.Release|Win32.Build.0 = Release|Win32
+		{C4A928D7-75C1-44E9-8A9E-EEE058F3338D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C4A928D7-75C1-44E9-8A9E-EEE058F3338D}.Debug|Win32.Build.0 = Debug|Win32
+		{C4A928D7-75C1-44E9-8A9E-EEE058F3338D}.Release|Win32.ActiveCfg = Release|Win32
+		{C4A928D7-75C1-44E9-8A9E-EEE058F3338D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -117,6 +123,7 @@ Global
 		{99DE1DBC-0A4C-48F6-ADAF-75E29EDF2F1F} = {69F1082F-185D-4490-80C2-EFA5AC6F2EF7}
 		{4B29F8CD-B065-48D8-8B4A-3BAA89ABFD7E} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
 		{4B0F0996-50E0-498C-AEEB-B06EE5FD4E54} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
+		{C4A928D7-75C1-44E9-8A9E-EEE058F3338D} = {9DEE086C-8571-41DD-ADD4-7583EB13580A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		VisualSVNWorkingCopyRoot = .

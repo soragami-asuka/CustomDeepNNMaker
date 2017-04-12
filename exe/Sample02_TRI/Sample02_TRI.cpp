@@ -86,7 +86,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	std::list<Layer::ILayerData*> lppLayerData;	// レイヤーデータの一覧
 
 	// サンプルデータの読み込み
-	Gravisbell::DataFormat::IDataFormatBase* pSampleData = ::LoadSampleData(L"DataFormat.xml", L"../../SampleData/crx.csv");
+	Gravisbell::DataFormat::IDataFormatBase* pTeachData  = ::LoadSampleData(L"DataFormat.xml", L"../../SampleData/tri_teach.csv");
+	Gravisbell::DataFormat::IDataFormatBase* pSampleData = ::LoadSampleData(L"DataFormat.xml", L"../../SampleData/tri_sample.csv");
 	printf("入力信号：%d\n", pSampleData->GetDataStruct(L"input").GetDataCount());
 	printf("出力信号：%d\n", pSampleData->GetDataStruct(L"output").GetDataCount());
 
@@ -94,22 +95,22 @@ int _tmain(int argc, _TCHAR* argv[])
 	Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager = ::CreateLayerDLLManager();
 	if(pLayerDLLManager == NULL)
 	{
+		delete pTeachData;
 		delete pSampleData;
 		return -1;
 	}
 
 	// 入出力信号レイヤーを作成
-	Layer::IOData::IIODataLayer* pTeachInputLayer  = Layer::IOData::CreateIODataLayerCPU( pSampleData->GetDataStruct(L"input") );	// 入力信号(教師信号)
-	Layer::IOData::IIODataLayer* pTeachOutputLayer = Layer::IOData::CreateIODataLayerCPU( pSampleData->GetDataStruct(L"output") );	// 出力信号(教師信号)
+	Layer::IOData::IIODataLayer* pTeachInputLayer  = Layer::IOData::CreateIODataLayerCPU( pTeachData->GetDataStruct(L"input") );	// 入力信号(教師信号)
+	Layer::IOData::IIODataLayer* pTeachOutputLayer = Layer::IOData::CreateIODataLayerCPU( pTeachData->GetDataStruct(L"output") );	// 出力信号(教師信号)
 	Layer::IOData::IIODataLayer* pSampleInputLayer  = Layer::IOData::CreateIODataLayerCPU( pSampleData->GetDataStruct(L"input") );	// 入力信号(確認用サンプルデータ)
 	Layer::IOData::IIODataLayer* pSampleOutputLayer = Layer::IOData::CreateIODataLayerCPU( pSampleData->GetDataStruct(L"output") );	// 出力信号(確認用サンプルデータ)
-	const F32 USE_TEACH_RATE = 0.8f;
-	for(U32 dataNum=0; dataNum<(U32)(pSampleData->GetDataCount()*USE_TEACH_RATE); dataNum++)
+	for(U32 dataNum=0; dataNum<(U32)(pTeachData->GetDataCount()); dataNum++)
 	{
-		pTeachInputLayer->AddData(pSampleData->GetDataByNum(dataNum, L"input"));
-		pTeachOutputLayer->AddData(pSampleData->GetDataByNum(dataNum, L"output"));
+		pTeachInputLayer->AddData(pTeachData->GetDataByNum(dataNum, L"input"));
+		pTeachOutputLayer->AddData(pTeachData->GetDataByNum(dataNum, L"output"));
 	}
-	for(U32 dataNum=(U32)(pSampleData->GetDataCount()*USE_TEACH_RATE); dataNum<pSampleData->GetDataCount(); dataNum++)
+	for(U32 dataNum=0; dataNum<pSampleData->GetDataCount(); dataNum++)
 	{
 		pSampleInputLayer->AddData(pSampleData->GetDataByNum(dataNum, L"input"));
 		pSampleOutputLayer->AddData(pSampleData->GetDataByNum(dataNum, L"output"));
@@ -126,6 +127,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		delete pSampleInputLayer;
 		delete pSampleOutputLayer;
 		delete pLayerDLLManager;
+		delete pTeachData;
 		delete pSampleData;
 		return -1;
 	}
@@ -141,6 +143,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		delete pSampleInputLayer;
 		delete pSampleOutputLayer;
 		delete pLayerDLLManager;
+		delete pTeachData;
 		delete pSampleData;
 		return -1;
 	}
@@ -165,6 +168,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			delete pSampleInputLayer;
 			delete pSampleOutputLayer;
 			delete pLayerDLLManager;
+			delete pTeachData;
 			delete pSampleData;
 			return -1;
 		}
@@ -179,6 +183,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			delete pSampleInputLayer;
 			delete pSampleOutputLayer;
 			delete pLayerDLLManager;
+			delete pTeachData;
 			delete pSampleData;
 			return -1;
 		}
@@ -193,6 +198,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			delete pSampleInputLayer;
 			delete pSampleOutputLayer;
 			delete pLayerDLLManager;
+			delete pTeachData;
 			delete pSampleData;
 			return -1;
 		}
@@ -219,6 +225,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			delete pSampleInputLayer;
 			delete pSampleOutputLayer;
 			delete pLayerDLLManager;
+			delete pTeachData;
 			delete pSampleData;
 			return -1;
 		}
@@ -240,12 +247,13 @@ int _tmain(int argc, _TCHAR* argv[])
 			delete pSampleInputLayer;
 			delete pSampleOutputLayer;
 			delete pLayerDLLManager;
+			delete pTeachData;
 			delete pSampleData;
 			return -1;
 		}
 
 		// 学習
-		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkSample, pTeachInputLayer, pTeachOutputLayer, pSampleInputLayer, pSampleOutputLayer, 8, 120) != ErrorCode::ERROR_CODE_NONE)
+		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkSample, pTeachInputLayer, pTeachOutputLayer, pSampleInputLayer, pSampleOutputLayer, 1, 500) != ErrorCode::ERROR_CODE_NONE)
 		{
 			delete pNeuralNetworkSample;
 			delete pNeuralNetworkLearn;
@@ -256,6 +264,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			delete pSampleInputLayer;
 			delete pSampleOutputLayer;
 			delete pLayerDLLManager;
+			delete pTeachData;
 			delete pSampleData;
 			return -1;
 		}
@@ -275,6 +284,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	delete pSampleInputLayer;
 	delete pSampleOutputLayer;
 	delete pLayerDLLManager;
+	delete pTeachData;
 	delete pSampleData;
 
 	printf("Press any key to continue");
@@ -403,6 +413,7 @@ Layer::NeuralNetwork::INNLayerData* CreateLayerData(const Layer::NeuralNetwork::
 Layer::NeuralNetwork::INNLayerData* CreateHiddenLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount)
 {
 	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"ReLU");
+//	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"sigmoid");
 }
 Layer::NeuralNetwork::INNLayerData* CreateOutputLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount)
 {
@@ -530,7 +541,7 @@ Gravisbell::ErrorCode LearnNeuralNetwork(
 	Gravisbell::ErrorCode err;
 
 	// 学習係数を設定
-	pNeuralNetwork->SetLearnSettingData(L"LearnCoeff", 0.01f);
+	pNeuralNetwork->SetLearnSettingData(L"LearnCoeff", 0.1f);
 
 	// 事前処理を実行
 	err = pNeuralNetwork->PreProcessLearn(BATCH_SIZE);
@@ -671,7 +682,7 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 	Gravisbell::ErrorCode err;
 
 	// 学習係数を設定
-	pNeuralNetworkLearn->SetLearnSettingData(L"LearnCoeff", 0.01f);
+	pNeuralNetworkLearn->SetLearnSettingData(L"LearnCoeff", 0.1f);
 
 	// 事前処理を実行
 	err = pNeuralNetworkLearn->PreProcessLearn(BATCH_SIZE);
@@ -715,7 +726,8 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 	// 学習を実行
 	for(U32 learnTime=0; learnTime<LEARN_TIMES; learnTime++)
 	{
-		printf("%4d回 ", learnTime);
+//		printf("%4d回 ", learnTime);
+		printf("%4d,", learnTime);
 
 		// 学習
 		{
@@ -773,13 +785,15 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 		{
 			F32 errorMin, errorMax, errorAve, errorAve2;
 			pTeachOutputLayer->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2);
-			printf("学習：min=%.3f, max=%.3f, ave=%.3f, ave2=%.3f", errorMin, errorMax, errorAve, errorAve2);
+//			printf("学習：min=%.3f, max=%.3f, ave=%.3f, ave2=%.3f", errorMin, errorMax, errorAve, errorAve2);
+			printf("%.3f,%.3f,%.3f,%.3f,", errorMin, errorMax, errorAve, errorAve2);
 		}
-		printf(" : ");
+//		printf(" : ");
 		{
 			F32 errorMin, errorMax, errorAve, errorAve2;
 			pSampleOutputLayer->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2);
-			printf("実行：min=%.3f, max=%.3f, ave=%.3f, ave2=%.3f", errorMin, errorMax, errorAve, errorAve2);
+//			printf("実行：min=%.3f, max=%.3f, ave=%.3f, ave2=%.3f", errorMin, errorMax, errorAve, errorAve2);
+			printf("%.3f,%.3f,%.3f,%.3f,", errorMin, errorMax, errorAve, errorAve2);
 		}
 		printf("\n");
 	}
