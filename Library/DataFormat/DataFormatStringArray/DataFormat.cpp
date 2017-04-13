@@ -331,7 +331,7 @@ namespace StringArray {
 			if(bufferNum >= 1)
 				return 0.0f;
 
-			return lpNormalizeValue[bufferNum];
+			return lpNormalizeValue[dataNum];
 		}
 
 		/** ƒf[ƒ^‚ğ’Ç‰Á‚·‚é */

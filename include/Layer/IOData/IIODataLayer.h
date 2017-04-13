@@ -35,8 +35,9 @@ namespace IOData {
 			@param	o_min	最小誤差.
 			@param	o_max	最大誤差.
 			@param	o_ave	平均誤差.
-			@param	o_ave2	平均二乗誤差. */
-		virtual ErrorCode GetCalculateErrorValue(F32& o_min, F32& o_max, F32& o_ave, F32& o_ave2) = 0;
+			@param	o_ave2	平均二乗誤差.
+			@param	o_crossEntropy	クロスエントロピー*/
+		virtual ErrorCode GetCalculateErrorValue(F32& o_min, F32& o_max, F32& o_ave, F32& o_ave2, F32& o_crossEntropy) = 0;
 
 		/** 詳細な誤差の値を取得する.
 			各入出力の値毎に誤差を取る.

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+データフォーマットに関する情報.
+-->
+
+<DataFormat version="1.0.0.0" default-language="ja">
+  <Text>論理演算情報</Text>
+
+  <!--boolが使用された場合はfalse,trueの値設定. categoryを設定した場合は所定のデータ種別にに適用される. category未設定の場合はデフォルト値に割り当てられる。 デフォルト値が未定義の場合はfalse=0.0, true=1.0-->
+  <BoolValue>
+    <false>0.50</false>
+    <true>0.95</true>
+    <false category="output">0.05</false>
+    <true  category="output">0.95</true>
+  </BoolValue>
+ 
+
+  <!--Ch成分の内容.-->
+  <Channel>
+    <!--[id]は変数を識別するための一意の文字列-->
+    <!--[category]はデータ種別を識別するための値.-->
+
+    <String id="INPUT_A" category="input" useType="bit">
+      <false>
+        <item>FALSE</item>
+      </false>
+      <true>
+        <item>TRUE</item>
+      </true>
+    </String>
+    <String id="INPUT_B" category="input" useType="bit">
+      <false>
+        <item>FALSE</item>
+      </false>
+      <true>
+        <item>TRUE</item>
+      </true>
+    </String>
+
+    <String id="AND" category="output" useType="bit">
+      <false>
+        <item>FALSE</item>
+      </false>
+      <true>
+        <item>TRUE</item>
+      </true>
+    </String>
+    <String id="OR" category="output" useType="bit">
+      <false>
+        <item>FALSE</item>
+      </false>
+      <true>
+        <item>TRUE</item>
+      </true>
+    </String>
+    <String id="XOR" category="output" useType="bit">
+      <false>
+        <item>FALSE</item>
+      </false>
+      <true>
+        <item>TRUE</item>
+      </true>
+    </String>
+    
+  </Channel>
+</DataFormat>

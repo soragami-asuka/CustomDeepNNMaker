@@ -20,20 +20,21 @@ namespace
 	//================================
 	// 活性化関数
 	//================================
-	F32 func_activate_sigmoid(F32 x)
+	F32 func_activation_sigmoid(F32 x)
 	{
 		return 1.0f / (1.0f + (F32)exp(-x));
 	}
-	F32 func_dactivate_sigmoid(F32 x)
+	F32 func_dactivation_sigmoid(F32 x)
 	{
-		return x * (1.0f - x);
+//		return x * (1.0f - x);
+		return 1;
 	}
 
-	F32 func_activate_ReLU(F32 x)
+	F32 func_activation_ReLU(F32 x)
 	{
 		return x * (x > 0.0f);
 	}
-	F32 func_dactivate_ReLU(F32 x)
+	F32 func_dactivation_ReLU(F32 x)
 	{
 		return 1.0f * (x > 0.0f);
 	}
@@ -55,8 +56,8 @@ namespace NeuralNetwork {
 		,	m_lppInputBuffer				(NULL)	/**< 演算時の入力データ */
 		,	m_lppDOutputBufferPrev			(NULL)	/**< 入力誤差計算時の出力誤差データ */
 		,	onUseDropOut					(false)
-		,	func_activation					(func_activate_sigmoid)
-		,	func_dactivation				(func_dactivate_sigmoid)
+		,	func_activation					(func_activation_sigmoid)
+		,	func_dactivation				(func_dactivation_sigmoid)
 	{
 	}
 	/** デストラクタ */
@@ -189,17 +190,14 @@ namespace NeuralNetwork {
 		{
 		case Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_sigmoid:
 		default:
-			this->func_activation  = ::func_activate_sigmoid;
-			this->func_dactivation = ::func_dactivate_sigmoid;
+			this->func_activation  = ::func_activation_sigmoid;
+			this->func_dactivation = ::func_dactivation_sigmoid;
 			break;
 		case Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_ReLU:
-			this->func_activation  = ::func_activate_ReLU;
-			this->func_dactivation = ::func_dactivate_ReLU;
+			this->func_activation  = ::func_activation_ReLU;
+			this->func_dactivation = ::func_dactivation_ReLU;
 			break;
 		}
-
-		// 入力差分バッファを作成
-		// はスキップ
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -282,7 +280,6 @@ namespace NeuralNetwork {
 	{
 		this->m_lppInputBuffer = i_lppInputBuffer;
 
-		// DropOutを使用しない場合
 		for(unsigned int batchNum=0; batchNum<this->batchSize; batchNum++)
 		{
 			for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
@@ -299,16 +296,11 @@ namespace NeuralNetwork {
 				}
 				tmp += this->layerData.lpBias[neuronNum];
 
-				if(this->learnData.DropOut > 0.0f)
+				if(!this->onUseDropOut && this->learnData.DropOut > 0.0f)
 					tmp *= (1.0f - this->learnData.DropOut);
 
 				// 活性化
 				this->lpOutputBuffer[batchNum][neuronNum] = this->func_activation(tmp);
-					
-				#ifdef _DEBUG
-				if(isnan(this->lpOutputBuffer[batchNum][neuronNum]))
-					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
-				#endif
 			}
 		}
 
@@ -378,18 +370,10 @@ namespace NeuralNetwork {
 					else
 						tmp += this->lpDOutputBuffer[batchNum][neuronNum] * this->layerData.lppNeuron[neuronNum][inputNum];
 				}
-#ifdef _DEBUG
-				if(isnan(tmp))
-					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
-#endif
 
 				// 活性化関数で分岐
 				this->lpDInputBuffer[batchNum][inputNum] = tmp;
 
-#ifdef _DEBUG
-				if(isnan(lpDInputBuffer[batchNum][inputNum]))
-					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
-#endif
 			}
 		}
 
@@ -411,13 +395,8 @@ namespace NeuralNetwork {
 				{
 					 sumDOutput += this->lpDOutputBuffer[batchNum][neuronNum];
 				}
-				
-				#ifdef _DEBUG
-				if(isnan(sumDOutput))
-					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
-				#endif
 
-				this->layerData.lpBias[neuronNum] += this->learnData.LearnCoeff * sumDOutput;// / this->batchSize;
+				this->layerData.lpBias[neuronNum] += this->learnData.LearnCoeff * sumDOutput;
 			}
 
 			// 入力対応ニューロン更新
@@ -431,13 +410,8 @@ namespace NeuralNetwork {
 				{
 					sumDOutput += this->m_lppInputBuffer[batchNum][inputNum] * this->lpDOutputBuffer[batchNum][neuronNum];
 				}
-								
-				#ifdef _DEBUG
-				if(isnan(sumDOutput))
-					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
-				#endif
 
-				this->layerData.lppNeuron[neuronNum][inputNum] += this->learnData.LearnCoeff * sumDOutput;// / this->batchSize;
+				this->layerData.lppNeuron[neuronNum][inputNum] += this->learnData.LearnCoeff * sumDOutput;
 			}
 		}
 

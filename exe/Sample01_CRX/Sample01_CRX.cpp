@@ -83,6 +83,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	::_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_ALLOC_MEM_DF);
 #endif
 
+	srand(12345);
+
 	std::list<Layer::ILayerData*> lppLayerData;	// レイヤーデータの一覧
 
 	// サンプルデータの読み込み
@@ -245,7 +247,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 
 		// 学習
-		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkSample, pTeachInputLayer, pTeachOutputLayer, pSampleInputLayer, pSampleOutputLayer, 8, 120) != ErrorCode::ERROR_CODE_NONE)
+		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkSample, pTeachInputLayer, pTeachOutputLayer, pSampleInputLayer, pSampleOutputLayer, 1, 5000) != ErrorCode::ERROR_CODE_NONE)
 		{
 			delete pNeuralNetworkSample;
 			delete pNeuralNetworkLearn;
@@ -458,7 +460,7 @@ Gravisbell::ErrorCode CreateNeuralNetworkLayerConnect(
 		Gravisbell::GUID guid = boost::uuids::random_generator()().data;
 
 		// レイヤーデータを作成
-		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateHiddenLayerData(layerDLLManager, 128, inputDataStruct.GetDataCount());
+		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateHiddenLayerData(layerDLLManager, 64, inputDataStruct.GetDataCount());
 		if(pLayerData == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
 		lppLayerData.push_back(pLayerData);
@@ -478,7 +480,7 @@ Gravisbell::ErrorCode CreateNeuralNetworkLayerConnect(
 		Gravisbell::GUID guid = boost::uuids::random_generator()().data;
 
 		// レイヤーデータを作成
-		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateHiddenLayerData(layerDLLManager, 128, inputDataStruct.GetDataCount());
+		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateHiddenLayerData(layerDLLManager, 64, inputDataStruct.GetDataCount());
 		if(pLayerData == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
 		lppLayerData.push_back(pLayerData);
@@ -530,7 +532,7 @@ Gravisbell::ErrorCode LearnNeuralNetwork(
 	Gravisbell::ErrorCode err;
 
 	// 学習係数を設定
-	pNeuralNetwork->SetLearnSettingData(L"LearnCoeff", 0.01f);
+	pNeuralNetwork->SetLearnSettingData(L"LearnCoeff", 0.1f);
 
 	// 事前処理を実行
 	err = pNeuralNetwork->PreProcessLearn(BATCH_SIZE);
@@ -593,8 +595,8 @@ Gravisbell::ErrorCode LearnNeuralNetwork(
 
 		// 誤差表示
 		{
-			F32 errorMin, errorMax, errorAve, errorAve2;
-			pTeachLayer->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2);
+			F32 errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy;
+			pTeachLayer->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy);
 			printf("min=%.3f, max=%.3f, ave=%.3f, ave2=%.3f\n", errorMin, errorMax, errorAve, errorAve2);
 		}
 	}
@@ -647,8 +649,8 @@ Gravisbell::ErrorCode CalculateSampleError(
 	// 誤差表示
 	printf("\nサンプル誤差\n");
 	{
-		F32 errorMin, errorMax, errorAve, errorAve2;
-		pTeachLayer->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2);
+		F32 errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy;
+		pTeachLayer->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy);
 		printf("min=%.3f, max=%.3f, ave=%.3f, ave2=%.3f\n", errorMin, errorMax, errorAve, errorAve2);
 	}
 
@@ -671,7 +673,7 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 	Gravisbell::ErrorCode err;
 
 	// 学習係数を設定
-	pNeuralNetworkLearn->SetLearnSettingData(L"LearnCoeff", 0.01f);
+	pNeuralNetworkLearn->SetLearnSettingData(L"LearnCoeff", 0.1f);
 
 	// 事前処理を実行
 	err = pNeuralNetworkLearn->PreProcessLearn(BATCH_SIZE);
@@ -771,15 +773,15 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 
 		// 誤差表示
 		{
-			F32 errorMin, errorMax, errorAve, errorAve2;
-			pTeachOutputLayer->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2);
-			printf("学習：min=%.3f, max=%.3f, ave=%.3f, ave2=%.3f", errorMin, errorMax, errorAve, errorAve2);
+			F32 errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy;
+			pTeachOutputLayer->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy);
+			printf("学習：max=%.3f, ave=%.3f, ave2=%.3f, entropy=%.3f", errorMax, errorAve, errorAve2, errorCrossEntoropy);
 		}
 		printf(" : ");
 		{
-			F32 errorMin, errorMax, errorAve, errorAve2;
-			pSampleOutputLayer->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2);
-			printf("実行：min=%.3f, max=%.3f, ave=%.3f, ave2=%.3f", errorMin, errorMax, errorAve, errorAve2);
+			F32 errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy;
+			pSampleOutputLayer->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy);
+			printf("実行：max=%.3f, ave=%.3f, ave2=%.3f, entropy=%.3f", errorMax, errorAve, errorAve2, errorCrossEntoropy);
 		}
 		printf("\n");
 	}

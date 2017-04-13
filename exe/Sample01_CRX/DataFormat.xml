@@ -9,8 +9,8 @@
 
   <!--boolが使用された場合はfalse,trueの値設定. categoryを設定した場合は所定のデータ種別にに適用される. category未設定の場合はデフォルト値に割り当てられる。 デフォルト値が未定義の場合はfalse=0.0, true=1.0-->
   <BoolValue>
-    <false>0.05</false>
-    <true>0.95</true>
+    <false>0.0</false>
+    <true>1.0</true>
     <false category="output">0.00</false>
     <true  category="output">1.00</true>
   </BoolValue>

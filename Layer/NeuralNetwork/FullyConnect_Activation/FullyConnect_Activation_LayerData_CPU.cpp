@@ -49,7 +49,7 @@ namespace NeuralNetwork {
 		this->lpBias.resize(neuronCount);
 		for(unsigned int neuronNum=0; neuronNum<lppNeuron.size(); neuronNum++)
 		{
-			float maxArea = sqrt(6.0f / (0.5f*inputBufferCount + 0.5f*neuronCount));
+			float maxArea = sqrt(6.0f / (inputBufferCount + neuronCount));
 
 			// バイアス
 			this->lpBias[neuronNum] = ((float)rand()/RAND_MAX - 0.5f) * 2.0f * maxArea;

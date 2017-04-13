@@ -30,10 +30,12 @@ namespace IOData {
 		std::vector<F32*> lpBatchDataPointer;			/**< バッチ処理データの配列先頭アドレスリスト */
 		std::vector<F32*> lpBatchDInputBufferPointer;	/**< バッチ処理入力誤差差分の配列先導アドレスリスト */
 
+		U32 calcErrorCount;	/**< 誤差計算を実行した回数 */
 		std::vector<F32> lpErrorValue_min;	/**< 最小誤差 */
 		std::vector<F32> lpErrorValue_max;	/**< 最大誤差 */
 		std::vector<F32> lpErrorValue_ave;	/**< 平均誤差 */
 		std::vector<F32> lpErrorValue_ave2;	/**< 平均二乗誤差 */
+		std::vector<F32> lpErrorValue_crossEntropy;	/**< クロスエントロピー */
 
 		std::vector<S32> lpMaxErrorDataNo;
 
@@ -43,6 +45,7 @@ namespace IOData {
 			:	guid				(guid)
 			,	ioDataStruct		(ioDataStruct)
 			,	lpBatchDataNoList	(NULL)
+			,	calcErrorCount		(0)
 		{
 		}
 		/** デストラクタ */
@@ -236,6 +239,7 @@ namespace IOData {
 			this->lpErrorValue_max.resize(this->GetBufferCount());
 			this->lpErrorValue_ave.resize(this->GetBufferCount());
 			this->lpErrorValue_ave2.resize(this->GetBufferCount());
+			this->lpErrorValue_crossEntropy.resize(this->GetBufferCount());
 
 			this->lpMaxErrorDataNo.resize(this->GetBufferCount());
 
@@ -252,10 +256,12 @@ namespace IOData {
 			失敗した場合はCalculate以降の処理は実行不可. */
 		Gravisbell::ErrorCode PreProcessCalculateLoop()
 		{
+			this->calcErrorCount = 0;
 			this->lpErrorValue_min.assign(this->lpErrorValue_min.size(),  FLT_MAX);
 			this->lpErrorValue_max.assign(this->lpErrorValue_max.size(),  0.0f);
 			this->lpErrorValue_ave.assign(this->lpErrorValue_ave.size(),  0.0f);
 			this->lpErrorValue_ave2.assign(this->lpErrorValue_ave2.size(), 0.0f);
+			this->lpErrorValue_crossEntropy.assign(this->lpErrorValue_crossEntropy.size(), 0.0f);
 
 			this->lpMaxErrorDataNo.assign(this->lpMaxErrorDataNo.size(), -1);
 
@@ -284,22 +290,34 @@ namespace IOData {
 			{
 				for(U32 inputNum=0; inputNum<inputBufferCount; inputNum++)
 				{
+					F32 output = i_lppInputBuffer[batchNum][inputNum];
+					F32 teach  = this->lpBatchDataPointer[batchNum][inputNum];
+
 					F32 error = this->lpBatchDataPointer[batchNum][inputNum] - i_lppInputBuffer[batchNum][inputNum];
-					error = min(1.0f, max(-1.0f, error));
 					F32 error_abs = abs(error);
 
 					if(this->lpDInputBuffer.size() > 0)
+					{
 						this->lpDInputBuffer[batchNum][inputNum] = error;
+//						this->lpDInputBuffer[batchNum][inputNum] = -(output - teach) / (output * (1.0f - output));
+					}
 
 					if(this->lpErrorValue_max[inputNum] < error_abs)
 						this->lpMaxErrorDataNo[inputNum] = this->lpBatchDataNoList[batchNum];
+
+					F32 crossEntropy = -(
+						((teach > 0) && (output > 0) ? (teach * log(output)) : 0) +
+						(((teach < 0) && (output < 1)) ? ((1 - teach) * log(1 - output)) : 0)
+						);
 
 					// 誤差を保存
 					this->lpErrorValue_min[inputNum]  = min(this->lpErrorValue_min[inputNum], error_abs);
 					this->lpErrorValue_max[inputNum]  = max(this->lpErrorValue_max[inputNum], error_abs);
 					this->lpErrorValue_ave[inputNum]  += error_abs;
 					this->lpErrorValue_ave2[inputNum] += error_abs * error_abs;
+					this->lpErrorValue_crossEntropy[inputNum] += crossEntropy;
 				}
+				this->calcErrorCount++;
 			}
 
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
@@ -312,12 +330,13 @@ namespace IOData {
 			@param	o_max	最大誤差.
 			@param	o_ave	平均誤差.
 			@param	o_ave2	平均二乗誤差. */
-		ErrorCode GetCalculateErrorValue(F32& o_min, F32& o_max, F32& o_ave, F32& o_ave2)
+		ErrorCode GetCalculateErrorValue(F32& o_min, F32& o_max, F32& o_ave, F32& o_ave2, F32& o_crossEntropy)
 		{
 			o_min  = FLT_MAX;
 			o_max  = 0.0f;
 			o_ave  = 0.0f;
 			o_ave2 = 0.0f;
+			o_crossEntropy = 0.0f;
 
 			for(U32 inputNum=0; inputNum<this->GetBufferCount(); inputNum++)
 			{
@@ -325,10 +344,12 @@ namespace IOData {
 				o_max   = max(o_max, this->lpErrorValue_max[inputNum]);
 				o_ave  += this->lpErrorValue_ave[inputNum];
 				o_ave2 += this->lpErrorValue_ave2[inputNum];
+				o_crossEntropy += this->lpErrorValue_crossEntropy[inputNum];
 			}
 
-			o_ave  = o_ave / this->GetDataCount() / this->GetBufferCount();
-			o_ave2 = (F32)sqrt(o_ave2 / this->GetDataCount() / this->GetBufferCount());
+			o_ave  = o_ave / this->calcErrorCount / this->GetBufferCount();
+			o_ave2 = (F32)sqrt(o_ave2 / this->calcErrorCount / this->GetBufferCount());
+			o_crossEntropy = o_crossEntropy / this->calcErrorCount / this->GetBufferCount();
 
 			//for(U32 inputNum=0; inputNum<this->GetBufferCount(); inputNum++)
 			//	printf("%d,", this->lpMaxErrorDataNo[inputNum]);

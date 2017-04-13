@@ -447,8 +447,8 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 
 		// Œë·•\Ž¦
 		{
-			F32 errorMin, errorMax, errorAve, errorAve2;
-			pTeachLayerA->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2);
+			F32 errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy;
+			pTeachLayerA->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy);
 			printf("min=%.3f, max=%.3f, ave=%.3f, ave2=%.3f\n", errorMin, errorMax, errorAve, errorAve2);
 		}
 	}
@@ -527,8 +527,8 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 	
 	// Œë·•\Ž¦
 	{
-		F32 errorMin, errorMax, errorAve, errorAve2;
-		pTeachLayerA->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2);
+		F32 errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy;
+		pTeachLayerA->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy);
 		printf("min=%.3f, max=%.3f, ave=%.3f, ave2=%.3f\n", errorMin, errorMax, errorAve, errorAve2);
 	}
 
