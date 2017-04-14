@@ -51,15 +51,17 @@
     <Float  id="A15" category="input"  normalize="min_max" />
 
     <!--
-    <String id="A16" category="output" useType="bit"> 
-      <false> 
+    <String id="A16" category="output" useType="bit">
+      <false>
         <item>-</item>
       </false>
-      <true>  
+      <true>
         <item>+</item>
       </true>
     </String>
     -->
+
+
     <String id="A16" category="output" useType="bit_array"/>
 
     <!--<String id="A16" category="output" useType="bit_array"/>-->

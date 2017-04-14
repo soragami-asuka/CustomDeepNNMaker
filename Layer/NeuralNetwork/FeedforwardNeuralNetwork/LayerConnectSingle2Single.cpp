@@ -63,9 +63,9 @@ namespace NeuralNetwork {
 	/** 入力誤差バッファの位置を入力元レイヤーのGUID指定で取得する */
 	S32 LayerConnectSingle2Single::GetDInputPositionByGUID(const Gravisbell::GUID& i_guid)const
 	{
-		for(U32 pos=0; pos<this->lppOutputToLayer.size(); pos++)
+		for(U32 pos=0; pos<this->lppInputFromLayer.size(); pos++)
 		{
-			if(this->lppOutputToLayer[pos].pLayer->GetGUID() == i_guid)
+			if(this->lppInputFromLayer[pos]->GetGUID() == i_guid)
 				return pos;
 		}
 

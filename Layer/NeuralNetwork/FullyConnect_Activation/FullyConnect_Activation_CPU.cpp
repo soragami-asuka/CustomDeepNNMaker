@@ -20,16 +20,26 @@ namespace
 	//================================
 	// 活性化関数
 	//================================
+	// sigmoid系
 	F32 func_activation_sigmoid(F32 x)
 	{
 		return 1.0f / (1.0f + (F32)exp(-x));
 	}
 	F32 func_dactivation_sigmoid(F32 x)
 	{
-//		return x * (1.0f - x);
-		return 1;
+		return x * (1.0f - x);
 	}
 
+	F32 func_activation_sigmoid_crossEntropy(F32 x)
+	{
+		return 1.0f / (1.0f + (F32)exp(-x));
+	}
+	F32 func_dactivation_sigmoid_crossEntropy(F32 x)
+	{
+		return 1.0f;
+	}
+
+	// ReLU系
 	F32 func_activation_ReLU(F32 x)
 	{
 		return x * (x > 0.0f);
@@ -38,6 +48,14 @@ namespace
 	{
 		return 1.0f * (x > 0.0f);
 	}
+
+	// SoftMax系
+	F32 func_activation_SoftMax(F32 x)
+	{
+		return (F32)exp(x);	// 平均は別に行う
+	}
+
+
 }
 
 
@@ -188,14 +206,31 @@ namespace NeuralNetwork {
 		// 活性化関数を設定
 		switch(this->layerData.layerStructure.ActivationType)
 		{
+			// Sigmoid
 		case Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_sigmoid:
 		default:
 			this->func_activation  = ::func_activation_sigmoid;
 			this->func_dactivation = ::func_dactivation_sigmoid;
 			break;
+		case Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_sigmoid_crossEntropy:
+			this->func_activation  = ::func_activation_sigmoid_crossEntropy;
+			this->func_dactivation = ::func_dactivation_sigmoid_crossEntropy;
+			break;
+
+			// ReLU
 		case Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_ReLU:
 			this->func_activation  = ::func_activation_ReLU;
 			this->func_dactivation = ::func_dactivation_ReLU;
+			break;
+
+			// Softmax
+		case Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_softmax:
+			this->func_activation  = ::func_activation_SoftMax;
+			this->func_dactivation = ::func_dactivation_sigmoid;
+			break;
+		case Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_softmax_crossEntropy:
+			this->func_activation  = ::func_activation_SoftMax;
+			this->func_dactivation = ::func_dactivation_sigmoid_crossEntropy;
 			break;
 		}
 
@@ -303,6 +338,35 @@ namespace NeuralNetwork {
 				this->lpOutputBuffer[batchNum][neuronNum] = this->func_activation(tmp);
 			}
 		}
+
+		// 活性化後のデータを合計値で割る
+		switch(this->layerData.layerStructure.ActivationType)
+		{
+		case Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_softmax:
+		case Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_softmax_crossEntropy:
+			{
+				for(unsigned int batchNum=0; batchNum<this->batchSize; batchNum++)
+				{
+					// 平均を算出
+					F32 sum = 0.0f;
+					for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
+					{
+						sum += this->lpOutputBuffer[batchNum][neuronNum];
+					}
+
+					// 値を平均値で割る
+					for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
+					{
+						if(sum == 0.0f)
+							this->lpOutputBuffer[batchNum][neuronNum] = 1.0f / neuronNum;
+						else
+							this->lpOutputBuffer[batchNum][neuronNum] /= sum;
+					}
+				}
+			}
+			break;
+		}
+
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

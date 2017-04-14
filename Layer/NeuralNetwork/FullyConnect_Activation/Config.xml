@@ -33,9 +33,21 @@
           <Name>シグモイド関数</Name>
           <Text>y = 1 / (1 + e^(-x));&#x0A;範囲 0 &lt; y &lt; 1&#x0A;(x=0, y=0.5)を通る</Text>
         </Item>
+        <Item id="sigmoid_crossEntropy">
+          <Name>シグモイド関数(出力レイヤー用)</Name>
+          <Text>y = 1 / (1 + e^(-x));&#x0A;範囲 0 &lt; y &lt; 1&#x0A;(x=0, y=0.5)を通る</Text>
+        </Item>
         <Item id="ReLU">
           <Name>ReLU（ランプ関数）</Name>
           <Text>y = max(0, x);&#x0A;範囲 0 &lt;= y&#x0A;(x=0, y=0)を通る</Text>
+        </Item>
+        <Item id="softmax">
+          <Name>SoftMax関数</Name>
+          <Text>全体における自身の割合を返す関数.&#x0A;y = e^x / Σe^x;&#x0A;</Text>
+        </Item>
+        <Item id="softmax_crossEntropy">
+          <Name>SoftMax関数(出力レイヤー用)</Name>
+          <Text>全体における自身の割合を返す関数.&#x0A;y = e^x / Σe^x;&#x0A;</Text>
         </Item>
       </Items>
       <Default>sigmoid</Default>

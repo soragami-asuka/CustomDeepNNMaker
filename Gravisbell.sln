@@ -49,6 +49,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sample02_TRI", "exe\Sample0
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sample03_XOR", "exe\Sample03_XOR\Sample03_XOR.vcxproj", "{27C1743E-44B5-4B98-BF94-0179F856B871}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NeuralNetworkTest", "exe\NeuralNetworkTest\NeuralNetworkTest.vcxproj", "{B0455F31-B421-4D4B-AC39-BDA1EB688ED1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -107,6 +109,10 @@ Global
 		{27C1743E-44B5-4B98-BF94-0179F856B871}.Debug|Win32.Build.0 = Debug|Win32
 		{27C1743E-44B5-4B98-BF94-0179F856B871}.Release|Win32.ActiveCfg = Release|Win32
 		{27C1743E-44B5-4B98-BF94-0179F856B871}.Release|Win32.Build.0 = Release|Win32
+		{B0455F31-B421-4D4B-AC39-BDA1EB688ED1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B0455F31-B421-4D4B-AC39-BDA1EB688ED1}.Debug|Win32.Build.0 = Debug|Win32
+		{B0455F31-B421-4D4B-AC39-BDA1EB688ED1}.Release|Win32.ActiveCfg = Release|Win32
+		{B0455F31-B421-4D4B-AC39-BDA1EB688ED1}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -131,6 +137,7 @@ Global
 		{4B0F0996-50E0-498C-AEEB-B06EE5FD4E54} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
 		{C4A928D7-75C1-44E9-8A9E-EEE058F3338D} = {9DEE086C-8571-41DD-ADD4-7583EB13580A}
 		{27C1743E-44B5-4B98-BF94-0179F856B871} = {9DEE086C-8571-41DD-ADD4-7583EB13580A}
+		{B0455F31-B421-4D4B-AC39-BDA1EB688ED1} = {9DEE086C-8571-41DD-ADD4-7583EB13580A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		VisualSVNWorkingCopyRoot = .

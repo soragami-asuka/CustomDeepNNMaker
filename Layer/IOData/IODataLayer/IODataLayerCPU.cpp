@@ -305,10 +305,10 @@ namespace IOData {
 					if(this->lpErrorValue_max[inputNum] < error_abs)
 						this->lpMaxErrorDataNo[inputNum] = this->lpBatchDataNoList[batchNum];
 
-					F32 crossEntropy = -(
-						((teach > 0) && (output > 0) ? (teach * log(output)) : 0) +
-						(((teach < 0) && (output < 1)) ? ((1 - teach) * log(1 - output)) : 0)
-						);
+					F32 crossEntropy = -(F32)(
+						      teach  * log(max(0.0001,  output)) +
+						 (1 - teach) * log(max(0.0001,1-output))
+						 );
 
 					// Œë·‚ð•Û‘¶
 					this->lpErrorValue_min[inputNum]  = min(this->lpErrorValue_min[inputNum], error_abs);

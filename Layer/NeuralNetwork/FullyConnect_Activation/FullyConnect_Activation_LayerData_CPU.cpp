@@ -8,6 +8,8 @@
 #include"FullyConnect_Activation_FUNC.hpp"
 #include"FullyConnect_Activation_CPU.h"
 
+#include"RandomUtility.h"
+
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
@@ -52,13 +54,13 @@ namespace NeuralNetwork {
 			float maxArea = sqrt(6.0f / (inputBufferCount + neuronCount));
 
 			// バイアス
-			this->lpBias[neuronNum] = ((float)rand()/RAND_MAX - 0.5f) * 2.0f * maxArea;
+			this->lpBias[neuronNum] = (F32)Utility::Random::GetValue(-maxArea, maxArea);
 
 			// ニューロン
 			lppNeuron[neuronNum].resize(inputBufferCount);
 			for(unsigned int inputNum=0; inputNum<lppNeuron[neuronNum].size(); inputNum++)
 			{
-				lppNeuron[neuronNum][inputNum] = ((float)rand()/RAND_MAX - 0.5f) * 2.0f * maxArea;
+				lppNeuron[neuronNum][inputNum] = (F32)Utility::Random::GetValue(-maxArea, maxArea);
 			}
 		}
 

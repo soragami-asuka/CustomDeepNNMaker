@@ -58,12 +58,18 @@ namespace Common {
 			}
 
 			// 端数の開始イテレータを取得
-			it_addDataBegin = this->lpAllDataNoList.begin();
+			this->it_addDataBegin = this->lpAllDataNoList.begin();
 			for(unsigned int i=0; i<dataCount; i++)
-				it_addDataBegin++;
+				this->it_addDataBegin++;
 
+			// 端数部分を穴埋め
+			unsigned int addDataCount = this->lpAllDataNoList.size() - this->dataCount;
+			for(unsigned int i=0; i<addDataCount; i++)
+			{
+				this->lpAllDataNoList[this->dataCount + i] = this->lpAllDataNoList[i];
+			}
 
-			return this->PreProcessLearnLoop();
+			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
 
 		/** 学習ループの初期化処理.データセットの学習開始前に実行する

@@ -109,6 +109,7 @@
     <ClInclude Include="FullyConnect_Activation_LayerData_Base.h" />
     <ClInclude Include="FullyConnect_Activation_FUNC.hpp" />
     <ClInclude Include="FullyConnect_Activation_LayerData_CPU.h" />
+    <ClInclude Include="RandomUtility.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -128,6 +129,7 @@
     <ClCompile Include="FullyConnect_Activation_FUNC.cpp" />
     <ClCompile Include="FullyConnect_Activation_LayerData_Base.cpp" />
     <ClCompile Include="FullyConnect_Activation_LayerData_CPU.cpp" />
+    <ClCompile Include="RandomUtility.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

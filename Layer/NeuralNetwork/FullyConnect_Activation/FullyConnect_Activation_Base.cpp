@@ -15,8 +15,8 @@ using namespace Gravisbell::Layer::NeuralNetwork;
 /** コンストラクタ */
 FullyConnect_Activation_Base::FullyConnect_Activation_Base(Gravisbell::GUID guid)
 	:	INNLayer()
-	,	guid			(guid)
-	,	pLearnData		(NULL)
+	,	guid				(guid)
+	,	pLearnData			(NULL)
 {
 }
 

@@ -176,7 +176,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 
 		// 学習
-		if(::LearnNeuralNetwork(pNeuralNetwork, pTeachInputLayer, pTeachOutputLayer, 8, 5000) != ErrorCode::ERROR_CODE_NONE)
+		if(::LearnNeuralNetwork(pNeuralNetwork, pTeachInputLayer, pTeachOutputLayer, 8, 1000) != ErrorCode::ERROR_CODE_NONE)
 		{
 			for(auto pLayerData : lppLayerData)
 				delete pLayerData;
@@ -255,7 +255,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 
 		// 学習
-		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkSample, pTeachInputLayer, pTeachOutputLayer, pSampleInputLayer, pSampleOutputLayer, 1, 5000) != ErrorCode::ERROR_CODE_NONE)
+		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkSample, pTeachInputLayer, pTeachOutputLayer, pSampleInputLayer, pSampleOutputLayer, 1, 1000) != ErrorCode::ERROR_CODE_NONE)
 		{
 			delete pNeuralNetworkSample;
 			delete pNeuralNetworkLearn;
@@ -420,7 +420,7 @@ Layer::NeuralNetwork::INNLayerData* CreateHiddenLayerData(const Layer::NeuralNet
 Layer::NeuralNetwork::INNLayerData* CreateOutputLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount)
 {
 //	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"ReLU");
-	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"sigmoid");
+	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"sigmoid_crossEntropy");
 }
 
 /** ニューラルネットワーククラスを作成する */

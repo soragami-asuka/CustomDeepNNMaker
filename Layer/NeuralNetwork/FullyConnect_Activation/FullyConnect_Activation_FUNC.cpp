@@ -92,10 +92,31 @@ namespace DefaultLanguage
                     },
                 },
                 {
+                    L"sigmoid_crossEntropy",
+                    {
+                        L"シグモイド関数(出力レイヤー用)",
+                        L"y = 1 / (1 + e^(-x));\n範囲 0 < y < 1\n(x=0, y=0.5)を通る",
+                    },
+                },
+                {
                     L"ReLU",
                     {
                         L"ReLU（ランプ関数）",
                         L"y = max(0, x);\n範囲 0 <= y\n(x=0, y=0)を通る",
+                    },
+                },
+                {
+                    L"softmax",
+                    {
+                        L"SoftMax関数",
+                        L"全体における自身の割合を返す関数.\ny = e^x / Σe^x;\n",
+                    },
+                },
+                {
+                    L"softmax_crossEntropy",
+                    {
+                        L"SoftMax関数(出力レイヤー用)",
+                        L"全体における自身の割合を返す関数.\ny = e^x / Σe^x;\n",
                     },
                 },
             }
@@ -231,9 +252,24 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			L"y = 1 / (1 + e^(-x));\n範囲 0 < y < 1\n(x=0, y=0.5)を通る");
 		// 1
 		pItemEnum->AddEnumItem(
+			L"sigmoid_crossEntropy",
+			L"シグモイド関数(出力レイヤー用)",
+			L"y = 1 / (1 + e^(-x));\n範囲 0 < y < 1\n(x=0, y=0.5)を通る");
+		// 2
+		pItemEnum->AddEnumItem(
 			L"ReLU",
 			L"ReLU（ランプ関数）",
 			L"y = max(0, x);\n範囲 0 <= y\n(x=0, y=0)を通る");
+		// 3
+		pItemEnum->AddEnumItem(
+			L"softmax",
+			L"SoftMax関数",
+			L"全体における自身の割合を返す関数.\ny = e^x / Σe^x;\n");
+		// 4
+		pItemEnum->AddEnumItem(
+			L"softmax_crossEntropy",
+			L"SoftMax関数(出力レイヤー用)",
+			L"全体における自身の割合を返す関数.\ny = e^x / Σe^x;\n");
 
 		pLayerConfig->AddItem(pItemEnum);
 	}
