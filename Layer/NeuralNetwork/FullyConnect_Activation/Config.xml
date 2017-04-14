@@ -25,6 +25,14 @@
       <Default>200</Default>
     </Int>
 
+    <Float id="DropOut">
+      <Name>ドロップアウト率</Name>
+      <Text>前レイヤーを無視する割合.&#x0A;1.0で前レイヤーの全出力を無視する</Text>
+      <Min>0.0</Min>
+      <Max>1.0</Max>
+      <Default>0.0</Default>
+    </Float>
+
     <Enum id="ActivationType">
       <Name>活性化関数種別</Name>
       <Text>使用する活性化関数の種類を定義する</Text>
@@ -71,14 +79,6 @@
       <Min>0.0</Min>
       <Max>1000.0</Max>
       <Default>1.0</Default>
-    </Float>
-    
-    <Float id="DropOut">
-      <Name>ドロップアウト率</Name>
-      <Text>前レイヤーを無視する割合.&#x0A;1.0で前レイヤーの全出力を無視する</Text>
-      <Min>0.0</Min>
-      <Max>1.0</Max>
-      <Default>0.0</Default>
     </Float>
   </Learn>
 

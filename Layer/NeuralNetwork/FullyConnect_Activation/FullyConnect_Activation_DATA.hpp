@@ -31,6 +31,13 @@ namespace FullyConnect_Activation {
 		  */
 		int NeuronCount;
 
+		/** Name : ドロップアウト率
+		  * ID   : DropOut
+		  * Text : 前レイヤーを無視する割合.
+		  *       : 1.0で前レイヤーの全出力を無視する
+		  */
+		float DropOut;
+
 		/** Name : 活性化関数種別
 		  * ID   : ActivationType
 		  * Text : 使用する活性化関数の種類を定義する
@@ -87,13 +94,6 @@ namespace FullyConnect_Activation {
 		  * ID   : LearnCoeff
 		  */
 		float LearnCoeff;
-
-		/** Name : ドロップアウト率
-		  * ID   : DropOut
-		  * Text : 前レイヤーを無視する割合.
-		  *       : 1.0で前レイヤーの全出力を無視する
-		  */
-		float DropOut;
 
 	};
 

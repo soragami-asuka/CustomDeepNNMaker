@@ -36,9 +36,9 @@ DataFormat::IDataFormatBase* LoadSampleData(const std::wstring& formatFilePath, 
 Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManager(void);
 
 /** レイヤーデータを作成 */
-Layer::NeuralNetwork::INNLayerData* CreateLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount, const std::wstring activationType);
-Layer::NeuralNetwork::INNLayerData* CreateHiddenLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount);
-Layer::NeuralNetwork::INNLayerData* CreateOutputLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount);
+Layer::NeuralNetwork::INNLayerData* CreateLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount, const std::wstring activationType, F32 dropOutRate);
+Layer::NeuralNetwork::INNLayerData* CreateHiddenLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount, F32 dropOutRate);
+Layer::NeuralNetwork::INNLayerData* CreateOutputLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount, F32 dropOutRate);
 
 /** ニューラルネットワーククラスを作成する */
 Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 inputDataCount);
@@ -368,7 +368,7 @@ Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManager(void)
 
 
 /** レイヤーデータを作成 */
-Layer::NeuralNetwork::INNLayerData* CreateLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount, const std::wstring activationType)
+Layer::NeuralNetwork::INNLayerData* CreateLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount, const std::wstring activationType, F32 dropOutRate)
 {
 	// DLL取得
 	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(Gravisbell::GUID(0xbeba34ec, 0xc30c, 0x4565, 0x93, 0x86, 0x56, 0x08, 0x89, 0x81, 0xd2, 0xd7));
@@ -389,6 +389,11 @@ Layer::NeuralNetwork::INNLayerData* CreateLayerData(const Layer::NeuralNetwork::
 		SettingData::Standard::IItem_Enum* pItem = dynamic_cast<SettingData::Standard::IItem_Enum*>(pConfig->GetItemByID(L"ActivationType"));
 		pItem->SetValue(activationType.c_str());
 	}
+	// ドロップアウト率
+	{
+		SettingData::Standard::IItem_Float* pItem = dynamic_cast<SettingData::Standard::IItem_Float*>(pConfig->GetItemByID(L"DropOut"));
+		pItem->SetValue(dropOutRate);
+	}
 
 	// レイヤーの作成
 	Layer::NeuralNetwork::INNLayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, IODataStruct(inputDataCount));
@@ -400,15 +405,15 @@ Layer::NeuralNetwork::INNLayerData* CreateLayerData(const Layer::NeuralNetwork::
 
 	return pLayer;
 }
-Layer::NeuralNetwork::INNLayerData* CreateHiddenLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount)
+Layer::NeuralNetwork::INNLayerData* CreateHiddenLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount, F32 dropOutRate)
 {
-//	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"sigmoid");
-	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"ReLU");
+//	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"sigmoid", dropOutRate);
+	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"ReLU", dropOutRate);
 }
-Layer::NeuralNetwork::INNLayerData* CreateOutputLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount)
+Layer::NeuralNetwork::INNLayerData* CreateOutputLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount, F32 dropOutRate)
 {
-	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"sigmoid_crossEntropy");
-//	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"softmax_crossEntropy");
+	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"sigmoid_crossEntropy", dropOutRate);
+//	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"softmax_crossEntropy", dropOutRate);
 }
 
 /** ニューラルネットワーククラスを作成する */
@@ -460,7 +465,7 @@ Gravisbell::ErrorCode CreateNeuralNetworkLayerConnect(
 		Gravisbell::GUID guid = boost::uuids::random_generator()().data;
 
 		// レイヤーデータを作成
-		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateHiddenLayerData(layerDLLManager, 128, inputDataStruct.GetDataCount());
+		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateHiddenLayerData(layerDLLManager, 128, inputDataStruct.GetDataCount(), 0.0f);
 		if(pLayerData == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
 		lppLayerData.push_back(pLayerData);
@@ -480,7 +485,7 @@ Gravisbell::ErrorCode CreateNeuralNetworkLayerConnect(
 		Gravisbell::GUID guid = boost::uuids::random_generator()().data;
 
 		// レイヤーデータを作成
-		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateHiddenLayerData(layerDLLManager, 128, inputDataStruct.GetDataCount());
+		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateHiddenLayerData(layerDLLManager, 128, inputDataStruct.GetDataCount(), 0.0f);
 		if(pLayerData == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
 		lppLayerData.push_back(pLayerData);
@@ -500,7 +505,7 @@ Gravisbell::ErrorCode CreateNeuralNetworkLayerConnect(
 		Gravisbell::GUID guid = boost::uuids::random_generator()().data;
 
 		// レイヤーデータを作成
-		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateOutputLayerData(layerDLLManager, outputDataCount, inputDataStruct.GetDataCount());
+		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateOutputLayerData(layerDLLManager, outputDataCount, inputDataStruct.GetDataCount(), 0.0f);
 		if(pLayerData == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
 		lppLayerData.push_back(pLayerData);

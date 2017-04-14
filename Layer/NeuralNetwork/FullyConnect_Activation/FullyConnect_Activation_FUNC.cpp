@@ -55,6 +55,13 @@ namespace DefaultLanguage
             }
         },
         {
+            L"DropOut",
+            {
+                L"ドロップアウト率",
+                L"前レイヤーを無視する割合.\n1.0で前レイヤーの全出力を無視する",
+            }
+        },
+        {
             L"ActivationType",
             {
                 L"活性化関数種別",
@@ -133,13 +140,6 @@ namespace DefaultLanguage
             {
                 L"学習係数",
                 L"",
-            }
-        },
-        {
-            L"DropOut",
-            {
-                L"ドロップアウト率",
-                L"前レイヤーを無視する割合.\n1.0で前レイヤーの全出力を無視する",
             }
         },
     };
@@ -234,6 +234,18 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			CurrentLanguage::g_lpItemData_LayerStructure[L"NeuronCount"].name.c_str(),
 			CurrentLanguage::g_lpItemData_LayerStructure[L"NeuronCount"].text.c_str(),
 			1, 65535, 200));
+
+	/** Name : ドロップアウト率
+	  * ID   : DropOut
+	  * Text : 前レイヤーを無視する割合.
+	  *      : 1.0で前レイヤーの全出力を無視する
+	  */
+	pLayerConfig->AddItem(
+		Gravisbell::SettingData::Standard::CreateItem_Float(
+			L"DropOut",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"DropOut"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"DropOut"].text.c_str(),
+			0.000000f, 1.000000f, 0.000000f));
 
 	/** Name : 活性化関数種別
 	  * ID   : ActivationType
@@ -349,18 +361,6 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSetting(void)
 			CurrentLanguage::g_lpItemData_Learn[L"LearnCoeff"].name.c_str(),
 			CurrentLanguage::g_lpItemData_Learn[L"LearnCoeff"].text.c_str(),
 			0.000000f, 1000.000000f, 1.000000f));
-
-	/** Name : ドロップアウト率
-	  * ID   : DropOut
-	  * Text : 前レイヤーを無視する割合.
-	  *      : 1.0で前レイヤーの全出力を無視する
-	  */
-	pLayerConfig->AddItem(
-		Gravisbell::SettingData::Standard::CreateItem_Float(
-			L"DropOut",
-			CurrentLanguage::g_lpItemData_Learn[L"DropOut"].name.c_str(),
-			CurrentLanguage::g_lpItemData_Learn[L"DropOut"].text.c_str(),
-			0.000000f, 1.000000f, 0.000000f));
 
 	return pLayerConfig;
 }

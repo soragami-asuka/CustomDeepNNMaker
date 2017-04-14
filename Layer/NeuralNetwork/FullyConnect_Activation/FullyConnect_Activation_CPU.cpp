@@ -248,13 +248,7 @@ namespace NeuralNetwork {
 
 		// ドロップアウト
 		{
-			auto pItem = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Float*>(data.GetItemByID(L"DropOut"));
-			 if(pItem)
-				this->learnData.DropOut = pItem->GetValue();
-			else
-				this->learnData.DropOut = 0.0f;
-			
-			S32 dropOutRate = (S32)(learnData.DropOut * RAND_MAX);
+			S32 dropOutRate = (S32)(this->layerData.layerStructure.DropOut * RAND_MAX);
 
 			if(dropOutRate > 0)
 			{
@@ -331,8 +325,8 @@ namespace NeuralNetwork {
 				}
 				tmp += this->layerData.lpBias[neuronNum];
 
-				if(!this->onUseDropOut && this->learnData.DropOut > 0.0f)
-					tmp *= (1.0f - this->learnData.DropOut);
+				if(!this->onUseDropOut && this->layerData.layerStructure.DropOut > 0.0f)
+					tmp *= (1.0f - this->layerData.layerStructure.DropOut);
 
 				// 活性化
 				this->lpOutputBuffer[batchNum][neuronNum] = this->func_activation(tmp);
