@@ -293,7 +293,7 @@ namespace IOData {
 					F32 output = i_lppInputBuffer[batchNum][inputNum];
 					F32 teach  = this->lpBatchDataPointer[batchNum][inputNum];
 
-					F32 error = this->lpBatchDataPointer[batchNum][inputNum] - i_lppInputBuffer[batchNum][inputNum];
+					F32 error = teach - output;
 					F32 error_abs = abs(error);
 
 					if(this->lpDInputBuffer.size() > 0)

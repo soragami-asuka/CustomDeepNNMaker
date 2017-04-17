@@ -247,7 +247,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 
 		// 学習
-		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkSample, pTeachInputLayer, pTeachOutputLayer, pSampleInputLayer, pSampleOutputLayer, 1, 500) != ErrorCode::ERROR_CODE_NONE)
+		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkSample, pTeachInputLayer, pTeachOutputLayer, pSampleInputLayer, pSampleOutputLayer, 1, 5000) != ErrorCode::ERROR_CODE_NONE)
 		{
 			delete pNeuralNetworkSample;
 			delete pNeuralNetworkLearn;
@@ -412,8 +412,8 @@ Layer::NeuralNetwork::INNLayerData* CreateHiddenLayerData(const Layer::NeuralNet
 }
 Layer::NeuralNetwork::INNLayerData* CreateOutputLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount, F32 dropOutRate)
 {
-	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"sigmoid_crossEntropy", dropOutRate);
-//	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"softmax_crossEntropy", dropOutRate);
+//	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"sigmoid_crossEntropy", dropOutRate);
+	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"softmax_crossEntropy", dropOutRate);
 }
 
 /** ニューラルネットワーククラスを作成する */
@@ -727,6 +727,9 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 //		printf("%4d回 ", learnTime);
 		printf("%4d,", learnTime);
 
+		U32 correctCount_learn  = 0;	// 正解数
+		U32 correctCount_sample = 0;	// 正解数
+
 		// 学習
 		{
 			// 学習ループ先頭処理
@@ -753,6 +756,42 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 
 				// 誤差を反映
 				pNeuralNetworkLearn->ReflectionLearnError();
+
+				// 正解率を算出する
+				for(U32 batchDataNum=0; batchDataNum<pTeachOutputLayer->GetBatchSize(); batchDataNum++)
+				{
+					// 正解の番号を取得
+					U32 correctNo = 0;
+					{
+						U32 curValue = 0.0f;
+						for(U32 i=0; i<pTeachOutputLayer->GetBufferCount(); i++)
+						{
+							if(pTeachOutputLayer->GetOutputBuffer()[batchDataNum][i] > curValue)
+							{
+								correctNo = i;
+								curValue = pTeachOutputLayer->GetOutputBuffer()[batchDataNum][i];
+							}
+						}
+					}
+					// 出力された番号を取得
+					U32 outputNo = 0;
+					{
+						U32 curValue = 0.0f;
+						for(U32 i=0; i<pTeachOutputLayer->GetBufferCount(); i++)
+						{
+							if(pNeuralNetworkLearn->GetOutputBuffer()[batchDataNum][i] > curValue)
+							{
+								outputNo = i;
+								curValue = pNeuralNetworkLearn->GetOutputBuffer()[batchDataNum][i];
+							}
+						}
+					}
+
+					if(correctNo == outputNo)
+					{
+						correctCount_learn++;
+					}
+				}
 			}
 		}
 
@@ -784,7 +823,7 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 			F32 errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy;
 			pTeachOutputLayer->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy);
 //			printf("学習：max=%.3f, ave=%.3f, ave2=%.3f, entropy=%.3f", errorMax, errorAve, errorAve2, errorCrossEntoropy);
-			printf("%.3f,%.3f,%.3f,",  errorMax, errorAve2, errorCrossEntoropy); 
+			printf("%.3f,%.3f,%.3f,%.3f,",  errorMax, errorAve2, errorCrossEntoropy, (F32)correctCount_learn / pBatchDataNoListGenerator->GetDataCount()); 
 		}
 //		printf(" : ");
 		{

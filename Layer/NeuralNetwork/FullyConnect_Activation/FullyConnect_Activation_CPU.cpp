@@ -330,6 +330,11 @@ namespace NeuralNetwork {
 
 				// 活性化
 				this->lpOutputBuffer[batchNum][neuronNum] = this->func_activation(tmp);
+
+#ifdef _DEBUG
+				if(isnan(this->lpOutputBuffer[batchNum][neuronNum]))
+					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+#endif
 			}
 		}
 
@@ -355,6 +360,11 @@ namespace NeuralNetwork {
 							this->lpOutputBuffer[batchNum][neuronNum] = 1.0f / neuronNum;
 						else
 							this->lpOutputBuffer[batchNum][neuronNum] /= sum;
+					
+#ifdef _DEBUG
+						if(isnan(this->lpOutputBuffer[batchNum][neuronNum]))
+							return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+#endif
 					}
 				}
 			}
@@ -410,8 +420,56 @@ namespace NeuralNetwork {
 			for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
 			{
 				this->lpDOutputBuffer[batchNum][neuronNum] = this->func_dactivation(this->lpOutputBuffer[batchNum][neuronNum]) * i_lppDOutputBufferPrev[batchNum][neuronNum];
+
+#ifdef _DEBUG
+				if(isnan(this->lpDOutputBuffer[batchNum][neuronNum]))
+					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+#endif
 			}
 		}
+
+
+#if 1
+		for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
+		{
+			// バイアス更新
+			{
+				F32 sumDOutput = 0.0f;
+				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+				{
+					 sumDOutput += this->lpDOutputBuffer[batchNum][neuronNum];
+				}
+
+#ifdef _DEBUG
+				if(isnan(sumDOutput))
+					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+#endif
+
+				this->layerData.lpBias[neuronNum] += this->learnData.LearnCoeff * sumDOutput;
+			}
+
+			// 入力対応ニューロン更新
+			for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
+			{
+				if(this->onUseDropOut && this->lppDropOutBuffer[neuronNum][inputNum] == 0.0f)
+					continue;
+
+				F32 sumDOutput = 0.0f;
+				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+				{
+					sumDOutput += this->m_lppInputBuffer[batchNum][inputNum] * this->lpDOutputBuffer[batchNum][neuronNum];
+				}
+
+#ifdef _DEBUG
+				if(isnan(sumDOutput))
+					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+#endif
+
+				this->layerData.lppNeuron[neuronNum][inputNum] += this->learnData.LearnCoeff * sumDOutput;
+			}
+		}
+#endif
+
 
 
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
@@ -429,9 +487,12 @@ namespace NeuralNetwork {
 						tmp += this->lpDOutputBuffer[batchNum][neuronNum] * this->layerData.lppNeuron[neuronNum][inputNum];
 				}
 
-				// 活性化関数で分岐
 				this->lpDInputBuffer[batchNum][inputNum] = tmp;
 
+#ifdef _DEBUG
+				if(isnan(this->lpDInputBuffer[batchNum][inputNum]))
+					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+#endif
 			}
 		}
 
@@ -444,6 +505,7 @@ namespace NeuralNetwork {
 		出力誤差差分、入力誤差差分は直前のCalculateLearnErrorの値を参照する. */
 	ErrorCode FullyConnect_Activation_CPU::ReflectionLearnError(void)
 	{
+#if 0
 		for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
 		{
 			// バイアス更新
@@ -453,6 +515,11 @@ namespace NeuralNetwork {
 				{
 					 sumDOutput += this->lpDOutputBuffer[batchNum][neuronNum];
 				}
+
+#ifdef _DEBUG
+				if(isnan(sumDOutput))
+					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+#endif
 
 				this->layerData.lpBias[neuronNum] += this->learnData.LearnCoeff * sumDOutput;
 			}
@@ -469,9 +536,15 @@ namespace NeuralNetwork {
 					sumDOutput += this->m_lppInputBuffer[batchNum][inputNum] * this->lpDOutputBuffer[batchNum][neuronNum];
 				}
 
+#ifdef _DEBUG
+				if(isnan(sumDOutput))
+					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+#endif
+
 				this->layerData.lppNeuron[neuronNum][inputNum] += this->learnData.LearnCoeff * sumDOutput;
 			}
 		}
+#endif
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
