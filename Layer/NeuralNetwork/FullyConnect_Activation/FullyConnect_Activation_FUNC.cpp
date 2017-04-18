@@ -92,6 +92,13 @@ namespace DefaultLanguage
             L"ActivationType",
             {
                 {
+                    L"lenear",
+                    {
+                        L"リニア関数",
+                        L"y = x;",
+                    },
+                },
+                {
                     L"sigmoid",
                     {
                         L"シグモイド関数",
@@ -259,25 +266,30 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 
 		// 0
 		pItemEnum->AddEnumItem(
+			L"lenear",
+			L"リニア関数",
+			L"y = x;");
+		// 1
+		pItemEnum->AddEnumItem(
 			L"sigmoid",
 			L"シグモイド関数",
 			L"y = 1 / (1 + e^(-x));\n範囲 0 < y < 1\n(x=0, y=0.5)を通る");
-		// 1
+		// 2
 		pItemEnum->AddEnumItem(
 			L"sigmoid_crossEntropy",
 			L"シグモイド関数(出力レイヤー用)",
 			L"y = 1 / (1 + e^(-x));\n範囲 0 < y < 1\n(x=0, y=0.5)を通る");
-		// 2
+		// 3
 		pItemEnum->AddEnumItem(
 			L"ReLU",
 			L"ReLU（ランプ関数）",
 			L"y = max(0, x);\n範囲 0 <= y\n(x=0, y=0)を通る");
-		// 3
+		// 4
 		pItemEnum->AddEnumItem(
 			L"softmax",
 			L"SoftMax関数",
 			L"全体における自身の割合を返す関数.\ny = e^x / Σe^x;\n");
-		// 4
+		// 5
 		pItemEnum->AddEnumItem(
 			L"softmax_crossEntropy",
 			L"SoftMax関数(出力レイヤー用)",

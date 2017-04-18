@@ -52,15 +52,16 @@ namespace NeuralNetwork {
 		for(unsigned int neuronNum=0; neuronNum<lppNeuron.size(); neuronNum++)
 		{
 			float maxArea = sqrt(6.0f / (inputBufferCount + neuronCount));
+			//float maxArea = sqrt(3.0f / inputBufferCount);
 
 			// バイアス
-			this->lpBias[neuronNum] = (F32)Utility::Random::GetValue(-maxArea, maxArea);
+			this->lpBias[neuronNum] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
 
 			// ニューロン
 			lppNeuron[neuronNum].resize(inputBufferCount);
 			for(unsigned int inputNum=0; inputNum<lppNeuron[neuronNum].size(); inputNum++)
 			{
-				lppNeuron[neuronNum][inputNum] = (F32)Utility::Random::GetValue(-maxArea, maxArea);
+				lppNeuron[neuronNum][inputNum] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
 			}
 		}
 

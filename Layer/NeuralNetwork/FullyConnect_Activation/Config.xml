@@ -37,6 +37,10 @@
       <Name>活性化関数種別</Name>
       <Text>使用する活性化関数の種類を定義する</Text>
       <Items>
+        <Item id="lenear">
+          <Name>リニア関数</Name>
+          <Text>y = x;</Text>
+        </Item>
         <Item id="sigmoid">
           <Name>シグモイド関数</Name>
           <Text>y = 1 / (1 + e^(-x));&#x0A;範囲 0 &lt; y &lt; 1&#x0A;(x=0, y=0.5)を通る</Text>

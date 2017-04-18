@@ -43,6 +43,12 @@ namespace FullyConnect_Activation {
 		  * Text : 使用する活性化関数の種類を定義する
 		  */
 		enum : S32{
+			/** Name : リニア関数
+			  * ID   : lenear
+			  * Text : y = x;
+			  */
+			ActivationType_lenear,
+
 			/** Name : シグモイド関数
 			  * ID   : sigmoid
 			  * Text : y = 1 / (1 + e^(-x));

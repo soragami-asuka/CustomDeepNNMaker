@@ -20,6 +20,16 @@ namespace
 	//================================
 	// 活性化関数
 	//================================
+	// lenear系
+	F32 func_activation_lenear(F32 x)
+	{
+		return x;
+	}
+	F32 func_dactivation_lenear(F32 x)
+	{
+		return 1;
+	}
+
 	// sigmoid系
 	F32 func_activation_sigmoid(F32 x)
 	{
@@ -206,6 +216,12 @@ namespace NeuralNetwork {
 		// 活性化関数を設定
 		switch(this->layerData.layerStructure.ActivationType)
 		{
+			// lenear
+		case Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_lenear:
+			this->func_activation  = ::func_activation_lenear;
+			this->func_dactivation = ::func_dactivation_lenear;
+			break;
+
 			// Sigmoid
 		case Gravisbell::Layer::NeuralNetwork::FullyConnect_Activation::LayerStructure::ActivationType_sigmoid:
 		default:
@@ -429,7 +445,7 @@ namespace NeuralNetwork {
 		}
 
 
-#if 1
+#if 0
 		for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
 		{
 			// バイアス更新
@@ -505,7 +521,7 @@ namespace NeuralNetwork {
 		出力誤差差分、入力誤差差分は直前のCalculateLearnErrorの値を参照する. */
 	ErrorCode FullyConnect_Activation_CPU::ReflectionLearnError(void)
 	{
-#if 0
+#if 1
 		for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
 		{
 			// バイアス更新

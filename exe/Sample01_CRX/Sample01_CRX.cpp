@@ -88,7 +88,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	std::list<Layer::ILayerData*> lppLayerData;	// レイヤーデータの一覧
 
 	// サンプルデータの読み込み
-	Gravisbell::DataFormat::IDataFormatBase* pSampleData = ::LoadSampleData(L"DataFormat.xml", L"../../SampleData/crx2.csv");
+	Gravisbell::DataFormat::IDataFormatBase* pSampleData = ::LoadSampleData(L"DataFormat.xml", L"../../SampleData/crx.csv");
 	printf("入力信号：%d\n", pSampleData->GetDataStruct(L"input").GetDataCount());
 	printf("出力信号：%d\n", pSampleData->GetDataStruct(L"output").GetDataCount());
 
@@ -247,7 +247,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 
 		// 学習
-		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkSample, pTeachInputLayer, pTeachOutputLayer, pSampleInputLayer, pSampleOutputLayer, 1, 5000) != ErrorCode::ERROR_CODE_NONE)
+		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkSample, pTeachInputLayer, pTeachOutputLayer, pSampleInputLayer, pSampleOutputLayer, 1, 10000) != ErrorCode::ERROR_CODE_NONE)
 		{
 			delete pNeuralNetworkSample;
 			delete pNeuralNetworkLearn;
@@ -407,13 +407,14 @@ Layer::NeuralNetwork::INNLayerData* CreateLayerData(const Layer::NeuralNetwork::
 }
 Layer::NeuralNetwork::INNLayerData* CreateHiddenLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount, F32 dropOutRate)
 {
-//	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"sigmoid", dropOutRate);
-	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"ReLU", dropOutRate);
+	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"sigmoid", dropOutRate);
+//	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"ReLU", dropOutRate);
+//	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"lenear", dropOutRate);
 }
 Layer::NeuralNetwork::INNLayerData* CreateOutputLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount, F32 dropOutRate)
 {
-//	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"sigmoid_crossEntropy", dropOutRate);
-	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"softmax_crossEntropy", dropOutRate);
+	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"sigmoid_crossEntropy", dropOutRate);
+//	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"softmax_crossEntropy", dropOutRate);
 }
 
 /** ニューラルネットワーククラスを作成する */
@@ -465,7 +466,7 @@ Gravisbell::ErrorCode CreateNeuralNetworkLayerConnect(
 		Gravisbell::GUID guid = boost::uuids::random_generator()().data;
 
 		// レイヤーデータを作成
-		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateHiddenLayerData(layerDLLManager, 128, inputDataStruct.GetDataCount(), 0.0f);
+		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateHiddenLayerData(layerDLLManager, 32, inputDataStruct.GetDataCount(), 0.0f);
 		if(pLayerData == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
 		lppLayerData.push_back(pLayerData);
@@ -485,7 +486,7 @@ Gravisbell::ErrorCode CreateNeuralNetworkLayerConnect(
 		Gravisbell::GUID guid = boost::uuids::random_generator()().data;
 
 		// レイヤーデータを作成
-		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateHiddenLayerData(layerDLLManager, 128, inputDataStruct.GetDataCount(), 0.0f);
+		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateHiddenLayerData(layerDLLManager, 32, inputDataStruct.GetDataCount(), 0.0f);
 		if(pLayerData == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
 		lppLayerData.push_back(pLayerData);
@@ -724,8 +725,8 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 	// 学習を実行
 	for(U32 learnTime=0; learnTime<LEARN_TIMES; learnTime++)
 	{
-//		printf("%4d回 ", learnTime);
-		printf("%4d,", learnTime);
+//		printf("%5d回 ", learnTime);
+		printf("%5d,", learnTime);
 
 		U32 correctCount_learn  = 0;	// 正解数
 		U32 correctCount_sample = 0;	// 正解数
@@ -733,7 +734,7 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 		// 学習
 		{
 			// 学習ループ先頭処理
-			pBatchDataNoListGenerator->PreProcessLearnLoop();
+//			pBatchDataNoListGenerator->PreProcessLearnLoop();
 			pTeachInputLayer->PreProcessLearnLoop(*pLearnSetting);
 			pTeachOutputLayer->PreProcessLearnLoop(*pLearnSetting);
 			pNeuralNetworkLearn->PreProcessLearnLoop(*pLearnSetting);
@@ -763,7 +764,7 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 					// 正解の番号を取得
 					U32 correctNo = 0;
 					{
-						U32 curValue = 0.0f;
+						F32 curValue = 0.0f;
 						for(U32 i=0; i<pTeachOutputLayer->GetBufferCount(); i++)
 						{
 							if(pTeachOutputLayer->GetOutputBuffer()[batchDataNum][i] > curValue)
@@ -776,7 +777,7 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 					// 出力された番号を取得
 					U32 outputNo = 0;
 					{
-						U32 curValue = 0.0f;
+						F32 curValue = 0.0f;
 						for(U32 i=0; i<pTeachOutputLayer->GetBufferCount(); i++)
 						{
 							if(pNeuralNetworkLearn->GetOutputBuffer()[batchDataNum][i] > curValue)
@@ -815,6 +816,41 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 
 				// 誤差計算
 				pSampleOutputLayer->CalculateLearnError(pNeuralNetworkSample->GetOutputBuffer());
+
+
+				// 正解の番号を取得
+				{
+					U32 correctNo = 0;
+					{
+						F32 curValue = 0.0f;
+						for(U32 i=0; i<pSampleOutputLayer->GetBufferCount(); i++)
+						{
+							if(pSampleOutputLayer->GetOutputBuffer()[0][i] > curValue)
+							{
+								correctNo = i;
+								curValue = pSampleOutputLayer->GetOutputBuffer()[0][i];
+							}
+						}
+					}
+					// 出力された番号を取得
+					U32 outputNo = 0;
+					{
+						F32 curValue = 0.0f;
+						for(U32 i=0; i<pSampleOutputLayer->GetBufferCount(); i++)
+						{
+							if(pNeuralNetworkSample->GetOutputBuffer()[0][i] > curValue)
+							{
+								outputNo = i;
+								curValue = pNeuralNetworkSample->GetOutputBuffer()[0][i];
+							}
+						}
+					}
+
+					if(correctNo == outputNo)
+					{
+						correctCount_sample++;
+					}
+				}
 			}
 		}
 
@@ -830,7 +866,7 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 			F32 errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy;
 			pSampleOutputLayer->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy);
 //			printf("実行：max=%.3f, ave=%.3f, ave2=%.3f, entropy=%.3f", errorMax, errorAve, errorAve2, errorCrossEntoropy);
-			printf("%.3f,%.3f,%.3f", errorMax, errorAve2, errorCrossEntoropy); 
+			printf("%.3f,%.3f,%.3f,%.3f", errorMax, errorAve2, errorCrossEntoropy, (F32)correctCount_sample / pSampleInputLayer->GetDataCount()); 
 		}
 		printf("\n");
 	}

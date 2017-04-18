@@ -103,7 +103,9 @@ namespace StringArray {
 	class CDataFormatItemFloat : public CDataFormatItem
 	{
 	protected:
-		std::list<F32> lpData;
+		std::vector<F32> lpNormalizeData;
+
+		std::list<std::wstring> lpData;
 
 	public:
 		/** コンストラクタ */
@@ -123,22 +125,18 @@ namespace StringArray {
 		/** バッファを取得する */
 		F32 GetBuffer(U32 dataNum, U32 bufferNum)const
 		{
-			if(dataNum >= this->lpData.size())
+			if(dataNum >= this->lpNormalizeData.size())
 				return 0.0f;
 			if(bufferNum >= 1)
 				return 0.0f;
 
-			auto it = this->lpData.begin();
-			for(U32 i=0; i<dataNum; i++)
-				it++;
-
-			return *it;
+			return this->lpNormalizeData[dataNum];
 		}
 
 		/** データを追加する */
 		ErrorCode AddData(const std::wstring& buf)
 		{
-			this->lpData.push_back((F32)_wtof(buf.c_str()));
+			this->lpData.push_back(buf);
 
 			return ErrorCode::ERROR_CODE_NONE;
 		}
@@ -146,6 +144,15 @@ namespace StringArray {
 		/** 正規化 */
 		virtual ErrorCode Normalize()
 		{
+			this->lpNormalizeData.resize(this->lpData.size());
+
+			U32 dataNum=0;
+			for(auto& buf : this->lpData)
+			{
+				this->lpNormalizeData[dataNum] = (F32)_wtoi(buf.c_str());
+				dataNum++;
+			}
+
 			return ErrorCode::ERROR_CODE_NONE;
 		}
 	};
@@ -165,32 +172,47 @@ namespace StringArray {
 		/** 正規化 */
 		virtual ErrorCode Normalize()
 		{
+			// バッファ確保
+			this->lpNormalizeData.resize(this->lpData.size());
+
 			// 最小値と最大値を求める
 			F32 minValue =  FLT_MAX;
 			F32 maxValue = -FLT_MAX;
 			{
-				auto it = this->lpData.begin();
-				while(it != this->lpData.end())
+				for(auto& buf : this->lpData)
 				{
-					if(*it < minValue)
-						minValue = *it;
-					if(*it > maxValue)
-						maxValue = *it;
+					if(buf.empty() || !isdigit(buf.c_str()[0]))
+						continue;
 
-					it++;
+					F32 value = (F32)_wtof(buf.c_str());
+
+					if(value < minValue)
+						minValue = value;
+					if(value > maxValue)
+						maxValue = value;
 				}
 			}
 
 			// 最小値と最大値を用いて正規化
 			{
-				auto it = this->lpData.begin();
-				while(it != this->lpData.end())
+				U32 dataNum = 0;
+
+				for(auto& buf : this->lpData)
 				{
-					F32 value = (*it - minValue) / (maxValue - minValue);
+					if(buf.empty() || !isdigit(buf.c_str()[0]))
+					{
+						this->lpNormalizeData[dataNum] = this->CalcOutputValue(0.5f);
+					}
+					else
+					{
+						F32 tmpValue = (F32)_wtof(buf.c_str());
 
-					*it = this->CalcOutputValue(value);
+						F32 value = (tmpValue - minValue) / (maxValue - minValue);
 
-					it++;
+						this->lpNormalizeData[dataNum] = this->CalcOutputValue(value);
+					}
+
+					dataNum++;
 				}
 			}
 
@@ -219,16 +241,28 @@ namespace StringArray {
 		/** 正規化 */
 		virtual ErrorCode Normalize()
 		{
+			// バッファ確保
+			this->lpNormalizeData.resize(this->lpData.size());
+
 			// 最小値と最大値を用いて正規化
 			{
-				auto it = this->lpData.begin();
-				while(it != this->lpData.end())
+				U32 dataNum = 0;
+
+				for(auto& buf : this->lpData)
 				{
-					F32 value = (*it - minValue) / (maxValue - minValue);
+					if(buf.empty() || !isdigit(buf.c_str()[0]))
+					{
+						this->lpNormalizeData[dataNum] = this->CalcOutputValue(0.5f);
+					}
+					else
+					{
+						F32 tmpValue = (F32)_wtof(buf.c_str());
+						F32 value = (tmpValue - minValue) / (maxValue - minValue);
 
-					*it = this->CalcOutputValue(value);
+						this->lpNormalizeData[dataNum] = this->CalcOutputValue(value);
+					}
 
-					it++;
+					dataNum++;
 				}
 			}
 
@@ -260,37 +294,55 @@ namespace StringArray {
 			// 平均値を求める
 			F32 average = 0.0f;
 			{
-				auto it = this->lpData.begin();
-				while(it != this->lpData.end())
+				U32 sumCount = 0;
+				for(auto& buf : this->lpData)
 				{
-					average += *it;
-					it++;
+					if(buf.empty() || !isdigit(buf.c_str()[0]))
+						continue;
+
+					F32 tmpValue = (F32)_wtof(buf.c_str());
+
+					average += tmpValue;
+					sumCount++;
 				}
-				average = average / this->lpData.size();
+				average = average / sumCount;
 			}
 
 			// 標準偏差
 			F32 deviation = 0.0f;
 			{
-				auto it = this->lpData.begin();
-				while(it != this->lpData.end())
+				U32 sumCount = 0;
+				for(auto& buf : this->lpData)
 				{
-					deviation += (*it - average) * (*it - average);
-					it++;
+					if(buf.empty() || !isdigit(buf.c_str()[0]))
+						continue;
+
+					F32 tmpValue = (F32)_wtof(buf.c_str());
+
+					deviation += (tmpValue - average) * (tmpValue - average);
+					sumCount++;
 				}
-				deviation = sqrt(deviation / this->lpData.size());
+				deviation = sqrt(deviation / sumCount);
 			}
 
 			// 値を計算
 			{
-				auto it = this->lpData.begin();
-				while(it != this->lpData.end())
+				U32 dataNum=0;
+				for(auto& buf : this->lpData)
 				{
-					F32 value = (*it - minValue) / (maxValue - minValue);
+					if(buf.empty() || !isdigit(buf.c_str()[0]))
+					{
+						this->lpNormalizeData[dataNum] = this->CalcOutputValue(0.5f);
+					}
+					else
+					{
+						F32 tmpValue = (F32)_wtoi(buf.c_str());
+						F32 value = (tmpValue - minValue) / (maxValue - minValue);
 
-					*it = this->CalcOutputValue(value);
+						this->lpNormalizeData[dataNum] = this->CalcOutputValue(value);
+					}
 
-					it++;
+					dataNum++;
 				}
 			}
 
