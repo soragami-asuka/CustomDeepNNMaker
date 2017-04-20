@@ -14,37 +14,37 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="include">
-      <UniqueIdentifier>{09de9a28-a3d1-4af1-941c-1cfff78eccaa}</UniqueIdentifier>
+      <UniqueIdentifier>{c0d4e937-f8d9-4535-97ae-afa7b074b363}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\Common">
-      <UniqueIdentifier>{0f2bdb40-7edb-44ca-a27a-ef8185d1ca16}</UniqueIdentifier>
+      <UniqueIdentifier>{1d94e851-c2e4-4161-8404-26da0ed2cc74}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\SettingData">
-      <UniqueIdentifier>{d008b117-11d8-41ca-94e8-a3ed344720a4}</UniqueIdentifier>
+      <UniqueIdentifier>{d95a01c1-e214-4683-8ad0-e6815e8ee7e3}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\SettingData\Standard">
-      <UniqueIdentifier>{7b7c4ae3-a8f9-4ae4-9c29-5590eb536b83}</UniqueIdentifier>
+      <UniqueIdentifier>{b6a734f5-b2e5-42df-a30a-989e9d9973fe}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\Layer">
-      <UniqueIdentifier>{86c0a6cb-7184-4557-82b9-e108fa05be7a}</UniqueIdentifier>
+      <UniqueIdentifier>{d29be0e4-1848-4152-b968-a03af6b00467}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\Layer\IOData">
-      <UniqueIdentifier>{968bdd93-e479-4c10-9ef5-46b48c2b3a32}</UniqueIdentifier>
+      <UniqueIdentifier>{ffe3be6b-9740-4d62-9787-88441e6ae636}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\Layer\NeuralNetwork">
-      <UniqueIdentifier>{a6d76efe-2238-4036-9cf1-d8c13cc22f10}</UniqueIdentifier>
+      <UniqueIdentifier>{ad46d8c7-b50b-474c-b778-93fec8247b77}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\Layer\IO">
-      <UniqueIdentifier>{169f1436-6176-40fc-bc7e-ea97559438f6}</UniqueIdentifier>
+      <UniqueIdentifier>{6198ca2c-8dd8-42a9-9f2b-2b4e0a36310a}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\DataFormat">
-      <UniqueIdentifier>{4ec49961-a49c-4496-8b38-63ee314fe035}</UniqueIdentifier>
+      <UniqueIdentifier>{4961ca95-f62a-46dd-8ec5-df18359d4335}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\DataFormat\StringArray">
-      <UniqueIdentifier>{0b95db67-b3dc-4a08-a8f9-768d308b1dbc}</UniqueIdentifier>
+      <UniqueIdentifier>{f625925e-85ab-46e4-b7b0-00a775c10c95}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\DataFormat\Binary">
-      <UniqueIdentifier>{70248e79-750d-45c5-81d2-a860397ec420}</UniqueIdentifier>
+      <UniqueIdentifier>{190a694c-fb95-4ff0-9649-fac2a0b09a74}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -90,13 +90,16 @@
     <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer.h">
       <Filter>include\Layer\IOData</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INeuralNetwork.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayer.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerDLL.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h">
@@ -120,14 +123,17 @@
     <ClInclude Include="..\..\..\include\DataFormat\IDataFormatBase.h">
       <Filter>include\DataFormat</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\DataFormat\StringArray\IDataFromat.h">
-      <Filter>include\DataFormat\StringArray</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INeuralNetwork.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\DataFormat\Binary\IDataFormat.h">
       <Filter>include\DataFormat\Binary</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\DataFormat\StringArray\IDataFormat.h">
+      <Filter>include\DataFormat\StringArray</Filter>
+    </ClInclude>
+    <ClInclude Include="DataFormatItem.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="DataFormatClass.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -138,6 +144,12 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="DataFormat.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="DataFormatItem.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="DataFormatClass.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

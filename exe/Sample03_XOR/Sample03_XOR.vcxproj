@@ -99,7 +99,7 @@
     <ProjectReference Include="..\..\Library\Common\BatchDataNoListGenerator\BatchDataNoListGenerator.vcxproj">
       <Project>{8609a0f5-ad98-4b79-b039-5492c1d26ce9}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\Library\DataFormat\DataFormatStringArray\DataFormatStringArray.vcxproj">
+    <ProjectReference Include="..\..\Library\DataFormat\StringArray\StringArray.vcxproj">
       <Project>{a08b9691-cb48-4671-a5cb-c70b3fbb175d}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\Library\NeuralNetwork\LayerDLLManager\LayerDLLManager.vcxproj">

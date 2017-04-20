@@ -8,7 +8,7 @@
 #undef GRAVISBELL_LIBRAY_API
 #endif
 
-#ifdef DATAFORMATSTRINGARRAY_EXPORTS
+#ifdef DATAFORMAT_STRINGARRAY_EXPORTS
 #define GRAVISBELL_LIBRAY_API __declspec(dllexport)
 #else
 #define GRAVISBELL_LIBRAY_API __declspec(dllimport)

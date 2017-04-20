@@ -1,25 +1,25 @@
 //=====================================
 // データフォーマットの文字列配列形式
 //=====================================
-#ifndef __GRAVISBELL_DATAFORMAT_STRINGARRAY_H__
-#define __GRAVISBELL_DATAFORMAT_STRINGARRAY_H__
+#ifndef __GRAVISBELL_LIBRARY_DATAFORMAT_BINARY_H__
+#define __GRAVISBELL_LIBRARY_DATAFORMAT_BINARY_H__
 
 #ifdef GRAVISBELL_LIBRAY_API
 #undef GRAVISBELL_LIBRAY_API
 #endif
 
-#ifdef DATAFORMATSTRINGARRAY_EXPORTS
+#ifdef DATAFORMAT_BINARY_EXPORTS
 #define GRAVISBELL_LIBRAY_API __declspec(dllexport)
 #else
 #define GRAVISBELL_LIBRAY_API __declspec(dllimport)
 #endif
 
-#include"DataFormat/StringArray/IDataFormat.h"
+#include"DataFormat/Binary/IDataFormat.h"
 
 
 namespace Gravisbell {
 namespace DataFormat {
-namespace StringArray {
+namespace Binary {
 
 	/** 文字列の配列を読み込むデータフォーマットを作成する */
 	extern GRAVISBELL_LIBRAY_API IDataFormat* CreateDataFormat(const wchar_t i_szName[], const wchar_t i_szText[]);

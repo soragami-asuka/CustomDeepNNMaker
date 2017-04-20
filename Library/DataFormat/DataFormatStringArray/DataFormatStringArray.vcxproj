@@ -87,6 +87,7 @@
     <ClInclude Include="..\..\..\include\Common\IBatchDataNoListGenerator.h" />
     <ClInclude Include="..\..\..\include\Common\IODataStruct.h" />
     <ClInclude Include="..\..\..\include\Common\VersionCode.h" />
+    <ClInclude Include="..\..\..\include\DataFormat\Binary\IDataFormat.h" />
     <ClInclude Include="..\..\..\include\DataFormat\IDataFormatBase.h" />
     <ClInclude Include="..\..\..\include\DataFormat\StringArray\IDataFromat.h" />
     <ClInclude Include="..\..\..\include\Layer\ILayerBase.h" />

@@ -247,7 +247,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 
 		// 学習
-		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkSample, pTeachInputLayer, pTeachOutputLayer, pSampleInputLayer, pSampleOutputLayer, 1, 10000) != ErrorCode::ERROR_CODE_NONE)
+		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkSample, pTeachInputLayer, pTeachOutputLayer, pSampleInputLayer, pSampleOutputLayer, 16, 100000) != ErrorCode::ERROR_CODE_NONE)
 		{
 			delete pNeuralNetworkSample;
 			delete pNeuralNetworkLearn;
@@ -407,14 +407,14 @@ Layer::NeuralNetwork::INNLayerData* CreateLayerData(const Layer::NeuralNetwork::
 }
 Layer::NeuralNetwork::INNLayerData* CreateHiddenLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount, F32 dropOutRate)
 {
-	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"sigmoid", dropOutRate);
-//	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"ReLU", dropOutRate);
+//	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"sigmoid", dropOutRate);
+	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"ReLU", dropOutRate);
 //	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"lenear", dropOutRate);
 }
 Layer::NeuralNetwork::INNLayerData* CreateOutputLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount, F32 dropOutRate)
 {
-	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"sigmoid_crossEntropy", dropOutRate);
-//	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"softmax_crossEntropy", dropOutRate);
+//	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"sigmoid_crossEntropy", dropOutRate);
+	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"softmax_crossEntropy", dropOutRate);
 }
 
 /** ニューラルネットワーククラスを作成する */
@@ -466,7 +466,7 @@ Gravisbell::ErrorCode CreateNeuralNetworkLayerConnect(
 		Gravisbell::GUID guid = boost::uuids::random_generator()().data;
 
 		// レイヤーデータを作成
-		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateHiddenLayerData(layerDLLManager, 32, inputDataStruct.GetDataCount(), 0.0f);
+		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateHiddenLayerData(layerDLLManager, 128, inputDataStruct.GetDataCount(), 0.2f);
 		if(pLayerData == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
 		lppLayerData.push_back(pLayerData);
@@ -486,7 +486,7 @@ Gravisbell::ErrorCode CreateNeuralNetworkLayerConnect(
 		Gravisbell::GUID guid = boost::uuids::random_generator()().data;
 
 		// レイヤーデータを作成
-		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateHiddenLayerData(layerDLLManager, 32, inputDataStruct.GetDataCount(), 0.0f);
+		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateHiddenLayerData(layerDLLManager, 128, inputDataStruct.GetDataCount(), 0.5f);
 		if(pLayerData == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
 		lppLayerData.push_back(pLayerData);
@@ -506,7 +506,7 @@ Gravisbell::ErrorCode CreateNeuralNetworkLayerConnect(
 		Gravisbell::GUID guid = boost::uuids::random_generator()().data;
 
 		// レイヤーデータを作成
-		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateOutputLayerData(layerDLLManager, outputDataCount, inputDataStruct.GetDataCount(), 0.0f);
+		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateOutputLayerData(layerDLLManager, outputDataCount, inputDataStruct.GetDataCount(), 0.3f);
 		if(pLayerData == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
 		lppLayerData.push_back(pLayerData);
@@ -681,7 +681,7 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 	Gravisbell::ErrorCode err;
 
 	// 学習係数を設定
-	pNeuralNetworkLearn->SetLearnSettingData(L"LearnCoeff", 0.1f);
+	pNeuralNetworkLearn->SetLearnSettingData(L"LearnCoeff", 0.01f);
 
 	// 事前処理を実行
 	err = pNeuralNetworkLearn->PreProcessLearn(BATCH_SIZE);
@@ -734,7 +734,7 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 		// 学習
 		{
 			// 学習ループ先頭処理
-//			pBatchDataNoListGenerator->PreProcessLearnLoop();
+			pBatchDataNoListGenerator->PreProcessLearnLoop();
 			pTeachInputLayer->PreProcessLearnLoop(*pLearnSetting);
 			pTeachOutputLayer->PreProcessLearnLoop(*pLearnSetting);
 			pNeuralNetworkLearn->PreProcessLearnLoop(*pLearnSetting);
