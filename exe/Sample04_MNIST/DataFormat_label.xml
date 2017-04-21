@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+データフォーマットに関する情報.
+-->
+
+<DataFormat-binary version="1.0.0.0" default-language="ja">
+  <Name>LABEL</Name>
+  <Text>MNISTラベルファイル</Text>
+
+  <Structure category="output">
+    <x>1</x>
+    <y>1</y>
+    <z>1</z>
+    <ch>10</ch>
+
+    <false>0.00</false>
+    <true>1.00</true>
+  </Structure>
+
+  <Data>
+    <Signature size="4">0x00000801</Signature>
+    <Variable size="4" type="uint" id="images"/>
+
+    <Items id="no" count="images">
+      <BoolArray category="output" size="1" type="ubyte">
+        <no>no</no>
+        <x>0</x>
+        <y>0</y>
+        <z>0</z>
+        <ch>value</ch>
+      </BoolArray>
+    </Items>
+  </Data>
+
+</DataFormat-binary>
