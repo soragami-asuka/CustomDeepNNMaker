@@ -29,10 +29,14 @@ namespace Gravisbell {
 namespace DataFormat {
 namespace Binary {
 
+	class CDataFormat;
+
 	/** 文字列を値に変換.進数判定付き */
 	S32 ConvertString2Int(const std::wstring& buf);
 	/** 文字列を値に変換.進数判定付き */
 	U32 ConvertString2UInt(const std::wstring& buf);
+	/** 文字列を値に変換.進数判定付き */
+	F32 ConvertString2Float(const std::wstring& buf);
 
 	/** データ構造 */
 	struct DataStruct
@@ -55,13 +59,6 @@ namespace Binary {
 		DataInfo();
 		/** デストラクタ */
 		~DataInfo();
-		/** コピーコンストラクタ */
-		DataInfo(const DataInfo& info);
-		/** =演算子 */
-		const DataInfo& operator=(const DataInfo& info);
-
-		/** データを設定 */
-		Gravisbell::ErrorCode SetValue(U32 no, U32 x, U32 y, U32 z, U32 ch, F32 value);
 
 		/** データ数を取得 */
 		U32 GetDataCount()const;
@@ -80,11 +77,13 @@ namespace Binary {
 
 		std::list<Format::CItem_base*> lpDataFormat;
 
+		bool onReverseByteOrder;
+
 	public:
 		/** コンストラクタ */
 		CDataFormat();
 		/** コンストラクタ */
-		CDataFormat(const wchar_t i_szName[], const wchar_t i_szText[]);
+		CDataFormat(const wchar_t i_szName[], const wchar_t i_szText[], bool onReverseByteOrder);
 		/** デストラクタ */
 		virtual ~CDataFormat();
 
@@ -115,18 +114,28 @@ namespace Binary {
 		Gravisbell::ErrorCode AddDataInfo(const wchar_t i_szCategory[], const wchar_t i_x[], const wchar_t i_y[], const wchar_t i_z[], const wchar_t i_ch[], F32 i_false, F32 i_true);
 		/** データ情報に値を書き込む */
 		Gravisbell::ErrorCode SetDataValue(const wchar_t i_szCategory[], U32 i_No, U32 i_x, U32 i_y, U32 i_z, U32 i_ch, F32 value);
+		/** データ情報に値を書き込む.
+			0.0=false.
+			1.0=true.
+			として値を格納する */
+		Gravisbell::ErrorCode SetDataValueNormalize(const wchar_t i_szCategory[], U32 i_No, U32 i_x, U32 i_y, U32 i_z, U32 i_ch, F32 value);
 		/** データ情報に値を書き込む */
 		Gravisbell::ErrorCode SetDataValue(const wchar_t i_szCategory[], U32 i_No, U32 i_x, U32 i_y, U32 i_z, U32 i_ch, bool value);
 
 		/** ID指定で変数の値を取得する.(直値判定付き) */
-		S32 GetVariableValue(const std::wstring& id)const;
+		S32 GetVariableValue(const wchar_t i_szID[])const;
+		/** ID指定で変数の値を取得する.(直値判定付き.)(float型として値を返す) */
+		F32 GetVariableValueAsFloat(const wchar_t i_szID[])const;
 		/** ID指定で変数に値を設定する.(直値判定付き) */
-		void SetVariableValue(const std::wstring& id, S32 value);
+		void SetVariableValue(const wchar_t i_szID[], S32 value);
 
 		/** カテゴリー数を取得する */
 		U32 GetCategoryCount()const;
 		/** カテゴリー名を番号指定で取得する */
 		const wchar_t* GetCategoryNameByNum(U32 categoryNo)const;
+
+		/** Byte-Orderの反転フラグを取得する */
+		bool GetOnReverseByteOrder()const;
 
 	public:
 		/** データ数を取得する */
@@ -147,6 +156,9 @@ namespace Binary {
 
 		/** データフォーマットを全削除する */
 		Gravisbell::ErrorCode ClearDataFormat();
+
+		/** データフォーマットを追加する */
+		Gravisbell::ErrorCode AddDataFormat(Format::CItem_base* pDataFormat);
 
 
 	public:

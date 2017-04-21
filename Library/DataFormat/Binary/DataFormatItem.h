@@ -34,145 +34,14 @@ namespace Binary {
 		DATA_TYPE_DOUBLE,
 	};
 
+	enum ByteOrder
+	{
+		BYTEODER_BIG,
+		BYTEODER_LITTLE,
+	};
 
 	namespace Format
 	{
-		namespace Data
-		{
-			class CDataItem_base
-			{
-			protected:
-				CDataFormat& m_dataFormat;
-
-			public:
-				/** コンストラクタ */
-				CDataItem_base(CDataFormat& i_dataFormat)
-					:	m_dataFormat	(i_dataFormat)
-				{
-				}
-				/** デストラクタ */
-				virtual ~CDataItem_base(){}
-
-			public:
-				/** バイナリデータを読み込む.
-					@param	i_lpBuf			バイナリ先頭アドレス.
-					@param	i_byteCount		読込可能なバイト数.
-					@param	i_dataNo		データ番号.
-					@param	i_lpLocalValue	ローカル変数.
-					@return	実際に読み込んだバイト数. 失敗した場合は負の値 */
-				virtual S32 LoadBinary(const BYTE* i_lpBuf, U32 i_byteCount, U32 i_dataNo) = 0;
-			};
-			class CDataItem_float : public CDataItem_base
-			{
-			private:
-
-			protected:
-				std::wstring m_category;
-
-				U32 m_size;
-				DataType m_dataType;
-
-				std::wstring var_x;
-				std::wstring var_y;
-				std::wstring var_z;
-				std::wstring var_ch;
-
-			public:
-				/** コンストラクタ */
-				CDataItem_float(
-					CDataFormat& i_dataFormat,
-					const std::wstring& i_category,
-					U32 i_size, DataType i_dataType,
-					const std::wstring& i_var_x, const std::wstring& i_var_y, const std::wstring& i_var_z, const std::wstring& i_var_ch);
-				/** デストラクタ */
-				virtual ~CDataItem_float();
-
-			public:
-				/** バイナリデータを読み込む.
-					@param	i_lpBuf			バイナリ先頭アドレス.
-					@param	i_byteCount		読込可能なバイト数.
-					@param	i_dataNo		データ番号.
-					@param	i_lpLocalValue	ローカル変数.
-					@return	実際に読み込んだバイト数. 失敗した場合は負の値 */
-				virtual S32 LoadBinary(const BYTE* i_lpBuf, U32 i_byteCount, U32 i_dataNo);
-			};
-			class CDataItem_float_normalize_min_max : public CDataItem_base
-			{
-			protected:
-				const std::wstring& var_min;
-				const std::wstring& var_max;
-
-			public:
-				/** コンストラクタ */
-				CDataItem_float_normalize_min_max(
-					CDataFormat& i_dataFormat,
-					U32 i_size, DataType i_dataType,
-					const std::wstring& i_var_x, const std::wstring& i_var_y, const std::wstring& i_var_z, const std::wstring& i_var_ch,
-					const std::wstring& i_var_min, const std::wstring& i_var_max);
-				/** デストラクタ */
-				virtual ~CDataItem_float_normalize_min_max();
-
-			public:
-				/** バイナリデータを読み込む.
-					@param	i_lpBuf			バイナリ先頭アドレス.
-					@param	i_byteCount		読込可能なバイト数.
-					@param	i_dataNo		データ番号.
-					@param	i_lpLocalValue	ローカル変数.
-					@return	実際に読み込んだバイト数. 失敗した場合は負の値 */
-				virtual S32 LoadBinary(const BYTE* i_lpBuf, U32 i_byteCount, U32 i_dataNo);
-			};
-			class CDataItem_int : public CDataItem_base
-			{
-			protected:
-				U32 m_size;
-				DataType m_dataType;
-
-				std::wstring var_x;
-				std::wstring var_y;
-				std::wstring var_z;
-				std::wstring var_ch;
-
-			public:
-				/** コンストラクタ */
-				CDataItem_int(
-					CDataFormat& i_dataFormat,
-					U32 i_size, DataType i_dataType,
-					const std::wstring& i_var_x, const std::wstring& i_var_y, const std::wstring& i_var_z, const std::wstring& i_var_ch);
-				/** デストラクタ */
-				virtual ~CDataItem_int();
-
-			public:
-				/** バイナリデータを読み込む.
-					@param	i_lpBuf			バイナリ先頭アドレス.
-					@param	i_byteCount		読込可能なバイト数.
-					@param	i_dataNo		データ番号.
-					@param	i_lpLocalValue	ローカル変数.
-					@return	実際に読み込んだバイト数. 失敗した場合は負の値 */
-				virtual S32 LoadBinary(const BYTE* i_lpBuf, U32 i_byteCount, U32 i_dataNo);
-			};
-			class CDataItem_items : public CDataItem_base
-			{
-			protected:
-				std::wstring m_id;
-				std::wstring m_count;
-
-			public:
-				/** コンストラクタ */
-				CDataItem_items(CDataFormat& i_dataFormat, U32 i_id, U32 i_count);
-				/** デストラクタ */
-				virtual ~CDataItem_items();
-
-			public:
-				/** バイナリデータを読み込む.
-					@param	i_lpBuf			バイナリ先頭アドレス.
-					@param	i_byteCount		読込可能なバイト数.
-					@param	i_dataNo		データ番号.
-					@param	i_lpLocalValue	ローカル変数.
-					@return	実際に読み込んだバイト数. 失敗した場合は負の値 */
-				virtual S32 LoadBinary(const BYTE* i_lpBuf, U32 i_byteCount, U32 i_dataNo);
-			};
-		}
-
 		class CItem_base
 		{
 		protected:
@@ -252,29 +121,164 @@ namespace Binary {
 				@return	実際に読み込んだバイト数. 失敗した場合は負の値 */
 			S32 LoadBinary(const BYTE* i_lpBuf, U32 i_byteCount);
 		};
-		class CItem_data : public CItem_base
+
+		class CItem_float : public CItem_base
 		{
 		private:
-			std::wstring m_count;	/**< ループ回数. 文字列の場合は変数名. */
 
-			std::list<Data::CDataItem_base*> lpItem;
+		protected:
+			const std::wstring m_category;
+
+			const U32 m_size;
+			const DataType m_dataType;
+			
+			const std::wstring var_no;
+			const std::wstring var_x;
+			const std::wstring var_y;
+			const std::wstring var_z;
+			const std::wstring var_ch;
 
 		public:
 			/** コンストラクタ */
-			CItem_data(CDataFormat& dataFormat, const std::wstring& i_count);
+			CItem_float(
+				CDataFormat& i_dataFormat,
+				const std::wstring& i_category,
+				U32 i_size, DataType i_dataType,
+				const std::wstring& i_var_no, const std::wstring& i_var_x, const std::wstring& i_var_y, const std::wstring& i_var_z, const std::wstring& i_var_ch);
+			/** デストラクタ */
+			virtual ~CItem_float();
+
+		public:
+			/** バイナリデータを読み込む.
+				@param	i_lpBuf			バイナリ先頭アドレス.
+				@param	i_byteCount		読込可能なバイト数.
+				@param	i_dataNo		データ番号.
+				@param	i_lpLocalValue	ローカル変数.
+				@return	実際に読み込んだバイト数. 失敗した場合は負の値 */
+			virtual S32 LoadBinary(const BYTE* i_lpBuf, U32 i_byteCount);
+		};
+		class CItem_float_normalize_min_max : public CItem_float
+		{
+		protected:
+			const std::wstring var_min;
+			const std::wstring var_max;
+
+		public:
+			/** コンストラクタ */
+			CItem_float_normalize_min_max(
+				CDataFormat& i_dataFormat,
+				const std::wstring& i_category,
+				U32 i_size, DataType i_dataType,
+				const std::wstring& i_var_no, const std::wstring& i_var_x, const std::wstring& i_var_y, const std::wstring& i_var_z, const std::wstring& i_var_ch,
+				const std::wstring& i_var_min, const std::wstring& i_var_max);
+			/** デストラクタ */
+			virtual ~CItem_float_normalize_min_max();
+
+		public:
+			/** バイナリデータを読み込む.
+				@param	i_lpBuf			バイナリ先頭アドレス.
+				@param	i_byteCount		読込可能なバイト数.
+				@param	i_dataNo		データ番号.
+				@param	i_lpLocalValue	ローカル変数.
+				@return	実際に読み込んだバイト数. 失敗した場合は負の値 */
+			virtual S32 LoadBinary(const BYTE* i_lpBuf, U32 i_byteCount);
+		};
+		class CItem_boolArray : public CItem_base
+		{
+		protected:
+			const std::wstring m_category;
+
+			const U32 m_size;
+			const DataType m_dataType;
+
+			const std::wstring var_no;
+			const std::wstring var_x;
+			const std::wstring var_y;
+			const std::wstring var_z;
+			const std::wstring var_ch;
+
+		public:
+			/** コンストラクタ */
+			CItem_boolArray(
+				CDataFormat& i_dataFormat,
+				const std::wstring& i_category,
+				U32 i_size, DataType i_dataType,
+				const std::wstring& i_var_no, const std::wstring& i_var_x, const std::wstring& i_var_y, const std::wstring& i_var_z, const std::wstring& i_var_ch);
+			/** デストラクタ */
+			virtual ~CItem_boolArray();
+
+		public:
+			/** バイナリデータを読み込む.
+				@param	i_lpBuf			バイナリ先頭アドレス.
+				@param	i_byteCount		読込可能なバイト数.
+				@param	i_dataNo		データ番号.
+				@param	i_lpLocalValue	ローカル変数.
+				@return	実際に読み込んだバイト数. 失敗した場合は負の値 */
+			virtual S32 LoadBinary(const BYTE* i_lpBuf, U32 i_byteCount);
+		};
+
+		class CItem_items_base : public CItem_base
+		{
+		public:
+			/** コンストラクタ */
+			CItem_items_base(CDataFormat& i_dataFormat) : CItem_base(i_dataFormat){}
+			/** デストラクタ */
+			virtual ~CItem_items_base(){}
+
+		public:
+			/** アイテムを追加する */
+			virtual Gravisbell::ErrorCode AddItem(CItem_base* pItem) = 0;
+		};
+		class CItem_items : public CItem_items_base
+		{
+		protected:
+			const std::wstring m_id;
+			const std::wstring m_count;
+
+			std::list<CItem_base*> lpItem;
+
+		public:
+			/** コンストラクタ */
+			CItem_items(CDataFormat& i_dataFormat, const std::wstring& i_id, const std::wstring& i_count);
+			/** デストラクタ */
+			virtual ~CItem_items();
+
+		public:
+			/** アイテムを追加する */
+			Gravisbell::ErrorCode AddItem(CItem_base* pItem);
+
+		public:
+			/** バイナリデータを読み込む.
+				@param	i_lpBuf			バイナリ先頭アドレス.
+				@param	i_byteCount		読込可能なバイト数.
+				@param	i_dataNo		データ番号.
+				@param	i_lpLocalValue	ローカル変数.
+				@return	実際に読み込んだバイト数. 失敗した場合は負の値 */
+			virtual S32 LoadBinary(const BYTE* i_lpBuf, U32 i_byteCount);
+		};
+		class CItem_data : public CItem_items_base
+		{
+		protected:
+			std::list<CItem_base*> lpItem;
+
+		public:
+			/** コンストラクタ */
+			CItem_data(CDataFormat& i_dataFormat);
 			/** デストラクタ */
 			virtual ~CItem_data();
 
 		public:
 			/** アイテムを追加する */
-			Gravisbell::ErrorCode AddItem(Data::CDataItem_base* pItem);
+			Gravisbell::ErrorCode AddItem(CItem_base* pItem);
 
 		public:
 			/** バイナリデータを読み込む.
-				@param	i_lpBuf		バイナリ先頭アドレス.
-				@param	i_byteCount	読込可能なバイト数.
+				@param	i_lpBuf			バイナリ先頭アドレス.
+				@param	i_byteCount		読込可能なバイト数.
+				@param	i_dataNo		データ番号.
+				@param	i_lpLocalValue	ローカル変数.
 				@return	実際に読み込んだバイト数. 失敗した場合は負の値 */
-			S32 LoadBinary(const BYTE* i_lpBuf, U32 i_byteCount);
+			virtual S32 LoadBinary(const BYTE* i_lpBuf, U32 i_byteCount);
 		};
 	}
 

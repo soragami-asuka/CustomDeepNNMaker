@@ -12,13 +12,14 @@ namespace Binary {
 
 	/** コンストラクタ */
 	CDataFormat::CDataFormat()
-	:	CDataFormat	(L"", L"")
+	:	CDataFormat	(L"", L"", false)
 	{
 	}
 	/** コンストラクタ */
-	CDataFormat::CDataFormat(const wchar_t i_szName[], const wchar_t i_szText[])
-	:	name		(i_szName)
-	,	text		(i_szText)
+	CDataFormat::CDataFormat(const wchar_t i_szName[], const wchar_t i_szText[], bool onReverseByteOrder)
+	:	name				(i_szName)
+	,	text				(i_szText)
+	,	onReverseByteOrder	(onReverseByteOrder)
 	{
 	}
 	/** デストラクタ */
@@ -55,7 +56,7 @@ namespace Binary {
 		if(pDataInfo == NULL)
 			return 0;
 
-		return this->GetVariableValue(pDataInfo->dataStruct.m_x);
+		return this->GetVariableValue(pDataInfo->dataStruct.m_x.c_str());
 	}
 	/** Y次元の要素数を取得 */
 	U32 CDataFormat::GetBufferCountY(const wchar_t i_szCategory[])const
@@ -64,7 +65,7 @@ namespace Binary {
 		if(pDataInfo == NULL)
 			return 0;
 
-		return this->GetVariableValue(pDataInfo->dataStruct.m_y);
+		return this->GetVariableValue(pDataInfo->dataStruct.m_y.c_str());
 	}
 	/** Z次元の要素数を取得 */
 	U32 CDataFormat::GetBufferCountZ(const wchar_t i_szCategory[])const
@@ -73,7 +74,7 @@ namespace Binary {
 		if(pDataInfo == NULL)
 			return 0;
 
-		return this->GetVariableValue(pDataInfo->dataStruct.m_z);
+		return this->GetVariableValue(pDataInfo->dataStruct.m_z.c_str());
 	}
 	/** CH次元の要素数を取得 */
 	U32 CDataFormat::GetBufferCountCH(const wchar_t i_szCategory[])const
@@ -82,7 +83,7 @@ namespace Binary {
 		if(pDataInfo == NULL)
 			return 0;
 
-		return this->GetVariableValue(pDataInfo->dataStruct.m_ch);
+		return this->GetVariableValue(pDataInfo->dataStruct.m_ch.c_str());
 	}
 
 	/** データ構造を取得 */
@@ -129,7 +130,7 @@ namespace Binary {
 	Gravisbell::ErrorCode CDataFormat::SetDataValue(const wchar_t i_szCategory[], U32 i_no, U32 i_x, U32 i_y, U32 i_z, U32 i_ch, F32 value)
 	{
 		DataInfo* pDataInfo = this->GetDataInfo(i_szCategory);
-		if(pDataInfo)
+		if(pDataInfo == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
 
 		if(pDataInfo->lpData.size() <= i_no)
@@ -157,16 +158,16 @@ namespace Binary {
 		}
 
 		// 値を設定する
-		U32 size_x  = this->GetVariableValue(pDataInfo->dataStruct.m_x);
+		U32 size_x  = this->GetVariableValue(pDataInfo->dataStruct.m_x.c_str());
 		if(i_x >= size_x)
 			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_ARRAYRANGE;
-		U32 size_y  = this->GetVariableValue(pDataInfo->dataStruct.m_y);
+		U32 size_y  = this->GetVariableValue(pDataInfo->dataStruct.m_y.c_str());
 		if(i_y >= size_y)
 			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_ARRAYRANGE;
-		U32 size_z  = this->GetVariableValue(pDataInfo->dataStruct.m_z);
+		U32 size_z  = this->GetVariableValue(pDataInfo->dataStruct.m_z.c_str());
 		if(i_z >= size_z)
 			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_ARRAYRANGE;
-		U32 size_ch = this->GetVariableValue(pDataInfo->dataStruct.m_ch);
+		U32 size_ch = this->GetVariableValue(pDataInfo->dataStruct.m_ch.c_str());
 		if(i_ch >= size_ch)
 			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_ARRAYRANGE;
 
@@ -180,6 +181,21 @@ namespace Binary {
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
+	/** データ情報に値を書き込む.
+		0.0=false.
+		1.0=true.
+		として値を格納する */
+	Gravisbell::ErrorCode CDataFormat::SetDataValueNormalize(const wchar_t i_szCategory[], U32 i_No, U32 i_x, U32 i_y, U32 i_z, U32 i_ch, F32 value)
+	{
+		DataInfo* pDataInfo = this->GetDataInfo(i_szCategory);
+		if(pDataInfo == NULL)
+			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
+
+		F32 tmpValue = (pDataInfo->dataStruct.m_true - pDataInfo->dataStruct.m_false) * value + pDataInfo->dataStruct.m_false;
+		tmpValue = min(pDataInfo->dataStruct.m_true, max(pDataInfo->dataStruct.m_false, tmpValue));
+
+		return this->SetDataValue(i_szCategory, i_No, i_x, i_y, i_z, i_ch, tmpValue);
+	}
 	/** データ情報に値を書き込む */
 	Gravisbell::ErrorCode CDataFormat::SetDataValue(const wchar_t i_szCategory[], U32 i_No, U32 i_x, U32 i_y, U32 i_z, U32 i_ch, bool value)
 	{
@@ -192,17 +208,17 @@ namespace Binary {
 
 
 	/** ID指定で変数の値を取得する.(直値判定付き) */
-	S32 CDataFormat::GetVariableValue(const std::wstring& id)const
+	S32 CDataFormat::GetVariableValue(const wchar_t i_szID[])const
 	{
-		if(isdigit(id.c_str()[0]))
+		if(isdigit(i_szID[0]))
 		{
 			// 変数ではない
-			return ConvertString2Int(id);
+			return ConvertString2Int(i_szID);
 		}
 		else
 		{
 			// 変数
-			auto it = this->lpVariable.find(id);
+			auto it = this->lpVariable.find(i_szID);
 			if(it == this->lpVariable.end())
 				return 0;
 			return it->second;
@@ -210,10 +226,29 @@ namespace Binary {
 
 		return 0;
 	}
-	/** ID指定で変数に値を設定する.(直値判定付き) */
-	void CDataFormat::SetVariableValue(const std::wstring& id, S32 value)
+	/** ID指定で変数の値を取得する.(直値判定付き.)(float型として値を返す) */
+	F32 CDataFormat::GetVariableValueAsFloat(const wchar_t i_szID[])const
 	{
-		this->lpVariable[id] = value;
+		if(isdigit(i_szID[0]))
+		{
+			// 変数ではない
+			return ConvertString2Float(i_szID);
+		}
+		else
+		{
+			// 変数
+			auto it = this->lpVariable.find(i_szID);
+			if(it == this->lpVariable.end())
+				return 0.0f;
+			return (F32)it->second;
+		}
+
+		return 0;
+	}
+	/** ID指定で変数に値を設定する.(直値判定付き) */
+	void CDataFormat::SetVariableValue(const wchar_t i_szID[], S32 value)
+	{
+		this->lpVariable[i_szID] = value;
 	}
 	/** 文字列を値に変換.進数判定付き */
 	S32 ConvertString2Int(const std::wstring& buf)
@@ -249,13 +284,49 @@ namespace Binary {
 		else
 		{
 			return wcstol(buf.c_str(), NULL, 10);
-
 		}
 	}
 	/** 文字列を値に変換.進数判定付き */
 	U32 ConvertString2UInt(const std::wstring& buf)
 	{
 		return (U32)ConvertString2Int(buf);
+	}
+	/** 文字列を値に変換.進数判定付き */
+	F32 ConvertString2Float(const std::wstring& buf)
+	{
+		if(buf.size() >= 2 && buf.c_str()[0] == L'0' && buf.c_str()[1] != L'.')	// 正の値
+		{
+			// 進数判定を行う
+			if(buf.c_str()[1] == L'x')
+			{
+				// 16進数
+				return (F32)wcstol(&buf.c_str()[2], NULL, 16);
+			}
+			else
+			{
+				// 8進数
+				return (F32)wcstol(&buf.c_str()[1], NULL, 8);
+			}
+		}
+		if(buf.size() >= 3 && buf.c_str()[0] == L'-' && buf.c_str()[1] == L'0' && buf.c_str()[2] != L'.')	// 負の値
+		{
+			// 進数判定を行う
+			if(buf.c_str()[2] == L'x')
+			{
+				// 16進数
+				return (F32)-wcstol(&buf.c_str()[3], NULL, 16);
+			}
+			else
+			{
+				// 8進数
+				return (F32)-wcstol(&buf.c_str()[2], NULL, 8);
+			}
+		}
+		else
+		{
+			// 10進数の場合はfloat型
+			return (F32)wcstof(buf.c_str(), NULL);
+		}
 	}
 
 	/** カテゴリー数を取得する */
@@ -273,6 +344,12 @@ namespace Binary {
 		for(U32 no=0; no<categoryNo; no++)
 			it++;
 		return it->first.c_str();
+	}
+
+	/** Byte-Orderの反転フラグを取得する */
+	bool CDataFormat::GetOnReverseByteOrder()const
+	{
+		return this->onReverseByteOrder;
 	}
 
 
@@ -320,6 +397,14 @@ namespace Binary {
 			delete it;
 		}
 		this->lpDataFormat.clear();
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+
+	/** データフォーマットを追加する */
+	Gravisbell::ErrorCode CDataFormat::AddDataFormat(Format::CItem_base* pDataFormat)
+	{
+		this->lpDataFormat.push_back(pDataFormat);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
