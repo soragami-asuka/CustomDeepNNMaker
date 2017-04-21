@@ -19,6 +19,11 @@ namespace Binary {
 		/** デストラクタ */
 		virtual ~IDataFormat(){}
 
+	public:
+		/** ID指定で変数の値を取得する.(直値判定付き) */
+		virtual S32 GetVariableValue(const wchar_t i_szID[])const = 0;
+		/** ID指定で変数の値を取得する.(直値判定付き.)(float型として値を返す) */
+		virtual F32 GetVariableValueAsFloat(const wchar_t i_szID[])const = 0;
 
 	public:
 		/** データをバイナリから読み込む.
