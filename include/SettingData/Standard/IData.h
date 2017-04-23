@@ -23,6 +23,10 @@ namespace Standard {
 		ITEMTYPE_STRING,
 		ITEMTYPE_BOOL,
 		ITEMTYPE_ENUM,
+		ITEMTYPE_VECTOR2D_FLOAT,
+		ITEMTYPE_VECTOR2D_INT,
+		ITEMTYPE_VECTOR3D_FLOAT,
+		ITEMTYPE_VECTOR3D_INT,
 
 		ITEMTYPE_COUNT
 	};
@@ -268,6 +272,49 @@ namespace Standard {
 		virtual S32 GetDefault()const = 0;
 	};
 
+	/** 設定項目(Vector3)(実数) */
+	template<class Type>
+	class IItem_Vector3D : public IItemBase
+	{
+	public:
+		/** コンストラクタ */
+		IItem_Vector3D()
+			: IItemBase()
+		{};
+		/** デストラクタ */
+		virtual ~IItem_Vector3D(){};
+
+	public:
+		/** 値を取得する */
+		virtual const Vector3D<Type>& GetValue()const = 0;
+		virtual Type GetValueX()const = 0;
+		virtual Type GetValueY()const = 0;
+		virtual Type GetValueZ()const = 0;
+		/** 値を設定する
+			@param value	設定する値
+			@return 成功した場合0 */
+		virtual Gravisbell::ErrorCode SetValue(const Vector3D<Type>& value) = 0;
+		virtual Gravisbell::ErrorCode SetValueX(Type value) = 0;
+		virtual Gravisbell::ErrorCode SetValueY(Type value) = 0;
+		virtual Gravisbell::ErrorCode SetValueZ(Type value) = 0;
+
+	public:
+		/** 設定可能最小値を取得する */
+		virtual Type GetMinX()const = 0;
+		virtual Type GetMinY()const = 0;
+		virtual Type GetMinZ()const = 0;
+		/** 設定可能最大値を取得する */
+		virtual Type GetMaxX()const = 0;
+		virtual Type GetMaxY()const = 0;
+		virtual Type GetMaxZ()const = 0;
+
+		/** デフォルトの設定値を取得する */
+		virtual Type GetDefaultX()const = 0;
+		virtual Type GetDefaultY()const = 0;
+		virtual Type GetDefaultZ()const = 0;
+	};
+	typedef IItem_Vector3D<F32> IItem_Vector3D_Float;
+	typedef IItem_Vector3D<S32> IItem_Vector3D_Int;
 
 
 	/** 設定情報 */

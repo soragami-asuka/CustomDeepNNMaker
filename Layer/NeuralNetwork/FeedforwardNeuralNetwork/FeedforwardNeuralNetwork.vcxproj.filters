@@ -43,6 +43,15 @@
     <Filter Include="LayerConnect">
       <UniqueIdentifier>{cb727a1f-1fc4-43b4-a563-262ab28721d8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\DataFormat">
+      <UniqueIdentifier>{7902cf87-ad4f-4489-8ce5-091dab8e5e6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\DataFormat\StringArray">
+      <UniqueIdentifier>{9574eec5-6d87-4ba6-8fc8-fb626f46d984}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\DataFormat\Binary">
+      <UniqueIdentifier>{24d65bf7-83eb-4bcd-8800-4cb86b3d5ca1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -146,6 +155,15 @@
     </ClInclude>
     <ClInclude Include="FeedforwardNeuralNetwork_CPU.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\DataFormat\IDataFormatBase.h">
+      <Filter>include\DataFormat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\DataFormat\StringArray\IDataFormat.h">
+      <Filter>include\DataFormat\StringArray</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\DataFormat\Binary\IDataFormat.h">
+      <Filter>include\DataFormat\Binary</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

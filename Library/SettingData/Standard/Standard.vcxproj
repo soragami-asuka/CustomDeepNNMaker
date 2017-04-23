@@ -14,7 +14,7 @@
     <ProjectGuid>{79FD5F13-1407-43AB-834C-04C1AECCDBB5}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Standard</RootNamespace>
-    <ProjectName>Standard</ProjectName>
+    <ProjectName>SettingData.Standard</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -43,12 +43,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(Configuration)\</IntDir>
-    <TargetName>$(SolutionName).SettingData.$(ProjectName)</TargetName>
+    <TargetName>$(SolutionName).$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(Configuration)\</IntDir>
-    <TargetName>$(SolutionName).SettingData.$(ProjectName)</TargetName>
+    <TargetName>$(SolutionName).$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -121,6 +121,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Item_Vector3D.cpp" />
     <ClCompile Include="Standard.cpp" />
     <ClCompile Include="Item_Bool.cpp" />
     <ClCompile Include="Item_Enum.cpp" />

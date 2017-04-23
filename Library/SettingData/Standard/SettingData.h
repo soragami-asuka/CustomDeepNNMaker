@@ -34,6 +34,20 @@ namespace Standard {
 	/** İ’è€–Ú(—ñ‹“’l)‚ğì¬‚·‚é */
 	extern "C" GRAVISBELL_SETTINGDATA_API IItemEx_Enum* CreateItem_Enum(const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[]);
 
+	/** İ’è€–Ú(Vector3)(À”)‚ğì¬‚·‚é. */
+	extern "C" GRAVISBELL_SETTINGDATA_API IItem_Vector3D_Float* CreateItem_Vector3D_Float(
+		const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[],
+		F32 i_minValueX, F32 i_minValueY, F32 i_minValueZ,
+		F32 i_maxValueX, F32 i_maxValueY, F32 i_maxValueZ,
+		F32 i_defaultValueX, F32 i_defaultValueY, F32 i_defaultValueZ);
+
+	/** İ’è€–Ú(Vector3)(®”)‚ğì¬‚·‚é. */
+	extern "C" GRAVISBELL_SETTINGDATA_API IItem_Vector3D_Int* CreateItem_Vector3D_Int(
+		const wchar_t i_szID[], const wchar_t i_szName[], const wchar_t i_szText[],
+		S32 i_minValueX, S32 i_minValueY, S32 i_minValueZ,
+		S32 i_maxValueX, S32 i_maxValueY, S32 i_maxValueZ,
+		S32 i_defaultValueX, S32 i_defaultValueY, S32 i_defaultValueZ);
+
 }	// Standard
 }	// SettingData
 }	// Gravisbell

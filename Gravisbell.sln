@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{D7D4DAE4-074F-4473-A80B-94E557D28FD0}"
 EndProject
@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NeuralNetwork", "NeuralNetw
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IOData", "IOData", "{82040EB7-85BE-4915-9DC4-25A0979CA86B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IODataLayer", "Layer\IOData\IODataLayer\IODataLayer.vcxproj", "{FE50F8D5-EFE1-4B8E-9BA8-1754980D6266}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.IOData.IODataLayer", "Layer\IOData\IODataLayer\IODataLayer.vcxproj", "{FE50F8D5-EFE1-4B8E-9BA8-1754980D6266}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{69F1082F-185D-4490-80C2-EFA5AC6F2EF7}"
 EndProject
@@ -31,7 +31,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BatchDataNoListGenerator", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SettingData", "SettingData", "{A7BB7879-AEFD-4E2F-81C0-3E18DE55F508}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Standard", "Library\SettingData\Standard\Standard.vcxproj", "{79FD5F13-1407-43AB-834C-04C1AECCDBB5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SettingData.Standard", "Library\SettingData\Standard\Standard.vcxproj", "{79FD5F13-1407-43AB-834C-04C1AECCDBB5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sample01_CRX", "exe\Sample01_CRX\Sample01_CRX.vcxproj", "{E7EB4E79-BBE1-42A0-AF62-1BC396CA5888}"
 EndProject
@@ -39,9 +39,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataFormat", "DataFormat", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StringUtility", "Library\Common\StringUtility\StringUtility.vcxproj", "{99DE1DBC-0A4C-48F6-ADAF-75E29EDF2F1F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FullyConnect_Activation", "Layer\NeuralNetwork\FullyConnect_Activation\FullyConnect_Activation.vcxproj", "{4B29F8CD-B065-48D8-8B4A-3BAA89ABFD7E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.FullyConnect_Activation", "Layer\NeuralNetwork\FullyConnect_Activation\FullyConnect_Activation.vcxproj", "{4B29F8CD-B065-48D8-8B4A-3BAA89ABFD7E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FeedforwardNeuralNetwork", "Layer\NeuralNetwork\FeedforwardNeuralNetwork\FeedforwardNeuralNetwork.vcxproj", "{4B0F0996-50E0-498C-AEEB-B06EE5FD4E54}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.FeedforwardNeuralNetwork", "Layer\NeuralNetwork\FeedforwardNeuralNetwork\FeedforwardNeuralNetwork.vcxproj", "{4B0F0996-50E0-498C-AEEB-B06EE5FD4E54}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sample02_TRI", "exe\Sample02_TRI\Sample02_TRI.vcxproj", "{C4A928D7-75C1-44E9-8A9E-EEE058F3338D}"
 EndProject
@@ -54,6 +54,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataFormat.StringArray", "Library\DataFormat\StringArray\StringArray.vcxproj", "{A08B9691-CB48-4671-A5CB-C70B3FBB175D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sample04_MNIST", "exe\Sample04_MNIST\Sample04_MNIST.vcxproj", "{8008D157-41BC-47AB-B90C-B9F4B86AD198}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.Convolution", "Layer\NeuralNetwork\Convolution\Convolution.vcxproj", "{68F66AF4-5742-4648-A5F3-DC5AD15FFDE6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -125,6 +127,10 @@ Global
 		{8008D157-41BC-47AB-B90C-B9F4B86AD198}.Debug|Win32.Build.0 = Debug|Win32
 		{8008D157-41BC-47AB-B90C-B9F4B86AD198}.Release|Win32.ActiveCfg = Release|Win32
 		{8008D157-41BC-47AB-B90C-B9F4B86AD198}.Release|Win32.Build.0 = Release|Win32
+		{68F66AF4-5742-4648-A5F3-DC5AD15FFDE6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{68F66AF4-5742-4648-A5F3-DC5AD15FFDE6}.Debug|Win32.Build.0 = Debug|Win32
+		{68F66AF4-5742-4648-A5F3-DC5AD15FFDE6}.Release|Win32.ActiveCfg = Release|Win32
+		{68F66AF4-5742-4648-A5F3-DC5AD15FFDE6}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -152,6 +158,7 @@ Global
 		{B3700B28-5D2C-4B7B-9857-09682F048974} = {7BFBA22C-8094-4455-99EC-B6C375FFA37B}
 		{A08B9691-CB48-4671-A5CB-C70B3FBB175D} = {7BFBA22C-8094-4455-99EC-B6C375FFA37B}
 		{8008D157-41BC-47AB-B90C-B9F4B86AD198} = {9DEE086C-8571-41DD-ADD4-7583EB13580A}
+		{68F66AF4-5742-4648-A5F3-DC5AD15FFDE6} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		VisualSVNWorkingCopyRoot = .

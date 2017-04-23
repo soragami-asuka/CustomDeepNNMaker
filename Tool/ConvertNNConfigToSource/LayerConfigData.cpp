@@ -19,6 +19,62 @@ using namespace StringUtility;
 
 namespace
 {
+	template<class Type>
+	Type GetTreeValue(const boost::property_tree::ptree& pXmlTree, const std::string& id)
+	{
+		Type value = 0;
+		if(boost::optional<Type> pValue = pXmlTree.get_optional<Type>(id))
+		{
+			value = pValue.get();
+		}
+
+		return value;
+	}
+	template<>
+	std::wstring GetTreeValue<std::wstring>(const boost::property_tree::ptree& pXmlTree, const std::string& id)
+	{
+		std::wstring value;
+		if(boost::optional<std::string> pValue = pXmlTree.get_optional<std::string>(id))
+		{
+			value = StringUtility::UTF8toUnicode(pValue.get());
+		}
+
+		return value;
+	}
+	template<>
+	Vector3D<S32> GetTreeValue<Vector3D<S32>>(const boost::property_tree::ptree& pXmlTree, const std::string& id)
+	{
+		auto pTree = pXmlTree.get_child_optional(id);
+		if(pTree == NULL)
+			return Vector3D<S32>();
+
+		Vector3D<S32> value;
+
+		value.x = GetTreeValue<S32>(pTree.get(), "x");
+		value.y = GetTreeValue<S32>(pTree.get(), "y");
+		value.z = GetTreeValue<S32>(pTree.get(), "z");
+
+		return value;
+	}
+	template<>
+	Vector3D<F32> GetTreeValue<Vector3D<F32>>(const boost::property_tree::ptree& pXmlTree, const std::string& id)
+	{
+		auto pTree = pXmlTree.get_child_optional(id);
+		if(pTree == NULL)
+			return Vector3D<F32>();
+
+		Vector3D<F32> value;
+
+		value.x = GetTreeValue<F32>(pTree.get(), "x");
+		value.y = GetTreeValue<F32>(pTree.get(), "y");
+		value.z = GetTreeValue<F32>(pTree.get(), "z");
+
+		return value;
+	}
+}
+
+namespace
+{
 	/** レイヤー設定情報をXMLから読み込む */
 	SettingData::Standard::IDataEx* ReadLayerConfigXML(boost::property_tree::ptree& pTree, const Gravisbell::GUID& layerCode, const VersionCode& versionCode)
 	{
@@ -304,6 +360,76 @@ namespace
 				// 設定情報に追加
 				pConfig->AddItem(pItem);
 			}
+			else if(it.first == "Vector3D")
+			{
+				std::wstring id;
+				std::wstring type;
+				std::wstring name;
+				std::wstring text;
+
+				// ID
+				id = ::GetTreeValue<std::wstring>(it.second, "<xmlattr>.id");
+				if(id.empty())
+				{
+					delete pConfig;
+					return NULL;
+				}
+				// 種別
+				type = ::GetTreeValue<std::wstring>(it.second, "<xmlattr>.type");
+				if(type.empty())
+				{
+					delete pConfig;
+					return NULL;
+				}
+				// 名前
+				name = ::GetTreeValue<std::wstring>(it.second, "Name");
+				// テキスト
+				text = ::GetTreeValue<std::wstring>(it.second, "Text");
+
+				if(type == L"Int")
+				{
+					Vector3D<S32> minValue     = ::GetTreeValue<Vector3D<S32>>(it.second, "Min");
+					Vector3D<S32> maxValue     = ::GetTreeValue<Vector3D<S32>>(it.second, "Max");
+					Vector3D<S32> defaultValue = ::GetTreeValue<Vector3D<S32>>(it.second, "Default");
+
+					// アイテムを作成する
+					Gravisbell::SettingData::Standard::IItem_Vector3D_Int* pItem
+						= Gravisbell::SettingData::Standard::CreateItem_Vector3D_Int(
+							id.c_str(), name.c_str(), text.c_str(),
+							minValue.x, minValue.y, minValue.z,
+							maxValue.x, maxValue.y, maxValue.z,
+							defaultValue.x, defaultValue.y, defaultValue.z);
+					if(pItem == NULL)
+					{
+						delete pConfig;
+						return NULL;
+					}
+
+					pConfig->AddItem(pItem);
+				}
+				else if(type == L"Float")
+				{
+					Vector3D<F32> minValue     = ::GetTreeValue<Vector3D<F32>>(it.second, "Min");
+					Vector3D<F32> maxValue     = ::GetTreeValue<Vector3D<F32>>(it.second, "Max");
+					Vector3D<F32> defaultValue = ::GetTreeValue<Vector3D<F32>>(it.second, "Default");
+										
+					// アイテムを作成する
+					Gravisbell::SettingData::Standard::IItem_Vector3D_Float* pItem
+						= Gravisbell::SettingData::Standard::CreateItem_Vector3D_Float(
+							id.c_str(), name.c_str(), text.c_str(),
+							minValue.x, minValue.y, minValue.z,
+							maxValue.x, maxValue.y, maxValue.z,
+							defaultValue.x, defaultValue.y, defaultValue.z);
+					if(pItem == NULL)
+					{
+						delete pConfig;
+						return NULL;
+					}
+
+					pConfig->AddItem(pItem);
+				}
+
+			}
 		}
 
 		return pConfig;
@@ -467,6 +593,22 @@ namespace
 					fwprintf(fp, L"		}%ls;\n", szID);
 				}
 				break;
+			case SettingData::Standard::ITEMTYPE_VECTOR3D_INT:
+				{
+					const Gravisbell::SettingData::Standard::IItem_Vector3D<S32>* pItemVector3D = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Vector3D<S32>*>(pItem);
+					if(pItemVector3D == NULL)
+						break;
+					fwprintf(fp, L"		Vector3D<S32> %ls;\n", szID);
+				}
+				break;
+			case SettingData::Standard::ITEMTYPE_VECTOR3D_FLOAT:
+				{
+					const Gravisbell::SettingData::Standard::IItem_Vector3D<F32>* pItemVector3D = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Vector3D<F32>*>(pItem);
+					if(pItemVector3D == NULL)
+						break;
+					fwprintf(fp, L"		Vector3D<F32> %ls;\n", szID);
+				}
+				break;
 			}
 
 			fwprintf(fp, L"\n");
@@ -616,6 +758,38 @@ namespace
 					fwprintf(fp, L"\n");
 					fwprintf(fp, L"		pLayerConfig->AddItem(pItemEnum);\n");
 					fwprintf(fp, L"	}\n");
+				}
+				break;
+			case Gravisbell::SettingData::Standard::ITEMTYPE_VECTOR3D_INT:
+				{
+					const Gravisbell::SettingData::Standard::IItem_Vector3D_Int* pItemVector3D = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Vector3D_Int*>(pItem);
+					if(pItemVector3D == NULL)
+						break;
+					
+					fwprintf(fp, L"	pLayerConfig->AddItem(\n");
+					fwprintf(fp, L"		Gravisbell::SettingData::Standard::CreateItem_Vector3D_Int(\n");
+					fwprintf(fp, L"			L\"%ls\",\n", szID);
+					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].name.c_str(),\n", dataCode.c_str(), szID);
+					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].text.c_str(),\n", dataCode.c_str(), szID);
+					fwprintf(fp, L"			%d, %d, %d,\n", pItemVector3D->GetMinX(), pItemVector3D->GetMinY(), pItemVector3D->GetMinZ());
+					fwprintf(fp, L"			%d, %d, %d,\n", pItemVector3D->GetMaxX(), pItemVector3D->GetMaxY(), pItemVector3D->GetMaxZ());
+					fwprintf(fp, L"			%d, %d, %d));\n", pItemVector3D->GetDefaultX(), pItemVector3D->GetDefaultY(), pItemVector3D->GetDefaultZ());
+				}
+				break;
+			case Gravisbell::SettingData::Standard::ITEMTYPE_VECTOR3D_FLOAT:
+				{
+					const Gravisbell::SettingData::Standard::IItem_Vector3D_Float* pItemVector3D = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Vector3D_Float*>(pItem);
+					if(pItemVector3D == NULL)
+						break;
+					
+					fwprintf(fp, L"	pLayerConfig->AddItem(\n");
+					fwprintf(fp, L"		Gravisbell::SettingData::Standard::CreateItem_Vector3D_Float(\n");
+					fwprintf(fp, L"			L\"%ls\",\n", szID);
+					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].name.c_str(),\n", dataCode.c_str(), szID);
+					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].text.c_str(),\n", dataCode.c_str(), szID);
+					fwprintf(fp, L"			%ff, %ff, %ff,\n", pItemVector3D->GetMinX(), pItemVector3D->GetMinY(), pItemVector3D->GetMinZ());
+					fwprintf(fp, L"			%ff, %ff, %ff,\n", pItemVector3D->GetMaxX(), pItemVector3D->GetMaxY(), pItemVector3D->GetMaxZ());
+					fwprintf(fp, L"			%ff, %ff, %ff));\n", pItemVector3D->GetDefaultX(), pItemVector3D->GetDefaultY(), pItemVector3D->GetDefaultZ());
 				}
 				break;
 			}

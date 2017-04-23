@@ -14,28 +14,37 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="include">
-      <UniqueIdentifier>{64bd772b-e9dd-4878-9e80-f1da9684d35c}</UniqueIdentifier>
+      <UniqueIdentifier>{2bbe225a-7abf-4ddf-8783-28ad45d810ec}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\Common">
-      <UniqueIdentifier>{6ce2c8c6-ace2-458d-bd1a-e619993e3eaf}</UniqueIdentifier>
+      <UniqueIdentifier>{f7c5abee-89b6-49d0-8ae0-642291eea0ce}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\SettingData">
-      <UniqueIdentifier>{75eec339-7aea-44ca-8a2a-a707951e4986}</UniqueIdentifier>
+      <UniqueIdentifier>{dd7d5575-cdc0-4d3a-bf7d-38f959b65d50}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\SettingData\Standard">
-      <UniqueIdentifier>{1cff5551-8b18-4a2f-97c3-cb7bce403cb0}</UniqueIdentifier>
+      <UniqueIdentifier>{0ed9cb07-2772-4491-9345-f7b1361eb5bc}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\Layer">
-      <UniqueIdentifier>{6e7834de-c2f3-4d06-8529-9c6f1501d094}</UniqueIdentifier>
+      <UniqueIdentifier>{189d7a1f-e4cb-4ed8-9db8-659456c5762f}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\Layer\IOData">
-      <UniqueIdentifier>{03fafd48-1459-42d4-a066-81cb3a95ea46}</UniqueIdentifier>
+      <UniqueIdentifier>{5935af78-6b17-43c3-8544-aa11e8f3f1a0}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\Layer\NeuralNetwork">
-      <UniqueIdentifier>{4e643d5a-888e-4337-bef5-21d088b4ddfa}</UniqueIdentifier>
+      <UniqueIdentifier>{8a6c4c31-2835-448f-b299-58d2bd885d98}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\Layer\IO">
-      <UniqueIdentifier>{d9093fbe-5804-4c66-91ec-8cc28193b3d7}</UniqueIdentifier>
+      <UniqueIdentifier>{74db7ebe-2cb3-41d9-b26d-41e281765117}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\DataFormat">
+      <UniqueIdentifier>{a9d9456c-7f7a-445e-9089-3c0360295f2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\DataFormat\StringArray">
+      <UniqueIdentifier>{6d6861e1-82de-4945-afb7-e192f810d525}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\DataFormat\Binary">
+      <UniqueIdentifier>{0abc43e4-aa87-40b7-8118-1616adaa37df}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -46,15 +55,6 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="ItemBase.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="IDataEx.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="IItemEx_Enum.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Common\Common.h">
@@ -87,13 +87,16 @@
     <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer.h">
       <Filter>include\Layer\IOData</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INeuralNetwork.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayer.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerDLL.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h">
@@ -114,37 +117,28 @@
     <ClInclude Include="..\..\..\include\Layer\IO\ISingleOutputLayer.h">
       <Filter>include\Layer\IO</Filter>
     </ClInclude>
-    <ClInclude Include="SettingData.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="..\..\..\include\DataFormat\IDataFormatBase.h">
+      <Filter>include\DataFormat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\DataFormat\StringArray\IDataFormat.h">
+      <Filter>include\DataFormat\StringArray</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\DataFormat\Binary\IDataFormat.h">
+      <Filter>include\DataFormat\Binary</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Convolution.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Standard.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Item_Bool.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Item_Enum.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Item_Float.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Item_Int.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Item_String.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Item_Vector3D.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="Config.xml" />
   </ItemGroup>
 </Project>

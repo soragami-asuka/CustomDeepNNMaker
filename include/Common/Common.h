@@ -25,6 +25,60 @@ namespace Gravisbell {
 	typedef float	F32;
 	typedef double	F64;
 
+	template<class Type>
+	struct Vector3D
+	{
+		Type x;
+		Type y;
+		Type z;
+
+		Vector3D()
+			:	x	(0)
+			,	y	(0)
+			,	z	(0)
+		{
+		}
+		Vector3D(Type x, Type y, Type z)
+			:	x	(x)
+			,	y	(y)
+			,	z	(z)
+		{
+		}
+
+		bool operator==(const Vector3D& i_value)const
+		{
+			if(this->x != i_value.x)
+				return false;
+			if(this->y != i_value.y)
+				return false;
+			if(this->z != i_value.z)
+				return false;
+			return true;
+		}
+		bool operator!=(const Vector3D& i_value)const
+		{
+			return !(*this == i_value);
+		}
+			
+	};
+
+	template<class Type>
+	struct Vector2D
+	{
+		Type x;
+		Type y;
+
+		Vector2D()
+			:	x	(0)
+			,	y	(0)
+		{
+		}
+		Vector2D(Type x, Type y)
+			:	x	(x)
+			,	y	(y)
+		{
+		}
+	};
 
 	/** レイヤー間のデータのやり取りを行うバッチ処理用2次元配列ポインタ型.
 		[バッチサイズ][バッファ数] */
