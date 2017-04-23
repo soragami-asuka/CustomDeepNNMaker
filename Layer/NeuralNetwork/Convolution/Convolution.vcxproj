@@ -105,11 +105,14 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerDLL.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
     <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h" />
+    <ClInclude Include="Convolution_DATA.hpp" />
+    <ClInclude Include="Convolution_FUNC.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Convolution.cpp" />
+    <ClCompile Include="Convolution_FUNC.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

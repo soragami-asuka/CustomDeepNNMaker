@@ -89,7 +89,7 @@ namespace Standard {
 		/** İ’è€–Úí•Ê‚ğæ“¾‚·‚é */
 		ItemType GetItemType()const
 		{
-			return ITEMTYPE_FLOAT;
+			return itemType;
 		}
 
 	public:

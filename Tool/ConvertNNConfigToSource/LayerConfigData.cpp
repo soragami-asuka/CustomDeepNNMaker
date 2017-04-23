@@ -145,9 +145,9 @@ namespace
 				std::wstring id;
 				std::wstring name;
 				std::wstring text;
-				float minValue = 0;
-				float maxValue = 0;
-				float defaultValue = 0;
+				F32 minValue = 0;
+				F32 maxValue = 0;
+				F32 defaultValue = 0;
 
 				// ID
 				if(boost::optional<std::string> pValue = it.second.get_optional<std::string>("<xmlattr>.id"))
@@ -170,17 +170,17 @@ namespace
 					text = UTF8toUnicode(pValue.get());
 				}
 				// 最小値
-				if(boost::optional<float> pValue = it.second.get_optional<float>("Min"))
+				if(boost::optional<F32> pValue = it.second.get_optional<F32>("Min"))
 				{
 					minValue = pValue.get();
 				}
 				// 最大値
-				if(boost::optional<float> pValue = it.second.get_optional<float>("Max"))
+				if(boost::optional<F32> pValue = it.second.get_optional<F32>("Max"))
 				{
 					maxValue = pValue.get();
 				}
 				// デフォルト値
-				if(boost::optional<float> pValue = it.second.get_optional<float>("Default"))
+				if(boost::optional<F32> pValue = it.second.get_optional<F32>("Default"))
 				{
 					defaultValue = pValue.get();
 				}
@@ -529,7 +529,7 @@ namespace
 					const Gravisbell::SettingData::Standard::IItem_Float* pItemFloat = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Float*>(pItem);
 					if(pItemFloat == NULL)
 						break;
-					fwprintf(fp, L"		float %ls;\n", szID);
+					fwprintf(fp, L"		F32 %ls;\n", szID);
 				}
 				break;
 			case SettingData::Standard::ITEMTYPE_INT:
@@ -537,7 +537,7 @@ namespace
 					const Gravisbell::SettingData::Standard::IItem_Int* pItemInt = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Int*>(pItem);
 					if(pItemInt == NULL)
 						break;
-					fwprintf(fp, L"		int %ls;\n", szID);
+					fwprintf(fp, L"		S32 %ls;\n", szID);
 				}
 				break;
 			case SettingData::Standard::ITEMTYPE_STRING:
@@ -595,7 +595,7 @@ namespace
 				break;
 			case SettingData::Standard::ITEMTYPE_VECTOR3D_INT:
 				{
-					const Gravisbell::SettingData::Standard::IItem_Vector3D<S32>* pItemVector3D = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Vector3D<S32>*>(pItem);
+					const Gravisbell::SettingData::Standard::IItem_Vector3D_Int* pItemVector3D = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Vector3D_Int*>(pItem);
 					if(pItemVector3D == NULL)
 						break;
 					fwprintf(fp, L"		Vector3D<S32> %ls;\n", szID);
@@ -603,7 +603,7 @@ namespace
 				break;
 			case SettingData::Standard::ITEMTYPE_VECTOR3D_FLOAT:
 				{
-					const Gravisbell::SettingData::Standard::IItem_Vector3D<F32>* pItemVector3D = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Vector3D<F32>*>(pItem);
+					const Gravisbell::SettingData::Standard::IItem_Vector3D_Float* pItemVector3D = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Vector3D_Float*>(pItem);
 					if(pItemVector3D == NULL)
 						break;
 					fwprintf(fp, L"		Vector3D<F32> %ls;\n", szID);

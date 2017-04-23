@@ -29,14 +29,14 @@ namespace FullyConnect_Activation {
 		  * Text : レイヤー内のニューロン数.
 		  *       : 出力バッファ数に直結する.
 		  */
-		int NeuronCount;
+		S32 NeuronCount;
 
 		/** Name : ドロップアウト率
 		  * ID   : DropOut
 		  * Text : 前レイヤーを無視する割合.
 		  *       : 1.0で前レイヤーの全出力を無視する
 		  */
-		float DropOut;
+		F32 DropOut;
 
 		/** Name : 活性化関数種別
 		  * ID   : ActivationType
@@ -99,7 +99,7 @@ namespace FullyConnect_Activation {
 		/** Name : 学習係数
 		  * ID   : LearnCoeff
 		  */
-		float LearnCoeff;
+		F32 LearnCoeff;
 
 	};
 
