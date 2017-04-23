@@ -136,6 +136,7 @@
           <Name>ゼロパディング</Name>
           <Text>不足分を0で埋める</Text>
         </Item>
+        <!--
         <Item id="border">
           <Name>境界値</Name>
           <Text>不足分と隣接する値を参照する</Text>
@@ -148,6 +149,7 @@
           <Name>クランプ</Name>
           <Text>不足分の反対側の境目から順方向に参照する</Text>
         </Item>
+        -->
       </Items>
       <Default>zero</Default>
     </Enum>

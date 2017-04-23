@@ -74,24 +74,6 @@ namespace Convolution {
 			  */
 			PaddingType_zero,
 
-			/** Name : 境界値
-			  * ID   : border
-			  * Text : 不足分と隣接する値を参照する
-			  */
-			PaddingType_border,
-
-			/** Name : 反転
-			  * ID   : mirror
-			  * Text : 不足分と隣接する値から逆方向に参照する
-			  */
-			PaddingType_mirror,
-
-			/** Name : クランプ
-			  * ID   : clamp
-			  * Text : 不足分の反対側の境目から順方向に参照する
-			  */
-			PaddingType_clamp,
-
 		}PaddingType;
 
 	};

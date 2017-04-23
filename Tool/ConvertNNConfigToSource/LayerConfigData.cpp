@@ -325,33 +325,36 @@ namespace
 				// 列挙値を追加する
 				for(const boost::property_tree::ptree::value_type &it_item : it.second.get_child("Items"))
 				{
-					std::wstring item_id;
-					std::wstring item_name;
-					std::wstring item_text;
+					if(it_item.first == "Item")
+					{
+						std::wstring item_id;
+						std::wstring item_name;
+						std::wstring item_text;
 
-					// ID
-					if(boost::optional<std::string> pValue = it_item.second.get_optional<std::string>("<xmlattr>.id"))
-					{
-						item_id = UTF8toUnicode(pValue.get());
-					}
-					else
-					{
-						delete pItem;
-						delete pConfig;
-						return NULL;
-					}
-					// 名前
-					if(boost::optional<std::string> pValue = it_item.second.get_optional<std::string>("Name"))
-					{
-						item_name = UTF8toUnicode(pValue.get());
-					}
-					// テキスト
-					if(boost::optional<std::string> pValue = it_item.second.get_optional<std::string>("Text"))
-					{
-						item_text = UTF8toUnicode(pValue.get());
-					}
+						// ID
+						if(boost::optional<std::string> pValue = it_item.second.get_optional<std::string>("<xmlattr>.id"))
+						{
+							item_id = UTF8toUnicode(pValue.get());
+						}
+						else
+						{
+							delete pItem;
+							delete pConfig;
+							return NULL;
+						}
+						// 名前
+						if(boost::optional<std::string> pValue = it_item.second.get_optional<std::string>("Name"))
+						{
+							item_name = UTF8toUnicode(pValue.get());
+						}
+						// テキスト
+						if(boost::optional<std::string> pValue = it_item.second.get_optional<std::string>("Text"))
+						{
+							item_text = UTF8toUnicode(pValue.get());
+						}
 
-					pItem->AddEnumItem(item_id.c_str(), item_name.c_str(), item_text.c_str());
+						pItem->AddEnumItem(item_id.c_str(), item_name.c_str(), item_text.c_str());
+					}
 				}
 
 				// デフォルト値を設定

@@ -117,27 +117,6 @@ namespace DefaultLanguage
                         L"不足分を0で埋める",
                     },
                 },
-                {
-                    L"border",
-                    {
-                        L"境界値",
-                        L"不足分と隣接する値を参照する",
-                    },
-                },
-                {
-                    L"mirror",
-                    {
-                        L"反転",
-                        L"不足分と隣接する値から逆方向に参照する",
-                    },
-                },
-                {
-                    L"clamp",
-                    {
-                        L"クランプ",
-                        L"不足分の反対側の境目から順方向に参照する",
-                    },
-                },
             }
         },
     };
@@ -336,21 +315,6 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			L"zero",
 			L"ゼロパディング",
 			L"不足分を0で埋める");
-		// 1
-		pItemEnum->AddEnumItem(
-			L"border",
-			L"境界値",
-			L"不足分と隣接する値を参照する");
-		// 2
-		pItemEnum->AddEnumItem(
-			L"mirror",
-			L"反転",
-			L"不足分と隣接する値から逆方向に参照する");
-		// 3
-		pItemEnum->AddEnumItem(
-			L"clamp",
-			L"クランプ",
-			L"不足分の反対側の境目から順方向に参照する");
 
 		pLayerConfig->AddItem(pItemEnum);
 	}
