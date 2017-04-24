@@ -14,6 +14,9 @@
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
 
+#define POSITION_TO_OFFSET(x,y,z,ch,xSize,ySize,zSize,chSize)	(((((z*ySize)+y)*xSize)+x)*chSize+ch)
+#define POSITION_TO_OFFSET_STRUCT(inX,inY,inZ,inCh,structure)			POSITION_TO_OFFSET(inX, inY, inZ, inCh, structure.x, structure.y, structure.z, structure.ch)
+
 
 namespace Gravisbell {
 namespace Layer {
@@ -28,7 +31,6 @@ namespace NeuralNetwork {
 		,	neuronCount						(0)		/**< ニューロン数 */
 		,	outputBufferCount				(0)		/**< 出力バッファ数 */
 		,	m_lppInputBuffer				(NULL)	/**< 演算時の入力データ */
-		,	m_lppDOutputBufferPrev			(NULL)	/**< 入力誤差計算時の出力誤差データ */
 		,	onUseDropOut					(false)
 	{
 	}
@@ -93,13 +95,6 @@ namespace NeuralNetwork {
 		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
-		
-		// 出力誤差バッファを作成
-		this->lpDOutputBuffer.resize(this->batchSize);
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
-		{
-			this->lpDOutputBuffer[batchNum].resize(this->outputBufferCount);
-		}
 
 		// 入力差分バッファを作成
 		this->lpDInputBuffer.resize(this->batchSize);
@@ -108,6 +103,17 @@ namespace NeuralNetwork {
 		{
 			this->lpDInputBuffer[batchNum].resize(this->inputBufferCount);
 			this->lppBatchDInputBuffer[batchNum] = &this->lpDInputBuffer[batchNum][0];
+		}
+
+		// パディング後の入力バッファを作成
+		this->paddingInputDataStruct.x  = this->layerData.convolutionCount.x + this->layerData.layerStructure.FilterSize.x;
+		this->paddingInputDataStruct.y  = this->layerData.convolutionCount.y + this->layerData.layerStructure.FilterSize.y;
+		this->paddingInputDataStruct.z  = this->layerData.convolutionCount.z + this->layerData.layerStructure.FilterSize.z;
+		this->paddingInputDataStruct.ch = this->layerData.inputDataStruct.ch;
+		this->lpPaddingInputBuffer.resize(this->batchSize);
+		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		{
+			this->lpPaddingInputBuffer[batchNum].resize(this->paddingInputDataStruct.GetDataCount(), 0.0f);
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
@@ -238,6 +244,39 @@ namespace NeuralNetwork {
 	{
 		this->m_lppInputBuffer = i_lppInputBuffer;
 
+		// パディング後の入力バッファにデータを移す
+		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		{
+			for(S32 paddingZ=0; paddingZ<this->paddingInputDataStruct.z; paddingZ++)
+			{
+				S32 inputZ = paddingZ - this->layerData.layerStructure.PaddingM.z;
+				for(S32 paddingY=0; paddingY<this->paddingInputDataStruct.y; paddingY++)
+				{
+					S32 inputY = paddingY - this->layerData.layerStructure.PaddingM.y;
+					for(S32 paddingX=0; paddingX<this->paddingInputDataStruct.x; paddingX++)
+					{
+						S32 inputX = paddingX - this->layerData.layerStructure.PaddingM.x;
+
+						if(inputZ<0 || inputZ>=this->layerData.inputDataStruct.z)
+							continue;
+						if(inputY<0 || inputY>=this->layerData.inputDataStruct.y)
+							continue;
+						if(inputX<0 || inputX>=this->layerData.inputDataStruct.x)
+							continue;
+
+						S32 paddingOffset = POSITION_TO_OFFSET_STRUCT(paddingX, paddingY, paddingZ, 0, this->paddingInputDataStruct);
+						S32 inputOffset   = POSITION_TO_OFFSET_STRUCT(inputX, inputY, inputZ, 0, this->layerData.inputDataStruct);
+
+						for(S32 chNum=0; chNum<this->layerData.inputDataStruct.ch; chNum++)
+						{
+							this->lpPaddingInputBuffer[batchNum][paddingOffset + chNum] = i_lppInputBuffer[batchNum][inputOffset + chNum];
+						}
+					}
+				}
+			}
+		}
+
+		// 畳みこみ結合処理
 		for(unsigned int batchNum=0; batchNum<this->batchSize; batchNum++)
 		{
 			for(S32 convZ=this->layerData.convolutionStart.x; convZ<this->layerData.convolutionCount.z; convZ++)
@@ -246,59 +285,41 @@ namespace NeuralNetwork {
 				{
 					for(S32 convX=this->layerData.convolutionStart.x; convX<this->layerData.convolutionCount.x; convX++)
 					{
+						U32 outputOffet = POSITION_TO_OFFSET(convX,convY,convZ,0, this->layerData.convolutionCount.x,this->layerData.convolutionCount.y,this->layerData.convolutionCount.z, this->layerData.layerStructure.Output_Channel);
+
 						for(U32 neuronNum=0; neuronNum<this->layerData.layerStructure.Output_Channel; neuronNum++)
 						{
 							F32 tmp = 0.0f;
 
 							// フィルタを処理する
-							for(U32 filterPos=0; filterPos<this->filterSize; filterPos++)
+							for(U32 filterOffset=0; filterOffset<this->filterSize; filterOffset++)
 							{
-								S32 filterZ =  filterPos / (this->layerData.layerStructure.FilterSize.y  * this->layerData.layerStructure.FilterSize.x);
-								S32 filterY = (filterPos /  this->layerData.layerStructure.FilterSize.x) % this->layerData.layerStructure.FilterSize.y;
-								S32 filterX =  filterPos %  this->layerData.layerStructure.FilterSize.x;
+								S32 filterZ =  filterOffset / (this->layerData.layerStructure.FilterSize.y  * this->layerData.layerStructure.FilterSize.x);
+								S32 filterY = (filterOffset /  this->layerData.layerStructure.FilterSize.x) % this->layerData.layerStructure.FilterSize.y;
+								S32 filterX =  filterOffset %  this->layerData.layerStructure.FilterSize.x;
 
 								S32 inputZ = (S32)(convZ * this->layerData.layerStructure.Stride.z + filterZ * this->layerData.layerStructure.Move.z);
 								S32 inputY = (S32)(convY * this->layerData.layerStructure.Stride.y + filterY * this->layerData.layerStructure.Move.y);
 								S32 inputX = (S32)(convX * this->layerData.layerStructure.Stride.x + filterX * this->layerData.layerStructure.Move.x);
+								
+								S32 inputOffset = POSITION_TO_OFFSET_STRUCT(inputX,inputY,inputZ, 0, this->paddingInputDataStruct);
 
-								for(U32 filterCh=0; filterCh<this->layerData.inputDataStruct.ch; filterCh++)
+								for(S32 chNum=0; chNum<this->layerData.inputDataStruct.ch; chNum++)
 								{
-									U32 inputNo = ( inputZ * this->layerData.layerStructure.FilterSize.y * this->layerData.layerStructure.FilterSize.x
-												  + inputY * this->layerData.layerStructure.FilterSize.x
-												  + inputX)
-												  * this->layerData.inputDataStruct.ch + filterCh;
-
-									this->lpOutputBuffer[batchNum]	this->layerData.lppNeuron[neuronNum][filterPos*this->layerData.inputDataStruct.ch + filterCh];
-
+									if(this->onUseDropOut)
+										tmp += this->layerData.lppNeuron[neuronNum][filterOffset*this->layerData.inputDataStruct.ch + chNum] * this->lpPaddingInputBuffer[batchNum][inputOffset+chNum] * this->lppDropOutBuffer[neuronNum][filterOffset*this->layerData.inputDataStruct.ch + chNum];
+									else
+										tmp += this->layerData.lppNeuron[neuronNum][filterOffset*this->layerData.inputDataStruct.ch + chNum] * this->lpPaddingInputBuffer[batchNum][inputOffset+chNum];
 								}
 							}
-							
+
+							// 加算値を格納
+							this->lpOutputBuffer[batchNum][outputOffet + neuronNum] = tmp;
 						}
 					}
 				}
 			}
 		}
-
-			for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
-			{
-				float tmp = 0;
-
-				// ニューロンの値を加算
-				for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
-				{
-					if(this->onUseDropOut)
-						tmp += i_lppInputBuffer[batchNum][inputNum] * this->layerData.lppNeuron[neuronNum][inputNum] * this->lppDropOutBuffer[neuronNum][inputNum];
-					else
-						tmp += i_lppInputBuffer[batchNum][inputNum] * this->layerData.lppNeuron[neuronNum][inputNum];
-				}
-				tmp += this->layerData.lpBias[neuronNum];
-
-				if(!this->onUseDropOut && this->layerData.layerStructure.DropOut > 0.0f)
-					tmp *= (1.0f - this->layerData.layerStructure.DropOut);
-
-			}
-		}
-
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -340,65 +361,7 @@ namespace NeuralNetwork {
 		直前の計算結果を使用する */
 	ErrorCode Convolution_CPU::CalculateLearnError(CONST_BATCH_BUFFER_POINTER i_lppDOutputBufferPrev)
 	{
-		this->m_lppDOutputBufferPrev = i_lppDOutputBufferPrev;
-
-		// 出力誤差を計算
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
-		{
-			for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
-			{
-				this->lpDOutputBuffer[batchNum][neuronNum] = this->func_dactivation(this->lpOutputBuffer[batchNum][neuronNum]) * i_lppDOutputBufferPrev[batchNum][neuronNum];
-
-#ifdef _DEBUG
-				if(isnan(this->lpDOutputBuffer[batchNum][neuronNum]))
-					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
-#endif
-			}
-		}
-
-
-#if 0
-		for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
-		{
-			// バイアス更新
-			{
-				F32 sumDOutput = 0.0f;
-				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
-				{
-					 sumDOutput += this->lpDOutputBuffer[batchNum][neuronNum];
-				}
-
-#ifdef _DEBUG
-				if(isnan(sumDOutput))
-					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
-#endif
-
-				this->layerData.lpBias[neuronNum] += this->learnData.LearnCoeff * sumDOutput;
-			}
-
-			// 入力対応ニューロン更新
-			for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
-			{
-				if(this->onUseDropOut && this->lppDropOutBuffer[neuronNum][inputNum] == 0.0f)
-					continue;
-
-				F32 sumDOutput = 0.0f;
-				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
-				{
-					sumDOutput += this->m_lppInputBuffer[batchNum][inputNum] * this->lpDOutputBuffer[batchNum][neuronNum];
-				}
-
-#ifdef _DEBUG
-				if(isnan(sumDOutput))
-					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
-#endif
-
-				this->layerData.lppNeuron[neuronNum][inputNum] += this->learnData.LearnCoeff * sumDOutput;
-			}
-		}
-#endif
-
-
+		this->m_lppDOutputBuffer = i_lppDOutputBufferPrev;
 
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 		{
@@ -410,17 +373,12 @@ namespace NeuralNetwork {
 				for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
 				{
 					if(this->onUseDropOut)
-						tmp += this->lpDOutputBuffer[batchNum][neuronNum] * this->layerData.lppNeuron[neuronNum][inputNum] * this->lppDropOutBuffer[neuronNum][inputNum];
+						tmp += this->m_lppDOutputBuffer[batchNum][neuronNum] * this->layerData.lppNeuron[neuronNum][inputNum] * this->lppDropOutBuffer[neuronNum][inputNum];
 					else
-						tmp += this->lpDOutputBuffer[batchNum][neuronNum] * this->layerData.lppNeuron[neuronNum][inputNum];
+						tmp += this->m_lppDOutputBuffer[batchNum][neuronNum] * this->layerData.lppNeuron[neuronNum][inputNum];
 				}
 
 				this->lpDInputBuffer[batchNum][inputNum] = tmp;
-
-#ifdef _DEBUG
-				if(isnan(this->lpDInputBuffer[batchNum][inputNum]))
-					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
-#endif
 			}
 		}
 
@@ -433,7 +391,6 @@ namespace NeuralNetwork {
 		出力誤差差分、入力誤差差分は直前のCalculateLearnErrorの値を参照する. */
 	ErrorCode Convolution_CPU::ReflectionLearnError(void)
 	{
-#if 1
 		for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
 		{
 			// バイアス更新
@@ -443,11 +400,6 @@ namespace NeuralNetwork {
 				{
 					 sumDOutput += this->lpDOutputBuffer[batchNum][neuronNum];
 				}
-
-#ifdef _DEBUG
-				if(isnan(sumDOutput))
-					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
-#endif
 
 				this->layerData.lpBias[neuronNum] += this->learnData.LearnCoeff * sumDOutput;
 			}
@@ -464,15 +416,9 @@ namespace NeuralNetwork {
 					sumDOutput += this->m_lppInputBuffer[batchNum][inputNum] * this->lpDOutputBuffer[batchNum][neuronNum];
 				}
 
-#ifdef _DEBUG
-				if(isnan(sumDOutput))
-					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
-#endif
-
 				this->layerData.lppNeuron[neuronNum][inputNum] += this->learnData.LearnCoeff * sumDOutput;
 			}
 		}
-#endif
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

@@ -26,7 +26,6 @@ private:
 
 	// 入出力バッファ
 	std::vector<std::vector<F32>>			lpOutputBuffer;		/**< 出力バッファ <バッチ数><畳み込み数> */
-	std::vector<std::vector<F32>>			lpDOutputBuffer;	/**< 出力誤差バッファ <バッチ数><畳み込み数> */
 	std::vector<std::vector<F32>>			lpDInputBuffer;		/**< 入力誤差差分 <バッチ数><入力信号数> */
 
 	std::vector<F32*>						lppBatchOutputBuffer;		/**< バッチ処理用出力バッファ <バッチ数> */
@@ -38,9 +37,12 @@ private:
 	U32 neuronCount;					/**< ニューロン数 */
 	U32 outputBufferCount;				/**< 出力バッファ数 */
 
+	IODataStruct paddingInputDataStruct;	/**< パディング後の入力バッファの入力データ構造 */
+	std::vector<std::vector<F32>> lpPaddingInputBuffer;	/**< パディング後の入力バッファ <バッチ数><入力バッファ> */
+
 	// 演算時の入力データ
 	CONST_BATCH_BUFFER_POINTER m_lppInputBuffer;		/**< 演算時の入力データ */
-	CONST_BATCH_BUFFER_POINTER m_lppDOutputBufferPrev;	/**< 入力誤差計算時の出力誤差データ */
+	CONST_BATCH_BUFFER_POINTER m_lppDOutputBuffer;		/**< 入力誤差計算時の出力誤差データ */
 
 	// 演算処理用のバッファ
 	bool onUseDropOut;											/**< ドロップアウト処理を実行するフラグ. */
