@@ -105,6 +105,8 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerDLL.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
     <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h" />
+    <ClInclude Include="Convolution_Base.h" />
+    <ClInclude Include="Convolution_CPU.h" />
     <ClInclude Include="Convolution_LayerData_CPU.h" />
     <ClInclude Include="Convolution_DATA.hpp" />
     <ClInclude Include="Convolution_FUNC.hpp" />
@@ -115,6 +117,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Convolution.cpp" />
+    <ClCompile Include="Convolution_Base.cpp" />
+    <ClCompile Include="Convolution_CPU.cpp" />
     <ClCompile Include="Convolution_FUNC.cpp" />
     <ClCompile Include="Convolution_LayerData_Base.cpp" />
     <ClCompile Include="Convolution_LayerData_CPU.cpp" />
