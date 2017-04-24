@@ -53,7 +53,7 @@
       </Default>
     </Vector3D>
     <Vector3D type="Float" id="Move">
-      <Name>フィルタ移動量</Name>
+      <Name>入力信号移動量</Name>
       <Text>1ニューロンごとに移動する入力信号の移動量</Text>
       <Min>
         <x>0.1</x>
@@ -72,8 +72,8 @@
       </Default>
     </Vector3D>
     <Vector3D type="Float" id="Stride">
-      <Name>畳みこみ移動量</Name>
-      <Text>畳みこみごとに移動する入力信号の移動量</Text>
+      <Name>フィルタ移動量</Name>
+      <Text>畳みこみごとに移動するフィルタの移動量</Text>
       <Min>
         <x>0.1</x>
         <y>0.1</y>
