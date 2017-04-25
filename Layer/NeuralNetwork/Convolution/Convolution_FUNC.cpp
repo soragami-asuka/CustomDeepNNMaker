@@ -67,17 +67,10 @@ namespace DefaultLanguage
             }
         },
         {
-            L"Move",
-            {
-                L"フィルタ移動量",
-                L"1ニューロンごとに移動する入力信号の移動量",
-            }
-        },
-        {
             L"Stride",
             {
-                L"畳みこみ移動量",
-                L"畳みこみごとに移動する入力信号の移動量",
+                L"フィルタ移動量",
+                L"畳みこみごとに移動するフィルタの移動量",
             }
         },
         {
@@ -251,30 +244,17 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			1, 1, 1));
 
 	/** Name : フィルタ移動量
-	  * ID   : Move
-	  * Text : 1ニューロンごとに移動する入力信号の移動量
-	  */
-	pLayerConfig->AddItem(
-		Gravisbell::SettingData::Standard::CreateItem_Vector3D_Float(
-			L"Move",
-			CurrentLanguage::g_lpItemData_LayerStructure[L"Move"].name.c_str(),
-			CurrentLanguage::g_lpItemData_LayerStructure[L"Move"].text.c_str(),
-			0.100000f, 0.100000f, 0.100000f,
-			65535.000000f, 65535.000000f, 65535.000000f,
-			1.000000f, 1.000000f, 1.000000f));
-
-	/** Name : 畳みこみ移動量
 	  * ID   : Stride
-	  * Text : 畳みこみごとに移動する入力信号の移動量
+	  * Text : 畳みこみごとに移動するフィルタの移動量
 	  */
 	pLayerConfig->AddItem(
-		Gravisbell::SettingData::Standard::CreateItem_Vector3D_Float(
+		Gravisbell::SettingData::Standard::CreateItem_Vector3D_Int(
 			L"Stride",
 			CurrentLanguage::g_lpItemData_LayerStructure[L"Stride"].name.c_str(),
 			CurrentLanguage::g_lpItemData_LayerStructure[L"Stride"].text.c_str(),
-			0.100000f, 0.100000f, 0.100000f,
-			65535.000000f, 65535.000000f, 65535.000000f,
-			1.000000f, 1.000000f, 1.000000f));
+			0, 0, 0,
+			65535, 65535, 65535,
+			1, 1, 1));
 
 	/** Name : パディングサイズ(-方向)
 	  * ID   : PaddingM

@@ -42,16 +42,10 @@ namespace Convolution {
 		Vector3D<S32> FilterSize;
 
 		/** Name : フィルタ移動量
-		  * ID   : Move
-		  * Text : 1ニューロンごとに移動する入力信号の移動量
-		  */
-		Vector3D<F32> Move;
-
-		/** Name : 畳みこみ移動量
 		  * ID   : Stride
-		  * Text : 畳みこみごとに移動する入力信号の移動量
+		  * Text : 畳みこみごとに移動するフィルタの移動量
 		  */
-		Vector3D<F32> Stride;
+		Vector3D<S32> Stride;
 
 		/** Name : パディングサイズ(-方向)
 		  * ID   : PaddingM

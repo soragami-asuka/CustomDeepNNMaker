@@ -52,26 +52,7 @@
         <z>1</z>
       </Default>
     </Vector3D>
-    <Vector3D type="Float" id="Move">
-      <Name>入力信号移動量</Name>
-      <Text>1ニューロンごとに移動する入力信号の移動量</Text>
-      <Min>
-        <x>0.1</x>
-        <y>0.1</y>
-        <z>0.1</z>
-      </Min>
-      <Max>
-        <x>65535</x>
-        <y>65535</y>
-        <z>65535</z>
-      </Max>
-      <Default>
-        <x>1</x>
-        <y>1</y>
-        <z>1</z>
-      </Default>
-    </Vector3D>
-    <Vector3D type="Float" id="Stride">
+    <Vector3D type="Int" id="Stride">
       <Name>フィルタ移動量</Name>
       <Text>畳みこみごとに移動するフィルタの移動量</Text>
       <Min>
