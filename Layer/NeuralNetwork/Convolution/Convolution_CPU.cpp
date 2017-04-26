@@ -14,7 +14,7 @@
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
 
-#define POSITION_TO_OFFSET(x,y,z,ch,xSize,ySize,zSize,chSize)		(((((ch*zSize+z)*ySize)+y)*xSize)+x)
+#define POSITION_TO_OFFSET(x,y,z,ch,xSize,ySize,zSize,chSize)		((((((ch)*(zSize)+(z))*(ySize))+(y))*(xSize))+(x))
 #define POSITION_TO_OFFSET_STRUCT(inX,inY,inZ,inCh,structure)		POSITION_TO_OFFSET(inX, inY, inZ, inCh, structure.x, structure.y, structure.z, structure.ch)
 #define POSITION_TO_OFFSET_VECTOR(inX,inY,inZ,inCh,vector,chSize)	POSITION_TO_OFFSET(inX, inY, inZ, inCh, vector.x,    vector.y,    vector.z,    chSize)
 

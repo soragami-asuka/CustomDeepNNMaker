@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="EB80E0D0-9D5A-4ED1-A80D-A1667DE0C890" version="1.0.0.0" default-language="ja">
+
+  <SourceName>Pooling</SourceName>
+  <Name>Pooling</Name>
+  <Text>Pooling.</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+    
+    <Vector3D type="Int" id="FilterSize">
+      <Name>フィルタサイズ</Name>
+      <Text>Poolingを行う範囲</Text>
+      <Min>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
+      </Min>
+      <Max>
+        <x>65535</x>
+        <y>65535</y>
+        <z>65535</z>
+      </Max>
+      <Default>
+        <x>2</x>
+        <y>2</y>
+        <z>2</z>
+      </Default>
+    </Vector3D>
+
+    <Enum id="PoolingType">
+      <Name>Pooling種別</Name>
+      <Text>Poolingの方法設定</Text>
+      <Items>
+        <Item id="max">
+          <Name>MAXプーリング</Name>
+          <Text>範囲内の最大値を使用する</Text>
+        </Item>
+      </Items>
+      <Default>zero</Default>
+    </Enum>
+    
+  </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <Learn>
+  </Learn>
+
+</Config>

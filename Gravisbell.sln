@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{D7D4DAE4-074F-4473-A80B-94E557D28FD0}"
 EndProject
@@ -58,6 +58,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.Convolution", "Layer\NeuralNetwork\Convolution\Convolution.vcxproj", "{68F66AF4-5742-4648-A5F3-DC5AD15FFDE6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.Activation", "Layer\NeuralNetwork\Activation\Activation.vcxproj", "{8C696A26-6D74-441D-9DD1-EA2DE5C4C303}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.Pooling", "Layer\NeuralNetwork\Pooling\Pooling.vcxproj", "{16A4FCB6-37F3-4DDE-BE9C-5500E64918AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -137,6 +139,10 @@ Global
 		{8C696A26-6D74-441D-9DD1-EA2DE5C4C303}.Debug|Win32.Build.0 = Debug|Win32
 		{8C696A26-6D74-441D-9DD1-EA2DE5C4C303}.Release|Win32.ActiveCfg = Release|Win32
 		{8C696A26-6D74-441D-9DD1-EA2DE5C4C303}.Release|Win32.Build.0 = Release|Win32
+		{16A4FCB6-37F3-4DDE-BE9C-5500E64918AE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{16A4FCB6-37F3-4DDE-BE9C-5500E64918AE}.Debug|Win32.Build.0 = Debug|Win32
+		{16A4FCB6-37F3-4DDE-BE9C-5500E64918AE}.Release|Win32.ActiveCfg = Release|Win32
+		{16A4FCB6-37F3-4DDE-BE9C-5500E64918AE}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -166,6 +172,7 @@ Global
 		{8008D157-41BC-47AB-B90C-B9F4B86AD198} = {9DEE086C-8571-41DD-ADD4-7583EB13580A}
 		{68F66AF4-5742-4648-A5F3-DC5AD15FFDE6} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
 		{8C696A26-6D74-441D-9DD1-EA2DE5C4C303} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
+		{16A4FCB6-37F3-4DDE-BE9C-5500E64918AE} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		VisualSVNWorkingCopyRoot = .

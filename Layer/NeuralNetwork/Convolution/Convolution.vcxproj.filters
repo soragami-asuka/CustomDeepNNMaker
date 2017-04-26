@@ -49,6 +49,12 @@
     <Filter Include="FromXML">
       <UniqueIdentifier>{b80500ee-fd14-4bd2-9736-3e24d70681a7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Layer">
+      <UniqueIdentifier>{2e3badb1-2202-4e72-9052-b5af02e3a647}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LayerData">
+      <UniqueIdentifier>{bf062363-0436-482c-9da7-4fc147c1e3e9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -135,27 +141,24 @@
     <ClInclude Include="Convolution_DATA.hpp">
       <Filter>FromXML</Filter>
     </ClInclude>
-    <ClInclude Include="Convolution_LayerData_Base.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Convolution_LayerData_CPU.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="RandomUtility.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Convolution_CPU.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Convolution_LayerData_CPU.h">
+      <Filter>LayerData</Filter>
+    </ClInclude>
+    <ClInclude Include="Convolution_LayerData_Base.h">
+      <Filter>LayerData</Filter>
     </ClInclude>
     <ClInclude Include="Convolution_Base.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="Convolution_CPU.h">
+      <Filter>Layer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Convolution.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
@@ -164,20 +167,20 @@
     <ClCompile Include="Convolution_FUNC.cpp">
       <Filter>FromXML</Filter>
     </ClCompile>
-    <ClCompile Include="Convolution_LayerData_Base.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Convolution_LayerData_CPU.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="RandomUtility.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Convolution_CPU.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Convolution_LayerData_Base.cpp">
+      <Filter>LayerData</Filter>
+    </ClCompile>
+    <ClCompile Include="Convolution_LayerData_CPU.cpp">
+      <Filter>LayerData</Filter>
     </ClCompile>
     <ClCompile Include="Convolution_Base.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="Convolution_CPU.cpp">
+      <Filter>Layer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

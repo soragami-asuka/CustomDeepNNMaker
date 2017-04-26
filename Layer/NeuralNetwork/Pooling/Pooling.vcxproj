@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{68F66AF4-5742-4648-A5F3-DC5AD15FFDE6}</ProjectGuid>
+    <ProjectGuid>{16A4FCB6-37F3-4DDE-BE9C-5500E64918AE}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Convolution</RootNamespace>
-    <ProjectName>Layer.NeuralNetwork.Convolution</ProjectName>
+    <RootNamespace>Pooling</RootNamespace>
+    <ProjectName>Layer.NeuralNetwork.Pooling</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -53,7 +53,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;CONVOLUTION_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;POOLING_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -68,7 +68,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;CONVOLUTION_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;POOLING_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -88,10 +88,8 @@
     <ClInclude Include="..\..\..\include\Common\IBatchDataNoListGenerator.h" />
     <ClInclude Include="..\..\..\include\Common\IODataStruct.h" />
     <ClInclude Include="..\..\..\include\Common\VersionCode.h" />
-    <ClInclude Include="..\..\..\include\DataFormat\Binary\IDataFormat.h" />
-    <ClInclude Include="..\..\..\include\DataFormat\IDataFormatBase.h" />
-    <ClInclude Include="..\..\..\include\DataFormat\StringArray\IDataFormat.h" />
     <ClInclude Include="..\..\..\include\Layer\ILayerBase.h" />
+    <ClInclude Include="..\..\..\include\Layer\ILayerData.h" />
     <ClInclude Include="..\..\..\include\Layer\IOData\IDataLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\IO\IInputLayer.h" />
@@ -99,28 +97,23 @@
     <ClInclude Include="..\..\..\include\Layer\IO\IOutputLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\IO\ISingleInputLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\IO\ISingleOutputLayer.h" />
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INeuralNetwork.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerDLL.h" />
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerData.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
     <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h" />
-    <ClInclude Include="Convolution_Base.h" />
-    <ClInclude Include="Convolution_CPU.h" />
-    <ClInclude Include="Convolution_LayerData_CPU.h" />
-    <ClInclude Include="Convolution_DATA.hpp" />
-    <ClInclude Include="Convolution_FUNC.hpp" />
-    <ClInclude Include="Convolution_LayerData_Base.h" />
-    <ClInclude Include="RandomUtility.h" />
+    <ClInclude Include="Pooling_Base.h" />
+    <ClInclude Include="Pooling_CPU.h" />
+    <ClInclude Include="Pooling_DATA.hpp" />
+    <ClInclude Include="Pooling_FUNC.hpp" />
+    <ClInclude Include="Pooling_LayerData_Base.h" />
+    <ClInclude Include="Pooling_LayerData_CPU.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Convolution_Base.cpp" />
-    <ClCompile Include="Convolution_CPU.cpp" />
-    <ClCompile Include="Convolution_FUNC.cpp" />
-    <ClCompile Include="Convolution_LayerData_Base.cpp" />
-    <ClCompile Include="Convolution_LayerData_CPU.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -129,19 +122,24 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="RandomUtility.cpp" />
+    <ClCompile Include="Pooling.cpp" />
+    <ClCompile Include="Pooling_Base.cpp" />
+    <ClCompile Include="Pooling_CPU.cpp" />
+    <ClCompile Include="Pooling_FUNC.cpp" />
+    <ClCompile Include="Pooling_LayerData_Base.cpp" />
+    <ClCompile Include="Pooling_LayerData_CPU.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <Xml Include="Config.xml" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\..\Library\SettingData\Standard\Standard.vcxproj">
       <Project>{79fd5f13-1407-43ab-834c-04c1aeccdbb5}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Xml Include="Config.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

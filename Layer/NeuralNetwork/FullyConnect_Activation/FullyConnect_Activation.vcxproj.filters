@@ -40,6 +40,12 @@
     <Filter Include="include\Layer\IO">
       <UniqueIdentifier>{c25a0088-3043-4729-8838-ba94658cf357}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Layer">
+      <UniqueIdentifier>{d33be59a-b25c-46b4-a4fb-3d2867602395}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LayerData">
+      <UniqueIdentifier>{7f756651-cf39-4ef5-895c-29a97761d20e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -117,9 +123,6 @@
     <ClInclude Include="FullyConnect_Activation_DATA.hpp">
       <Filter>FromXML</Filter>
     </ClInclude>
-    <ClInclude Include="FullyConnect_Activation_Base.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
@@ -129,17 +132,20 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerData.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
-    <ClInclude Include="FullyConnect_Activation_LayerData_Base.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="FullyConnect_Activation_LayerData_CPU.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="FullyConnect_Activation_CPU.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="RandomUtility.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="FullyConnect_Activation_Base.h">
+      <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="FullyConnect_Activation_CPU.h">
+      <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="FullyConnect_Activation_LayerData_Base.h">
+      <Filter>LayerData</Filter>
+    </ClInclude>
+    <ClInclude Include="FullyConnect_Activation_LayerData_CPU.h">
+      <Filter>LayerData</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -152,23 +158,23 @@
     <ClCompile Include="FullyConnect_Activation_FUNC.cpp">
       <Filter>FromXML</Filter>
     </ClCompile>
-    <ClCompile Include="FullyConnect_Activation_Base.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="FullyConnect_Activation_CPU.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="FullyConnect_Activation_GPU.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="FullyConnect_Activation_LayerData_Base.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="FullyConnect_Activation_LayerData_CPU.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="RandomUtility.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="FullyConnect_Activation_Base.cpp">
+      <Filter>Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="FullyConnect_Activation_CPU.cpp">
+      <Filter>Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="FullyConnect_Activation_GPU.cpp">
+      <Filter>Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="FullyConnect_Activation_LayerData_Base.cpp">
+      <Filter>LayerData</Filter>
+    </ClCompile>
+    <ClCompile Include="FullyConnect_Activation_LayerData_CPU.cpp">
+      <Filter>LayerData</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

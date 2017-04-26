@@ -14,46 +14,37 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="FromXML">
-      <UniqueIdentifier>{ca53a52b-720d-4d06-90da-eb7c63e4563a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include">
-      <UniqueIdentifier>{964c6051-54bf-400d-a752-eeb4a1850f95}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\Common">
-      <UniqueIdentifier>{964860ed-e3d4-44f9-9aea-c20f07ba92da}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\SettingData">
-      <UniqueIdentifier>{71480580-0953-4446-a828-78f359c9e765}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\SettingData\Standard">
-      <UniqueIdentifier>{5a77c93b-00b6-4fd3-ab0a-75e90cb27a21}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\Layer">
-      <UniqueIdentifier>{fd2d6731-ccd6-4f0d-827e-e5b06ad83c9e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\Layer\IOData">
-      <UniqueIdentifier>{54111579-0bd7-4508-aef4-93b1c3ac2236}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\Layer\NeuralNetwork">
-      <UniqueIdentifier>{9215cb73-934b-4772-a053-7819d76e7939}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\Layer\IO">
-      <UniqueIdentifier>{867fb881-4bcd-415b-bac7-f80627a20efc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\DataFormat">
-      <UniqueIdentifier>{04ad90b2-54a4-4e79-a44c-8ddb2f690d94}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\DataFormat\StringArray">
-      <UniqueIdentifier>{e0e344ff-14c7-4e3e-b8c0-da53518702e9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\DataFormat\Binary">
-      <UniqueIdentifier>{c119ca9a-d028-4a69-867f-917d2f820245}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="LayerData">
-      <UniqueIdentifier>{5f67eb82-375e-480e-b6d7-7e7f145dc922}</UniqueIdentifier>
+      <UniqueIdentifier>{b58fcf27-cba5-4e07-9b78-48878fa71298}</UniqueIdentifier>
     </Filter>
     <Filter Include="Layer">
-      <UniqueIdentifier>{65317a4e-8411-4853-b7a7-572d9e80e862}</UniqueIdentifier>
+      <UniqueIdentifier>{fd7ee3da-9f81-410d-9745-b397cf799746}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LayerData">
+      <UniqueIdentifier>{597687a2-3a20-4238-9d2b-1183a0c80022}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{4fb84f3f-408e-4c4f-8115-868b3958b2b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Common">
+      <UniqueIdentifier>{1b6fc7ad-864d-4e9b-ac6f-d0f638b92aaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\SettingData">
+      <UniqueIdentifier>{efad43e6-a444-4581-823c-2b1dbfaa9254}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\SettingData\Standard">
+      <UniqueIdentifier>{f408c8b0-02d9-4680-9406-fbc9b881ca43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Layer">
+      <UniqueIdentifier>{77fa2214-82ec-4a13-98a3-9c61cb7eb20f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Layer\IOData">
+      <UniqueIdentifier>{3e70136b-a977-42d9-8710-c338587d07e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Layer\NeuralNetwork">
+      <UniqueIdentifier>{ea6b4b0f-2d97-462d-b7e9-869b4feaac76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Layer\IO">
+      <UniqueIdentifier>{0bc20bfc-5091-4463-9264-6105df934dee}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -66,10 +57,10 @@
     <ClInclude Include="targetver.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Activation_FUNC.hpp">
+    <ClInclude Include="Pooling_FUNC.hpp">
       <Filter>FromXML</Filter>
     </ClInclude>
-    <ClInclude Include="Activation_DATA.hpp">
+    <ClInclude Include="Pooling_DATA.hpp">
       <Filter>FromXML</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Common\Common.h">
@@ -96,11 +87,17 @@
     <ClInclude Include="..\..\..\include\Layer\ILayerBase.h">
       <Filter>include\Layer</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\ILayerData.h">
+      <Filter>include\Layer</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\IOData\IDataLayer.h">
       <Filter>include\Layer\IOData</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer.h">
       <Filter>include\Layer\IOData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
@@ -111,7 +108,7 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayer.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerDLL.h">
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerData.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h">
@@ -132,49 +129,43 @@
     <ClInclude Include="..\..\..\include\Layer\IO\ISingleOutputLayer.h">
       <Filter>include\Layer\IO</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\DataFormat\IDataFormatBase.h">
-      <Filter>include\DataFormat</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\DataFormat\StringArray\IDataFormat.h">
-      <Filter>include\DataFormat\StringArray</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\DataFormat\Binary\IDataFormat.h">
-      <Filter>include\DataFormat\Binary</Filter>
-    </ClInclude>
-    <ClInclude Include="Activation_Base.h">
-      <Filter>Layer</Filter>
-    </ClInclude>
-    <ClInclude Include="Activation_CPU.h">
-      <Filter>Layer</Filter>
-    </ClInclude>
-    <ClInclude Include="Activation_LayerData_Base.h">
+    <ClInclude Include="Pooling_LayerData_Base.h">
       <Filter>LayerData</Filter>
     </ClInclude>
-    <ClInclude Include="Activation_LayerData_CPU.h">
+    <ClInclude Include="Pooling_LayerData_CPU.h">
       <Filter>LayerData</Filter>
+    </ClInclude>
+    <ClInclude Include="Pooling_CPU.h">
+      <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="Pooling_Base.h">
+      <Filter>Layer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Pooling.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Activation_FUNC.cpp">
+    <ClCompile Include="Pooling_FUNC.cpp">
       <Filter>FromXML</Filter>
     </ClCompile>
-    <ClCompile Include="Activation_Base.cpp">
-      <Filter>Layer</Filter>
-    </ClCompile>
-    <ClCompile Include="Activation_CPU.cpp">
-      <Filter>Layer</Filter>
-    </ClCompile>
-    <ClCompile Include="Activation_LayerData_CPU.cpp">
+    <ClCompile Include="Pooling_LayerData_CPU.cpp">
       <Filter>LayerData</Filter>
     </ClCompile>
-    <ClCompile Include="Activation_LayerData_Base.cpp">
+    <ClCompile Include="Pooling_LayerData_Base.cpp">
       <Filter>LayerData</Filter>
+    </ClCompile>
+    <ClCompile Include="Pooling_CPU.cpp">
+      <Filter>Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="Pooling_Base.cpp">
+      <Filter>Layer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
