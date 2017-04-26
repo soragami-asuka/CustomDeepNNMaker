@@ -1,15 +1,15 @@
 //======================================
-// 畳み込みニューラルネットワークの結合処理レイヤー
+// 活性関数レイヤー
 // CPU処理用
 //======================================
-#ifndef __CONVOLUTION_CPU_H__
-#define __CONVOLUTION_CPU_H__
+#ifndef __ACTIVATION_CPU_H__
+#define __ACTIVATION_CPU_H__
 
 #include"stdafx.h"
 
-#include"Convolution_DATA.hpp"
-#include"Convolution_FUNC.hpp"
-#include"Convolution_Base.h"
+#include"Activation_DATA.hpp"
+#include"Activation_FUNC.hpp"
+#include"Activation_Base.h"
 
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
@@ -18,47 +18,38 @@ namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-class Convolution_CPU : public Convolution_Base
+class Activation_CPU : public Activation_Base
 {
 private:
 	// データ本体
-	class Convolution_LayerData_CPU& layerData;
+	class Activation_LayerData_CPU& layerData;
 
 	// 入出力バッファ
-	std::vector<std::vector<F32>>			lpOutputBuffer;		/**< 出力バッファ <バッチ数><畳み込み数> */
+	std::vector<std::vector<F32>>			lpOutputBuffer;		/**< 出力バッファ <バッチ数><入力信号数> */
 	std::vector<std::vector<F32>>			lpDInputBuffer;		/**< 入力誤差差分 <バッチ数><入力信号数> */
 
 	std::vector<F32*>						lppBatchOutputBuffer;		/**< バッチ処理用出力バッファ <バッチ数> */
 	std::vector<F32*>						lppBatchDInputBuffer;		/**< バッチ処理用入力誤差差分 <バッチ数> */
 
-	std::vector<std::vector<F32>>			lppDropOutNeuron;	/**< ドロップアウト用の処理を加えたニューロン */
-	std::vector<std::vector<F32>>			lppDNeuron;	/**< ニューロンの学習量 */
-	std::vector<F32>						lpDBias;	/**< バイアスの学習量 */
-
-	// Get関数を使うと処理不可がかさむので一時保存用. PreCalculateで値を格納.
-	U32 filterSize;						/**< フィルタサイズ */
+	// Get関数を使うと処理負荷がかさむので一時保存用. PreCalculateで値を格納.
 	U32 inputBufferCount;				/**< 入力バッファ数 */
-	U32 neuronCount;					/**< ニューロン数 */
 	U32 outputBufferCount;				/**< 出力バッファ数 */
 
-	IODataStruct paddingInputDataStruct;	/**< パディング後の入力バッファの入力データ構造 */
-	std::vector<std::vector<F32>> lpPaddingInputBuffer;	/**< パディング後の入力バッファ <バッチ数><入力バッファ> */
+	std::vector<F32>						lpCalculateSum;	/**< 一時計算用のバッファ[z][y][x]のサイズを持つ */
 
 	// 演算時の入力データ
 	CONST_BATCH_BUFFER_POINTER m_lppInputBuffer;		/**< 演算時の入力データ */
-	CONST_BATCH_BUFFER_POINTER m_lppDOutputBuffer;		/**< 入力誤差計算時の出力誤差データ */
+	CONST_BATCH_BUFFER_POINTER m_lppDOutputBufferPrev;	/**< 入力誤差計算時の出力誤差データ */
 
-	// 演算処理用のバッファ
-	bool onUseDropOut;											/**< ドロップアウト処理を実行するフラグ. */
-	std::vector<std::vector<NEURON_TYPE>>	lppDropOutBuffer;	/**< ドロップアウト処理用の係数<ニューロン数, フィルタサイズ> */
-
+	// 活性化関数
+	F32 (*func_activation)(F32);
+	F32 (*func_dactivation)(F32);
 
 public:
 	/** コンストラクタ */
-	Convolution_CPU(Gravisbell::GUID guid, class Convolution_LayerData_CPU& i_layerData);
+	Activation_CPU(Gravisbell::GUID guid, class Activation_LayerData_CPU& i_layerData);
 	/** デストラクタ */
-	virtual ~Convolution_CPU();
-
+	virtual ~Activation_CPU();
 
 public:
 	//================================
@@ -76,8 +67,8 @@ public:
 	// レイヤーデータ関連
 	//===========================
 	/** レイヤーデータを取得する */
-	Convolution_LayerData_Base& GetLayerData();
-	const Convolution_LayerData_Base& GetLayerData()const;
+	Activation_LayerData_Base& GetLayerData();
+	const Activation_LayerData_Base& GetLayerData()const;
 
 
 	//===========================

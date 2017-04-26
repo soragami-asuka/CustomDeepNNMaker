@@ -1,9 +1,9 @@
 /*--------------------------------------------
- * FileName  : Convolution_FUNC.cpp
- * LayerName : 畳みこみニューラルネットワーク
- * guid      : F6662E0E-1CA4-4D59-ACCA-CAC29A16C0AA
+ * FileName  : Activation_FUNC.cpp
+ * LayerName : 活性化関数
+ * guid      : 99904134-83B7-4502-A0CA-728A2C9D80C7
  * 
- * Text      : 畳みこみニューラルネットワーク.
+ * Text      : 活性化関数
 --------------------------------------------*/
 #include"stdafx.h"
 
@@ -12,11 +12,11 @@
 
 #include<Library/SettingData/Standard/SettingData.h>
 
-#include"Convolution_FUNC.hpp"
+#include"Activation_FUNC.hpp"
 
 
-// {F6662E0E-1CA4-4D59-ACCA-CAC29A16C0AA}
-static const Gravisbell::GUID g_guid(0xf6662e0e, 0x1ca4, 0x4d59, 0xac, 0xca, 0xca, 0xc2, 0x9a, 0x16, 0xc0, 0xaa);
+// {99904134-83B7-4502-A0CA-728A2C9D80C7}
+static const Gravisbell::GUID g_guid(0x99904134, 0x83b7, 0x4502, 0xa0, 0xca, 0x72, 0x8a, 0x2c, 0x9d, 0x80, 0xc7);
 
 // VersionCode
 static const Gravisbell::VersionCode g_version = {   1,   0,   0,   0}; 
@@ -37,8 +37,8 @@ namespace DefaultLanguage
     /** Base */
     static const StringData g_baseData = 
     {
-        L"畳みこみニューラルネットワーク",
-        L"畳みこみニューラルネットワーク."
+        L"活性化関数",
+        L"活性化関数"
     };
 
 
@@ -46,45 +46,10 @@ namespace DefaultLanguage
     static const std::map<std::wstring, StringData> g_lpItemData_LayerStructure = 
     {
         {
-            L"Output_Channel",
+            L"ActivationType",
             {
-                L"出力チャンネル数",
-                L"出力されるチャンネルの数",
-            }
-        },
-        {
-            L"DropOut",
-            {
-                L"ドロップアウト率",
-                L"前レイヤーを無視する割合.\n1.0で前レイヤーの全出力を無視する",
-            }
-        },
-        {
-            L"FilterSize",
-            {
-                L"フィルタサイズ",
-                L"畳みこみを行う入力信号数",
-            }
-        },
-        {
-            L"Stride",
-            {
-                L"フィルタ移動量",
-                L"畳みこみごとに移動するフィルタの移動量",
-            }
-        },
-        {
-            L"Padding",
-            {
-                L"パディングサイズ",
-                L"",
-            }
-        },
-        {
-            L"PaddingType",
-            {
-                L"パディング種別",
-                L"パディングを行う際の方法設定",
+                L"活性化関数種別",
+                L"使用する活性化関数の種類を定義する",
             }
         },
     };
@@ -94,13 +59,62 @@ namespace DefaultLanguage
     static const std::map<std::wstring, std::map<std::wstring, StringData>> g_lpItemDataEnum_LayerStructure =
     {
         {
-            L"PaddingType",
+            L"ActivationType",
             {
                 {
-                    L"zero",
+                    L"lenear",
                     {
-                        L"ゼロパディング",
-                        L"不足分を0で埋める",
+                        L"リニア関数",
+                        L"y = x;",
+                    },
+                },
+                {
+                    L"sigmoid",
+                    {
+                        L"シグモイド関数",
+                        L"y = 1 / (1 + e^(-x));\n範囲 0 < y < 1\n(x=0, y=0.5)を通る",
+                    },
+                },
+                {
+                    L"sigmoid_crossEntropy",
+                    {
+                        L"シグモイド関数(出力レイヤー用)",
+                        L"y = 1 / (1 + e^(-x));\n範囲 0 < y < 1\n(x=0, y=0.5)を通る",
+                    },
+                },
+                {
+                    L"ReLU",
+                    {
+                        L"ReLU（ランプ関数）",
+                        L"y = max(0, x);\n範囲 0 <= y\n(x=0, y=0)を通る",
+                    },
+                },
+                {
+                    L"softmax_ALL",
+                    {
+                        L"SoftMax関数",
+                        L"全体における自身の割合を返す関数.\ny = e^x / Σe^x;\n",
+                    },
+                },
+                {
+                    L"softmax_ALL_crossEntropy",
+                    {
+                        L"SoftMax関数(出力レイヤー用)",
+                        L"全体における自身の割合を返す関数.\ny = e^x / Σe^x;\n",
+                    },
+                },
+                {
+                    L"softmax_CH",
+                    {
+                        L"SoftMax関数(CH内のみ)",
+                        L"同一のX,Y,Zにおける各CHの自身の割合を返す関数.\ny = e^x / Σe^x;\n",
+                    },
+                },
+                {
+                    L"softmax_CH_crossEntropy",
+                    {
+                        L"SoftMax関数(CH内のみ)(出力レイヤー用)",
+                        L"同一のX,Y,Zにおける各CHの自身の割合を返す関数.\ny = e^x / Σe^x;\n",
                     },
                 },
             }
@@ -112,13 +126,6 @@ namespace DefaultLanguage
     /** ItemData Learn <id, StringData> */
     static const std::map<std::wstring, StringData> g_lpItemData_Learn = 
     {
-        {
-            L"LearnCoeff",
-            {
-                L"学習係数",
-                L"",
-            }
-        },
     };
 
 
@@ -200,82 +207,56 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 
 
 	// Create Item
-	/** Name : 出力チャンネル数
-	  * ID   : Output_Channel
-	  * Text : 出力されるチャンネルの数
-	  */
-	pLayerConfig->AddItem(
-		Gravisbell::SettingData::Standard::CreateItem_Int(
-			L"Output_Channel",
-			CurrentLanguage::g_lpItemData_LayerStructure[L"Output_Channel"].name.c_str(),
-			CurrentLanguage::g_lpItemData_LayerStructure[L"Output_Channel"].text.c_str(),
-			1, 65535, 1));
-
-	/** Name : ドロップアウト率
-	  * ID   : DropOut
-	  * Text : 前レイヤーを無視する割合.
-	  *      : 1.0で前レイヤーの全出力を無視する
-	  */
-	pLayerConfig->AddItem(
-		Gravisbell::SettingData::Standard::CreateItem_Float(
-			L"DropOut",
-			CurrentLanguage::g_lpItemData_LayerStructure[L"DropOut"].name.c_str(),
-			CurrentLanguage::g_lpItemData_LayerStructure[L"DropOut"].text.c_str(),
-			0.000000f, 1.000000f, 0.000000f));
-
-	/** Name : フィルタサイズ
-	  * ID   : FilterSize
-	  * Text : 畳みこみを行う入力信号数
-	  */
-	pLayerConfig->AddItem(
-		Gravisbell::SettingData::Standard::CreateItem_Vector3D_Int(
-			L"FilterSize",
-			CurrentLanguage::g_lpItemData_LayerStructure[L"FilterSize"].name.c_str(),
-			CurrentLanguage::g_lpItemData_LayerStructure[L"FilterSize"].text.c_str(),
-			1, 1, 1,
-			65535, 65535, 65535,
-			1, 1, 1));
-
-	/** Name : フィルタ移動量
-	  * ID   : Stride
-	  * Text : 畳みこみごとに移動するフィルタの移動量
-	  */
-	pLayerConfig->AddItem(
-		Gravisbell::SettingData::Standard::CreateItem_Vector3D_Int(
-			L"Stride",
-			CurrentLanguage::g_lpItemData_LayerStructure[L"Stride"].name.c_str(),
-			CurrentLanguage::g_lpItemData_LayerStructure[L"Stride"].text.c_str(),
-			0, 0, 0,
-			65535, 65535, 65535,
-			1, 1, 1));
-
-	/** Name : パディングサイズ
-	  * ID   : Padding
-	  */
-	pLayerConfig->AddItem(
-		Gravisbell::SettingData::Standard::CreateItem_Vector3D_Int(
-			L"Padding",
-			CurrentLanguage::g_lpItemData_LayerStructure[L"Padding"].name.c_str(),
-			CurrentLanguage::g_lpItemData_LayerStructure[L"Padding"].text.c_str(),
-			0, 0, 0,
-			65535, 65535, 65535,
-			0, 0, 0));
-
-	/** Name : パディング種別
-	  * ID   : PaddingType
-	  * Text : パディングを行う際の方法設定
+	/** Name : 活性化関数種別
+	  * ID   : ActivationType
+	  * Text : 使用する活性化関数の種類を定義する
 	  */
 	{
 		Gravisbell::SettingData::Standard::IItemEx_Enum* pItemEnum = Gravisbell::SettingData::Standard::CreateItem_Enum(
-			L"PaddingType",
-			CurrentLanguage::g_lpItemData_LayerStructure[L"PaddingType"].name.c_str(),
-			CurrentLanguage::g_lpItemData_LayerStructure[L"PaddingType"].text.c_str());
+			L"ActivationType",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"ActivationType"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"ActivationType"].text.c_str());
 
 		// 0
 		pItemEnum->AddEnumItem(
-			L"zero",
-			L"ゼロパディング",
-			L"不足分を0で埋める");
+			L"lenear",
+			L"リニア関数",
+			L"y = x;");
+		// 1
+		pItemEnum->AddEnumItem(
+			L"sigmoid",
+			L"シグモイド関数",
+			L"y = 1 / (1 + e^(-x));\n範囲 0 < y < 1\n(x=0, y=0.5)を通る");
+		// 2
+		pItemEnum->AddEnumItem(
+			L"sigmoid_crossEntropy",
+			L"シグモイド関数(出力レイヤー用)",
+			L"y = 1 / (1 + e^(-x));\n範囲 0 < y < 1\n(x=0, y=0.5)を通る");
+		// 3
+		pItemEnum->AddEnumItem(
+			L"ReLU",
+			L"ReLU（ランプ関数）",
+			L"y = max(0, x);\n範囲 0 <= y\n(x=0, y=0)を通る");
+		// 4
+		pItemEnum->AddEnumItem(
+			L"softmax_ALL",
+			L"SoftMax関数",
+			L"全体における自身の割合を返す関数.\ny = e^x / Σe^x;\n");
+		// 5
+		pItemEnum->AddEnumItem(
+			L"softmax_ALL_crossEntropy",
+			L"SoftMax関数(出力レイヤー用)",
+			L"全体における自身の割合を返す関数.\ny = e^x / Σe^x;\n");
+		// 6
+		pItemEnum->AddEnumItem(
+			L"softmax_CH",
+			L"SoftMax関数(CH内のみ)",
+			L"同一のX,Y,Zにおける各CHの自身の割合を返す関数.\ny = e^x / Σe^x;\n");
+		// 7
+		pItemEnum->AddEnumItem(
+			L"softmax_CH_crossEntropy",
+			L"SoftMax関数(CH内のみ)(出力レイヤー用)",
+			L"同一のX,Y,Zにおける各CHの自身の割合を返す関数.\ny = e^x / Σe^x;\n");
 
 		pLayerConfig->AddItem(pItemEnum);
 	}
@@ -326,16 +307,6 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSetting(void)
 
 
 	// Create Item
-	/** Name : 学習係数
-	  * ID   : LearnCoeff
-	  */
-	pLayerConfig->AddItem(
-		Gravisbell::SettingData::Standard::CreateItem_Float(
-			L"LearnCoeff",
-			CurrentLanguage::g_lpItemData_Learn[L"LearnCoeff"].name.c_str(),
-			CurrentLanguage::g_lpItemData_Learn[L"LearnCoeff"].text.c_str(),
-			0.000000f, 1000.000000f, 1.000000f));
-
 	return pLayerConfig;
 }
 

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="99904134-83B7-4502-A0CA-728A2C9D80C7" version="1.0.0.0" default-language="ja">
+  
+  <SourceName>Activation</SourceName>
+  <Name>活性化関数</Name>
+  <Text>活性化関数</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+    <Enum id="ActivationType">
+      <Name>活性化関数種別</Name>
+      <Text>使用する活性化関数の種類を定義する</Text>
+      <Items>
+        <Item id="lenear">
+          <Name>リニア関数</Name>
+          <Text>y = x;</Text>
+        </Item>
+        <Item id="sigmoid">
+          <Name>シグモイド関数</Name>
+          <Text>y = 1 / (1 + e^(-x));&#x0A;範囲 0 &lt; y &lt; 1&#x0A;(x=0, y=0.5)を通る</Text>
+        </Item>
+        <Item id="sigmoid_crossEntropy">
+          <Name>シグモイド関数(出力レイヤー用)</Name>
+          <Text>y = 1 / (1 + e^(-x));&#x0A;範囲 0 &lt; y &lt; 1&#x0A;(x=0, y=0.5)を通る</Text>
+        </Item>
+        <Item id="ReLU">
+          <Name>ReLU（ランプ関数）</Name>
+          <Text>y = max(0, x);&#x0A;範囲 0 &lt;= y&#x0A;(x=0, y=0)を通る</Text>
+        </Item>
+        <Item id="ReLU">
+          <Name>ReLU（ランプ関数）</Name>
+          <Text>y = max(0, x);&#x0A;範囲 0 &lt;= y&#x0A;(x=0, y=0)を通る</Text>
+        </Item>
+        <Item id="softmax_ALL">
+          <Name>SoftMax関数</Name>
+          <Text>全体における自身の割合を返す関数.&#x0A;y = e^x / Σe^x;&#x0A;</Text>
+        </Item>
+        <Item id="softmax_ALL_crossEntropy">
+          <Name>SoftMax関数(出力レイヤー用)</Name>
+          <Text>全体における自身の割合を返す関数.&#x0A;y = e^x / Σe^x;&#x0A;</Text>
+        </Item>
+        <Item id="softmax_CH">
+          <Name>SoftMax関数(CH内のみ)</Name>
+          <Text>同一のX,Y,Zにおける各CHの自身の割合を返す関数.&#x0A;y = e^x / Σe^x;&#x0A;</Text>
+        </Item>
+        <Item id="softmax_CH_crossEntropy">
+          <Name>SoftMax関数(CH内のみ)(出力レイヤー用)</Name>
+          <Text>同一のX,Y,Zにおける各CHの自身の割合を返す関数.&#x0A;y = e^x / Σe^x;&#x0A;</Text>
+        </Item>
+      </Items>
+      <Default>sigmoid</Default>
+    </Enum>
+  </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <Learn>
+  </Learn>
+
+</Config>

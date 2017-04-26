@@ -373,7 +373,7 @@ namespace NeuralNetwork {
 					for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
 					{
 						if(sum == 0.0f)
-							this->lpOutputBuffer[batchNum][neuronNum] = 1.0f / neuronNum;
+							this->lpOutputBuffer[batchNum][neuronNum] = 1.0f / this->neuronCount;
 						else
 							this->lpOutputBuffer[batchNum][neuronNum] /= sum;
 					

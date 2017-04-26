@@ -47,15 +47,10 @@ namespace Convolution {
 		  */
 		Vector3D<S32> Stride;
 
-		/** Name : パディングサイズ(-方向)
-		  * ID   : PaddingM
+		/** Name : パディングサイズ
+		  * ID   : Padding
 		  */
-		Vector3D<S32> PaddingM;
-
-		/** Name : パディングサイズ(+方向)
-		  * ID   : PaddingP
-		  */
-		Vector3D<S32> PaddingP;
+		Vector3D<S32> Padding;
 
 		/** Name : パディング種別
 		  * ID   : PaddingType

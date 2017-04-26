@@ -71,27 +71,8 @@
         <z>1</z>
       </Default>
     </Vector3D>
-    <Vector3D type="Int" id="PaddingM">
-      <Name>パディングサイズ(-方向)</Name>
-      <Min>
-        <x>0</x>
-        <y>0</y>
-        <z>0</z>
-      </Min>
-      <Max>
-        <x>65535</x>
-        <y>65535</y>
-        <z>65535</z>
-      </Max>
-      <Default>
-        <x>0</x>
-        <y>0</y>
-        <z>0</z>
-      </Default>
-    </Vector3D>
-
-    <Vector3D type="Int" id="PaddingP">
-      <Name>パディングサイズ(+方向)</Name>
+    <Vector3D type="Int" id="Padding">
+      <Name>パディングサイズ</Name>
       <Min>
         <x>0</x>
         <y>0</y>
