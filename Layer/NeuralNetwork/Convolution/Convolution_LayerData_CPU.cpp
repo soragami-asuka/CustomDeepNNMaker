@@ -6,7 +6,7 @@
 
 #include"Convolution_LayerData_CPU.h"
 #include"Convolution_FUNC.hpp"
-//#include"Convolution_CPU.h"
+#include"Convolution_CPU.h"
 
 #include"RandomUtility.h"
 
@@ -45,6 +45,17 @@ namespace NeuralNetwork {
 		U32 neuronCount = this->layerStructure.Output_Channel;
 		if(neuronCount == 0)
 			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_VALUERANGE;
+		
+		// 畳みこみ回数を計算
+		this->convolutionCount.x = (S32)ceilf((F32)((this->inputDataStruct.x + this->layerStructure.Padding.x*2 - (this->layerStructure.FilterSize.x - 1)) / this->layerStructure.Stride.x));
+		this->convolutionCount.y = (S32)ceilf((F32)((this->inputDataStruct.y + this->layerStructure.Padding.y*2 - (this->layerStructure.FilterSize.y - 1)) / this->layerStructure.Stride.y));
+		this->convolutionCount.z = (S32)ceilf((F32)((this->inputDataStruct.z + this->layerStructure.Padding.z*2 - (this->layerStructure.FilterSize.z - 1)) / this->layerStructure.Stride.z));
+
+		// 畳み込み開始位置を計算
+		this->convolutionStart.x = -(S32)ceilf((F32)(this->layerStructure.Padding.x / this->layerStructure.Stride.x));
+		this->convolutionStart.y = -(S32)ceilf((F32)(this->layerStructure.Padding.y / this->layerStructure.Stride.y));
+		this->convolutionStart.z = -(S32)ceilf((F32)(this->layerStructure.Padding.z / this->layerStructure.Stride.z));
+
 
 		// バッファを確保しつつ、初期値を設定
 		this->lppNeuron.resize(neuronCount);
@@ -157,8 +168,7 @@ namespace NeuralNetwork {
 		@param guid	新規生成するレイヤーのGUID. */
 	INNLayer* Convolution_LayerData_CPU::CreateLayer(const Gravisbell::GUID& guid)
 	{
-		return NULL;
-//		return new Convolution_CPU(guid, *this);
+		return new Convolution_CPU(guid, *this);
 	}
 
 } // Gravisbell;

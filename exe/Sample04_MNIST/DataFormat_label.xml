@@ -3,7 +3,7 @@
 データフォーマットに関する情報.
 -->
 
-<DataFormat-binary version="1.0.0.0" default-language="ja">
+<DataFormat-binary version="1.0.0.0" default-language="ja" byte-order="big">
   <Name>LABEL</Name>
   <Text>MNISTラベルファイル</Text>
 
@@ -21,6 +21,7 @@
     <Signature size="4">0x00000801</Signature>
     <Variable size="4" type="uint" id="images"/>
 
+    <!--
     <Items id="no" count="images">
       <BoolArray category="output" size="1" type="ubyte">
         <no>no</no>
@@ -30,6 +31,7 @@
         <ch>value</ch>
       </BoolArray>
     </Items>
+    -->
   </Data>
 
 </DataFormat-binary>

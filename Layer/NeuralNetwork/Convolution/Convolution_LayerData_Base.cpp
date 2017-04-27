@@ -81,17 +81,6 @@ namespace NeuralNetwork {
 		// 構造体に読み込む
 		this->pLayerStructure->WriteToStruct((BYTE*)&this->layerStructure);
 
-		// 畳みこみ回数を計算
-		this->convolutionCount.x = (S32)ceilf((F32)((this->inputDataStruct.x + this->layerStructure.Padding.x*2) / this->layerStructure.Stride.x));
-		this->convolutionCount.y = (S32)ceilf((F32)((this->inputDataStruct.y + this->layerStructure.Padding.y*2) / this->layerStructure.Stride.y));
-		this->convolutionCount.z = (S32)ceilf((F32)((this->inputDataStruct.z + this->layerStructure.Padding.z*2) / this->layerStructure.Stride.z));
-
-		// 畳み込み開始位置を計算
-		this->convolutionStart.x = -(S32)ceilf((F32)(this->layerStructure.Padding.x / this->layerStructure.Stride.x));
-		this->convolutionStart.y = -(S32)ceilf((F32)(this->layerStructure.Padding.y / this->layerStructure.Stride.y));
-		this->convolutionStart.z = -(S32)ceilf((F32)(this->layerStructure.Padding.z / this->layerStructure.Stride.z));
-
-
 		return ERROR_CODE_NONE;
 	}
 

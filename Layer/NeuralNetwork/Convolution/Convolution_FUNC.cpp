@@ -46,24 +46,17 @@ namespace DefaultLanguage
     static const std::map<std::wstring, StringData> g_lpItemData_LayerStructure = 
     {
         {
-            L"Output_Channel",
-            {
-                L"出力チャンネル数",
-                L"出力されるチャンネルの数",
-            }
-        },
-        {
-            L"DropOut",
-            {
-                L"ドロップアウト率",
-                L"前レイヤーを無視する割合.\n1.0で前レイヤーの全出力を無視する",
-            }
-        },
-        {
             L"FilterSize",
             {
                 L"フィルタサイズ",
                 L"畳みこみを行う入力信号数",
+            }
+        },
+        {
+            L"Output_Channel",
+            {
+                L"出力チャンネル数",
+                L"出力されるチャンネルの数",
             }
         },
         {
@@ -85,6 +78,13 @@ namespace DefaultLanguage
             {
                 L"パディング種別",
                 L"パディングを行う際の方法設定",
+            }
+        },
+        {
+            L"DropOut",
+            {
+                L"ドロップアウト率",
+                L"前レイヤーを無視する割合.\n1.0で前レイヤーの全出力を無視する",
             }
         },
     };
@@ -200,29 +200,6 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 
 
 	// Create Item
-	/** Name : 出力チャンネル数
-	  * ID   : Output_Channel
-	  * Text : 出力されるチャンネルの数
-	  */
-	pLayerConfig->AddItem(
-		Gravisbell::SettingData::Standard::CreateItem_Int(
-			L"Output_Channel",
-			CurrentLanguage::g_lpItemData_LayerStructure[L"Output_Channel"].name.c_str(),
-			CurrentLanguage::g_lpItemData_LayerStructure[L"Output_Channel"].text.c_str(),
-			1, 65535, 1));
-
-	/** Name : ドロップアウト率
-	  * ID   : DropOut
-	  * Text : 前レイヤーを無視する割合.
-	  *      : 1.0で前レイヤーの全出力を無視する
-	  */
-	pLayerConfig->AddItem(
-		Gravisbell::SettingData::Standard::CreateItem_Float(
-			L"DropOut",
-			CurrentLanguage::g_lpItemData_LayerStructure[L"DropOut"].name.c_str(),
-			CurrentLanguage::g_lpItemData_LayerStructure[L"DropOut"].text.c_str(),
-			0.000000f, 1.000000f, 0.000000f));
-
 	/** Name : フィルタサイズ
 	  * ID   : FilterSize
 	  * Text : 畳みこみを行う入力信号数
@@ -235,6 +212,17 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			1, 1, 1,
 			65535, 65535, 65535,
 			1, 1, 1));
+
+	/** Name : 出力チャンネル数
+	  * ID   : Output_Channel
+	  * Text : 出力されるチャンネルの数
+	  */
+	pLayerConfig->AddItem(
+		Gravisbell::SettingData::Standard::CreateItem_Int(
+			L"Output_Channel",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"Output_Channel"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"Output_Channel"].text.c_str(),
+			1, 65535, 1));
 
 	/** Name : フィルタ移動量
 	  * ID   : Stride
@@ -279,6 +267,18 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 
 		pLayerConfig->AddItem(pItemEnum);
 	}
+
+	/** Name : ドロップアウト率
+	  * ID   : DropOut
+	  * Text : 前レイヤーを無視する割合.
+	  *      : 1.0で前レイヤーの全出力を無視する
+	  */
+	pLayerConfig->AddItem(
+		Gravisbell::SettingData::Standard::CreateItem_Float(
+			L"DropOut",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"DropOut"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"DropOut"].text.c_str(),
+			0.000000f, 1.000000f, 0.000000f));
 
 	return pLayerConfig;
 }
