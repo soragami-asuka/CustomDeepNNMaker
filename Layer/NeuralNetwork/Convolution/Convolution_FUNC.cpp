@@ -233,7 +233,7 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			L"Stride",
 			CurrentLanguage::g_lpItemData_LayerStructure[L"Stride"].name.c_str(),
 			CurrentLanguage::g_lpItemData_LayerStructure[L"Stride"].text.c_str(),
-			0, 0, 0,
+			1, 1, 1,
 			65535, 65535, 65535,
 			1, 1, 1));
 

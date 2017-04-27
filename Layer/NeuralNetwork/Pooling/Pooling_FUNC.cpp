@@ -176,7 +176,7 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			CurrentLanguage::g_lpItemData_LayerStructure[L"FilterSize"].text.c_str(),
 			1, 1, 1,
 			65535, 65535, 65535,
-			2, 2, 2));
+			1, 1, 1));
 
 	/** Name : PoolingŽí•Ê
 	  * ID   : PoolingType

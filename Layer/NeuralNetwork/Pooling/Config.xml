@@ -32,9 +32,9 @@
         <z>65535</z>
       </Max>
       <Default>
-        <x>2</x>
-        <y>2</y>
-        <z>2</z>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
       </Default>
     </Vector3D>
 
@@ -47,7 +47,7 @@
           <Text>範囲内の最大値を使用する</Text>
         </Item>
       </Items>
-      <Default>zero</Default>
+      <Default>max</Default>
     </Enum>
     
   </Structure>

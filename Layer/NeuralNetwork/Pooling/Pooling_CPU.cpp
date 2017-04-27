@@ -180,18 +180,20 @@ namespace NeuralNetwork {
 							F32 maxValue = -FLT_MAX;
 							for(S32 filterZ=0; filterZ<this->layerData.layerStructure.FilterSize.z; filterZ++)
 							{
+								U32 inputZ = outputZ * this->layerData.layerStructure.FilterSize.z + filterZ;
+								if(inputZ >= this->layerData.inputDataStruct.z)
+									continue;
+
 								for(S32 filterY=0; filterY<this->layerData.layerStructure.FilterSize.y; filterY++)
 								{
+									U32 inputY = outputY * this->layerData.layerStructure.FilterSize.y + filterY;
+									if(inputY >= this->layerData.inputDataStruct.y)
+										continue;
+
 									for(S32 filterX=0; filterX<this->layerData.layerStructure.FilterSize.x; filterX++)
 									{
 										U32 inputX = outputX * this->layerData.layerStructure.FilterSize.x + filterX;
-										U32 inputY = outputY * this->layerData.layerStructure.FilterSize.y + filterY;
-										U32 inputZ = outputZ * this->layerData.layerStructure.FilterSize.z + filterZ;
 										if(inputX >= this->layerData.inputDataStruct.x)
-											continue;
-										if(inputY >= this->layerData.inputDataStruct.y)
-											continue;
-										if(inputZ >= this->layerData.inputDataStruct.z)
 											continue;
 
 										U32 inputOffset = POSITION_TO_OFFSET_STRUCT(
@@ -276,18 +278,20 @@ namespace NeuralNetwork {
 							// ç≈ëÂílÇí≤Ç◊ÇÈ
 							for(S32 filterZ=0; filterZ<this->layerData.layerStructure.FilterSize.z; filterZ++)
 							{
+								U32 inputZ = outputZ * this->layerData.layerStructure.FilterSize.z + filterZ;
+								if(inputZ >= this->layerData.inputDataStruct.z)
+									continue;
+
 								for(S32 filterY=0; filterY<this->layerData.layerStructure.FilterSize.y; filterY++)
 								{
+									U32 inputY = outputY * this->layerData.layerStructure.FilterSize.y + filterY;
+									if(inputY >= this->layerData.inputDataStruct.y)
+										continue;
+
 									for(S32 filterX=0; filterX<this->layerData.layerStructure.FilterSize.x; filterX++)
 									{
 										U32 inputX = outputX * this->layerData.layerStructure.FilterSize.x + filterX;
-										U32 inputY = outputY * this->layerData.layerStructure.FilterSize.y + filterY;
-										U32 inputZ = outputZ * this->layerData.layerStructure.FilterSize.z + filterZ;
 										if(inputX >= this->layerData.inputDataStruct.x)
-											continue;
-										if(inputY >= this->layerData.inputDataStruct.y)
-											continue;
-										if(inputZ >= this->layerData.inputDataStruct.z)
 											continue;
 
 										U32 inputOffset = POSITION_TO_OFFSET_STRUCT(
