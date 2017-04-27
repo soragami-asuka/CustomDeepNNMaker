@@ -76,11 +76,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	Layer::IOData::IIODataLayer* pDataLayerTest_Input  = NULL;
 	Layer::IOData::IIODataLayer* pDataLayerTest_Output = NULL;
 
-	if(LoadSampleData_image(&pDataLayerTeach_Input, &pDataLayerTest_Input, 0.1f, L"./DataFormat_image.xml", L"../../SampleData/MNIST/train-images.idx3-ubyte") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	if(LoadSampleData_image(&pDataLayerTeach_Input, &pDataLayerTest_Input, 0.1f, L"../SampleData/MNIST/DataFormat_image.xml", L"../SampleData/MNIST/train-images.idx3-ubyte") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 	{
 		return -1;
 	}
-	if(LoadSampleData_label(&pDataLayerTeach_Output, &pDataLayerTest_Output, 0.1f, L"./DataFormat_label.xml", L"../../SampleData/MNIST/train-labels.idx1-ubyte") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	if(LoadSampleData_label(&pDataLayerTeach_Output, &pDataLayerTest_Output, 0.1f, L"../SampleData/MNIST/DataFormat_label.xml", L"../SampleData/MNIST/train-labels.idx1-ubyte") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 	{
 		delete pDataLayerTeach_Input;
 		delete pDataLayerTest_Input;
@@ -354,9 +354,9 @@ Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManager(void)
 
 	// Feedforward
 #ifdef _DEBUG
-	if(pDLLManager->ReadLayerDLL(L"../../Debug/Gravisbell.Layer.NeuralNetwork.FeedforwardNeuralNetwork.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	if(pDLLManager->ReadLayerDLL(L"./Gravisbell.Layer.NeuralNetwork.FeedforwardNeuralNetwork.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 #else
-	if(pDLLManager->ReadLayerDLL(L"../../Release/Gravisbell.Layer.NeuralNetwork.FeedforwardNeuralNetwork.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	if(pDLLManager->ReadLayerDLL(L"./Gravisbell.Layer.NeuralNetwork.FeedforwardNeuralNetwork.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 #endif
 	{
 		delete pDLLManager;
@@ -365,9 +365,9 @@ Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManager(void)
 
 	// FullyConnect_Activation
 #ifdef _DEBUG
-	if(pDLLManager->ReadLayerDLL(L"../../Debug/Gravisbell.Layer.NeuralNetwork.FullyConnect_Activation.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	if(pDLLManager->ReadLayerDLL(L"./Gravisbell.Layer.NeuralNetwork.FullyConnect_Activation.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 #else
-	if(pDLLManager->ReadLayerDLL(L"../../Release/Gravisbell.Layer.NeuralNetwork.FullyConnect_Activation.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	if(pDLLManager->ReadLayerDLL(L"./Gravisbell.Layer.NeuralNetwork.FullyConnect_Activation.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 #endif
 	{
 		delete pDLLManager;
@@ -376,9 +376,9 @@ Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManager(void)
 
 	// Convolution
 #ifdef _DEBUG
-	if(pDLLManager->ReadLayerDLL(L"../../Debug/Gravisbell.Layer.NeuralNetwork.Convolution.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	if(pDLLManager->ReadLayerDLL(L"./Gravisbell.Layer.NeuralNetwork.Convolution.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 #else
-	if(pDLLManager->ReadLayerDLL(L"../../Release/Gravisbell.Layer.NeuralNetwork.Convolution.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	if(pDLLManager->ReadLayerDLL(L"./Gravisbell.Layer.NeuralNetwork.Convolution.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 #endif
 	{
 		delete pDLLManager;
@@ -387,9 +387,9 @@ Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManager(void)
 
 	// Activation
 #ifdef _DEBUG
-	if(pDLLManager->ReadLayerDLL(L"../../Debug/Gravisbell.Layer.NeuralNetwork.Activation.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	if(pDLLManager->ReadLayerDLL(L"./Gravisbell.Layer.NeuralNetwork.Activation.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 #else
-	if(pDLLManager->ReadLayerDLL(L"../../Release/Gravisbell.Layer.NeuralNetwork.Activation.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	if(pDLLManager->ReadLayerDLL(L"./Gravisbell.Layer.NeuralNetwork.Activation.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 #endif
 	{
 		delete pDLLManager;
@@ -398,9 +398,9 @@ Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManager(void)
 
 	// Pooling
 #ifdef _DEBUG
-	if(pDLLManager->ReadLayerDLL(L"../../Debug/Gravisbell.Layer.NeuralNetwork.Pooling.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	if(pDLLManager->ReadLayerDLL(L"./Gravisbell.Layer.NeuralNetwork.Pooling.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 #else
-	if(pDLLManager->ReadLayerDLL(L"../../Release/Gravisbell.Layer.NeuralNetwork.Pooling.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	if(pDLLManager->ReadLayerDLL(L"./Gravisbell.Layer.NeuralNetwork.Pooling.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 #endif
 	{
 		delete pDLLManager;
@@ -491,7 +491,33 @@ Layer::NeuralNetwork::INNLayerData* CreateActivationLayer(const Layer::NeuralNet
 
 	return pLayer;
 }
-Layer::NeuralNetwork::INNLayerData* CreatePoolingLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, Vector3D<S32> filterSize);
+Layer::NeuralNetwork::INNLayerData* CreatePoolingLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, Vector3D<S32> filterSize)
+{
+	// DLL取得
+	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(Gravisbell::GUID(0xeb80e0d0, 0x9d5a, 0x4ed1, 0xa8, 0x0d, 0xa1, 0x66, 0x7d, 0xe0, 0xc8, 0x90));
+	if(pLayerDLL == NULL)
+		return NULL;
+
+	// 設定の作成
+	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
+	if(pConfig == NULL)
+		return NULL;
+	// フィルタサイズ
+	{
+		SettingData::Standard::IItem_Vector3D_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Vector3D_Int*>(pConfig->GetItemByID(L"FilterSize"));
+		pItem->SetValue(filterSize);
+	}
+
+	// レイヤーの作成
+	Layer::NeuralNetwork::INNLayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, inputDataStruct);
+	if(pLayer == NULL)
+		return NULL;
+
+	// 設定情報を削除
+	delete pConfig;
+
+	return pLayer;
+}
 Layer::NeuralNetwork::INNLayerData* CreateFullyConnectLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, U32 neuronCount, const std::wstring activationType, F32 dropOutRate)
 {
 	// DLL取得
@@ -601,6 +627,11 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::Neur
 			*pNeuralNetwork,
 			lppLayerData,
 			inputDataStruct, lastLayerGUID,
+			::CreatePoolingLayer(layerDLLManager, inputDataStruct, Vector3D<S32>(2,2,1)));
+		::AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lppLayerData,
+			inputDataStruct, lastLayerGUID,
 			::CreateActivationLayer(layerDLLManager, inputDataStruct, L"ReLU"));
 
 		// 2層目
@@ -609,6 +640,11 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::Neur
 			lppLayerData,
 			inputDataStruct, lastLayerGUID,
 			::CreateConvolutionLayer(layerDLLManager, inputDataStruct, Vector3D<S32>(4,4,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0), 0.0f));
+		::AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lppLayerData,
+			inputDataStruct, lastLayerGUID,
+			::CreatePoolingLayer(layerDLLManager, inputDataStruct, Vector3D<S32>(2,2,1)));
 		::AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lppLayerData,
