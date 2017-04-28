@@ -5,6 +5,7 @@ call ConvertNNConfigToSource.exe "./FullyConnect_Activation/Config.xml" "./Fully
 call ConvertNNConfigToSource.exe "./Convolution/Config.xml" "./Convolution/" "Convolution"
 call ConvertNNConfigToSource.exe "./Activation/Config.xml" "./Activation/" "Activation"
 call ConvertNNConfigToSource.exe "./Pooling/Config.xml" "./Pooling/" "Pooling"
+call ConvertNNConfigToSource.exe "./BatchNormalization/Config.xml" "./BatchNormalization/" "BatchNormalization"
 
 
 pause

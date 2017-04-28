@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="ACD11A5A-BFB5-4951-8382-1DE89DFA96A8" version="1.0.0.0" default-language="ja">
+  
+  <SourceName>BatchNormalization</SourceName>
+  <Name>バッチ正規化</Name>
+  <Text>バッチ単位で正規化を行う</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+    <Float id="epsilon">
+      <Name>安定化係数</Name>
+      <Text>分散の値が小さすぎる場合に割り算を安定させるための値</Text>
+      <Min>0.00001</Min>
+      <Max>1.0</Max>
+      <Default>0.00001</Default>
+    </Float>
+  </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <Learn>
+    <Float id="LearnCoeff">
+      <Name>学習係数</Name>
+      <Min>0.0</Min>
+      <Max>1000.0</Max>
+      <Default>1.0</Default>
+    </Float>
+  </Learn>
+
+</Config>

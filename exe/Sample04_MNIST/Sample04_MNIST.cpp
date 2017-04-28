@@ -44,6 +44,7 @@ Layer::NeuralNetwork::INNLayerData* CreateConvolutionLayer(const Layer::NeuralNe
 Layer::NeuralNetwork::INNLayerData* CreateActivationLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, const std::wstring activationType);
 Layer::NeuralNetwork::INNLayerData* CreatePoolingLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, Vector3D<S32> filterSize);
 Layer::NeuralNetwork::INNLayerData* CreateFullyConnectLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, U32 neuronCount, const std::wstring activationType, F32 dropOutRate);
+Layer::NeuralNetwork::INNLayerData* CreateBatchNormalizationLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct);
 
 /** レイヤーをネットワークの末尾に追加する.GUIDは自動割り当て.入力データ構造、最終GUIDも更新する. */
 Gravisbell::ErrorCode AddLayerToNetworkLast( Layer::NeuralNetwork::INNLayerConnectData& neuralNetwork, std::list<Layer::ILayerData*>& lppLayerData, Gravisbell::IODataStruct& inputDataStruct, Gravisbell::GUID& lastLayerGUID, Layer::NeuralNetwork::INNLayerData* pAddlayer);
@@ -407,6 +408,17 @@ Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManager(void)
 		return NULL;
 	}
 
+	// BatchNormalization
+#ifdef _DEBUG
+	if(pDLLManager->ReadLayerDLL(L"./Gravisbell.Layer.NeuralNetwork.BatchNormalization.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+#else
+	if(pDLLManager->ReadLayerDLL(L"./Gravisbell.Layer.NeuralNetwork.BatchNormalization.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+#endif
+	{
+		delete pDLLManager;
+		return NULL;
+	}
+
 	return pDLLManager;
 }
 
@@ -555,6 +567,28 @@ Layer::NeuralNetwork::INNLayerData* CreateFullyConnectLayer(const Layer::NeuralN
 
 	return pLayer;
 }
+Layer::NeuralNetwork::INNLayerData* CreateBatchNormalizationLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct)
+{
+	// DLL取得
+	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(Gravisbell::GUID(0xacd11a5a, 0xbfb5, 0x4951, 0x83, 0x82, 0x1d, 0xe8, 0x9d, 0xfa, 0x96, 0xa8));
+	if(pLayerDLL == NULL)
+		return NULL;
+
+	// 設定の作成
+	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
+	if(pConfig == NULL)
+		return NULL;
+	
+	// レイヤーの作成
+	Layer::NeuralNetwork::INNLayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, inputDataStruct);
+	if(pLayer == NULL)
+		return NULL;
+
+	// 設定情報を削除
+	delete pConfig;
+
+	return pLayer;
+}
 
 
 /** レイヤーをネットワークの末尾に追加する.GUIDは自動割り当て.入力データ構造、最終GUIDも更新する. */
@@ -632,6 +666,11 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::Neur
 			*pNeuralNetwork,
 			lppLayerData,
 			inputDataStruct, lastLayerGUID,
+			::CreateBatchNormalizationLayer(layerDLLManager, inputDataStruct));
+		::AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lppLayerData,
+			inputDataStruct, lastLayerGUID,
 			::CreateActivationLayer(layerDLLManager, inputDataStruct, L"ReLU"));
 
 		// 2層目
@@ -645,6 +684,11 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::Neur
 			lppLayerData,
 			inputDataStruct, lastLayerGUID,
 			::CreatePoolingLayer(layerDLLManager, inputDataStruct, Vector3D<S32>(2,2,1)));
+		::AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lppLayerData,
+			inputDataStruct, lastLayerGUID,
+			::CreateBatchNormalizationLayer(layerDLLManager, inputDataStruct));
 		::AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lppLayerData,
@@ -681,7 +725,8 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 	Gravisbell::ErrorCode err;
 
 	// 学習係数を設定
-	pNeuralNetworkLearn->SetLearnSettingData(L"LearnCoeff", 0.001f);
+//	pNeuralNetworkLearn->SetLearnSettingData(L"LearnCoeff", 0.001f);
+	pNeuralNetworkLearn->SetLearnSettingData(L"LearnCoeff", 0.005f);
 
 	// 事前処理を実行
 	err = pNeuralNetworkLearn->PreProcessLearn(BATCH_SIZE);
