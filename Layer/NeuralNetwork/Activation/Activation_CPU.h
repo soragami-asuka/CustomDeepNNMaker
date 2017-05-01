@@ -25,8 +25,8 @@ private:
 	class Activation_LayerData_CPU& layerData;
 
 	// 入出力バッファ
-	std::vector<std::vector<F32>>			lpOutputBuffer;		/**< 出力バッファ <バッチ数><入力信号数> */
-	std::vector<std::vector<F32>>			lpDInputBuffer;		/**< 入力誤差差分 <バッチ数><入力信号数> */
+	std::vector<F32>						lpOutputBuffer;		/**< 出力バッファ <バッチ数><入力信号数> */
+	std::vector<F32>						lpDInputBuffer;		/**< 入力誤差差分 <バッチ数><入力信号数> */
 
 	std::vector<F32*>						lppBatchOutputBuffer;		/**< バッチ処理用出力バッファ <バッチ数> */
 	std::vector<F32*>						lppBatchDInputBuffer;		/**< バッチ処理用入力誤差差分 <バッチ数> */
@@ -38,8 +38,10 @@ private:
 	std::vector<F32>						lpCalculateSum;	/**< 一時計算用のバッファ[z][y][x]のサイズを持つ */
 
 	// 演算時の入力データ
-	CONST_BATCH_BUFFER_POINTER m_lppInputBuffer;		/**< 演算時の入力データ */
-	CONST_BATCH_BUFFER_POINTER m_lppDOutputBufferPrev;	/**< 入力誤差計算時の出力誤差データ */
+	CONST_BATCH_BUFFER_POINTER m_lpInputBuffer;
+	std::vector<CONST_BATCH_BUFFER_POINTER> m_lppInputBuffer;		/**< 演算時の入力データ */
+	CONST_BATCH_BUFFER_POINTER m_lpDOutputBufferPrev;
+	std::vector<CONST_BATCH_BUFFER_POINTER> m_lppDOutputBufferPrev;	/**< 入力誤差計算時の出力誤差データ */
 
 	// 活性化関数
 	F32 (*func_activation)(F32);

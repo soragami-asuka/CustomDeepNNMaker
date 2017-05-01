@@ -82,10 +82,12 @@ namespace Gravisbell {
 
 	/** レイヤー間のデータのやり取りを行うバッチ処理用2次元配列ポインタ型.
 		[バッチサイズ][バッファ数] */
-	typedef F32**				BATCH_BUFFER_POINTER;
+//	typedef F32**				BATCH_BUFFER_POINTER;
+	typedef F32*				BATCH_BUFFER_POINTER;
 	/** レイヤー間のデータのやり取りを行うバッチ処理用2次元配列ポインタ型(定数).
 		[バッチサイズ][バッファ数] */
-	typedef const F32*const*	CONST_BATCH_BUFFER_POINTER;
+//	typedef const F32*const*	CONST_BATCH_BUFFER_POINTER;
+	typedef const F32*			CONST_BATCH_BUFFER_POINTER;
 
 }	// Gravisbell
 

@@ -25,8 +25,8 @@ private:
 	class Pooling_LayerData_CPU& layerData;
 
 	// 入出力バッファ
-	std::vector<std::vector<F32>>			lpOutputBuffer;		/**< 出力バッファ <バッチ数><出力信号数> */
-	std::vector<std::vector<F32>>			lpDInputBuffer;		/**< 入力誤差差分 <バッチ数><入力信号数> */
+	std::vector<F32>			lpOutputBuffer;		/**< 出力バッファ <バッチ数><出力信号数> */
+	std::vector<F32>			lpDInputBuffer;		/**< 入力誤差差分 <バッチ数><入力信号数> */
 
 	std::vector<F32*>						lppBatchOutputBuffer;		/**< バッチ処理用出力バッファ <バッチ数> */
 	std::vector<F32*>						lppBatchDInputBuffer;		/**< バッチ処理用入力誤差差分 <バッチ数> */
@@ -36,8 +36,8 @@ private:
 	U32 outputBufferCount;				/**< 出力バッファ数 */
 
 	// 演算時の入力データ
-	CONST_BATCH_BUFFER_POINTER m_lppInputBuffer;		/**< 演算時の入力データ */
-	CONST_BATCH_BUFFER_POINTER m_lppDOutputBufferPrev;	/**< 入力誤差計算時の出力誤差データ */
+	std::vector<CONST_BATCH_BUFFER_POINTER> m_lppInputBuffer;		/**< 演算時の入力データ */
+	std::vector<CONST_BATCH_BUFFER_POINTER> m_lppDOutputBufferPrev;	/**< 入力誤差計算時の出力誤差データ */
 
 
 public:

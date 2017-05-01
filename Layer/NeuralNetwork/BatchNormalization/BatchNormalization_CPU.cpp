@@ -30,8 +30,6 @@ namespace NeuralNetwork {
 		,	channeclBufferCount		(0)				/**< 1チャンネル当たりのバッファ数 */
 		,	onLearnMode				(false)			/**< 学習処理中フラグ */
 		,	learnCount				(0)				/**< 学習実行回数 */
-		,	m_lppInputBuffer		(NULL)	/**< 演算時の入力データ */
-		,	m_lppDOutputBufferPrev	(NULL)	/**< 入力誤差計算時の出力誤差データ */
 	{
 	}
 	/** デストラクタ */
@@ -102,13 +100,15 @@ namespace NeuralNetwork {
 		this->lpTmpMean.resize(this->layerData.inputDataStruct.ch, 0.0f);
 		this->lpTmpVariance.resize(this->layerData.inputDataStruct.ch, 0.0f);
 
+		// 出力誤差バッファ受け取り用のアドレス配列を作成する
+		this->m_lppDOutputBufferPrev.resize(batchSize);
+
 		// 入力誤差用バッファを作成
-		this->lpDInputBuffer.resize(this->batchSize);
+		this->lpDInputBuffer.resize(this->batchSize * this->inputBufferCount);
 		this->lppBatchDInputBuffer.resize(this->batchSize);
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 		{
-			this->lpDInputBuffer[batchNum].resize(this->inputBufferCount);
-			this->lppBatchDInputBuffer[batchNum] = &this->lpDInputBuffer[batchNum][0];
+			this->lppBatchDInputBuffer[batchNum] = &this->lpDInputBuffer[batchNum * this->inputBufferCount];
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
@@ -138,14 +138,15 @@ namespace NeuralNetwork {
 		if(this->channeclBufferCount == 0)
 			return ErrorCode::ERROR_CODE_FRAUD_INPUT_COUNT;
 
+		// 入力バッファ保存用のアドレス配列を作成
+		this->m_lppInputBuffer.resize(batchSize, NULL);
 
 		// 出力バッファを作成
-		this->lpOutputBuffer.resize(this->batchSize);
+		this->lpOutputBuffer.resize(this->batchSize * this->outputBufferCount);
 		this->lppBatchOutputBuffer.resize(this->batchSize);
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 		{
-			this->lpOutputBuffer[batchNum].resize(this->outputBufferCount);
-			this->lppBatchOutputBuffer[batchNum] = &this->lpOutputBuffer[batchNum][0];
+			this->lppBatchOutputBuffer[batchNum] = &this->lpOutputBuffer[batchNum * this->outputBufferCount];
 		}
 
 		// 平均,分散を一時バッファに移す
@@ -195,9 +196,11 @@ namespace NeuralNetwork {
 	/** 演算処理を実行する.
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 		@return 成功した場合0が返る */
-	ErrorCode BatchNormalization_CPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer)
+	ErrorCode BatchNormalization_CPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
 	{
-		this->m_lppInputBuffer = i_lppInputBuffer;
+		// 入力バッファのアドレスを配列に格納
+		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			this->m_lppInputBuffer[batchNum] = &i_lpInputBuffer[batchNum * this->inputBufferCount];
 
 		// 学習中ならば平均、分散を求める
 		if(this->onLearnMode)
@@ -210,7 +213,7 @@ namespace NeuralNetwork {
 				{
 					for(U32 bufNum=0; bufNum<this->channeclBufferCount; bufNum++)
 					{
-						this->lpTmpMean[ch] += i_lppInputBuffer[batchNum][this->channeclBufferCount*ch + bufNum];
+						this->lpTmpMean[ch] += this->m_lppInputBuffer[batchNum][this->channeclBufferCount*ch + bufNum];
 					}
 				}
 				this->lpTmpMean[ch] /= (this->batchSize * this->channeclBufferCount);
@@ -224,7 +227,7 @@ namespace NeuralNetwork {
 				{
 					for(U32 bufNum=0; bufNum<this->channeclBufferCount; bufNum++)
 					{
-						F32 value = i_lppInputBuffer[batchNum][this->channeclBufferCount*ch + bufNum];
+						F32 value = this->m_lppInputBuffer[batchNum][this->channeclBufferCount*ch + bufNum];
 
 						this->lpTmpVariance[ch] += (value - this->lpTmpMean[ch]) * (value - this->lpTmpMean[ch]);
 					}
@@ -244,13 +247,13 @@ namespace NeuralNetwork {
 			{
 				for(U32 bufNum=0; bufNum<this->channeclBufferCount; bufNum++)
 				{
-					F32 value = i_lppInputBuffer[batchNum][this->channeclBufferCount*ch + bufNum];
+					F32 value = this->m_lppInputBuffer[batchNum][this->channeclBufferCount*ch + bufNum];
 
 					// 正規化
 					F32 value2 = (value - mean) / sqrtVariance;
 
 					// スケーリングとバイアス
-					this->lpOutputBuffer[batchNum][this->channeclBufferCount*ch + bufNum] = this->layerData.lpScale[ch] * value2 + this->layerData.lpBias[ch];
+					this->lppBatchOutputBuffer[batchNum][this->channeclBufferCount*ch + bufNum] = this->layerData.lpScale[ch] * value2 + this->layerData.lpBias[ch];
 				}
 			}
 		}
@@ -264,7 +267,7 @@ namespace NeuralNetwork {
 		@return 出力データ配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER BatchNormalization_CPU::GetOutputBuffer()const
 	{
-		return &this->lppBatchOutputBuffer[0];
+		return &this->lpOutputBuffer[0];
 	}
 	/** 出力データバッファを取得する.
 		@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
@@ -279,10 +282,7 @@ namespace NeuralNetwork {
 
 		CONST_BATCH_BUFFER_POINTER lppUseOutputBuffer = this->GetOutputBuffer();
 
-		for(U32 batchNum=0; batchNum<batchSize; batchNum++)
-		{
-			memcpy(o_lpOutputBuffer[batchNum], lppUseOutputBuffer[batchNum], sizeof(F32)*outputBufferCount);
-		}
+		memcpy(o_lpOutputBuffer, this->GetOutputBuffer(), sizeof(F32) * outputBufferCount * batchSize);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -295,10 +295,12 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode BatchNormalization_CPU::CalculateLearnError(CONST_BATCH_BUFFER_POINTER i_lppDOutputBufferPrev)
+	ErrorCode BatchNormalization_CPU::CalculateLearnError(CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
 	{
-		this->m_lppDOutputBufferPrev = i_lppDOutputBufferPrev;
-		
+		// 出力誤差バッファのアドレスを配列に格納
+		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			this->m_lppDOutputBufferPrev[batchNum] = &i_lpDOutputBufferPrev[batchNum * this->outputBufferCount];
+
 		for(U32 ch=0; ch<this->layerData.inputDataStruct.ch; ch++)
 		{
 			F32 mean = this->lpTmpMean[ch];
@@ -332,7 +334,7 @@ namespace NeuralNetwork {
 					F32 dOutput = this->m_lppDOutputBufferPrev[batchNum][this->channeclBufferCount*ch + bufNum];
 					F32 dValue2 = dOutput * scale;
 
-					this->lpDInputBuffer[batchNum][this->channeclBufferCount*ch + bufNum]
+					this->lppBatchDInputBuffer[batchNum][this->channeclBufferCount*ch + bufNum]
 						= dValue2 / sqrtVariance
 						+ dVariance * 2 * (value - mean) / (this->channeclBufferCount * this->batchSize)
 						+ dMean / (this->channeclBufferCount * this->batchSize);
@@ -396,7 +398,7 @@ namespace NeuralNetwork {
 		@return	誤差差分配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER BatchNormalization_CPU::GetDInputBuffer()const
 	{
-		return &this->lppBatchDInputBuffer[0];
+		return &this->lpDInputBuffer[0];
 	}
 	/** 学習差分を取得する.
 		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
@@ -410,10 +412,7 @@ namespace NeuralNetwork {
 
 		CONST_BATCH_BUFFER_POINTER lppUseDInputBuffer = this->GetDInputBuffer();
 
-		for(U32 batchNum=0; batchNum<batchSize; batchNum++)
-		{
-			memcpy(o_lpDInputBuffer[batchNum], lppUseDInputBuffer[batchNum], sizeof(F32)*inputBufferCount);
-		}
+		memcpy(o_lpDInputBuffer, this->GetDInputBuffer(), sizeof(F32) * inputBufferCount * batchSize);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

@@ -19,7 +19,7 @@ namespace StringUtility
 		*	@retval		0ˆÈŠO = Ž¸”s
 		*/
 	//=========================================================================
-	int ShiftjisToUnicode(const char *buf, wchar_t *dest, int size);
+	int ShiftjisToUnicode(const char *buf, wchar_t *dest, size_t size);
 
 	//=========================================================================
 	//	@brief		Shift-jis‚Ì•¶Žš—ñ‚ð, UTF8•¶Žš—ñ‚É•ÏŠ·‚·‚é
@@ -38,7 +38,7 @@ namespace StringUtility
 		*	@retval		0ˆÈŠO = Ž¸”s
 		*/
 	//=========================================================================
-	int UnicodeToShiftjis(const wchar_t *buf, char *dest, int size);
+	int UnicodeToShiftjis(const wchar_t *buf, char *dest, size_t size);
 
 	//=========================================================================
 	//	@brief		UTF8‚Ì•¶Žš—ñ‚ð, Shift-jis•¶Žš—ñ‚É•ÏŠ·‚·‚é

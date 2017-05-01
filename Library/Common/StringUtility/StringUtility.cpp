@@ -13,7 +13,7 @@ namespace StringUtility
 {
 
 	//=========================================================================
-	int ShiftjisToUnicode(const char *buf, wchar_t *dest, int size)
+	int ShiftjisToUnicode(const char *buf, wchar_t *dest, size_t size)
 	{
 		// 出力バッファに必要な長さを求める
 		int orgLen = (int)strlen(buf);
@@ -33,7 +33,7 @@ namespace StringUtility
 	//=========================================================================
 	std::wstring ShiftjisToUnicode(std::string buf)
 	{
-		int size = buf.size() + 1;
+		size_t size = buf.size() + 1;
 		WCHAR* szBuf = new WCHAR[size];
 
 		ShiftjisToUnicode(buf.c_str(), szBuf, size);
@@ -47,7 +47,7 @@ namespace StringUtility
 
 
 	//=========================================================================
-	int UnicodeToShiftjis(const wchar_t *buf, char *dest, int size)
+	int UnicodeToShiftjis(const wchar_t *buf, char *dest, size_t size)
 	{
 		// BSTRの長さを求める
 		int orgLen = SysStringLen(SysAllocString(buf));
@@ -78,7 +78,7 @@ namespace StringUtility
 	//=========================================================================
 	std::string UnicodeToShiftjis(const std::wstring& strWBuf)
 	{
-		int size = strWBuf.size()*2 + 1;
+		size_t size = strWBuf.size()*2 + 1;
 		char* szBuf = new char[size];
 
 		UnicodeToShiftjis(strWBuf.c_str(), szBuf, size);

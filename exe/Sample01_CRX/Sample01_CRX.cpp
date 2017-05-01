@@ -341,7 +341,7 @@ Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManager(void)
 	// FullyConnect
 	{
 	#ifdef _DEBUG
-		if(pDLLManager->ReadLayerDLL(L"../../Debug/Gravisbell.Layer.NeuralNetwork.FullyConnect_Activation.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+		if(pDLLManager->ReadLayerDLL(L"../../x64/Debug/Gravisbell.Layer.NeuralNetwork.FullyConnect_Activation.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 	#else
 		if(pDLLManager->ReadLayerDLL(L"../../Release/Gravisbell.Layer.NeuralNetwork.FullyConnect_Activation.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 	#endif
@@ -353,7 +353,7 @@ Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManager(void)
 	// Feedforward
 	{
 	#ifdef _DEBUG
-		if(pDLLManager->ReadLayerDLL(L"../../Debug/Gravisbell.Layer.NeuralNetwork.FeedforwardNeuralNetwork.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+		if(pDLLManager->ReadLayerDLL(L"../../x64/Debug/Gravisbell.Layer.NeuralNetwork.FeedforwardNeuralNetwork.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 	#else
 		if(pDLLManager->ReadLayerDLL(L"../../Release/Gravisbell.Layer.NeuralNetwork.FeedforwardNeuralNetwork.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 	#endif
@@ -767,10 +767,12 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 						F32 curValue = 0.0f;
 						for(U32 i=0; i<pTeachOutputLayer->GetBufferCount(); i++)
 						{
-							if(pTeachOutputLayer->GetOutputBuffer()[batchDataNum][i] > curValue)
+							U32 bufferPos = batchDataNum * pTeachOutputLayer->GetBufferCount() + i;
+
+							if(pTeachOutputLayer->GetOutputBuffer()[bufferPos] > curValue)
 							{
 								correctNo = i;
-								curValue = pTeachOutputLayer->GetOutputBuffer()[batchDataNum][i];
+								curValue = pTeachOutputLayer->GetOutputBuffer()[bufferPos];
 							}
 						}
 					}
@@ -780,10 +782,12 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 						F32 curValue = 0.0f;
 						for(U32 i=0; i<pTeachOutputLayer->GetBufferCount(); i++)
 						{
-							if(pNeuralNetworkLearn->GetOutputBuffer()[batchDataNum][i] > curValue)
+							U32 bufferPos = batchDataNum * pTeachOutputLayer->GetBufferCount() + i;
+
+							if(pNeuralNetworkLearn->GetOutputBuffer()[bufferPos] > curValue)
 							{
 								outputNo = i;
-								curValue = pNeuralNetworkLearn->GetOutputBuffer()[batchDataNum][i];
+								curValue = pNeuralNetworkLearn->GetOutputBuffer()[bufferPos];
 							}
 						}
 					}
@@ -825,10 +829,10 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 						F32 curValue = 0.0f;
 						for(U32 i=0; i<pSampleOutputLayer->GetBufferCount(); i++)
 						{
-							if(pSampleOutputLayer->GetOutputBuffer()[0][i] > curValue)
+							if(pSampleOutputLayer->GetOutputBuffer()[i] > curValue)
 							{
 								correctNo = i;
-								curValue = pSampleOutputLayer->GetOutputBuffer()[0][i];
+								curValue = pSampleOutputLayer->GetOutputBuffer()[i];
 							}
 						}
 					}
@@ -838,10 +842,10 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 						F32 curValue = 0.0f;
 						for(U32 i=0; i<pSampleOutputLayer->GetBufferCount(); i++)
 						{
-							if(pNeuralNetworkSample->GetOutputBuffer()[0][i] > curValue)
+							if(pNeuralNetworkSample->GetOutputBuffer()[i] > curValue)
 							{
 								outputNo = i;
-								curValue = pNeuralNetworkSample->GetOutputBuffer()[0][i];
+								curValue = pNeuralNetworkSample->GetOutputBuffer()[i];
 							}
 						}
 					}

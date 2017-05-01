@@ -196,7 +196,20 @@ namespace NeuralNetwork {
 				// DLLの読み込み
 				pLayerDLL->hModule = LoadLibrary(filePath.c_str());
 				if(pLayerDLL->hModule == NULL)
+				{
+					DWORD errNo = GetLastError();
+					wchar_t szErrorMessage[1024];
+
+					FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM,
+								NULL,
+								errNo,
+								0,
+								szErrorMessage,
+								sizeof(szErrorMessage)/sizeof(szErrorMessage[0]),
+								NULL);
+
 					break;
+				}
 
 				// 関数読み込み
 				// レイヤーコード

@@ -45,10 +45,7 @@ namespace NeuralNetwork {
 		const U32 batchSize = this->GetBatchSize();
 		const U32 outputBufferCount = this->GetOutputBufferCount();
 
-		for(U32 batchNum=0; batchNum<batchSize; batchNum++)
-		{
-			memcpy(o_lpOutputBuffer[batchNum], FeedforwardNeuralNetwork_Base::GetOutputBuffer()[batchNum], sizeof(F32)*outputBufferCount);
-		}
+		memcpy(o_lpOutputBuffer, FeedforwardNeuralNetwork_Base::GetOutputBuffer(), sizeof(F32)*outputBufferCount*batchSize);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -63,10 +60,7 @@ namespace NeuralNetwork {
 		const U32 batchSize = this->GetBatchSize();
 		const U32 inputBufferCount = this->GetInputBufferCount();
 
-		for(U32 batchNum=0; batchNum<batchSize; batchNum++)
-		{
-			memcpy(o_lpDInputBuffer[batchNum], FeedforwardNeuralNetwork_Base::GetDInputBuffer()[batchNum], sizeof(F32)*inputBufferCount);
-		}
+		memcpy(o_lpDInputBuffer, FeedforwardNeuralNetwork_Base::GetDInputBuffer(), sizeof(F32)*inputBufferCount*batchSize);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

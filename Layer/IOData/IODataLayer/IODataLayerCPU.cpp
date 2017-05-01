@@ -22,10 +22,12 @@ namespace IOData {
 		Gravisbell::IODataStruct ioDataStruct;	/**< データ構造 */
 
 		std::vector<F32*> lpBufferList;
-		std::vector<std::vector<F32>> lpDInputBuffer;	/**< 誤差差分の保存バッファ */
 
 		U32 batchSize;	/**< バッチ処理サイズ */
 		const U32* lpBatchDataNoList;	/**< バッチ処理データ番号リスト */
+
+		std::vector<F32> lpOutputBuffer;	/**< 出力バッファ */
+		std::vector<F32> lpDInputBuffer;	/**< 入力誤差バッファ */
 
 		std::vector<F32*> lpBatchDataPointer;			/**< バッチ処理データの配列先頭アドレスリスト */
 		std::vector<F32*> lpBatchDInputBufferPointer;	/**< バッチ処理入力誤差差分の配列先導アドレスリスト */
@@ -96,7 +98,7 @@ namespace IOData {
 			@return データのバッファサイズ.使用するF32型配列の要素数. */
 		U32 GetBufferCount()const
 		{
-			return this->ioDataStruct.ch * this->ioDataStruct.x * this->ioDataStruct.y * this->ioDataStruct.z;
+			return this->ioDataStruct.GetDataCount();
 		}
 
 		/** データを追加する.
@@ -184,12 +186,13 @@ namespace IOData {
 		{
 			this->lpBatchDataNoList = i_lpBatchDataNoList;
 
+			// データを出力用バッファにコピー
 			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
 				if(this->lpBatchDataNoList[batchNum] > this->lpBufferList.size())
 					return Gravisbell::ErrorCode::ERROR_CODE_COMMON_OUT_OF_ARRAYRANGE;
 
-				this->lpBatchDataPointer[batchNum] = this->lpBufferList[this->lpBatchDataNoList[batchNum]];
+				memcpy(this->lpBatchDataPointer[batchNum], this->lpBufferList[this->lpBatchDataNoList[batchNum]], sizeof(F32)*this->GetBufferCount());
 			}
 
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
@@ -213,12 +216,11 @@ namespace IOData {
 				return err;
 
 			// 誤差差分データ配列の初期化
-			this->lpDInputBuffer.resize(batchSize);
+			this->lpDInputBuffer.resize(batchSize * this->GetBufferCount());
 			this->lpBatchDInputBufferPointer.resize(batchSize);
-			for(U32 i=0; i<this->lpDInputBuffer.size(); i++)
+			for(U32 batchNum=0; batchNum<batchSize; batchNum++)
 			{
-				this->lpDInputBuffer[i].resize(this->GetInputBufferCount());
-				this->lpBatchDInputBufferPointer[i] = &this->lpDInputBuffer[i][0];
+				this->lpBatchDInputBufferPointer[batchNum] = &this->lpDInputBuffer[batchNum * this->GetBufferCount()];
 			}
 
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
@@ -230,9 +232,16 @@ namespace IOData {
 			失敗した場合はCalculate以降の処理は実行不可. */
 		Gravisbell::ErrorCode PreProcessCalculate(U32 batchSize)
 		{
-			// バッチ処理データ配列の初期化
+			// バッチサイズの保存
 			this->batchSize = batchSize;
+
+			// バッファの確保とバッチ処理データ配列の初期化
+			this->lpOutputBuffer.resize(batchSize * this->GetBufferCount());
 			this->lpBatchDataPointer.resize(batchSize);
+			for(U32 batchNum=0; batchNum<batchSize; batchNum++)
+			{
+				this->lpBatchDataPointer[batchNum] = &this->lpOutputBuffer[batchNum * this->GetBufferCount()];
+			}
 
 			// 誤差計算処理
 			this->lpErrorValue_min.resize(this->GetBufferCount());
@@ -290,7 +299,7 @@ namespace IOData {
 			{
 				for(U32 inputNum=0; inputNum<inputBufferCount; inputNum++)
 				{
-					F32 output = i_lppInputBuffer[batchNum][inputNum];
+					F32 output = i_lppInputBuffer[batchNum*inputBufferCount + inputNum];
 					F32 teach  = this->lpBatchDataPointer[batchNum][inputNum];
 
 					F32 error = teach - output;
@@ -298,7 +307,7 @@ namespace IOData {
 
 					if(this->lpDInputBuffer.size() > 0)
 					{
-						this->lpDInputBuffer[batchNum][inputNum] = error;
+						this->lpBatchDInputBufferPointer[batchNum][inputNum] = error;
 //						this->lpDInputBuffer[batchNum][inputNum] = -(output - teach) / (output * (1.0f - output));
 					}
 
@@ -398,7 +407,7 @@ namespace IOData {
 			@return	誤差差分配列の先頭ポインタ */
 		CONST_BATCH_BUFFER_POINTER GetDInputBuffer()const
 		{
-			return &this->lpBatchDInputBufferPointer[0];
+			return &this->lpDInputBuffer[0];
 		}
 		/** 学習差分を取得する.
 			@param lpDOutputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
@@ -412,7 +421,7 @@ namespace IOData {
 
 			for(U32 batchNum=0; batchNum<batchSize; batchNum++)
 			{
-				memcpy(o_lpDInputBuffer[batchNum], this->lpBatchDataPointer[batchNum], sizeof(F32)*inputBufferCount);
+				memcpy(&o_lpDInputBuffer[batchNum*inputBufferCount], this->lpBatchDataPointer[batchNum], sizeof(F32)*inputBufferCount);
 			}
 
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
@@ -440,7 +449,7 @@ namespace IOData {
 			@return 出力データ配列の先頭ポインタ */
 		CONST_BATCH_BUFFER_POINTER GetOutputBuffer()const
 		{
-			return &this->lpBatchDataPointer[0];
+			return &this->lpOutputBuffer[0];
 		}
 		/** 出力データバッファを取得する.
 			@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
@@ -455,7 +464,7 @@ namespace IOData {
 
 			for(U32 batchNum=0; batchNum<batchSize; batchNum++)
 			{
-				memcpy(o_lpOutputBuffer[batchNum], this->lpBatchDataPointer[batchNum], sizeof(F32)*outputBufferCount);
+				memcpy(&o_lpOutputBuffer[batchNum*outputBufferCount], this->lpBatchDataPointer[batchNum], sizeof(F32)*outputBufferCount);
 			}
 
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;

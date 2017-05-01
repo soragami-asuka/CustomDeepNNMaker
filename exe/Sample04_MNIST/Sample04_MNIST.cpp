@@ -77,11 +77,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	Layer::IOData::IIODataLayer* pDataLayerTest_Input  = NULL;
 	Layer::IOData::IIODataLayer* pDataLayerTest_Output = NULL;
 
-	if(LoadSampleData_image(&pDataLayerTeach_Input, &pDataLayerTest_Input, 0.1f, L"../SampleData/MNIST/DataFormat_image.xml", L"../SampleData/MNIST/train-images.idx3-ubyte") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	if(LoadSampleData_image(&pDataLayerTeach_Input, &pDataLayerTest_Input, 0.1f, L"../../SampleData/MNIST/DataFormat_image.xml", L"../../SampleData/MNIST/train-images.idx3-ubyte") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 	{
 		return -1;
 	}
-	if(LoadSampleData_label(&pDataLayerTeach_Output, &pDataLayerTest_Output, 0.1f, L"../SampleData/MNIST/DataFormat_label.xml", L"../SampleData/MNIST/train-labels.idx1-ubyte") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	if(LoadSampleData_label(&pDataLayerTeach_Output, &pDataLayerTest_Output, 0.1f, L"../../SampleData/MNIST/DataFormat_label.xml", L"../../SampleData/MNIST/train-labels.idx1-ubyte") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 	{
 		delete pDataLayerTeach_Input;
 		delete pDataLayerTest_Input;
@@ -815,10 +815,12 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 						F32 curValue = 0.0f;
 						for(U32 i=0; i<pTeachOutputLayer->GetBufferCount(); i++)
 						{
-							if(pTeachOutputLayer->GetOutputBuffer()[batchDataNum][i] > curValue)
+							U32 bufferPos = batchDataNum * pTeachOutputLayer->GetBufferCount() + i;
+
+							if(pTeachOutputLayer->GetOutputBuffer()[bufferPos] > curValue)
 							{
 								correctNo = i;
-								curValue = pTeachOutputLayer->GetOutputBuffer()[batchDataNum][i];
+								curValue = pTeachOutputLayer->GetOutputBuffer()[bufferPos];
 							}
 						}
 					}
@@ -828,10 +830,12 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 						F32 curValue = 0.0f;
 						for(U32 i=0; i<pTeachOutputLayer->GetBufferCount(); i++)
 						{
-							if(pNeuralNetworkLearn->GetOutputBuffer()[batchDataNum][i] > curValue)
+							U32 bufferPos = batchDataNum * pTeachOutputLayer->GetBufferCount() + i;
+
+							if(pNeuralNetworkLearn->GetOutputBuffer()[bufferPos] > curValue)
 							{
 								outputNo = i;
-								curValue = pNeuralNetworkLearn->GetOutputBuffer()[batchDataNum][i];
+								curValue = pNeuralNetworkLearn->GetOutputBuffer()[bufferPos];
 							}
 						}
 					}
@@ -876,10 +880,10 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 						F32 curValue = 0.0f;
 						for(U32 i=0; i<pSampleOutputLayer->GetBufferCount(); i++)
 						{
-							if(pSampleOutputLayer->GetOutputBuffer()[0][i] > curValue)
+							if(pSampleOutputLayer->GetOutputBuffer()[i] > curValue)
 							{
 								correctNo = i;
-								curValue = pSampleOutputLayer->GetOutputBuffer()[0][i];
+								curValue = pSampleOutputLayer->GetOutputBuffer()[i];
 							}
 						}
 					}
@@ -889,10 +893,10 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 						F32 curValue = 0.0f;
 						for(U32 i=0; i<pSampleOutputLayer->GetBufferCount(); i++)
 						{
-							if(pNeuralNetworkSample->GetOutputBuffer()[0][i] > curValue)
+							if(pNeuralNetworkSample->GetOutputBuffer()[i] > curValue)
 							{
 								outputNo = i;
-								curValue = pNeuralNetworkSample->GetOutputBuffer()[0][i];
+								curValue = pNeuralNetworkSample->GetOutputBuffer()[i];
 							}
 						}
 					}
