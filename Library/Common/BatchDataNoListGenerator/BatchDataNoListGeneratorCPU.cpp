@@ -13,7 +13,7 @@ using namespace Gravisbell;
 namespace Gravisbell {
 namespace Common {
 
-	class BatchDataNoListGeneratorCPU : public Gravisbell::Common::IBatchDataNoListGenerator
+	class BatchDataNoListGenerator : public Gravisbell::Common::IBatchDataNoListGenerator
 	{
 	private:
 		unsigned int dataCount;
@@ -27,14 +27,14 @@ namespace Common {
 
 	public:
 		/** コンストラクタ */
-		BatchDataNoListGeneratorCPU()
+		BatchDataNoListGenerator()
 			:	IBatchDataNoListGenerator	()
 			,	seed_gen					()
 			,	random_generator			(seed_gen())
 		{
 		}
 		/** デストラクタ */
-		virtual ~BatchDataNoListGeneratorCPU()
+		virtual ~BatchDataNoListGenerator()
 		{
 		}
 
@@ -63,7 +63,7 @@ namespace Common {
 				this->it_addDataBegin++;
 
 			// 端数部分を穴埋め
-			unsigned int addDataCount = this->lpAllDataNoList.size() - this->dataCount;
+			U32 addDataCount = (U32)this->lpAllDataNoList.size() - this->dataCount;
 			for(unsigned int i=0; i<addDataCount; i++)
 			{
 				this->lpAllDataNoList[this->dataCount + i] = this->lpAllDataNoList[i];
@@ -80,7 +80,7 @@ namespace Common {
 			std::shuffle(this->lpAllDataNoList.begin(), this->it_addDataBegin, random_generator);
 
 			// 端数部分を穴埋め
-			unsigned int addDataCount = this->lpAllDataNoList.size() - this->dataCount;
+			U32 addDataCount = (U32)this->lpAllDataNoList.size() - this->dataCount;
 			for(unsigned int i=0; i<addDataCount; i++)
 			{
 				this->lpAllDataNoList[this->dataCount + i] = this->lpAllDataNoList[i];
@@ -109,7 +109,7 @@ namespace Common {
 			@return	データ番号リストの総数 = データ数 / バッチサイズ (端数切り上げ)が返る */
 		unsigned int GetBatchDataNoListCount()const
 		{
-			return this->lpAllDataNoList.size() / this->GetBatchSize();
+			return (U32)this->lpAllDataNoList.size() / this->GetBatchSize();
 		}
 
 		/** データ番号リストを取得する.
@@ -123,9 +123,9 @@ namespace Common {
 
 
 	/** バッチ処理データ番号リスト生成クラスを作成する. */
-	extern BatchDataNoListGenerator_API Gravisbell::Common::IBatchDataNoListGenerator* CreateBatchDataNoListGeneratorCPU()
+	extern BatchDataNoListGenerator_API Gravisbell::Common::IBatchDataNoListGenerator* CreateBatchDataNoListGenerator()
 	{
-		return new BatchDataNoListGeneratorCPU();
+		return new BatchDataNoListGenerator();
 	}
 
 }	// Common

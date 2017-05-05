@@ -579,7 +579,7 @@ Gravisbell::ErrorCode LearnNeuralNetwork(
 
 
 	// バッチNo生成クラスを作成
-	Gravisbell::Common::IBatchDataNoListGenerator* pBatchDataNoListGenerator = Gravisbell::Common::CreateBatchDataNoListGeneratorCPU();
+	Gravisbell::Common::IBatchDataNoListGenerator* pBatchDataNoListGenerator = Gravisbell::Common::CreateBatchDataNoListGenerator();
 	err = pBatchDataNoListGenerator->PreProcess(pInputLayer->GetDataCount(), BATCH_SIZE);
 	if(err != ErrorCode::ERROR_CODE_NONE)
 	{
@@ -730,7 +730,7 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 
 
 	// バッチNo生成クラスを作成
-	Gravisbell::Common::IBatchDataNoListGenerator* pBatchDataNoListGenerator = Gravisbell::Common::CreateBatchDataNoListGeneratorCPU();
+	Gravisbell::Common::IBatchDataNoListGenerator* pBatchDataNoListGenerator = Gravisbell::Common::CreateBatchDataNoListGenerator();
 	err = pBatchDataNoListGenerator->PreProcess(pTeachInputLayer->GetDataCount(), BATCH_SIZE);
 	if(err != ErrorCode::ERROR_CODE_NONE)
 	{

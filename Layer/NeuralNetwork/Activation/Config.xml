@@ -41,6 +41,10 @@
           <Name>ReLU（ランプ関数）</Name>
           <Text>y = max(0, x);&#x0A;範囲 0 &lt;= y&#x0A;(x=0, y=0)を通る</Text>
         </Item>
+        <Item id="tanh">
+          <Name>tanh(双曲線関数)</Name>
+          <Text>y = sin(x)/cos(x);</Text>
+        </Item>
         <Item id="softmax_ALL">
           <Name>SoftMax関数</Name>
           <Text>全体における自身の割合を返す関数.&#x0A;y = e^x / Σe^x;&#x0A;</Text>

@@ -26,6 +26,7 @@ namespace NeuralNetwork {
 		,	guid			(i_guid)			/**< レイヤー識別用のGUID */
 		,	inputLayer		(*this)	/**< 入力信号の代替レイヤーのアドレス. */
 		,	outputLayer		(*this)	/**< 出力信号の代替レイヤーのアドレス. */
+		,	pLearnData		(NULL)
 	{
 
 	}
@@ -134,7 +135,7 @@ namespace NeuralNetwork {
 	/** 登録されているレイヤー数を取得する */
 	U32 FeedforwardNeuralNetwork_Base::GetLayerCount()const
 	{
-		return this->lpLayerInfo.size();
+		return (U32)this->lpLayerInfo.size();
 	}
 	/** レイヤーのGUIDを番号指定で取得する */
 	ErrorCode FeedforwardNeuralNetwork_Base::GetLayerGUIDbyNum(U32 i_layerNum, Gravisbell::GUID& o_guid)
@@ -779,6 +780,9 @@ namespace NeuralNetwork {
 	{
 		ErrorCode err = ErrorCode::ERROR_CODE_NONE;
 
+		// バッチサイズを格納する
+		this->batchSize = batchSize;
+
 		// 接続の確立を行う
 		err = this->EstablishmentConnection();
 		if(err != ErrorCode::ERROR_CODE_NONE)
@@ -804,6 +808,9 @@ namespace NeuralNetwork {
 	ErrorCode FeedforwardNeuralNetwork_Base::PreProcessCalculate(unsigned int batchSize)
 	{
 		ErrorCode err = ErrorCode::ERROR_CODE_NONE;
+
+		// バッチサイズを格納する
+		this->batchSize = batchSize;
 
 		// 接続の確立を行う
 		err = this->EstablishmentConnection();

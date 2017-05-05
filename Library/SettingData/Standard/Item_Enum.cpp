@@ -176,7 +176,7 @@ namespace Standard {
 		/** 列挙要素数を取得する */
 		U32 GetEnumCount()const
 		{
-			return this->lpEnumItem.size();
+			return (U32)this->lpEnumItem.size();
 		}
 		/** 列挙要素IDを番号指定で取得する.
 			@param num		要素番号
@@ -267,7 +267,7 @@ namespace Standard {
 			// 追加
 			this->lpEnumItem.push_back(EnumItem(id, szEnumName, szComment));
 
-			return this->lpEnumItem.size()-1;
+			return (S32)this->lpEnumItem.size()-1;
 		}
 
 		/** 列挙値を削除する.
@@ -339,7 +339,7 @@ namespace Standard {
 			U32 byteCount = 0;
 
 			byteCount += sizeof(U32);		// 値のバッファサイズ
-			byteCount += this->value.size();		// 値
+			byteCount += (U32)this->value.size();		// 値
 
 			return byteCount;
 		}
@@ -386,7 +386,7 @@ namespace Standard {
 			// 値
 			{
 				// バッファサイズ
-				U32 bufferSize = this->value.size();;
+				U32 bufferSize = (U32)this->value.size();;
 				*(U32*)&o_lpBuffer[bufferPos] = bufferSize;
 				bufferPos += sizeof(U32);
 

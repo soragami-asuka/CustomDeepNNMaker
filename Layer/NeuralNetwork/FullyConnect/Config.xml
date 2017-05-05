@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="14CC33F4-8CD3-4686-9C48-EF452BA5D202" version="1.0.0.0" default-language="ja">
+
+  <SourceName>FullyConnect</SourceName>
+  <Name>全結合レイヤー</Name>
+  <Text>全結合レイヤー.</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+    <Int id="NeuronCount">
+      <Name>ニューロン数</Name>
+      <Text>レイヤー内のニューロン数.&#x0A;出力バッファ数に直結する.</Text>
+      <Min>1</Min>
+      <Max>65535</Max>
+      <Default>200</Default>
+    </Int>
+
+    <Float id="DropOut">
+      <Name>ドロップアウト率</Name>
+      <Text>前レイヤーを無視する割合.&#x0A;1.0で前レイヤーの全出力を無視する</Text>
+      <Min>0.0</Min>
+      <Max>1.0</Max>
+      <Default>0.0</Default>
+    </Float>
+
+  </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <Learn>
+    <Float id="LearnCoeff">
+      <Name>学習係数</Name>
+      <Min>0.0</Min>
+      <Max>1000.0</Max>
+      <Default>1.0</Default>
+    </Float>
+  </Learn>
+
+</Config>

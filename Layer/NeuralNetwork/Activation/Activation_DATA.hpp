@@ -51,6 +51,12 @@ namespace Activation {
 			  */
 			ActivationType_ReLU,
 
+			/** Name : tanh(‘o‹ÈüŠÖ”)
+			  * ID   : tanh
+			  * Text : y = sin(x)/cos(x);
+			  */
+			ActivationType_tanh,
+
 			/** Name : SoftMaxŠÖ”
 			  * ID   : softmax_ALL
 			  * Text : ‘S‘Ì‚É‚¨‚¯‚é©g‚ÌŠ„‡‚ğ•Ô‚·ŠÖ”.

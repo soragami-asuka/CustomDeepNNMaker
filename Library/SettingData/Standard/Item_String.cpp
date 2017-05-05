@@ -83,7 +83,7 @@ namespace Standard {
 		/** 文字列の長さを取得する */
 		virtual unsigned int GetLength()const
 		{
-			return this->value.size();
+			return (U32)this->value.size();
 		}
 		/** 値を取得する.
 			@param o_szBuf	格納先バッファ
@@ -133,7 +133,7 @@ namespace Standard {
 			unsigned int byteCount = 0;
 
 			byteCount += sizeof(unsigned int);		// 値のバッファサイズ
-			byteCount += this->value.size();		// 値
+			byteCount += (U32)this->value.size();		// 値
 
 			return byteCount;
 		}
@@ -177,7 +177,7 @@ namespace Standard {
 			// 値
 			{
 				// バッファサイズ
-				unsigned int bufferSize = this->value.size();;
+				unsigned int bufferSize = (U32)this->value.size();;
 				*(unsigned int*)&o_lpBuffer[bufferPos] = bufferSize;
 				bufferPos += sizeof(unsigned int);
 

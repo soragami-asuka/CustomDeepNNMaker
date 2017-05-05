@@ -115,7 +115,7 @@ namespace Standard {
 		/** 設定項目数を取得する */
 		unsigned int GetItemCount()const
 		{
-			return this->lpLayerConfigItem.size();
+			return (U32)this->lpLayerConfigItem.size();
 		}
 		/** 設定項目を番号指定で取得する */
 		IItemBase* GetItemByNum(U32 i_num)
@@ -271,7 +271,7 @@ namespace Standard {
 			bufferPos += sizeof(VersionCode);
 
 			// アイテム数
-			*(unsigned int*)&o_lpBuffer[bufferPos] = this->lpLayerConfigItem.size();
+			*(unsigned int*)&o_lpBuffer[bufferPos] = (U32)this->lpLayerConfigItem.size();
 			bufferPos += sizeof(unsigned int);
 
 			// 各アイテム

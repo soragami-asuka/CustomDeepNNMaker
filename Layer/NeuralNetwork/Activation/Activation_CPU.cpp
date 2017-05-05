@@ -59,6 +59,16 @@ namespace
 		return 1.0f * (x > 0.0f);
 	}
 
+	// tanhån
+	F32 func_activation_tanh(F32 x)
+	{
+		return tanh(x);
+	}
+	F32 func_dactivation_tanh(F32 x)
+	{
+		return 1.0f - x*x;
+	}
+
 	// SoftMaxån
 	F32 func_activation_SoftMax(F32 x)
 	{

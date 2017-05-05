@@ -123,6 +123,9 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INeuralNetwork.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
+    <ClInclude Include="IODataLayerGPU_base.cuh">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -137,5 +140,16 @@
     <ClCompile Include="IODataLayer.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="IODataLayerGPU_base.cu">
+      <Filter>ソース ファイル</Filter>
+    </CudaCompile>
+    <CudaCompile Include="IODataLayerGPU_host.cu">
+      <Filter>ソース ファイル</Filter>
+    </CudaCompile>
+    <CudaCompile Include="IODataLayerGPU_device.cu">
+      <Filter>ソース ファイル</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

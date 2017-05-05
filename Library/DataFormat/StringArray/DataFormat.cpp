@@ -431,7 +431,7 @@ namespace StringArray {
 
 	public:
 		/** 使用バッファ数を返す */
-		U32 GetBufferCount()const{return this->lpEnumData.size();}
+		U32 GetBufferCount()const{return (U32)this->lpEnumData.size();}
 
 		/** バッファを取得する */
 		F32 GetBuffer(U32 dataNum, U32 bufferNum)const
@@ -638,7 +638,7 @@ namespace StringArray {
 		/** カテゴリー数を取得する */
 		U32 GetCategoryCount()const
 		{
-			return this->lpCategoryName.size();
+			return (U32)this->lpCategoryName.size();
 		}
 		/** カテゴリー名を番号指定で取得する */
 		const wchar_t* GetCategoryNameByNum(U32 categoryNo)const
@@ -710,7 +710,7 @@ namespace StringArray {
 		/** データフォーマット数を取得する */
 		U32 GetDataFormatCount()const
 		{
-			return this->lpDataFormat.size();
+			return (U32)this->lpDataFormat.size();
 		}
 
 		/** データフォーマットを全削除する */
@@ -1002,7 +1002,7 @@ namespace StringArray {
 
 							pDataFormat->AddDataFormatStringToBit(
 								id.c_str(), category.c_str(),
-								lpFalseStringPointer.size(), &lpFalseStringPointer[0], lpTrueStringPointer.size(), &lpTrueStringPointer[0],
+								(U32)lpFalseStringPointer.size(), &lpFalseStringPointer[0], (U32)lpTrueStringPointer.size(), &lpTrueStringPointer[0],
 								boolValue.falseValue, boolValue.trueValue);
 						}
 						break;
@@ -1040,7 +1040,7 @@ namespace StringArray {
 							}
 
 							// フォーマットを追加
-							pDataFormat->AddDataFormatStringToBitArrayEnum(id.c_str(), category.c_str(), lpEnumStringPointer.size(), &lpEnumStringPointer[0], defaultString.c_str(), boolValue.falseValue, boolValue.trueValue); 
+							pDataFormat->AddDataFormatStringToBitArrayEnum(id.c_str(), category.c_str(), (U32)lpEnumStringPointer.size(), &lpEnumStringPointer[0], defaultString.c_str(), boolValue.falseValue, boolValue.trueValue); 
 						}
 						break;
 					}

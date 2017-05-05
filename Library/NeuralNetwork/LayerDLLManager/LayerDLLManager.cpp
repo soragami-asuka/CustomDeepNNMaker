@@ -350,7 +350,7 @@ namespace NeuralNetwork {
 		/** 管理しているレイヤーDLLの数を取得する */
 		unsigned int GetLayerDLLCount()const
 		{
-			return this->lppNNLayerDLL.size();
+			return (U32)this->lppNNLayerDLL.size();
 		}
 		/** 管理しているレイヤーDLLを番号指定で取得する.
 			@param	num	取得するDLLの管理番号.

@@ -27,28 +27,23 @@
 #include"Layer/NeuralNetwork/INNLayerData.h"
 #include"Layer/NeuralNetwork/INNLayerConnectData.h"
 #include"Layer/NeuralNetwork/INeuralNetwork.h"
+#include"Utility/NeuralNetworkLayer/NeuralNetworkLayer.h"
+
+
+#define USE_GPU	1
+#define USE_HOST_MEMORY 1
+
 
 using namespace Gravisbell;
 
 /** サンプルデータの読み込み */
 DataFormat::IDataFormatBase* LoadSampleData(const std::wstring& formatFilePath, const std::wstring& dataFilePath);
-/** レイヤーDLL管理クラスの作成 */
-Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManager(void);
-
-/** レイヤーデータを作成 */
-Layer::NeuralNetwork::INNLayerData* CreateLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount, const std::wstring activationType, F32 dropOutRate);
-Layer::NeuralNetwork::INNLayerData* CreateHiddenLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount, F32 dropOutRate);
-Layer::NeuralNetwork::INNLayerData* CreateOutputLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount, F32 dropOutRate);
 
 /** ニューラルネットワーククラスを作成する */
-Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 inputDataCount);
-
-/** ニューラルネットワーククラスにレイヤーを追加する */
-Gravisbell::ErrorCode CreateNeuralNetworkLayerConnect(
+Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager,
-	Layer::NeuralNetwork::INNLayerConnectData* pNeuralNetworkData,
-	U32 outputDataCount,
-	std::list<Layer::ILayerData*>& lppLayerData);
+	std::list<Layer::ILayerData*>& lppLayerData,
+	const IODataStruct& inputDataStruct, const IODataStruct& outputDataStruct);
 
 /** ニューラルネットワークの学習 */
 Gravisbell::ErrorCode LearnNeuralNetwork(
@@ -83,17 +78,22 @@ int _tmain(int argc, _TCHAR* argv[])
 	::_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_ALLOC_MEM_DF);
 #endif
 
+
 	srand(12345);
 
 	std::list<Layer::ILayerData*> lppLayerData;	// レイヤーデータの一覧
 
 	// サンプルデータの読み込み
-	Gravisbell::DataFormat::IDataFormatBase* pSampleData = ::LoadSampleData(L"DataFormat.xml", L"../../SampleData/crx.csv");
+	Gravisbell::DataFormat::IDataFormatBase* pSampleData = ::LoadSampleData(L"../../SampleData/CRX/DataFormat.xml", L"../../SampleData/CRX/crx.csv");
 	printf("入力信号：%d\n", pSampleData->GetDataStruct(L"input").GetDataCount());
 	printf("出力信号：%d\n", pSampleData->GetDataStruct(L"output").GetDataCount());
 
 	// レイヤーDLL管理クラスを作成
-	Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager = ::CreateLayerDLLManager();
+#if USE_GPU
+	Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager = Gravisbell::Utility::NeuralNetworkLayer::CreateLayerDLLManagerGPU(L"./");
+#else
+	Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager = Gravisbell::Utility::NeuralNetworkLayer::CreateLayerDLLManagerCPU(L"./");
+#endif
 	if(pLayerDLLManager == NULL)
 	{
 		delete pSampleData;
@@ -101,10 +101,24 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 
 	// 入出力信号レイヤーを作成
+#if USE_GPU
+#if USE_HOST_MEMORY
+	Layer::IOData::IIODataLayer* pTeachInputLayer  = Layer::IOData::CreateIODataLayerGPU_host( pSampleData->GetDataStruct(L"input") );	// 入力信号(教師信号)
+	Layer::IOData::IIODataLayer* pTeachOutputLayer = Layer::IOData::CreateIODataLayerGPU_host( pSampleData->GetDataStruct(L"output") );	// 出力信号(教師信号)
+	Layer::IOData::IIODataLayer* pSampleInputLayer  = Layer::IOData::CreateIODataLayerGPU_host( pSampleData->GetDataStruct(L"input") );	// 入力信号(確認用サンプルデータ)
+	Layer::IOData::IIODataLayer* pSampleOutputLayer = Layer::IOData::CreateIODataLayerGPU_host( pSampleData->GetDataStruct(L"output") );	// 出力信号(確認用サンプルデータ)
+#else
+	Layer::IOData::IIODataLayer* pTeachInputLayer  = Layer::IOData::CreateIODataLayerGPU_device( pSampleData->GetDataStruct(L"input") );	// 入力信号(教師信号)
+	Layer::IOData::IIODataLayer* pTeachOutputLayer = Layer::IOData::CreateIODataLayerGPU_device( pSampleData->GetDataStruct(L"output") );	// 出力信号(教師信号)
+	Layer::IOData::IIODataLayer* pSampleInputLayer  = Layer::IOData::CreateIODataLayerGPU_device( pSampleData->GetDataStruct(L"input") );	// 入力信号(確認用サンプルデータ)
+	Layer::IOData::IIODataLayer* pSampleOutputLayer = Layer::IOData::CreateIODataLayerGPU_device( pSampleData->GetDataStruct(L"output") );	// 出力信号(確認用サンプルデータ)
+#endif
+#else
 	Layer::IOData::IIODataLayer* pTeachInputLayer  = Layer::IOData::CreateIODataLayerCPU( pSampleData->GetDataStruct(L"input") );	// 入力信号(教師信号)
 	Layer::IOData::IIODataLayer* pTeachOutputLayer = Layer::IOData::CreateIODataLayerCPU( pSampleData->GetDataStruct(L"output") );	// 出力信号(教師信号)
 	Layer::IOData::IIODataLayer* pSampleInputLayer  = Layer::IOData::CreateIODataLayerCPU( pSampleData->GetDataStruct(L"input") );	// 入力信号(確認用サンプルデータ)
 	Layer::IOData::IIODataLayer* pSampleOutputLayer = Layer::IOData::CreateIODataLayerCPU( pSampleData->GetDataStruct(L"output") );	// 出力信号(確認用サンプルデータ)
+#endif
 	const F32 USE_TEACH_RATE = 0.8f;
 	for(U32 dataNum=0; dataNum<(U32)(pSampleData->GetDataCount()*USE_TEACH_RATE); dataNum++)
 	{
@@ -120,7 +134,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	printf("テストデータ：%d\n", pSampleInputLayer->GetDataCount());
 
 	// ニューラルネットワーククラスを作成
-	Layer::NeuralNetwork::INNLayerConnectData* pNeuralNetworkData = ::CreateNeuralNetwork(*pLayerDLLManager, pTeachInputLayer->GetInputBufferCount());
+	Layer::NeuralNetwork::INNLayerConnectData* pNeuralNetworkData = ::CreateNeuralNetwork(*pLayerDLLManager, lppLayerData, pTeachInputLayer->GetOutputDataStruct(), pTeachOutputLayer->GetInputDataStruct());
 	if(pNeuralNetworkData == NULL)
 	{
 		delete pTeachInputLayer;
@@ -133,19 +147,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 	lppLayerData.push_back(pNeuralNetworkData);
 
-	// ニューラルネットワークの接続を作成
-	if(::CreateNeuralNetworkLayerConnect(*pLayerDLLManager, pNeuralNetworkData, pTeachOutputLayer->GetBufferCount(), lppLayerData) != ErrorCode::ERROR_CODE_NONE)
-	{
-		for(auto pLayerData : lppLayerData)
-			delete pLayerData;
-		delete pTeachInputLayer;
-		delete pTeachOutputLayer;
-		delete pSampleInputLayer;
-		delete pSampleOutputLayer;
-		delete pLayerDLLManager;
-		delete pSampleData;
-		return -1;
-	}
+	// 開始時刻を計測
+	clock_t startTime = clock();
 
 	// 学習,サンプル実行別実行
 #if 0
@@ -247,7 +250,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 
 		// 学習
-		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkSample, pTeachInputLayer, pTeachOutputLayer, pSampleInputLayer, pSampleOutputLayer, 16, 100000) != ErrorCode::ERROR_CODE_NONE)
+		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkSample, pTeachInputLayer, pTeachOutputLayer, pSampleInputLayer, pSampleOutputLayer, 32, 500) != ErrorCode::ERROR_CODE_NONE)
 		{
 			delete pNeuralNetworkSample;
 			delete pNeuralNetworkLearn;
@@ -268,7 +271,13 @@ int _tmain(int argc, _TCHAR* argv[])
 		delete pNeuralNetworkLearn;
 	}
 #endif
-	
+
+	// 終了時刻を計測
+	clock_t endTime = clock();
+
+	// 経過時間を表示
+	printf("処理時間(ms) = %d\n", endTime - startTime);
+
 	// メモリ開放
 	for(auto pLayerData : lppLayerData)
 		delete pLayerData;
@@ -331,199 +340,59 @@ Gravisbell::DataFormat::IDataFormatBase* LoadSampleData(const std::wstring& form
 
 	return pDataFormat;
 }
-/** レイヤーDLL管理クラスの作成 */
-Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManager(void)
-{
-	// DLL管理クラスを作成
-	Layer::NeuralNetwork::ILayerDLLManager* pDLLManager = Layer::NeuralNetwork::CreateLayerDLLManagerCPU();
-
-	// DLLの読み込み.
-	// FullyConnect
-	{
-	#ifdef _DEBUG
-		if(pDLLManager->ReadLayerDLL(L"../../x64/Debug/Gravisbell.Layer.NeuralNetwork.FullyConnect_Activation.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
-	#else
-		if(pDLLManager->ReadLayerDLL(L"../../Release/Gravisbell.Layer.NeuralNetwork.FullyConnect_Activation.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
-	#endif
-		{
-			delete pDLLManager;
-			return NULL;
-		}
-	}
-	// Feedforward
-	{
-	#ifdef _DEBUG
-		if(pDLLManager->ReadLayerDLL(L"../../x64/Debug/Gravisbell.Layer.NeuralNetwork.FeedforwardNeuralNetwork.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
-	#else
-		if(pDLLManager->ReadLayerDLL(L"../../Release/Gravisbell.Layer.NeuralNetwork.FeedforwardNeuralNetwork.dll") != Gravisbell::ErrorCode::ERROR_CODE_NONE)
-	#endif
-		{
-			delete pDLLManager;
-			return NULL;
-		}
-	}
-
-	return pDLLManager;
-}
-
-
-/** レイヤーデータを作成 */
-Layer::NeuralNetwork::INNLayerData* CreateLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount, const std::wstring activationType, F32 dropOutRate)
-{
-	// DLL取得
-	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(Gravisbell::GUID(0xbeba34ec, 0xc30c, 0x4565, 0x93, 0x86, 0x56, 0x08, 0x89, 0x81, 0xd2, 0xd7));
-	if(pLayerDLL == NULL)
-		return NULL;
-
-	// 設定の作成
-	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
-	if(pConfig == NULL)
-		return NULL;
-	// ニューロン数
-	{
-		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"NeuronCount"));
-		pItem->SetValue(neuronCount);
-	}
-	// 活性化関数種別
-	{
-		SettingData::Standard::IItem_Enum* pItem = dynamic_cast<SettingData::Standard::IItem_Enum*>(pConfig->GetItemByID(L"ActivationType"));
-		pItem->SetValue(activationType.c_str());
-	}
-	// ドロップアウト率
-	{
-		SettingData::Standard::IItem_Float* pItem = dynamic_cast<SettingData::Standard::IItem_Float*>(pConfig->GetItemByID(L"DropOut"));
-		pItem->SetValue(dropOutRate);
-	}
-
-	// レイヤーの作成
-	Layer::NeuralNetwork::INNLayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, IODataStruct(inputDataCount));
-	if(pLayer == NULL)
-		return NULL;
-
-	// 設定情報を削除
-	delete pConfig;
-
-	return pLayer;
-}
-Layer::NeuralNetwork::INNLayerData* CreateHiddenLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount, F32 dropOutRate)
-{
-//	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"sigmoid", dropOutRate);
-	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"ReLU", dropOutRate);
-//	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"lenear", dropOutRate);
-}
-Layer::NeuralNetwork::INNLayerData* CreateOutputLayerData(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 neuronCount, U32 inputDataCount, F32 dropOutRate)
-{
-//	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"sigmoid_crossEntropy", dropOutRate);
-	return ::CreateLayerData(layerDLLManager, neuronCount, inputDataCount, L"softmax_crossEntropy", dropOutRate);
-}
 
 /** ニューラルネットワーククラスを作成する */
-Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, U32 inputDataCount)
-{
-	// DLL取得
-	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(Gravisbell::GUID(0x1c38e21f, 0x6f01, 0x41b2, 0xb4, 0x0e, 0x7f, 0x67, 0x26, 0x7a, 0x36, 0x92));
-	if(pLayerDLL == NULL)
-		return NULL;
-
-	// 設定の作成
-	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
-	if(pConfig == NULL)
-		return NULL;
-
-	// レイヤーの作成
-	Layer::NeuralNetwork::INNLayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, IODataStruct(inputDataCount));
-	if(pLayer == NULL)
-		return NULL;
-
-	// 設定情報を削除
-	delete pConfig;
-
-	// キャスト
-	Layer::NeuralNetwork::INNLayerConnectData* pNeuralNetwork = dynamic_cast<Layer::NeuralNetwork::INNLayerConnectData*>(pLayer);
-	if(pNeuralNetwork == NULL)
-	{
-		delete pLayer;
-		return NULL;
-	}
-
-	return pNeuralNetwork;
-}
-
-/** ニューラルネットワーククラスにレイヤーを追加する */
-Gravisbell::ErrorCode CreateNeuralNetworkLayerConnect(
+Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager,
-	Layer::NeuralNetwork::INNLayerConnectData* pNeuralNetworkData,
-	U32 outputDataCount,
-	std::list<Layer::ILayerData*>& lppLayerData)
+	std::list<Layer::ILayerData*>& lppLayerData,
+	const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct)
 {
+	Layer::NeuralNetwork::INNLayerConnectData* pNeuralNetwork = Gravisbell::Utility::NeuralNetworkLayer::CreateNeuralNetwork(layerDLLManager, i_inputDataStruct);
+
 	// 入力信号を直前レイヤーに設定
-	Gravisbell::IODataStruct inputDataStruct = pNeuralNetworkData->GetInputDataStruct();
-	Gravisbell::GUID lastLayerGUID = pNeuralNetworkData->GetInputGUID();
+	Gravisbell::IODataStruct inputDataStruct = pNeuralNetwork->GetInputDataStruct();
+	Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID();
 
 	// 1層目
-	{
-		// GUID生成
-		Gravisbell::GUID guid = boost::uuids::random_generator()().data;
-
-		// レイヤーデータを作成
-		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateHiddenLayerData(layerDLLManager, 128, inputDataStruct.GetDataCount(), 0.2f);
-		if(pLayerData == NULL)
-			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
-		lppLayerData.push_back(pLayerData);
-		pNeuralNetworkData->AddLayer(guid, pLayerData);
-
-		// 接続
-		pNeuralNetworkData->AddInputLayerToLayer(guid, lastLayerGUID);
-
-		// 現在レイヤーを直前レイヤーに変更
-		inputDataStruct = pLayerData->GetOutputDataStruct();
-		lastLayerGUID = guid;
-	}
+	Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+		*pNeuralNetwork,
+		lppLayerData,
+		inputDataStruct, lastLayerGUID,
+		Gravisbell::Utility::NeuralNetworkLayer::CreateFullyConnectLayer(layerDLLManager, inputDataStruct, 512, 0.2f));
+	Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+		*pNeuralNetwork,
+		lppLayerData,
+		inputDataStruct, lastLayerGUID,
+		Gravisbell::Utility::NeuralNetworkLayer::CreateActivationLayer(layerDLLManager, inputDataStruct, L"ReLU"));
 
 	// 2層目
-	{
-		// GUID生成
-		Gravisbell::GUID guid = boost::uuids::random_generator()().data;
-
-		// レイヤーデータを作成
-		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateHiddenLayerData(layerDLLManager, 128, inputDataStruct.GetDataCount(), 0.5f);
-		if(pLayerData == NULL)
-			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
-		lppLayerData.push_back(pLayerData);
-		pNeuralNetworkData->AddLayer(guid, pLayerData);
-
-		// 接続
-		pNeuralNetworkData->AddInputLayerToLayer(guid, lastLayerGUID);
-
-		// 現在レイヤーを直前レイヤーに変更
-		inputDataStruct = pLayerData->GetOutputDataStruct();
-		lastLayerGUID = guid;
-	}
+	Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+		*pNeuralNetwork,
+		lppLayerData,
+		inputDataStruct, lastLayerGUID,
+		Gravisbell::Utility::NeuralNetworkLayer::CreateFullyConnectLayer(layerDLLManager, inputDataStruct, 512, 0.5f));
+	Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+		*pNeuralNetwork,
+		lppLayerData,
+		inputDataStruct, lastLayerGUID,
+		Gravisbell::Utility::NeuralNetworkLayer::CreateActivationLayer(layerDLLManager, inputDataStruct, L"ReLU"));
 
 	// 3層目(出力層)
-	{
-		// GUID生成
-		Gravisbell::GUID guid = boost::uuids::random_generator()().data;
+	Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+		*pNeuralNetwork,
+		lppLayerData,
+		inputDataStruct, lastLayerGUID,
+		Gravisbell::Utility::NeuralNetworkLayer::CreateFullyConnectLayer(layerDLLManager, inputDataStruct, i_outputDataStruct.GetDataCount(), 0.2f));
+	Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+		*pNeuralNetwork,
+		lppLayerData,
+		inputDataStruct, lastLayerGUID,
+		Gravisbell::Utility::NeuralNetworkLayer::CreateActivationLayer(layerDLLManager, inputDataStruct, L"softmax_ALL_crossEntropy"));
 
-		// レイヤーデータを作成
-		Layer::NeuralNetwork::INNLayerData* pLayerData = CreateOutputLayerData(layerDLLManager, outputDataCount, inputDataStruct.GetDataCount(), 0.3f);
-		if(pLayerData == NULL)
-			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
-		lppLayerData.push_back(pLayerData);
-		pNeuralNetworkData->AddLayer(guid, pLayerData);
+	// 出力レイヤー設定
+	pNeuralNetwork->SetOutputLayerGUID(lastLayerGUID);
 
-		// 接続
-		pNeuralNetworkData->AddInputLayerToLayer(guid, lastLayerGUID);
-
-		// 現在レイヤーを直前レイヤーに変更
-		inputDataStruct = pLayerData->GetOutputDataStruct();
-		lastLayerGUID = guid;
-
-		// 出力レイヤーに設定
-		pNeuralNetworkData->SetOutputLayerGUID(guid);
-	}
-
-	return ErrorCode::ERROR_CODE_NONE;
+	return pNeuralNetwork;
 }
 
 
@@ -553,7 +422,7 @@ Gravisbell::ErrorCode LearnNeuralNetwork(
 
 
 	// バッチNo生成クラスを作成
-	Gravisbell::Common::IBatchDataNoListGenerator* pBatchDataNoListGenerator = Gravisbell::Common::CreateBatchDataNoListGeneratorCPU();
+	Gravisbell::Common::IBatchDataNoListGenerator* pBatchDataNoListGenerator = Gravisbell::Common::CreateBatchDataNoListGenerator();
 	err = pBatchDataNoListGenerator->PreProcess(pInputLayer->GetDataCount(), BATCH_SIZE);
 	if(err != ErrorCode::ERROR_CODE_NONE)
 	{
@@ -706,7 +575,7 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 
 
 	// バッチNo生成クラスを作成
-	Gravisbell::Common::IBatchDataNoListGenerator* pBatchDataNoListGenerator = Gravisbell::Common::CreateBatchDataNoListGeneratorCPU();
+	Gravisbell::Common::IBatchDataNoListGenerator* pBatchDataNoListGenerator = Gravisbell::Common::CreateBatchDataNoListGenerator();
 	err = pBatchDataNoListGenerator->PreProcess(pTeachInputLayer->GetDataCount(), BATCH_SIZE);
 	if(err != ErrorCode::ERROR_CODE_NONE)
 	{
@@ -721,6 +590,9 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 		delete pBatchDataNoListGenerator;
 		return err;
 	}
+
+	std::vector<F32> lpOutputBuffer(pTeachOutputLayer->GetBufferCount() * BATCH_SIZE);
+	std::vector<F32> lpTeachBuffer(pTeachOutputLayer->GetBufferCount() * BATCH_SIZE);
 
 	// 学習を実行
 	for(U32 learnTime=0; learnTime<LEARN_TIMES; learnTime++)
@@ -759,6 +631,8 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 				pNeuralNetworkLearn->ReflectionLearnError();
 
 				// 正解率を算出する
+				pTeachOutputLayer->GetOutputBuffer(&lpTeachBuffer[0]);
+				pNeuralNetworkLearn->GetOutputBuffer(&lpOutputBuffer[0]);
 				for(U32 batchDataNum=0; batchDataNum<pTeachOutputLayer->GetBatchSize(); batchDataNum++)
 				{
 					// 正解の番号を取得
@@ -769,10 +643,10 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 						{
 							U32 bufferPos = batchDataNum * pTeachOutputLayer->GetBufferCount() + i;
 
-							if(pTeachOutputLayer->GetOutputBuffer()[bufferPos] > curValue)
+							if(lpTeachBuffer[bufferPos] > curValue)
 							{
 								correctNo = i;
-								curValue = pTeachOutputLayer->GetOutputBuffer()[bufferPos];
+								curValue = lpTeachBuffer[bufferPos];
 							}
 						}
 					}
@@ -784,10 +658,10 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 						{
 							U32 bufferPos = batchDataNum * pTeachOutputLayer->GetBufferCount() + i;
 
-							if(pNeuralNetworkLearn->GetOutputBuffer()[bufferPos] > curValue)
+							if(lpOutputBuffer[bufferPos] > curValue)
 							{
 								outputNo = i;
-								curValue = pNeuralNetworkLearn->GetOutputBuffer()[bufferPos];
+								curValue = lpOutputBuffer[bufferPos];
 							}
 						}
 					}
@@ -823,16 +697,18 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 
 
 				// 正解の番号を取得
+				pSampleOutputLayer->GetOutputBuffer(&lpTeachBuffer[0]);
+				pNeuralNetworkSample->GetOutputBuffer(&lpOutputBuffer[0]);
 				{
 					U32 correctNo = 0;
 					{
 						F32 curValue = 0.0f;
 						for(U32 i=0; i<pSampleOutputLayer->GetBufferCount(); i++)
 						{
-							if(pSampleOutputLayer->GetOutputBuffer()[i] > curValue)
+							if(lpTeachBuffer[i] > curValue)
 							{
 								correctNo = i;
-								curValue = pSampleOutputLayer->GetOutputBuffer()[i];
+								curValue = lpTeachBuffer[i];
 							}
 						}
 					}
@@ -842,10 +718,10 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 						F32 curValue = 0.0f;
 						for(U32 i=0; i<pSampleOutputLayer->GetBufferCount(); i++)
 						{
-							if(pNeuralNetworkSample->GetOutputBuffer()[i] > curValue)
+							if(lpOutputBuffer[i] > curValue)
 							{
 								outputNo = i;
-								curValue = pNeuralNetworkSample->GetOutputBuffer()[i];
+								curValue = lpOutputBuffer[i];
 							}
 						}
 					}
@@ -863,7 +739,7 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 			F32 errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy;
 			pTeachOutputLayer->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy);
 //			printf("学習：max=%.3f, ave=%.3f, ave2=%.3f, entropy=%.3f", errorMax, errorAve, errorAve2, errorCrossEntoropy);
-			printf("%.3f,%.3f,%.3f,%.3f,",  errorMax, errorAve2, errorCrossEntoropy, (F32)correctCount_learn / pBatchDataNoListGenerator->GetDataCount()); 
+			printf("%.3f,%.3f,%.3f,%.3f,",  errorMax, errorAve2, errorCrossEntoropy, (F32)correctCount_learn / (pBatchDataNoListGenerator->GetBatchDataNoListCount() * BATCH_SIZE)); 
 		}
 //		printf(" : ");
 		{

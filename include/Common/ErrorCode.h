@@ -34,6 +34,12 @@ namespace Gravisbell {
 		ERROR_CODE_IO = 0x03000000,
 		ERROR_CODE_IO_DISAGREE_INPUT_OUTPUT_COUNT,	///< 入出力のデータ数が一致しない
 
+		// CUDA系エラー
+		ERROR_CODE_CUDA = 0x04000000,
+		ERROR_CODE_CUDA_INITIALIZE,				///< CUDAの初期化に失敗
+		ERROR_CODE_CUDA_ALLOCATION_MEMORY,		///< メモリの確保に失敗
+		ERROR_CODE_CUDA_COPY_MEMORY,			///< メモリのコピーに失敗
+
 
 		// レイヤー系エラー
 		ERROR_CODE_LAYER = 0x10000000,

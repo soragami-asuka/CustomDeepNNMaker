@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーのローカライズ用他言語情報を記載するファイル.
+DLLから参照する拡張パック扱い.
+[guid]に識別用のコードを記載し、Config.xmlの識別コードを一致したDLLに適用される.
+1ファイルに1レイヤーしか記載できないが、複数の言語の記載はできる
+-->
+
+<Config guid="BEBA34EC-C30C-4565-9386-56088981D2D7">
+  <Language language="en">
+    <Name>Fully Connect Neural-Network Layer</Name>
+    <Text>
+      Fully connect neural network layer.
+      Integration of bonding layer and activation layer.
+      You can set [learning coefficient] [dropout rate] at learning.
+    </Text>
+
+    <Structure>
+      <Item id="NeuronCount">
+        <Name>Number of neurons</Name>
+        <Text>
+          Number of neurons in the layer.
+          It is directly connected to the number of output buffers.
+        </Text>
+      </Item>
+    </Structure>
+
+    <Learn>
+      <Item id="LearnCoeff">
+        <Name>Learning coefficient</Name>
+      </Item>
+      <Item id="DropOut">
+        <Name>Dropout rate</Name>
+        <Text>
+          Percentage to ignore the previous layer.
+          1.0 ignores all previous layer's output.
+        </Text>
+      </Item>
+    </Learn>
+  </Language>
+
+  <Language languate="fr">
+    <!--別言語を同じファイルに書き込むことも可能-->
+  </Language>
+</Config>

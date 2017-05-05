@@ -180,4 +180,20 @@
   <ItemGroup>
     <Xml Include="Config.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Activation_LayerData_GPU.cuh">
+      <Filter>LayerData</Filter>
+    </None>
+    <None Include="Activation_GPU.cuh">
+      <Filter>Layer</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="Activation_LayerData_GPU.cu">
+      <Filter>LayerData</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Activation_GPU.cu">
+      <Filter>Layer</Filter>
+    </CudaCompile>
+  </ItemGroup>
 </Project>

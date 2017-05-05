@@ -21,6 +21,7 @@ namespace NeuralNetwork {
 		:	layerDLLManager	(i_layerDLLManager)
 		,	guid			(guid)
 		,	inputLayerGUID	(Gravisbell::GUID(0x2d2805a3, 0x97cc, 0x4ab4, 0x94, 0x2e, 0x69, 0x39, 0xfd, 0x62, 0x35, 0xb1))
+		,	pLayerStructure	(NULL)
 	{
 	}
 	/** デストラクタ */

@@ -107,12 +107,12 @@ namespace NeuralNetwork {
 		for(unsigned int neuronNum=0; neuronNum<this->lppNeuron.size(); neuronNum++)
 		{
 			memcpy(&this->lppNeuron[neuronNum][0], &i_lpBuffer[readBufferByte], this->lppNeuron[neuronNum].size() * sizeof(NEURON_TYPE));
-			readBufferByte += this->lppNeuron[neuronNum].size() * sizeof(NEURON_TYPE);
+			readBufferByte += (U32)this->lppNeuron[neuronNum].size() * sizeof(NEURON_TYPE);
 		}
 
 		// バイアス
 		memcpy(&this->lpBias[0], &i_lpBuffer[readBufferByte], this->lpBias.size() * sizeof(NEURON_TYPE));
-		readBufferByte += this->lpBias.size() * sizeof(NEURON_TYPE);
+		readBufferByte += (U32)this->lpBias.size() * sizeof(NEURON_TYPE);
 
 
 		return ErrorCode::ERROR_CODE_NONE;
@@ -139,12 +139,12 @@ namespace NeuralNetwork {
 		for(unsigned int neuronNum=0; neuronNum<this->lppNeuron.size(); neuronNum++)
 		{
 			memcpy(&o_lpBuffer[writeBufferByte], &this->lppNeuron[neuronNum][0], this->lppNeuron[neuronNum].size() * sizeof(NEURON_TYPE));
-			writeBufferByte += this->lppNeuron[neuronNum].size() * sizeof(NEURON_TYPE);
+			writeBufferByte += (U32)this->lppNeuron[neuronNum].size() * sizeof(NEURON_TYPE);
 		}
 
 		// バイアス
 		memcpy(&o_lpBuffer[writeBufferByte], &this->lpBias[0], this->lpBias.size() * sizeof(NEURON_TYPE));
-		writeBufferByte += this->lpBias.size() * sizeof(NEURON_TYPE);
+		writeBufferByte += (U32)this->lpBias.size() * sizeof(NEURON_TYPE);
 
 		return writeBufferByte;
 	}

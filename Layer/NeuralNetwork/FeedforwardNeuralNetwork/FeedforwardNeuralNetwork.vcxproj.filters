@@ -165,6 +165,9 @@
     <ClInclude Include="..\..\..\include\DataFormat\Binary\IDataFormat.h">
       <Filter>include\DataFormat\Binary</Filter>
     </ClInclude>
+    <ClInclude Include="FeedforwardNeuralNetwork_GPU.cuh">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -194,9 +197,6 @@
     <ClCompile Include="FeedforwardNeuralNetwork_CPU.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="FeedforwardNeuralNetwork_GPU.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="FeedforwardNeuralNetwork_LayerData_CPU.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -206,5 +206,13 @@
   </ItemGroup>
   <ItemGroup>
     <Xml Include="Config.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="FeedforwardNeuralNetwork_LayerData_GPU.cu">
+      <Filter>ソース ファイル</Filter>
+    </CudaCompile>
+    <CudaCompile Include="FeedforwardNeuralNetwork_GPU.cu">
+      <Filter>ソース ファイル</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

@@ -90,6 +90,13 @@ namespace DefaultLanguage
                     },
                 },
                 {
+                    L"tanh",
+                    {
+                        L"tanh(双曲線関数)",
+                        L"y = sin(x)/cos(x);",
+                    },
+                },
+                {
                     L"softmax_ALL",
                     {
                         L"SoftMax関数",
@@ -239,20 +246,25 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			L"y = max(0, x);\n範囲 0 <= y\n(x=0, y=0)を通る");
 		// 4
 		pItemEnum->AddEnumItem(
+			L"tanh",
+			L"tanh(双曲線関数)",
+			L"y = sin(x)/cos(x);");
+		// 5
+		pItemEnum->AddEnumItem(
 			L"softmax_ALL",
 			L"SoftMax関数",
 			L"全体における自身の割合を返す関数.\ny = e^x / Σe^x;\n");
-		// 5
+		// 6
 		pItemEnum->AddEnumItem(
 			L"softmax_ALL_crossEntropy",
 			L"SoftMax関数(出力レイヤー用)",
 			L"全体における自身の割合を返す関数.\ny = e^x / Σe^x;\n");
-		// 6
+		// 7
 		pItemEnum->AddEnumItem(
 			L"softmax_CH",
 			L"SoftMax関数(CH内のみ)",
 			L"同一のX,Y,Zにおける各CHの自身の割合を返す関数.\ny = e^x / Σe^x;\n");
-		// 7
+		// 8
 		pItemEnum->AddEnumItem(
 			L"softmax_CH_crossEntropy",
 			L"SoftMax関数(CH内のみ)(出力レイヤー用)",
