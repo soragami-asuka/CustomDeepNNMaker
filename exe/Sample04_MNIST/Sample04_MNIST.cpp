@@ -904,7 +904,7 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 			F32 errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy;
 			pTeachOutputLayer->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy);
 //			printf("ŠwKFmax=%.3f, ave=%.3f, ave2=%.3f, entropy=%.3f", errorMax, errorAve, errorAve2, errorCrossEntoropy);
-			printf("%.3f,%.3f,%.3f,%.3f,",  errorMax, errorAve2, errorCrossEntoropy, (F32)correctCount_learn / pBatchDataNoListGenerator->GetDataCount()); 
+			printf("%.3f,%.3f,%.3f,%.3f,",  errorMax, errorAve2, errorCrossEntoropy, (F32)correctCount_learn / (pBatchDataNoListGenerator->GetBatchDataNoListCount() * BATCH_SIZE)); 
 		}
 //		printf(" : ");
 		{
