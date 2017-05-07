@@ -28,7 +28,6 @@ namespace NeuralNetwork {
 		,	inputBufferCount				(0)		/**< 入力バッファ数 */
 		,	neuronCount						(0)		/**< ニューロン数 */
 		,	outputBufferCount				(0)		/**< 出力バッファ数 */
-		,	onUseDropOut					(false)
 	{
 	}
 	/** デストラクタ */
@@ -148,10 +147,6 @@ namespace NeuralNetwork {
 			this->lppBatchOutputBuffer[batchNum] = &this->lpOutputBuffer[batchNum*this->outputBufferCount];
 		}
 
-		// ドロップアウト処理を未使用に変更
-		this->onUseDropOut = false;
-		this->lppDropOutBuffer.clear();
-
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
@@ -164,41 +159,6 @@ namespace NeuralNetwork {
 			delete this->pLearnData;
 		this->pLearnData = data.Clone();
 
-		// ドロップアウト
-		{
-			S32 dropOutRate = (S32)(this->layerData.layerStructure.DropOut * RAND_MAX);
-
-			if(dropOutRate > 0)
-			{
-				this->onUseDropOut = true;
-				if(this->lppDropOutBuffer.empty())
-				{
-					// バッファの確保
-					this->lppDropOutBuffer.resize(this->neuronCount);
-					for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
-						this->lppDropOutBuffer[neuronNum].resize(this->inputBufferCount);
-				}
-
-				// バッファに1or0を入力
-				// 1 : DropOutしない
-				// 0 : DropOutする
-				for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
-				{
-					for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
-					{
-						if(rand() < dropOutRate)	// ドロップアウトする
-							this->lppDropOutBuffer[neuronNum][inputNum] = 0.0f;
-						else
-							this->lppDropOutBuffer[neuronNum][inputNum] = 1.0f;
-					}
-				}
-			}
-			else
-			{
-				this->onUseDropOut = false;
-				this->lppDropOutBuffer.clear();
-			}
-		}
 		// 学習係数
 		{
 			auto pItem = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Float*>(data.GetItemByID(L"LearnCoeff"));
@@ -214,8 +174,6 @@ namespace NeuralNetwork {
 		失敗した場合はCalculate以降の処理は実行不可. */
 	ErrorCode FullyConnect_CPU::PreProcessCalculateLoop()
 	{
-		this->onUseDropOut = false;
-
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
 
@@ -238,15 +196,9 @@ namespace NeuralNetwork {
 				// ニューロンの値を加算
 				for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
 				{
-					if(this->onUseDropOut)
-						tmp += this->m_lppInputBuffer[batchNum][inputNum] * this->layerData.lppNeuron[neuronNum][inputNum] * this->lppDropOutBuffer[neuronNum][inputNum];
-					else
-						tmp += this->m_lppInputBuffer[batchNum][inputNum] * this->layerData.lppNeuron[neuronNum][inputNum];
+					tmp += this->m_lppInputBuffer[batchNum][inputNum] * this->layerData.lppNeuron[neuronNum][inputNum];
 				}
 				tmp += this->layerData.lpBias[neuronNum];
-
-				if(!this->onUseDropOut && this->layerData.layerStructure.DropOut > 0.0f)
-					tmp *= (1.0f - this->layerData.layerStructure.DropOut);
 
 				// 活性化
 				this->lppBatchOutputBuffer[batchNum][neuronNum] = tmp;
@@ -310,10 +262,7 @@ namespace NeuralNetwork {
 
 				for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
 				{
-					if(this->onUseDropOut)
-						tmp += this->m_lppDOutputBuffer[batchNum][neuronNum] * this->layerData.lppNeuron[neuronNum][inputNum] * this->lppDropOutBuffer[neuronNum][inputNum];
-					else
-						tmp += this->m_lppDOutputBuffer[batchNum][neuronNum] * this->layerData.lppNeuron[neuronNum][inputNum];
+					tmp += this->m_lppDOutputBuffer[batchNum][neuronNum] * this->layerData.lppNeuron[neuronNum][inputNum];
 				}
 
 				this->lppBatchDInputBuffer[batchNum][inputNum] = tmp;
@@ -355,9 +304,6 @@ namespace NeuralNetwork {
 			// 入力対応ニューロン更新
 			for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
 			{
-				if(this->onUseDropOut && this->lppDropOutBuffer[neuronNum][inputNum] == 0.0f)
-					continue;
-
 				F32 sumDOutput = 0.0f;
 				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 				{

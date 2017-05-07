@@ -31,7 +31,6 @@ private:
 	std::vector<F32*>						lppBatchOutputBuffer;		/**< バッチ処理用出力バッファ <バッチ数> */
 	std::vector<F32*>						lppBatchDInputBuffer;		/**< バッチ処理用入力誤差差分 <バッチ数> */
 
-	std::vector<std::vector<F32>>			lppDropOutNeuron;	/**< ドロップアウト用の処理を加えたニューロン */
 	std::vector<std::vector<F32>>			lppDNeuron;	/**< ニューロンの学習量 */
 	std::vector<F32>						lpDBias;	/**< バイアスの学習量 */
 
@@ -49,8 +48,6 @@ private:
 	std::vector<CONST_BATCH_BUFFER_POINTER> m_lppDOutputBuffer;		/**< 入力誤差計算時の出力誤差データ */
 
 	// 演算処理用のバッファ
-	bool onUseDropOut;											/**< ドロップアウト処理を実行するフラグ. */
-	std::vector<std::vector<NEURON_TYPE>>	lppDropOutBuffer;	/**< ドロップアウト処理用の係数<ニューロン数, フィルタサイズ> */
 
 
 public:

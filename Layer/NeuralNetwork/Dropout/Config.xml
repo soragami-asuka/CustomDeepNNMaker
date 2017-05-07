@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="298243E4-2111-474F-A8F4-35BDC8764588" version="1.0.0.0" default-language="ja">
+  
+  <SourceName>Dropout</SourceName>
+  <Name>ドロップアウト</Name>
+  <Text>ドロップアウト.</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+    <Float id="Rate">
+      <Name>ドロップアウト率</Name>
+      <Text>前レイヤーを無視する割合.&#x0A;1.0で前レイヤーの全出力を無視する</Text>
+      <Min>0.0</Min>
+      <Max>1.0</Max>
+      <Default>0.0</Default>
+    </Float>
+  </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <Learn>
+  </Learn>
+
+</Config>

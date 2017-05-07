@@ -50,7 +50,6 @@ namespace NeuralNetwork {
 		,	inputBufferCount				(0)		/**< 入力バッファ数 */
 		,	neuronCount						(0)		/**< ニューロン数 */
 		,	outputBufferCount				(0)		/**< 出力バッファ数 */
-		,	onUseDropOut					(false)
 	{
 		cublasCreate(&cublasHandle);
 	}
@@ -67,7 +66,7 @@ namespace NeuralNetwork {
 	/** レイヤー種別の取得 */
 	U32 FullyConnect_GPU::GetLayerKind()const
 	{
-		return Layer::ELayerKind::LAYER_KIND_CPU | GetLayerKindBase();
+		return Layer::ELayerKind::LAYER_KIND_GPU | GetLayerKindBase();
 	}
 
 	/** 初期化. 各ニューロンの値をランダムに初期化
@@ -161,10 +160,6 @@ namespace NeuralNetwork {
 		// 出力バッファを作成
 		this->lpOutputBuffer_d.resize(this->batchSize * this->outputBufferCount);
 
-		// ドロップアウト処理を未使用に変更
-		this->onUseDropOut = false;
-		this->lpDropOutBuffer_d.clear();
-
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
@@ -177,44 +172,6 @@ namespace NeuralNetwork {
 			delete this->pLearnData;
 		this->pLearnData = data.Clone();
 
-		// ドロップアウト
-		{
-			S32 dropOutRate = (S32)(this->layerData.layerStructure.DropOut * RAND_MAX);
-
-			if(dropOutRate > 0)
-			{
-				this->onUseDropOut = true;
-				if(this->lpDropOutBuffer_d.empty())
-				{
-					// バッファの確保
-					this->lpDropOutBuffer_d.resize(this->neuronCount * this->inputBufferCount);
-				}
-
-				// バッファに1or0を入力
-				// 1 : DropOutしない
-				// 0 : DropOutする
-				thrust::host_vector<F32> lpTmpDropOutBuffer(this->neuronCount * this->inputBufferCount);
-				for(U32 i=0; i<this->neuronCount*this->inputBufferCount; i++)
-				{
-					if(rand() < dropOutRate)	// ドロップアウトする
-						lpTmpDropOutBuffer[i] = 0.0f;
-					else
-						lpTmpDropOutBuffer[i] = 1.0f;
-				}
-				this->lpDropOutBuffer_d = lpTmpDropOutBuffer;
-
-				// ドロップアウト処理済みのニューロンを格納するバッファを作成
-				this->lpDropOutNeuron_d.resize(this->neuronCount * this->inputBufferCount);
-				this->lpDNeuron_d.resize(this->neuronCount * this->inputBufferCount);
-			}
-			else
-			{
-				this->onUseDropOut = false;
-				this->lpDropOutBuffer_d.clear();
-				this->lpDropOutNeuron_d.clear();
-				this->lpDNeuron_d.clear();
-			}
-		}
 		// 学習係数
 		{
 			auto pItem = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Float*>(data.GetItemByID(L"LearnCoeff"));
@@ -230,11 +187,6 @@ namespace NeuralNetwork {
 		失敗した場合はCalculate以降の処理は実行不可. */
 	ErrorCode FullyConnect_GPU::PreProcessCalculateLoop()
 	{
-		this->onUseDropOut = false;
-		this->lpDropOutBuffer_d.clear();
-		this->lpDropOutNeuron_d.clear();
-		this->lpDNeuron_d.clear();
-
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
 
@@ -246,28 +198,6 @@ namespace NeuralNetwork {
 	{
 		// 入力バッファを保管
 		this->m_lppInputBuffer_d = i_lpInputBuffer;
-
-		// ニューロンにドロップアウト処理を行う
-		F32* pNeuron_d = NULL;
-		if(this->onUseDropOut)
-		{
-			pNeuron_d = thrust::raw_pointer_cast(&this->lpDropOutNeuron_d[0]);
-
-			U32 bufferCount = this->inputBufferCount * this->neuronCount;
-			dim3 grid((bufferCount +(BLOCK_SIZE - 1))/BLOCK_SIZE , 1, 1);
-			dim3 block(BLOCK_SIZE, 1, 1);
-
-			// ドロップアウト処理ニューロンを作成する
-			cuda_func_multiplVector<<<grid, block>>>(
-				thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]),
-				thrust::raw_pointer_cast(&this->lpDropOutBuffer_d[0]),
-				pNeuron_d,
-				bufferCount);
-		}
-		else
-		{
-			pNeuron_d = thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]);
-		}
 
 		// バイアスを出力信号にコピーする
 		{
@@ -287,7 +217,7 @@ namespace NeuralNetwork {
 		{
 			// C = aAB + bC;
 
-			F32 alpha = this->onUseDropOut ? 1.0f : (1.0f-this->layerData.layerStructure.DropOut);
+			F32 alpha = (1.0f-this->layerData.layerStructure.DropOut);
 			F32 beta  = 1.0f;	// バイアスがCにコピー済みなのでそのまま利用するために1.0を指定
 
 			cublasSgemm(
@@ -298,10 +228,10 @@ namespace NeuralNetwork {
 				this->batchSize,	// 行列Bの列数
 				this->inputBufferCount,	// 行列Aの列数,行列Bの行数
 				&alpha,
-				pNeuron_d,					// 行列A
-				this->inputBufferCount,		// 行列Aの転置前の行数
-				i_lpInputBuffer,			// 行列B
-				this->inputBufferCount,		// 行列Bの転置前の行数
+				thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]),	// 行列A
+				this->inputBufferCount,										// 行列Aの転置前の行数
+				i_lpInputBuffer,											// 行列B
+				this->inputBufferCount,										// 行列Bの転置前の行数
 				&beta,
 				thrust::raw_pointer_cast(&lpOutputBuffer_d[0]),
 				this->outputBufferCount);
@@ -347,18 +277,6 @@ namespace NeuralNetwork {
 		// 出力誤差バッファのアドレスを配列に格納
 		this->m_lppDOutputBuffer_d = i_lpDOutputBufferPrev;
 
-		// ドロップアウト処理から使用するニューロンバッファを選択する
-		F32* pNeuron_d = NULL;
-		if(this->onUseDropOut)
-		{
-			pNeuron_d = thrust::raw_pointer_cast(&this->lpDropOutNeuron_d[0]);
-		}
-		else
-		{
-			pNeuron_d = thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]);
-		}
-
-
 		// 入力誤差差分を計算
 		{
 			F32 alpha = 1.0f;
@@ -372,10 +290,10 @@ namespace NeuralNetwork {
 				this->batchSize,		// 行列Bの列数
 				this->neuronCount,		// 行列Aの列数,行列Bの行数
 				&alpha,
-				pNeuron_d,					// 行列A
-				this->inputBufferCount,		// 行列Aの転置前の行数
-				this->m_lppDOutputBuffer_d,	// 行列B
-				this->neuronCount,			// 行列Bの転置前の行数
+				thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]),	// 行列A
+				this->inputBufferCount,										// 行列Aの転置前の行数
+				this->m_lppDOutputBuffer_d,									// 行列B
+				this->neuronCount,											// 行列Bの転置前の行数
 				&beta,
 				thrust::raw_pointer_cast(&this->lpDInputBuffer_d[0]),
 				this->inputBufferCount);
@@ -413,49 +331,6 @@ namespace NeuralNetwork {
 		}
 
 		// ニューロン更新
-		if(this->onUseDropOut)
-		{
-			// ニューロンの誤差を計算
-			{
-				F32 alpha = 1.0f;
-				F32 beta  = 0.0f;
-
-				cublasSgemm(
-					this->cublasHandle,
-					CUBLAS_OP_N,
-					CUBLAS_OP_T,
-					this->inputBufferCount,	// 行列Aの行数
-					this->neuronCount,		// 行列Bの列数
-					this->batchSize,		// 行列Aの列数,行列Bの行数
-					&alpha,
-					this->m_lppInputBuffer_d,		// 行列A
-					this->inputBufferCount,										// 行列Aの転置前の行数
-					this->m_lppDOutputBuffer_d,	// 行列B
-					this->neuronCount,										// 行列Bの転置前の行数
-					&beta,
-					thrust::raw_pointer_cast(&this->lpDNeuron_d[0]),
-					this->inputBufferCount);
-			}
-
-			// ドロップアウト処理を加えてニューロンに値を加える
-			{
-				F32 alpha = this->learnData.LearnCoeff;
-				F32 beta  = 1.0f;
-
-				U32 bufferCount = this->inputBufferCount * this->neuronCount;
-				dim3 grid((bufferCount +(BLOCK_SIZE - 1))/BLOCK_SIZE , 1, 1);
-				dim3 block(BLOCK_SIZE, 1, 1);
-
-				// ドロップアウト処理ニューロンを作成する
-				cuda_func_multiplVectorWithScaler<<<grid, block>>>(
-					thrust::raw_pointer_cast(&this->lpDNeuron_d[0]),
-					thrust::raw_pointer_cast(&this->lpDropOutBuffer_d[0]),
-					thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]),
-					bufferCount,
-					alpha, beta);
-			}
-		}
-		else
 		{
 			// ニューロンの誤差を計算して加算する
 			{

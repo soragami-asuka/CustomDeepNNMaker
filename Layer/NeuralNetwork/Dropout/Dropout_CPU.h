@@ -1,16 +1,15 @@
 //======================================
-// フィードフォワードニューラルネットワークの統合処理レイヤー
-// 結合、活性化
+// 活性関数レイヤー
 // CPU処理用
 //======================================
-#ifndef __FullyConnect_CPU_H__
-#define __FullyConnect_CPU_H__
+#ifndef __Dropout_CPU_H__
+#define __Dropout_CPU_H__
 
 #include"stdafx.h"
 
-#include"FullyConnect_DATA.hpp"
-#include"FullyConnect_FUNC.hpp"
-#include"FullyConnect_Base.h"
+#include"Dropout_DATA.hpp"
+#include"Dropout_FUNC.hpp"
+#include"Dropout_Base.h"
 
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
@@ -19,36 +18,41 @@ namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-class FullyConnect_CPU : public FullyConnect_Base
+class Dropout_CPU : public Dropout_Base
 {
 private:
 	// データ本体
-	class FullyConnect_LayerData_CPU& layerData;
+	class Dropout_LayerData_CPU& layerData;
 
 	// 入出力バッファ
-	std::vector<F32>						lpOutputBuffer;		/**< 出力バッファ <バッチ数><ニューロン数> */
+	std::vector<F32>						lpOutputBuffer;		/**< 出力バッファ <バッチ数><入力信号数> */
 	std::vector<F32>						lpDInputBuffer;		/**< 入力誤差差分 <バッチ数><入力信号数> */
 
 	std::vector<F32*>						lppBatchOutputBuffer;		/**< バッチ処理用出力バッファ <バッチ数> */
 	std::vector<F32*>						lppBatchDInputBuffer;		/**< バッチ処理用入力誤差差分 <バッチ数> */
 
-	// Get関数を使うと処理不可がかさむので一時保存用. PreCalculateで値を格納.
+	// Get関数を使うと処理負荷がかさむので一時保存用. PreCalculateで値を格納.
 	U32 inputBufferCount;				/**< 入力バッファ数 */
-	U32 neuronCount;					/**< ニューロン数 */
 	U32 outputBufferCount;				/**< 出力バッファ数 */
 
+	std::vector<F32>						lpCalculateSum;	/**< 一時計算用のバッファ[z][y][x]のサイズを持つ */
+
 	// 演算時の入力データ
+	CONST_BATCH_BUFFER_POINTER m_lpInputBuffer;
 	std::vector<CONST_BATCH_BUFFER_POINTER> m_lppInputBuffer;		/**< 演算時の入力データ */
-	std::vector<CONST_BATCH_BUFFER_POINTER> m_lppDOutputBuffer;		/**< 入力誤差計算時の出力誤差データ */
+	CONST_BATCH_BUFFER_POINTER m_lpDOutputBufferPrev;
+	std::vector<CONST_BATCH_BUFFER_POINTER> m_lppDOutputBufferPrev;	/**< 入力誤差計算時の出力誤差データ */
 
-	// 演算処理用のバッファ
-
+	// 演算用の一時バッファ
+	S32 dropoutRate;					/**< ドロップアウト率 */
+	bool onLearning;					/**< 学習処理中フラグ */
+	std::vector<S08> lpDropoutBuffer;	/**< ドロップアウトバッファ */
 
 public:
 	/** コンストラクタ */
-	FullyConnect_CPU(Gravisbell::GUID guid, class FullyConnect_LayerData_CPU& i_layerData);
+	Dropout_CPU(Gravisbell::GUID guid, class Dropout_LayerData_CPU& i_layerData);
 	/** デストラクタ */
-	virtual ~FullyConnect_CPU();
+	virtual ~Dropout_CPU();
 
 public:
 	//================================
@@ -66,8 +70,8 @@ public:
 	// レイヤーデータ関連
 	//===========================
 	/** レイヤーデータを取得する */
-	FullyConnect_LayerData_Base& GetLayerData();
-	const FullyConnect_LayerData_Base& GetLayerData()const;
+	Dropout_LayerData_Base& GetLayerData();
+	const Dropout_LayerData_Base& GetLayerData()const;
 
 
 	//===========================

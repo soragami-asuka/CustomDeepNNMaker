@@ -126,7 +126,7 @@ namespace IOData {
 		/** データ数を取得する */
 		U32 GetDataCount()const
 		{
-			return this->lpBufferList.size();
+			return (U32)this->lpBufferList.size();
 		}
 		/** データを番号指定で取得する.
 			@param num		取得する番号

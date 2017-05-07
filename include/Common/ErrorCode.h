@@ -39,6 +39,7 @@ namespace Gravisbell {
 		ERROR_CODE_CUDA_INITIALIZE,				///< CUDA‚Ì‰Šú‰»‚ÉŽ¸”s
 		ERROR_CODE_CUDA_ALLOCATION_MEMORY,		///< ƒƒ‚ƒŠ‚ÌŠm•Û‚ÉŽ¸”s
 		ERROR_CODE_CUDA_COPY_MEMORY,			///< ƒƒ‚ƒŠ‚ÌƒRƒs[‚ÉŽ¸”s
+		ERROR_CODE_CUDA_CALCULATE,				///< ‰‰ŽZŽ¸”s
 
 
 		// ƒŒƒCƒ„[ŒnƒGƒ‰[

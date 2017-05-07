@@ -52,7 +52,7 @@ namespace NeuralNetwork {
 	/** レイヤー種別の取得 */
 	U32 Activation_GPU::GetLayerKind()const
 	{
-		return Layer::ELayerKind::LAYER_KIND_CPU | GetLayerKindBase();
+		return Layer::ELayerKind::LAYER_KIND_GPU | GetLayerKindBase();
 	}
 
 	/** 初期化. 各ニューロンの値をランダムに初期化

@@ -7,12 +7,15 @@
 
 #include"stdafx.h"
 
+#pragma warning(push)
+#pragma warning(disable : 4267)
 #include <cuda.h> // need CUDA_VERSION
 #include <cudnn.h>
 #include <cublas_v2.h>
 #include <thrust/device_vector.h>
 #include <thrust/host_vector.h>
 #include "device_launch_parameters.h"
+#pragma warning(pop)
 
 
 #include"FullyConnect_DATA.hpp"
@@ -43,12 +46,6 @@ private:
 	CONST_BATCH_BUFFER_POINTER				m_lppDOutputBuffer_d;		/**< 入力誤差計算時の出力誤差データ */
 
 	// 演算処理用のバッファ
-	bool onUseDropOut;										/**< ドロップアウト処理を実行するフラグ. */
-	thrust::device_vector<F32>	lpDropOutBuffer_d;			/**< ドロップアウト処理用の係数<ニューロン数, 入力数> */
-
-	thrust::device_vector<F32>	lpDropOutNeuron_d;			/**< ドロップアウト処理済みのニューロン */
-	thrust::device_vector<F32>	lpDNeuron_d;				/**< ニューロンの変化量.※ドロップアウトが有効な場合のみ使用する計算のための一時バッファ */
-
 	thrust::device_vector<F32>	lpBiasUpdateVector_d;		/**< バイアス更新のためのベクトル(全て1が入る) */
 
 	cublasHandle_t cublasHandle;

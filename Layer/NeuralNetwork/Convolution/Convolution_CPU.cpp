@@ -31,7 +31,6 @@ namespace NeuralNetwork {
 		,	inputBufferCount				(0)		/**< 入力バッファ数 */
 		,	neuronCount						(0)		/**< ニューロン数 */
 		,	outputBufferCount				(0)		/**< 出力バッファ数 */
-		,	onUseDropOut					(false)
 	{
 	}
 	/** デストラクタ */
@@ -167,10 +166,6 @@ namespace NeuralNetwork {
 			this->lpPaddingInputBuffer[batchNum].resize(this->paddingInputDataStruct.GetDataCount(), 0.0f);
 		}
 
-		// ドロップアウト処理を未使用に変更
-		this->onUseDropOut = false;
-		this->lppDropOutBuffer.clear();
-
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -192,51 +187,6 @@ namespace NeuralNetwork {
 			for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
 				this->lppDNeuron[neuronNum].resize(this->filterSize * this->layerData.inputDataStruct.ch);
 		}
-		// ドロップアウト
-		{
-			S32 dropOutRate = (S32)(this->layerData.layerStructure.DropOut * RAND_MAX);
-
-			if(dropOutRate > 0)
-			{
-				this->onUseDropOut = true;
-				if(this->lppDropOutBuffer.empty())
-				{
-					// バッファの確保
-					this->lppDropOutBuffer.resize(this->neuronCount);
-					for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
-						this->lppDropOutBuffer[neuronNum].resize(this->filterSize * this->layerData.inputDataStruct.ch);
-				}
-
-				// バッファに1or0を入力
-				// 1 : DropOutしない
-				// 0 : DropOutする
-				for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
-				{
-					for(U32 inputNum=0; inputNum<this->filterSize * this->layerData.inputDataStruct.ch; inputNum++)
-					{
-						if(rand() < dropOutRate)	// ドロップアウトする
-							this->lppDropOutBuffer[neuronNum][inputNum] = 0.0f;
-						else
-							this->lppDropOutBuffer[neuronNum][inputNum] = 1.0f;
-					}
-				}
-
-				// ドロップアウト処理を加えたニューロンを作成する
-				if(this->lppDropOutNeuron.empty())
-				{
-					// バッファの確保
-					this->lppDropOutNeuron.resize(this->neuronCount);
-					for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
-						this->lppDropOutNeuron[neuronNum].resize(this->filterSize * this->layerData.inputDataStruct.ch);
-				}
-			}
-			else
-			{
-				this->onUseDropOut = false;
-				this->lppDropOutBuffer.clear();
-				this->lppDropOutNeuron.clear();
-			}
-		}
 		// 学習係数
 		{
 			auto pItem = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Float*>(data.GetItemByID(L"LearnCoeff"));
@@ -252,8 +202,6 @@ namespace NeuralNetwork {
 		失敗した場合はCalculate以降の処理は実行不可. */
 	ErrorCode Convolution_CPU::PreProcessCalculateLoop()
 	{
-		this->onUseDropOut = false;
-
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
 
@@ -266,19 +214,6 @@ namespace NeuralNetwork {
 		// 入力バッファのアドレスを配列に格納
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 			this->m_lppInputBuffer[batchNum] = &i_lpInputBuffer[batchNum * this->inputBufferCount];
-
-		// ドロップアウトを実行する場合、ニューロンをドロップアウトさせつつドロップアウト用バッファに移動
-		if(this->onUseDropOut)
-		{
-			for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
-			{
-				for(U32 i=0; i<this->filterSize*this->layerData.inputDataStruct.ch; i++)
-				{
-					this->lppDropOutNeuron[neuronNum][i] = this->lppDropOutBuffer[neuronNum][i] * this->layerData.lppNeuron[neuronNum][i];
-				}
-			}
-		}
-		const std::vector<std::vector<F32>>& lppNeuron = this->onUseDropOut ? this->lppDropOutNeuron : this->layerData.lppNeuron;
 
 
 		// パディング後の入力バッファにデータを移す
@@ -348,18 +283,13 @@ namespace NeuralNetwork {
 											const S32 inputOffset  = POSITION_TO_OFFSET_STRUCT(inputX,inputY,inputZ, chNum, this->paddingInputDataStruct);
 											const S32 filterOffset = POSITION_TO_OFFSET_VECTOR(filterX, filterY, filterZ, chNum, this->layerData.layerStructure.FilterSize, this->layerData.inputDataStruct.ch);
 
-											tmp += lppNeuron[neuronNum][filterOffset] * this->lpPaddingInputBuffer[batchNum][inputOffset];
+											tmp += this->layerData.lppNeuron[neuronNum][filterOffset] * this->lpPaddingInputBuffer[batchNum][inputOffset];
 										}
 									}
 								}
 							}
 							// バイアスを追加
 							tmp += this->layerData.lpBias[neuronNum];
-
-							// 演算時のドロップアウト処理を実行
-							if(!this->onUseDropOut && this->layerData.layerStructure.DropOut > 0.0f)
-								tmp *= (1.0f - this->layerData.layerStructure.DropOut);
-
 
 							// 計算結果を格納する
 							this->lppBatchOutputBuffer[batchNum][outputOffset] = tmp;
@@ -411,9 +341,6 @@ namespace NeuralNetwork {
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 			this->m_lppDOutputBuffer[batchNum] = &i_lpDOutputBufferPrev[batchNum * this->outputBufferCount];
 
-		// 使用するニューロンデータを選択する
-		const std::vector<std::vector<F32>>& lppNeuron = this->onUseDropOut ? this->lppDropOutNeuron : this->layerData.lppNeuron;
-
 		// 入力誤差バッファを初期化
 		memset(&this->lpDInputBuffer[0], 0, sizeof(F32)*this->lpDInputBuffer.size());
 
@@ -461,7 +388,7 @@ namespace NeuralNetwork {
 											const S32 filterOffset = POSITION_TO_OFFSET_VECTOR(filterX, filterY, filterZ, chNum, this->layerData.layerStructure.FilterSize, this->layerData.inputDataStruct.ch);
 
 
-											this->lppBatchDInputBuffer[batchNum][inputOffset] += lppNeuron[neuronNum][filterOffset] * dOutput;
+											this->lppBatchDInputBuffer[batchNum][inputOffset] += this->layerData.lppNeuron[neuronNum][filterOffset] * dOutput;
 
 											// ニューロンの重み変化量を追加
 											this->lppDNeuron[neuronNum][filterOffset] += this->m_lppInputBuffer[batchNum][inputOffset] * dOutput;
