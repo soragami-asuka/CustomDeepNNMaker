@@ -130,11 +130,11 @@ namespace NeuralNetwork {
 		this->m_lppInputBuffer.resize(batchSize, NULL);
 
 		// 出力バッファを作成
-		this->lpOutputBuffer.resize(this->batchSize * this->inputBufferCount);
+		this->lpOutputBuffer.resize(this->batchSize * this->outputBufferCount);
 		this->lppBatchOutputBuffer.resize(this->batchSize);
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 		{
-			this->lppBatchOutputBuffer[batchNum] = &this->lpOutputBuffer[batchNum * this->inputBufferCount];
+			this->lppBatchOutputBuffer[batchNum] = &this->lpOutputBuffer[batchNum * this->outputBufferCount];
 		}
 
 

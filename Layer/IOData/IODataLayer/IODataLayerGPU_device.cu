@@ -8,6 +8,7 @@
 #include "stdafx.h"
 #include "IODataLayerGPU_base.cuh"
 
+
 #include<vector>
 #include<list>
 #include<algorithm>

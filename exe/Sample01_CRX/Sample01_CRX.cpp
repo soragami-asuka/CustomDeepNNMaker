@@ -84,7 +84,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	std::list<Layer::ILayerData*> lppLayerData;	// レイヤーデータの一覧
 
 	// サンプルデータの読み込み
+#ifndef _WIN64
+	Gravisbell::DataFormat::IDataFormatBase* pSampleData = ::LoadSampleData(L"../SampleData/CRX/DataFormat.xml", L"../SampleData/CRX/crx.csv");
+#else
 	Gravisbell::DataFormat::IDataFormatBase* pSampleData = ::LoadSampleData(L"../../SampleData/CRX/DataFormat.xml", L"../../SampleData/CRX/crx.csv");
+#endif
 	printf("入力信号：%d\n", pSampleData->GetDataStruct(L"input").GetDataCount());
 	printf("出力信号：%d\n", pSampleData->GetDataStruct(L"output").GetDataCount());
 

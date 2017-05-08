@@ -23,7 +23,7 @@ namespace Binary {
 	/** ƒf[ƒ^”‚ðŽæ“¾ */
 	U32 DataInfo::GetDataCount()const
 	{
-		return this->lpData.size();
+		return (U32)this->lpData.size();
 	}
 
 }	// Binary

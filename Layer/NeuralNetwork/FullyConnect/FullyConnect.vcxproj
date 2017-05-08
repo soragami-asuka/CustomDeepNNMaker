@@ -95,7 +95,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>cudart.lib;cublas.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CudaCompile>
       <AdditionalOptions>-Xcompiler "/wd 4819" %(AdditionalOptions)</AdditionalOptions>
@@ -136,7 +136,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>cudart.lib;cublas.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CudaCompile>
       <AdditionalOptions>-Xcompiler "/wd 4819" %(AdditionalOptions)</AdditionalOptions>
@@ -195,11 +195,17 @@
     <ClInclude Include="FullyConnect_Base.h" />
     <ClInclude Include="FullyConnect_CPU.h" />
     <ClInclude Include="FullyConnect_DATA.hpp" />
-    <ClInclude Include="FullyConnect_GPU.cuh" />
+    <ClInclude Include="FullyConnect_GPU.cuh">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="FullyConnect_LayerData_Base.h" />
     <ClInclude Include="FullyConnect_FUNC.hpp" />
     <ClInclude Include="FullyConnect_LayerData_CPU.h" />
-    <ClInclude Include="FullyConnect_LayerData_GPU.cuh" />
+    <ClInclude Include="FullyConnect_LayerData_GPU.cuh">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="RandomUtility.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -224,12 +230,16 @@
     <ClCompile Include="FullyConnect_CPU.cpp" />
     <CudaCompile Include="FullyConnect_GPU.cu">
       <FileType>CppCode</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </CudaCompile>
     <ClCompile Include="FullyConnect_FUNC.cpp" />
     <ClCompile Include="FullyConnect_LayerData_Base.cpp" />
     <ClCompile Include="FullyConnect_LayerData_CPU.cpp" />
     <CudaCompile Include="FullyConnect_LayerData_GPU.cu">
       <FileType>CppCode</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </CudaCompile>
     <ClCompile Include="RandomUtility.cpp" />
     <ClCompile Include="stdafx.cpp">

@@ -175,6 +175,9 @@
     <ProjectReference Include="..\..\Library\NeuralNetwork\LayerDLLManager\LayerDLLManager.vcxproj">
       <Project>{ac9b4528-ab0b-4549-a844-cfdc8837a7c6}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\Utility\NeuralNetworkLayer\NeuralNetworkLayer.vcxproj">
+      <Project>{b9fa3b73-f9b8-4bf7-a52f-5a397190755b}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
