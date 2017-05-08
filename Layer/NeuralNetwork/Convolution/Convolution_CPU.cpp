@@ -343,17 +343,19 @@ namespace NeuralNetwork {
 
 		// 入力誤差バッファを初期化
 		memset(&this->lpDInputBuffer[0], 0, sizeof(F32)*this->lpDInputBuffer.size());
+		
+		// ニューロンとバイアスの変化量を初期化
+		for(S32 neuronNum=0; neuronNum<this->layerData.layerStructure.Output_Channel; neuronNum++)
+		{
+			this->lpDBias[neuronNum] = 0.0f;
+			memset(&this->lppDNeuron[neuronNum][0], 0, this->filterSize * this->layerData.inputDataStruct.ch * sizeof(F32));
+		}
 
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 		{
 			// 入力誤差計算
 			for(S32 neuronNum=0; neuronNum<this->layerData.layerStructure.Output_Channel; neuronNum++)
 			{
-				// ニューロンとバイアスの変化量を初期化
-				this->lpDBias[neuronNum] = 0.0f;
-				memset(&this->lppDNeuron[neuronNum][0], 0, this->filterSize * this->layerData.inputDataStruct.ch * sizeof(F32));
-
-
 				for(S32 convZ=0; convZ<this->layerData.convolutionCount.z; convZ++)
 				{
 					for(S32 convY=0; convY<this->layerData.convolutionCount.y; convY++)
@@ -368,19 +370,19 @@ namespace NeuralNetwork {
 							{
 								for(S32 filterZ=0; filterZ<this->layerData.layerStructure.FilterSize.z; filterZ++)
 								{
-									const S32 inputZ = (S32)((convZ - this->layerData.convolutionStart.z) * this->layerData.layerStructure.Stride.z + filterZ);
+									const S32 inputZ = (S32)((convZ * this->layerData.layerStructure.Stride.z) - this->layerData.layerStructure.Padding.z + filterZ);
 									if((U32)inputZ>=this->layerData.inputDataStruct.z)
 										continue;
 
 									for(S32 filterY=0; filterY<this->layerData.layerStructure.FilterSize.y; filterY++)
 									{
-										const S32 inputY = (S32)((convY - this->layerData.convolutionStart.y) * this->layerData.layerStructure.Stride.y + filterY);
+										const S32 inputY = (S32)((convY * this->layerData.layerStructure.Stride.y) - this->layerData.layerStructure.Padding.y + filterY);
 										if((U32)inputY>=this->layerData.inputDataStruct.y)
 											continue;
 
 										for(S32 filterX=0; filterX<this->layerData.layerStructure.FilterSize.x; filterX++)
 										{
-											const S32 inputX = (S32)((convX - this->layerData.convolutionStart.x) * this->layerData.layerStructure.Stride.x + filterX);
+											const S32 inputX = (S32)((convX * this->layerData.layerStructure.Stride.x) - this->layerData.layerStructure.Padding.x + filterX);
 											if((U32)inputX>=this->layerData.inputDataStruct.x)
 												continue;
 

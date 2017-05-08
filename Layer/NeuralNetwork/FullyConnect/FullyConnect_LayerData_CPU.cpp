@@ -36,6 +36,9 @@ namespace NeuralNetwork {
 		@return	成功した場合0 */
 	ErrorCode FullyConnect_LayerData_CPU::Initialize(void)
 	{
+		// 乱数固定化
+		Utility::Random::Initialize(0);
+
 		// 入力バッファ数を確認
 		unsigned int inputBufferCount = this->GetInputBufferCount();
 		if(inputBufferCount == 0)
@@ -47,22 +50,23 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_VALUERANGE;
 
 		// バッファを確保しつつ、初期値を設定
+		float maxArea = sqrt(6.0f / (inputBufferCount + neuronCount));
 		this->lppNeuron.resize(neuronCount);
 		this->lpBias.resize(neuronCount);
+
+		// ニューロン
 		for(unsigned int neuronNum=0; neuronNum<lppNeuron.size(); neuronNum++)
 		{
-			float maxArea = sqrt(6.0f / (inputBufferCount + neuronCount));
-			//float maxArea = sqrt(3.0f / inputBufferCount);
-
-			// バイアス
-			this->lpBias[neuronNum] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
-
-			// ニューロン
 			lppNeuron[neuronNum].resize(inputBufferCount);
 			for(unsigned int inputNum=0; inputNum<lppNeuron[neuronNum].size(); inputNum++)
 			{
 				lppNeuron[neuronNum][inputNum] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
 			}
+		}
+		// バイアス
+		for(unsigned int neuronNum=0; neuronNum<lppNeuron.size(); neuronNum++)
+		{
+			this->lpBias[neuronNum] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;

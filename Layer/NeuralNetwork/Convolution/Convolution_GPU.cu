@@ -196,8 +196,8 @@ namespace NeuralNetwork {
 			filterDim = 1 + 1 + 3;	// 入力チャンネル + 出力チャンネル + 次元3
 
 			dimFilter.resize(filterDim);
-			dimFilter[0] = this->layerData.inputDataStruct.ch;
-			dimFilter[1] = this->layerData.GetOutputDataStruct().ch;
+			dimFilter[0] = this->layerData.GetOutputDataStruct().ch;
+			dimFilter[1] = this->layerData.inputDataStruct.ch;
 			dimFilter[2] = this->layerData.layerStructure.FilterSize.z;
 			dimFilter[3] = this->layerData.layerStructure.FilterSize.y;
 			dimFilter[4] = this->layerData.layerStructure.FilterSize.x;
@@ -225,9 +225,9 @@ namespace NeuralNetwork {
 
 			dimInput.resize(dataDim);
 			dimInput[0] = this->batchSize;
-			dimInput[1] = this->layerData.inputDataStruct.y;
-			dimInput[2] = this->layerData.inputDataStruct.x;
-			dimInput[3] = this->layerData.inputDataStruct.ch;
+			dimInput[1] = this->layerData.inputDataStruct.ch;
+			dimInput[2] = this->layerData.inputDataStruct.y;
+			dimInput[3] = this->layerData.inputDataStruct.x;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2] * dimInput[3];
@@ -235,25 +235,25 @@ namespace NeuralNetwork {
 			dimInputStride[2] = dimInput[3];
 			dimInputStride[3] = 1;
 
-			dimBiasStride.resize(dataDim);
-			dimBiasStride[0] = dimBias[1] * dimBias[1] * dimBias[1];
-			dimBiasStride[1] = dimBias[2] * dimBias[2];
-			dimBiasStride[2] = dimBias[3];
-			dimBiasStride[3] = 1;
-
 			dimBias.resize(dataDim);
 			dimBias[0] = 1;
 			dimBias[1] = this->layerData.GetOutputDataStruct().ch;
 			dimBias[2] = 1;
 			dimBias[3] = 1;
 
+			dimBiasStride.resize(dataDim);
+			dimBiasStride[0] = dimBias[1] * dimBias[2] * dimBias[3];
+			dimBiasStride[1] = dimBias[2] * dimBias[3];
+			dimBiasStride[2] = dimBias[3];
+			dimBiasStride[3] = 1;
+
 			dimOutput.resize(dataDim);
 
 			filterDim = 1 + 1 + 2;	// 入力チャンネル + 出力チャンネル + 次元3
 
 			dimFilter.resize(filterDim);
-			dimFilter[0] = this->layerData.inputDataStruct.ch;
-			dimFilter[1] = this->layerData.GetOutputDataStruct().ch;
+			dimFilter[0] = this->layerData.GetOutputDataStruct().ch;
+			dimFilter[1] = this->layerData.inputDataStruct.ch;
 			dimFilter[2] = this->layerData.layerStructure.FilterSize.y;
 			dimFilter[3] = this->layerData.layerStructure.FilterSize.x;
 
@@ -277,8 +277,8 @@ namespace NeuralNetwork {
 
 			dimInput.resize(dataDim);
 			dimInput[0] = this->batchSize;
-			dimInput[1] = this->layerData.inputDataStruct.x;
-			dimInput[2] = this->layerData.inputDataStruct.ch;
+			dimInput[1] = this->layerData.inputDataStruct.ch;
+			dimInput[2] = this->layerData.inputDataStruct.x;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2];
@@ -291,7 +291,7 @@ namespace NeuralNetwork {
 			dimBias[2] = 1;
 
 			dimBiasStride.resize(dataDim);
-			dimBiasStride[0] = dimBias[1] * dimBias[1];
+			dimBiasStride[0] = dimBias[1] * dimBias[2];
 			dimBiasStride[1] = dimBias[2];
 			dimBiasStride[2] = 1;
 
@@ -300,8 +300,8 @@ namespace NeuralNetwork {
 			filterDim = 1 + 1 + 1;	// 入力チャンネル + 出力チャンネル + 次元3
 
 			dimFilter.resize(filterDim);
-			dimFilter[0] = this->layerData.inputDataStruct.ch;
-			dimFilter[1] = this->layerData.GetOutputDataStruct().ch;
+			dimFilter[0] = this->layerData.GetOutputDataStruct().ch;
+			dimFilter[1] = this->layerData.inputDataStruct.ch;
 			dimFilter[2] = this->layerData.layerStructure.FilterSize.x;
 
 			convDim = 1;	// 次元3
@@ -347,7 +347,7 @@ namespace NeuralNetwork {
 			&dimPadding[0],
 			&dimStride[0],
 			&dimUpscale[0],
-			CUDNN_CONVOLUTION,
+			CUDNN_CROSS_CORRELATION,
 			CUDNN_DATA_FLOAT);
 		if(err_cudnn != 0)
 			return ErrorCode::ERROR_CODE_CUDA_INITIALIZE;
@@ -376,7 +376,7 @@ namespace NeuralNetwork {
 		{
 			outputVector.z = 1;
 			outputVector.y = dimOutput[2];
-			outputVector.z = dimOutput[3];
+			outputVector.x = dimOutput[3];
 		}
 		else if(dataDim == 3)
 		{
@@ -649,7 +649,7 @@ namespace NeuralNetwork {
 				&beta,
 				this->inputTensorDesc,
 				thrust::raw_pointer_cast(&this->lpDInputBuffer[0]));
-			if(err_cudnn == 0)
+			if(err_cudnn != 0)
 				return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
 		}
 
@@ -672,7 +672,7 @@ namespace NeuralNetwork {
 				&beta,
 				this->filterDesc,
 				thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]));
-			if(err_cudnn == 0)
+			if(err_cudnn != 0)
 				return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
 		}
 
@@ -689,7 +689,7 @@ namespace NeuralNetwork {
 				&beta,
 				this->biasTensorDesc,
 				thrust::raw_pointer_cast(&this->layerData.lpBias_d[0]));
-			if(err_cudnn == 0)
+			if(err_cudnn != 0)
 				return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
 		}
 

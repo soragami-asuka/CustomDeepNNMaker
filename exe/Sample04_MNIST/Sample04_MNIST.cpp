@@ -245,8 +245,20 @@ Gravisbell::ErrorCode LoadSampleData_image(
 	// データ構造を作成する
 	Gravisbell::IODataStruct dataStruct(1, pDataFormat->GetVariableValue(L"columns"), pDataFormat->GetVariableValue(L"rows"), 1);
 
+
+#if USE_GPU
+#if USE_HOST_MEMORY
+	*o_ppDataLayerTeach = Gravisbell::Layer::IOData::CreateIODataLayerGPU_host(dataStruct);
+	*o_ppDataLayerTest  = Gravisbell::Layer::IOData::CreateIODataLayerGPU_host(dataStruct);
+#else
+	*o_ppDataLayerTeach = Gravisbell::Layer::IOData::CreateIODataLayerGPU_device(dataStruct);
+	*o_ppDataLayerTest  = Gravisbell::Layer::IOData::CreateIODataLayerGPU_device(dataStruct);
+#endif
+#else
 	*o_ppDataLayerTeach = Gravisbell::Layer::IOData::CreateIODataLayerCPU(dataStruct);
 	*o_ppDataLayerTest  = Gravisbell::Layer::IOData::CreateIODataLayerCPU(dataStruct);
+#endif
+
 
 	std::vector<F32> lpTmpBuf(dataStruct.GetDataCount());
 
@@ -317,8 +329,20 @@ Gravisbell::ErrorCode LoadSampleData_label(
 	// データ構造を作成する
 	Gravisbell::IODataStruct dataStruct(10, 1, 1, 1);
 
+
+#if USE_GPU
+#if USE_HOST_MEMORY
+	*o_ppDataLayerTeach = Gravisbell::Layer::IOData::CreateIODataLayerGPU_host(dataStruct);
+	*o_ppDataLayerTest  = Gravisbell::Layer::IOData::CreateIODataLayerGPU_host(dataStruct);
+#else
+	*o_ppDataLayerTeach = Gravisbell::Layer::IOData::CreateIODataLayerGPU_device(dataStruct);
+	*o_ppDataLayerTest  = Gravisbell::Layer::IOData::CreateIODataLayerGPU_device(dataStruct);
+#endif
+#else
 	*o_ppDataLayerTeach = Gravisbell::Layer::IOData::CreateIODataLayerCPU(dataStruct);
 	*o_ppDataLayerTest  = Gravisbell::Layer::IOData::CreateIODataLayerCPU(dataStruct);
+#endif
+
 
 	std::vector<F32> lpTmpBuf(dataStruct.ch);
 
@@ -397,16 +421,16 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::Neur
 			lppLayerData,
 			inputDataStruct, lastLayerGUID,
 			Gravisbell::Utility::NeuralNetworkLayer::CreateConvolutionLayer(layerDLLManager, inputDataStruct, Vector3D<S32>(4,4,1), 4, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
-		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
-			*pNeuralNetwork,
-			lppLayerData,
-			inputDataStruct, lastLayerGUID,
-			Gravisbell::Utility::NeuralNetworkLayer::CreatePoolingLayer(layerDLLManager, inputDataStruct, Vector3D<S32>(2,2,1)));
-		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
-			*pNeuralNetwork,
-			lppLayerData,
-			inputDataStruct, lastLayerGUID,
-			Gravisbell::Utility::NeuralNetworkLayer::CreateBatchNormalizationLayer(layerDLLManager, inputDataStruct));
+		//Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+		//	*pNeuralNetwork,
+		//	lppLayerData,
+		//	inputDataStruct, lastLayerGUID,
+		//	Gravisbell::Utility::NeuralNetworkLayer::CreatePoolingLayer(layerDLLManager, inputDataStruct, Vector3D<S32>(2,2,1)));
+		//Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+		//	*pNeuralNetwork,
+		//	lppLayerData,
+		//	inputDataStruct, lastLayerGUID,
+		//	Gravisbell::Utility::NeuralNetworkLayer::CreateBatchNormalizationLayer(layerDLLManager, inputDataStruct));
 		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lppLayerData,
@@ -419,16 +443,16 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::Neur
 			lppLayerData,
 			inputDataStruct, lastLayerGUID,
 			Gravisbell::Utility::NeuralNetworkLayer::CreateConvolutionLayer(layerDLLManager, inputDataStruct, Vector3D<S32>(4,4,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
-		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
-			*pNeuralNetwork,
-			lppLayerData,
-			inputDataStruct, lastLayerGUID,
-			Gravisbell::Utility::NeuralNetworkLayer::CreatePoolingLayer(layerDLLManager, inputDataStruct, Vector3D<S32>(2,2,1)));
-		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
-			*pNeuralNetwork,
-			lppLayerData,
-			inputDataStruct, lastLayerGUID,
-			Gravisbell::Utility::NeuralNetworkLayer::CreateBatchNormalizationLayer(layerDLLManager, inputDataStruct));
+		//Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+		//	*pNeuralNetwork,
+		//	lppLayerData,
+		//	inputDataStruct, lastLayerGUID,
+		//	Gravisbell::Utility::NeuralNetworkLayer::CreatePoolingLayer(layerDLLManager, inputDataStruct, Vector3D<S32>(2,2,1)));
+		//Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+		//	*pNeuralNetwork,
+		//	lppLayerData,
+		//	inputDataStruct, lastLayerGUID,
+		//	Gravisbell::Utility::NeuralNetworkLayer::CreateBatchNormalizationLayer(layerDLLManager, inputDataStruct));
 		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lppLayerData,
@@ -527,7 +551,7 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 		// 学習
 		{
 			// 学習ループ先頭処理
-			pBatchDataNoListGenerator->PreProcessLearnLoop();
+//			pBatchDataNoListGenerator->PreProcessLearnLoop();
 			pTeachInputLayer->PreProcessLearnLoop(*pLearnSetting);
 			pTeachOutputLayer->PreProcessLearnLoop(*pLearnSetting);
 			pNeuralNetworkLearn->PreProcessLearnLoop(*pLearnSetting);

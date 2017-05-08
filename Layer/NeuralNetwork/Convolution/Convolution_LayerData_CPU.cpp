@@ -36,6 +36,9 @@ namespace NeuralNetwork {
 		@return	成功した場合0 */
 	ErrorCode Convolution_LayerData_CPU::Initialize(void)
 	{
+		// 乱数固定化
+		Utility::Random::Initialize(0);
+
 		// 入力バッファ数を確認
 		U32 inputBufferCount = this->inputDataStruct.ch * this->layerStructure.FilterSize.z * this->layerStructure.FilterSize.y * this->layerStructure.FilterSize.x;
 		if(inputBufferCount == 0)
@@ -45,7 +48,7 @@ namespace NeuralNetwork {
 		U32 neuronCount = this->layerStructure.Output_Channel;
 		if(neuronCount == 0)
 			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_VALUERANGE;
-		
+
 		// 畳みこみ回数を計算
 		this->convolutionCount.x = (S32)ceilf((F32)((this->inputDataStruct.x + this->layerStructure.Padding.x*2 - (this->layerStructure.FilterSize.x - 1)) / this->layerStructure.Stride.x));
 		this->convolutionCount.y = (S32)ceilf((F32)((this->inputDataStruct.y + this->layerStructure.Padding.y*2 - (this->layerStructure.FilterSize.y - 1)) / this->layerStructure.Stride.y));
@@ -56,24 +59,23 @@ namespace NeuralNetwork {
 		this->convolutionStart.y = -(S32)ceilf((F32)(this->layerStructure.Padding.y / this->layerStructure.Stride.y));
 		this->convolutionStart.z = -(S32)ceilf((F32)(this->layerStructure.Padding.z / this->layerStructure.Stride.z));
 
-
 		// バッファを確保しつつ、初期値を設定
+		float maxArea = sqrt(6.0f / (inputBufferCount + neuronCount));
 		this->lppNeuron.resize(neuronCount);
 		this->lpBias.resize(neuronCount);
+		// ニューロン
 		for(unsigned int neuronNum=0; neuronNum<lppNeuron.size(); neuronNum++)
 		{
-			float maxArea = sqrt(6.0f / (inputBufferCount + neuronCount));
-			//float maxArea = sqrt(3.0f / inputBufferCount);
-
-			// バイアス
-			this->lpBias[neuronNum] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
-
-			// ニューロン
 			lppNeuron[neuronNum].resize(inputBufferCount);
 			for(unsigned int inputNum=0; inputNum<lppNeuron[neuronNum].size(); inputNum++)
 			{
 				lppNeuron[neuronNum][inputNum] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
 			}
+		}
+		// バイアス
+		for(unsigned int neuronNum=0; neuronNum<lppNeuron.size(); neuronNum++)
+		{
+			this->lpBias[neuronNum] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
