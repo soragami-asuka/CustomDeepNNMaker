@@ -30,7 +30,7 @@
 #include"Utility/NeuralNetworkLayer/NeuralNetworkLayer.h"
 
 
-#define USE_GPU	0
+#define USE_GPU	1
 #define USE_HOST_MEMORY 1
 
 
@@ -362,7 +362,7 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(
 		*pNeuralNetwork,
 		lppLayerData,
 		inputDataStruct, lastLayerGUID,
-		Gravisbell::Utility::NeuralNetworkLayer::CreateFullyConnectLayer(layerDLLManager, inputDataStruct, 128));
+		Gravisbell::Utility::NeuralNetworkLayer::CreateFullyConnectLayer(layerDLLManager, inputDataStruct, 256));
 	Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
 		*pNeuralNetwork,
 		lppLayerData,
@@ -379,7 +379,7 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(
 		*pNeuralNetwork,
 		lppLayerData,
 		inputDataStruct, lastLayerGUID,
-		Gravisbell::Utility::NeuralNetworkLayer::CreateFullyConnectLayer(layerDLLManager, inputDataStruct, 128));
+		Gravisbell::Utility::NeuralNetworkLayer::CreateFullyConnectLayer(layerDLLManager, inputDataStruct, 256));
 	Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
 		*pNeuralNetwork,
 		lppLayerData,

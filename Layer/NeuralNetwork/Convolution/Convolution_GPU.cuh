@@ -1,11 +1,21 @@
 //======================================
 // 畳み込みニューラルネットワークの結合処理レイヤー
-// CPU処理用
+// GPU処理用
 //======================================
-#ifndef __CONVOLUTION_CPU_H__
-#define __CONVOLUTION_CPU_H__
+#ifndef __CONVOLUTION_GPU_H__
+#define __CONVOLUTION_GPU_H__
 
-#include"stdafx.h"
+#pragma warning(push)
+#pragma warning(disable : 4267)
+#pragma warning(disable : 4819)
+#include <cuda.h>
+#include <cudnn.h>
+#include <cublas_v2.h>
+#include <thrust/device_vector.h>
+#include <thrust/host_vector.h>
+#include "device_launch_parameters.h"
+#pragma warning(pop)
+
 
 #include"Convolution_DATA.hpp"
 #include"Convolution_FUNC.hpp"
@@ -15,21 +25,18 @@ namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-class Convolution_CPU : public Convolution_Base
+class Convolution_GPU : public Convolution_Base
 {
 private:
 	// データ本体
-	class Convolution_LayerData_CPU& layerData;
+	class Convolution_LayerData_GPU& layerData;
 
 	// 入出力バッファ
-	std::vector<F32>			lpOutputBuffer;		/**< 出力バッファ <バッチ数><畳み込み数> */
-	std::vector<F32>			lpDInputBuffer;		/**< 入力誤差差分 <バッチ数><入力信号数> */
+	thrust::device_vector<F32>			lpOutputBuffer;		/**< 出力バッファ <バッチ数><畳み込み数> */
+	thrust::device_vector<F32>			lpDInputBuffer;		/**< 入力誤差差分 <バッチ数><入力信号数> */
 
-	std::vector<F32*>						lppBatchOutputBuffer;		/**< バッチ処理用出力バッファ <バッチ数> */
-	std::vector<F32*>						lppBatchDInputBuffer;		/**< バッチ処理用入力誤差差分 <バッチ数> */
-
-	std::vector<std::vector<F32>>			lppDNeuron;	/**< ニューロンの学習量 */
-	std::vector<F32>						lpDBias;	/**< バイアスの学習量 */
+	thrust::device_vector<F32>			lppDNeuron;	/**< ニューロンの学習量<ニューロン数><入力信号数> */
+	thrust::device_vector<F32>			lpDBias;	/**< バイアスの学習量<ニューロン数> */
 
 	// Get関数を使うと処理不可がかさむので一時保存用. PreCalculateで値を格納.
 	U32 filterSize;						/**< フィルタサイズ */
@@ -37,21 +44,30 @@ private:
 	U32 neuronCount;					/**< ニューロン数 */
 	U32 outputBufferCount;				/**< 出力バッファ数 */
 
-	IODataStruct paddingInputDataStruct;	/**< パディング後の入力バッファの入力データ構造 */
-	std::vector<std::vector<F32>> lpPaddingInputBuffer;	/**< パディング後の入力バッファ <バッチ数><入力バッファ> */
-
 	// 演算時の入力データ
-	std::vector<CONST_BATCH_BUFFER_POINTER> m_lppInputBuffer;		/**< 演算時の入力データ */
-	std::vector<CONST_BATCH_BUFFER_POINTER> m_lppDOutputBuffer;		/**< 入力誤差計算時の出力誤差データ */
+	CONST_BATCH_BUFFER_POINTER				m_lppInputBuffer_d;			/**< 演算時の入力データ */
+	CONST_BATCH_BUFFER_POINTER				m_lppDOutputBuffer_d;		/**< 入力誤差計算時の出力誤差データ */
 
 	// 演算処理用のバッファ
+	cudnnHandle_t cudnnHandle;
+
+	// CUDNN用データ構造定義
+	cudnnTensorDescriptor_t			inputTensorDesc;			/**< 入力データ構造 */
+	cudnnTensorDescriptor_t			outputTensorDesc;			/**< 出力データ構造 */
+	cudnnTensorDescriptor_t			biasTensorDesc;				/**< バイアスデータ構造 */
+	cudnnFilterDescriptor_t			filterDesc;					/**< フィルター構造 */
+	cudnnConvolutionDescriptor_t	convDesc;					/**< 畳み込み設定 */
+	cudnnConvolutionFwdAlgo_t		useForwardAlgorithm;		/**< 前方伝播時に使用するアルゴリズム番号 */
+	cudnnConvolutionBwdDataAlgo_t	useBackwardDataAlgorithm;	/**< 後方伝播時のデータ計算に使用するアルゴリズム番号 */
+	cudnnConvolutionBwdFilterAlgo_t	useBackwardFilterAlgorithm;	/**< 後方伝播時のフィルタ計算に使用するアルゴリズム番号 */
+	thrust::device_vector<BYTE>		workSpace;					/**< 処理用のメモリ.前方伝播、後方伝播全てで共用する. */
 
 
 public:
 	/** コンストラクタ */
-	Convolution_CPU(Gravisbell::GUID guid, class Convolution_LayerData_CPU& i_layerData);
+	Convolution_GPU(Gravisbell::GUID guid, class Convolution_LayerData_GPU& i_layerData);
 	/** デストラクタ */
-	virtual ~Convolution_CPU();
+	virtual ~Convolution_GPU();
 
 
 public:

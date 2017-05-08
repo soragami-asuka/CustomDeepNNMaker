@@ -203,7 +203,10 @@
     <ClInclude Include="FeedforwardNeuralNetwork_CPU.h" />
     <ClInclude Include="FeedforwardNeuralNetwork_DATA.hpp" />
     <ClInclude Include="FeedforwardNeuralNetwork_FUNC.hpp" />
-    <ClInclude Include="FeedforwardNeuralNetwork_GPU.cuh" />
+    <ClInclude Include="FeedforwardNeuralNetwork_GPU.cuh">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="FeedforwardNeuralNetwork_LayerData_Base.h" />
     <ClInclude Include="LayerConnect.h" />
     <ClInclude Include="LayerConnectInput.h" />
@@ -252,8 +255,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="FeedforwardNeuralNetwork_GPU.cu" />
-    <CudaCompile Include="FeedforwardNeuralNetwork_LayerData_GPU.cu" />
+    <CudaCompile Include="FeedforwardNeuralNetwork_GPU.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="FeedforwardNeuralNetwork_LayerData_GPU.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CudaCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -25,14 +25,6 @@
       <Default>200</Default>
     </Int>
 
-    <Float id="DropOut">
-      <Name>ドロップアウト率</Name>
-      <Text>前レイヤーを無視する割合.&#x0A;1.0で前レイヤーの全出力を無視する</Text>
-      <Min>0.0</Min>
-      <Max>1.0</Max>
-      <Default>0.0</Default>
-    </Float>
-
   </Structure>
 
   <!--学習に使用するデータの構造-->

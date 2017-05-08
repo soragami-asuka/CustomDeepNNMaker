@@ -40,6 +40,11 @@ namespace Convolution {
 		  */
 		Vector3D<S32> Stride;
 
+		/** Name : 
+		  * ID   : UpScale
+		  */
+		Vector3D<S32> UpScale;
+
 		/** Name : パディングサイズ
 		  * ID   : Padding
 		  */
@@ -57,13 +62,6 @@ namespace Convolution {
 			PaddingType_zero,
 
 		}PaddingType;
-
-		/** Name : ドロップアウト率
-		  * ID   : DropOut
-		  * Text : 前レイヤーを無視する割合.
-		  *       : 1.0で前レイヤーの全出力を無視する
-		  */
-		F32 DropOut;
 
 	};
 

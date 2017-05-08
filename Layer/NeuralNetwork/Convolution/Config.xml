@@ -64,6 +64,25 @@
         <z>1</z>
       </Default>
     </Vector3D>
+
+    <Vector3D type="Int" id="UpScale">
+      <Min>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
+      </Min>
+      <Max>
+        <x>32</x>
+        <y>32</y>
+        <z>32</z>
+      </Max>
+      <Default>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
+      </Default>
+    </Vector3D>
+    
     <Vector3D type="Int" id="Padding">
       <Name>パディングサイズ</Name>
       <Min>
@@ -108,14 +127,6 @@
       </Items>
       <Default>zero</Default>
     </Enum>
-
-    <Float id="DropOut">
-      <Name>ドロップアウト率</Name>
-      <Text>前レイヤーを無視する割合.&#x0A;1.0で前レイヤーの全出力を無視する</Text>
-      <Min>0.0</Min>
-      <Max>1.0</Max>
-      <Default>0.0</Default>
-    </Float>
 
   </Structure>
 

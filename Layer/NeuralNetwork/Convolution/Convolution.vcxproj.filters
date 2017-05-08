@@ -186,4 +186,20 @@
   <ItemGroup>
     <Xml Include="Config.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Convolution_LayerData_GPU.cuh">
+      <Filter>LayerData</Filter>
+    </None>
+    <None Include="Convolution_GPU.cuh">
+      <Filter>Layer</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="Convolution_GPU.cu">
+      <Filter>Layer</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Convolution_LayerData_GPU.cu">
+      <Filter>LayerData</Filter>
+    </CudaCompile>
+  </ItemGroup>
 </Project>

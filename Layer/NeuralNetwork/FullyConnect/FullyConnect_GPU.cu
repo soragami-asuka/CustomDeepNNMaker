@@ -217,7 +217,7 @@ namespace NeuralNetwork {
 		{
 			// C = aAB + bC;
 
-			F32 alpha = (1.0f-this->layerData.layerStructure.DropOut);
+			F32 alpha = 1.0f;
 			F32 beta  = 1.0f;	// バイアスがCにコピー済みなのでそのまま利用するために1.0を指定
 
 			cublasSgemm(
