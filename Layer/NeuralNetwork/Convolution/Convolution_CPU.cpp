@@ -216,39 +216,91 @@ namespace NeuralNetwork {
 			this->m_lppInputBuffer[batchNum] = &i_lpInputBuffer[batchNum * this->inputBufferCount];
 
 
-		// パディング後の入力バッファにデータを移す
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
-		{
-			for(U32 chNum=0; chNum<this->layerData.inputDataStruct.ch; chNum++)
-			{
-				for(U32 paddingZ=0; paddingZ<this->paddingInputDataStruct.z; paddingZ++)
-				{
-					S32 inputZ = paddingZ - this->layerData.layerStructure.Padding.z;
-					if((U32)inputZ>=this->layerData.inputDataStruct.z)
-						continue;
+		//// パディング後の入力バッファにデータを移す
+		//for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		//{
+		//	for(U32 chNum=0; chNum<this->layerData.inputDataStruct.ch; chNum++)
+		//	{
+		//		for(U32 paddingZ=0; paddingZ<this->paddingInputDataStruct.z; paddingZ++)
+		//		{
+		//			S32 inputZ = paddingZ - this->layerData.layerStructure.Padding.z;
+		//			if((U32)inputZ>=this->layerData.inputDataStruct.z)
+		//				continue;
 
-					for(U32 paddingY=0; paddingY<this->paddingInputDataStruct.y; paddingY++)
-					{
-						S32 inputY = paddingY - this->layerData.layerStructure.Padding.y;
-						if((U32)inputY>=this->layerData.inputDataStruct.y)
-							continue;
+		//			for(U32 paddingY=0; paddingY<this->paddingInputDataStruct.y; paddingY++)
+		//			{
+		//				S32 inputY = paddingY - this->layerData.layerStructure.Padding.y;
+		//				if((U32)inputY>=this->layerData.inputDataStruct.y)
+		//					continue;
 
-						for(U32 paddingX=0; paddingX<this->paddingInputDataStruct.x; paddingX++)
-						{
-							S32 inputX = paddingX - this->layerData.layerStructure.Padding.x;
-							if((U32)inputX>=this->layerData.inputDataStruct.x)
-								continue;
+		//				for(U32 paddingX=0; paddingX<this->paddingInputDataStruct.x; paddingX++)
+		//				{
+		//					S32 inputX = paddingX - this->layerData.layerStructure.Padding.x;
+		//					if((U32)inputX>=this->layerData.inputDataStruct.x)
+		//						continue;
 
-							S32 paddingOffset = POSITION_TO_OFFSET_STRUCT(paddingX, paddingY, paddingZ, chNum, this->paddingInputDataStruct);
-							S32 inputOffset   = POSITION_TO_OFFSET_STRUCT(inputX, inputY, inputZ, chNum, this->layerData.inputDataStruct);
+		//					S32 paddingOffset = POSITION_TO_OFFSET_STRUCT(paddingX, paddingY, paddingZ, chNum, this->paddingInputDataStruct);
+		//					S32 inputOffset   = POSITION_TO_OFFSET_STRUCT(inputX, inputY, inputZ, chNum, this->layerData.inputDataStruct);
 
-							this->lpPaddingInputBuffer[batchNum][paddingOffset] = this->m_lppInputBuffer[batchNum][inputOffset];
-						}
-					}
-				}
-			}
-		}
+		//					this->lpPaddingInputBuffer[batchNum][paddingOffset] = this->m_lppInputBuffer[batchNum][inputOffset];
+		//				}
+		//			}
+		//		}
+		//	}
+		//}
 
+		//// 畳みこみ結合処理
+		//for(unsigned int batchNum=0; batchNum<this->batchSize; batchNum++)
+		//{
+		//	for(U32 neuronNum=0; neuronNum<(U32)this->layerData.layerStructure.Output_Channel; neuronNum++)
+		//	{
+		//		for(S32 convZ=0; convZ<this->layerData.convolutionCount.z; convZ++)
+		//		{
+		//			for(S32 convY=0; convY<this->layerData.convolutionCount.y; convY++)
+		//			{
+		//				for(S32 convX=0; convX<this->layerData.convolutionCount.x; convX++)
+		//				{
+		//					U32 outputOffset = POSITION_TO_OFFSET_VECTOR(convX,convY,convZ,neuronNum, this->layerData.convolutionCount, this->layerData.layerStructure.Output_Channel);
+
+		//					// 一時保存用のバッファを作成
+		//					F32 tmp = 0.0f;
+
+		//					// フィルタを処理する
+		//					for(U32 chNum=0; chNum<this->layerData.inputDataStruct.ch; chNum++)
+		//					{
+		//						for(S32 filterZ=0; filterZ<this->layerData.layerStructure.FilterSize.z; filterZ++)
+		//						{
+		//							const S32 inputZ = (S32)(convZ * this->layerData.layerStructure.Stride.z + filterZ);
+
+		//							for(S32 filterY=0; filterY<this->layerData.layerStructure.FilterSize.y; filterY++)
+		//							{
+		//								const S32 inputY = (S32)(convY * this->layerData.layerStructure.Stride.y + filterY);
+
+		//								for(S32 filterX=0; filterX<this->layerData.layerStructure.FilterSize.x; filterX++)
+		//								{
+		//									const S32 inputX = (S32)(convX * this->layerData.layerStructure.Stride.x + filterX);
+
+		//									const S32 inputOffset  = POSITION_TO_OFFSET_STRUCT(inputX,inputY,inputZ, chNum, this->paddingInputDataStruct);
+		//									const S32 filterOffset = POSITION_TO_OFFSET_VECTOR(filterX, filterY, filterZ, chNum, this->layerData.layerStructure.FilterSize, this->layerData.inputDataStruct.ch);
+
+		//									tmp += this->layerData.lppNeuron[neuronNum][filterOffset] * this->lpPaddingInputBuffer[batchNum][inputOffset];
+		//								}
+		//							}
+		//						}
+		//					}
+		//					// バイアスを追加
+		//					tmp += this->layerData.lpBias[neuronNum];
+
+		//					// 計算結果を格納する
+		//					this->lppBatchOutputBuffer[batchNum][outputOffset] = tmp;
+
+		//				}
+		//			}
+		//		}
+		//	}
+		//}
+
+		
 		// 畳みこみ結合処理
 		for(unsigned int batchNum=0; batchNum<this->batchSize; batchNum++)
 		{
@@ -270,20 +322,26 @@ namespace NeuralNetwork {
 							{
 								for(S32 filterZ=0; filterZ<this->layerData.layerStructure.FilterSize.z; filterZ++)
 								{
-									const S32 inputZ = (S32)(convZ * this->layerData.layerStructure.Stride.z + filterZ);
+									const S32 inputZ = (S32)(convZ * this->layerData.layerStructure.Stride.z + filterZ - this->layerData.layerStructure.Padding.z);
+									if((U32)inputZ >= this->layerData.inputDataStruct.z)
+										continue;
 
 									for(S32 filterY=0; filterY<this->layerData.layerStructure.FilterSize.y; filterY++)
 									{
-										const S32 inputY = (S32)(convY * this->layerData.layerStructure.Stride.y + filterY);
+										const S32 inputY = (S32)(convY * this->layerData.layerStructure.Stride.y + filterY - this->layerData.layerStructure.Padding.y);
+										if((U32)inputY >= this->layerData.inputDataStruct.y)
+											continue;
 
 										for(S32 filterX=0; filterX<this->layerData.layerStructure.FilterSize.x; filterX++)
 										{
-											const S32 inputX = (S32)(convX * this->layerData.layerStructure.Stride.x + filterX);
+											const S32 inputX = (S32)(convX * this->layerData.layerStructure.Stride.x + filterX - this->layerData.layerStructure.Padding.x);
+											if((U32)inputX >= this->layerData.inputDataStruct.x)
+												continue;
 
-											const S32 inputOffset  = POSITION_TO_OFFSET_STRUCT(inputX,inputY,inputZ, chNum, this->paddingInputDataStruct);
+											const S32 inputOffset  = POSITION_TO_OFFSET_STRUCT(inputX,inputY,inputZ, chNum, this->layerData.inputDataStruct);
 											const S32 filterOffset = POSITION_TO_OFFSET_VECTOR(filterX, filterY, filterZ, chNum, this->layerData.layerStructure.FilterSize, this->layerData.inputDataStruct.ch);
 
-											tmp += this->layerData.lppNeuron[neuronNum][filterOffset] * this->lpPaddingInputBuffer[batchNum][inputOffset];
+											tmp += this->layerData.lppNeuron[neuronNum][filterOffset] * this->m_lppInputBuffer[batchNum][inputOffset];
 										}
 									}
 								}
@@ -299,6 +357,7 @@ namespace NeuralNetwork {
 				}
 			}
 		}
+
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

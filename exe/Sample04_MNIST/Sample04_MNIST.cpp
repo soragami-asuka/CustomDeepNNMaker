@@ -421,11 +421,11 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::Neur
 			lppLayerData,
 			inputDataStruct, lastLayerGUID,
 			Gravisbell::Utility::NeuralNetworkLayer::CreateConvolutionLayer(layerDLLManager, inputDataStruct, Vector3D<S32>(4,4,1), 4, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
-		//Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
-		//	*pNeuralNetwork,
-		//	lppLayerData,
-		//	inputDataStruct, lastLayerGUID,
-		//	Gravisbell::Utility::NeuralNetworkLayer::CreatePoolingLayer(layerDLLManager, inputDataStruct, Vector3D<S32>(2,2,1)));
+		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lppLayerData,
+			inputDataStruct, lastLayerGUID,
+			Gravisbell::Utility::NeuralNetworkLayer::CreatePoolingLayer(layerDLLManager, inputDataStruct, Vector3D<S32>(3,3,1), Vector3D<S32>(2,2,1)));
 		//Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
 		//	*pNeuralNetwork,
 		//	lppLayerData,
@@ -443,11 +443,11 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::Neur
 			lppLayerData,
 			inputDataStruct, lastLayerGUID,
 			Gravisbell::Utility::NeuralNetworkLayer::CreateConvolutionLayer(layerDLLManager, inputDataStruct, Vector3D<S32>(4,4,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
-		//Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
-		//	*pNeuralNetwork,
-		//	lppLayerData,
-		//	inputDataStruct, lastLayerGUID,
-		//	Gravisbell::Utility::NeuralNetworkLayer::CreatePoolingLayer(layerDLLManager, inputDataStruct, Vector3D<S32>(2,2,1)));
+		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lppLayerData,
+			inputDataStruct, lastLayerGUID,
+			Gravisbell::Utility::NeuralNetworkLayer::CreatePoolingLayer(layerDLLManager, inputDataStruct, Vector3D<S32>(3,3,1), Vector3D<S32>(2,2,1)));
 		//Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
 		//	*pNeuralNetwork,
 		//	lppLayerData,

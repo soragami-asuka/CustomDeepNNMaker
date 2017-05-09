@@ -207,7 +207,7 @@ Layer::NeuralNetwork::INNLayerData* CreateDropoutLayer(const Layer::NeuralNetwor
 
 	return pLayer;
 }
-Layer::NeuralNetwork::INNLayerData* CreatePoolingLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, Vector3D<S32> filterSize)
+Layer::NeuralNetwork::INNLayerData* CreatePoolingLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, Vector3D<S32> filterSize, Vector3D<S32> stride)
 {
 	// DLL取得
 	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(Gravisbell::GUID(0xeb80e0d0, 0x9d5a, 0x4ed1, 0xa8, 0x0d, 0xa1, 0x66, 0x7d, 0xe0, 0xc8, 0x90));
@@ -222,6 +222,11 @@ Layer::NeuralNetwork::INNLayerData* CreatePoolingLayer(const Layer::NeuralNetwor
 	{
 		SettingData::Standard::IItem_Vector3D_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Vector3D_Int*>(pConfig->GetItemByID(L"FilterSize"));
 		pItem->SetValue(filterSize);
+	}
+	// ストライド
+	{
+		SettingData::Standard::IItem_Vector3D_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Vector3D_Int*>(pConfig->GetItemByID(L"Stride"));
+		pItem->SetValue(stride);
 	}
 
 	// レイヤーの作成

@@ -53,6 +53,13 @@ namespace DefaultLanguage
             }
         },
         {
+            L"Stride",
+            {
+                L"フィルタ移動量",
+                L"畳みこみごとに移動するフィルタの移動量",
+            }
+        },
+        {
             L"PoolingType",
             {
                 L"Pooling種別",
@@ -174,6 +181,19 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			L"FilterSize",
 			CurrentLanguage::g_lpItemData_LayerStructure[L"FilterSize"].name.c_str(),
 			CurrentLanguage::g_lpItemData_LayerStructure[L"FilterSize"].text.c_str(),
+			1, 1, 1,
+			65535, 65535, 65535,
+			1, 1, 1));
+
+	/** Name : フィルタ移動量
+	  * ID   : Stride
+	  * Text : 畳みこみごとに移動するフィルタの移動量
+	  */
+	pLayerConfig->AddItem(
+		Gravisbell::SettingData::Standard::CreateItem_Vector3D_Int(
+			L"Stride",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"Stride"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"Stride"].text.c_str(),
 			1, 1, 1,
 			65535, 65535, 65535,
 			1, 1, 1));

@@ -1,5 +1,5 @@
 //======================================
-// 活性化関数レイヤーのデータ
+// プーリングレイヤーのデータ
 //======================================
 #include"stdafx.h"
 
@@ -59,9 +59,9 @@ namespace NeuralNetwork {
 	{
 		// 出力データ構造を決定する
 		this->outputDataStruct.ch =  this->inputDataStruct.ch;
-		this->outputDataStruct.z  = (this->inputDataStruct.z + this->layerStructure.FilterSize.z-1) / this->layerStructure.FilterSize.z;
-		this->outputDataStruct.y  = (this->inputDataStruct.y + this->layerStructure.FilterSize.y-1) / this->layerStructure.FilterSize.y;
-		this->outputDataStruct.x  = (this->inputDataStruct.x + this->layerStructure.FilterSize.x-1) / this->layerStructure.FilterSize.x;
+		this->outputDataStruct.z  = 1 + (this->inputDataStruct.z - this->layerStructure.FilterSize.z) / this->layerStructure.Stride.z;
+		this->outputDataStruct.y  = 1 + (this->inputDataStruct.y - this->layerStructure.FilterSize.y) / this->layerStructure.Stride.y;
+		this->outputDataStruct.x  = 1 + (this->inputDataStruct.x - this->layerStructure.FilterSize.x) / this->layerStructure.Stride.x;
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

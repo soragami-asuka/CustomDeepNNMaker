@@ -28,6 +28,12 @@ namespace Pooling {
 		  */
 		Vector3D<S32> FilterSize;
 
+		/** Name : フィルタ移動量
+		  * ID   : Stride
+		  * Text : 畳みこみごとに移動するフィルタの移動量
+		  */
+		Vector3D<S32> Stride;
+
 		/** Name : Pooling種別
 		  * ID   : PoolingType
 		  * Text : Poolingの方法設定

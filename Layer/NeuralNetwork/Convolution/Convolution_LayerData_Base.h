@@ -29,7 +29,6 @@ namespace NeuralNetwork {
 		Convolution::LayerStructure layerStructure;	/**< レイヤー構造 */
 
 		Vector3D<S32> convolutionCount;	/**< 畳みこみ回数.(最大移動量) */
-		Vector3D<S32> convolutionStart;	/**< 畳み込み開始位置 */
 
 		//===========================
 		// コンストラクタ / デストラクタ

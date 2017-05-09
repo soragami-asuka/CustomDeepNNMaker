@@ -1,8 +1,8 @@
 //======================================
 // プーリングレイヤーのデータ
 //======================================
-#ifndef __POOLING_LAYERDATA_CPU_H__
-#define __POOLING_LAYERDATA_CPU_H__
+#ifndef __POOLING_LAYERDATA_GPU_H__
+#define __POOLING_LAYERDATA_GPU_H__
 
 #include"Pooling_LayerData_Base.h"
 
@@ -11,9 +11,9 @@ namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-	class Pooling_LayerData_CPU : public Pooling_LayerData_Base
+	class Pooling_LayerData_GPU : public Pooling_LayerData_Base
 	{
-		friend class Pooling_CPU;
+		friend class Pooling_GPU;
 
 	private:
 
@@ -22,9 +22,9 @@ namespace NeuralNetwork {
 		//===========================
 	public:
 		/** コンストラクタ */
-		Pooling_LayerData_CPU(const Gravisbell::GUID& guid);
+		Pooling_LayerData_GPU(const Gravisbell::GUID& guid);
 		/** デストラクタ */
-		~Pooling_LayerData_CPU();
+		~Pooling_LayerData_GPU();
 
 
 		//===========================

@@ -141,6 +141,12 @@
     <ClInclude Include="Pooling_Base.h">
       <Filter>Layer</Filter>
     </ClInclude>
+    <ClInclude Include="Pooling_LayerData_GPU.cuh">
+      <Filter>LayerData</Filter>
+    </ClInclude>
+    <ClInclude Include="Pooling_GPU.cuh">
+      <Filter>Layer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -170,5 +176,13 @@
   </ItemGroup>
   <ItemGroup>
     <Xml Include="Config.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="Pooling_LayerData_GPU.cu">
+      <Filter>LayerData</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Pooling_GPU.cu">
+      <Filter>Layer</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

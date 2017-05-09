@@ -20,7 +20,6 @@ namespace NeuralNetwork {
 		std::vector<std::vector<NEURON_TYPE>>	lppNeuron;			/**< 各ニューロンの係数<ニューロン数, 入力数> */
 		std::vector<NEURON_TYPE>				lpBias;				/**< ニューロンのバイアス<ニューロン数> */
 
-
 		//===========================
 		// コンストラクタ / デストラクタ
 		//===========================

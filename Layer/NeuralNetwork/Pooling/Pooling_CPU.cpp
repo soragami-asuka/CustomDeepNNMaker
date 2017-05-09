@@ -183,19 +183,19 @@ namespace NeuralNetwork {
 							F32 maxValue = -FLT_MAX;
 							for(S32 filterZ=0; filterZ<this->layerData.layerStructure.FilterSize.z; filterZ++)
 							{
-								U32 inputZ = outputZ * this->layerData.layerStructure.FilterSize.z + filterZ;
+								U32 inputZ = outputZ * this->layerData.layerStructure.Stride.z + filterZ;
 								if(inputZ >= this->layerData.inputDataStruct.z)
 									continue;
 
 								for(S32 filterY=0; filterY<this->layerData.layerStructure.FilterSize.y; filterY++)
 								{
-									U32 inputY = outputY * this->layerData.layerStructure.FilterSize.y + filterY;
+									U32 inputY = outputY * this->layerData.layerStructure.Stride.y + filterY;
 									if(inputY >= this->layerData.inputDataStruct.y)
 										continue;
 
 									for(S32 filterX=0; filterX<this->layerData.layerStructure.FilterSize.x; filterX++)
 									{
-										U32 inputX = outputX * this->layerData.layerStructure.FilterSize.x + filterX;
+										U32 inputX = outputX * this->layerData.layerStructure.Stride.x + filterX;
 										if(inputX >= this->layerData.inputDataStruct.x)
 											continue;
 
@@ -265,7 +265,6 @@ namespace NeuralNetwork {
 
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 		{
-			
 			for(U32 ch=0; ch<this->layerData.outputDataStruct.ch; ch++)
 			{
 				for(U32 outputZ=0; outputZ<this->layerData.outputDataStruct.z; outputZ++)
@@ -279,19 +278,19 @@ namespace NeuralNetwork {
 							// ç≈ëÂílÇí≤Ç◊ÇÈ
 							for(S32 filterZ=0; filterZ<this->layerData.layerStructure.FilterSize.z; filterZ++)
 							{
-								U32 inputZ = outputZ * this->layerData.layerStructure.FilterSize.z + filterZ;
+								U32 inputZ = outputZ * this->layerData.layerStructure.Stride.z + filterZ;
 								if(inputZ >= this->layerData.inputDataStruct.z)
 									continue;
 
 								for(S32 filterY=0; filterY<this->layerData.layerStructure.FilterSize.y; filterY++)
 								{
-									U32 inputY = outputY * this->layerData.layerStructure.FilterSize.y + filterY;
+									U32 inputY = outputY * this->layerData.layerStructure.Stride.y + filterY;
 									if(inputY >= this->layerData.inputDataStruct.y)
 										continue;
 
 									for(S32 filterX=0; filterX<this->layerData.layerStructure.FilterSize.x; filterX++)
 									{
-										U32 inputX = outputX * this->layerData.layerStructure.FilterSize.x + filterX;
+										U32 inputX = outputX * this->layerData.layerStructure.Stride.x + filterX;
 										if(inputX >= this->layerData.inputDataStruct.x)
 											continue;
 
@@ -303,7 +302,7 @@ namespace NeuralNetwork {
 																this->layerData.inputDataStruct);
 
 										if(this->m_lppInputBuffer[batchNum][inputOffset] == this->lppBatchOutputBuffer[batchNum][outputOffset])
-											this->lppBatchDInputBuffer[batchNum][inputOffset] = this->m_lppDOutputBufferPrev[batchNum][outputOffset];
+											this->lppBatchDInputBuffer[batchNum][inputOffset] += this->m_lppDOutputBufferPrev[batchNum][outputOffset];
 									}
 								}
 							}

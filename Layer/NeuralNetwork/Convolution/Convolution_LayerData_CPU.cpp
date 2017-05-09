@@ -54,11 +54,6 @@ namespace NeuralNetwork {
 		this->convolutionCount.y = (S32)ceilf((F32)((this->inputDataStruct.y + this->layerStructure.Padding.y*2 - (this->layerStructure.FilterSize.y - 1)) / this->layerStructure.Stride.y));
 		this->convolutionCount.z = (S32)ceilf((F32)((this->inputDataStruct.z + this->layerStructure.Padding.z*2 - (this->layerStructure.FilterSize.z - 1)) / this->layerStructure.Stride.z));
 
-		// 畳み込み開始位置を計算
-		this->convolutionStart.x = -(S32)ceilf((F32)(this->layerStructure.Padding.x / this->layerStructure.Stride.x));
-		this->convolutionStart.y = -(S32)ceilf((F32)(this->layerStructure.Padding.y / this->layerStructure.Stride.y));
-		this->convolutionStart.z = -(S32)ceilf((F32)(this->layerStructure.Padding.z / this->layerStructure.Stride.z));
-
 		// バッファを確保しつつ、初期値を設定
 		float maxArea = sqrt(6.0f / (inputBufferCount + neuronCount));
 		this->lppNeuron.resize(neuronCount);
