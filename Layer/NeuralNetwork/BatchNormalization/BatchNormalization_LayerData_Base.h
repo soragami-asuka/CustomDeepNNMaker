@@ -1,5 +1,5 @@
 //======================================
-// 活性関数のレイヤーデータ
+// バッチ正規化のレイヤーデータ
 //======================================
 #ifndef __BatchNormalization_DATA_BASE_H__
 #define __BatchNormalization_DATA_BASE_H__

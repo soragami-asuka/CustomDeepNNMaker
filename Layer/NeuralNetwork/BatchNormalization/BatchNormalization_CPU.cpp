@@ -1,6 +1,5 @@
 //======================================
-// フィードフォワードニューラルネットワークの統合処理レイヤー
-// 結合、活性化
+// バッチ正規化レイヤー
 // CPU処理用
 //======================================
 #include"stdafx.h"
@@ -240,7 +239,7 @@ namespace NeuralNetwork {
 		for(U32 ch=0; ch<this->layerData.inputDataStruct.ch; ch++)
 		{
 			F32 mean = this->lpTmpMean[ch];
-			F32 variance = this->lpTmpVariance[ch] + this->layerData.layerStructure.epsilon;
+			F32 variance = this->lpTmpVariance[ch] + max(this->layerData.layerStructure.epsilon, 1e-5);
 			F32 sqrtVariance = (F32)sqrt(variance);
 
 			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
@@ -304,7 +303,7 @@ namespace NeuralNetwork {
 		for(U32 ch=0; ch<this->layerData.inputDataStruct.ch; ch++)
 		{
 			F32 mean = this->lpTmpMean[ch];
-			F32 variance = this->lpTmpVariance[ch] + this->layerData.layerStructure.epsilon;
+			F32 variance = this->lpTmpVariance[ch] + max(this->layerData.layerStructure.epsilon, 1e-5);
 			F32 sqrtVariance  = (F32)sqrt(variance);
 			F32 sqrtVariance3 = sqrtVariance*sqrtVariance*sqrtVariance;
 			F32 scale = this->layerData.lpScale[ch];
@@ -353,14 +352,14 @@ namespace NeuralNetwork {
 	ErrorCode BatchNormalization_CPU::ReflectionLearnError(void)
 	{
 		// 学習処理の実行回数をカウントアップ
-//		F32 factor = 1.0f / (this->learnCount+1);
-		F32 factor = 0.5f;
+		F64 factor = 1.0 / (this->learnCount+1);
+//		F32 factor = 0.5f;
 		this->learnCount++;
 
 		for(U32 ch=0; ch<this->layerData.inputDataStruct.ch; ch++)
 		{
 			F32 mean = this->lpTmpMean[ch];
-			F32 variance = this->lpTmpVariance[ch] + this->layerData.layerStructure.epsilon;
+			F32 variance = this->lpTmpVariance[ch] + max(this->layerData.layerStructure.epsilon, 1e-5);
 			F32 sqrtVariance = (F32)sqrt(variance);
 
 			F32 dBias = 0.0f;
@@ -385,8 +384,8 @@ namespace NeuralNetwork {
 			this->layerData.lpBias[ch]  += this->learnData.LearnCoeff * dBias;
 
 			// 平均と分散を更新
-			this->layerData.lpMean[ch]     = (1.0f - factor) * this->layerData.lpMean[ch]     + factor * this->lpTmpMean[ch];
-			this->layerData.lpVariance[ch] = (1.0f - factor) * this->layerData.lpVariance[ch] + factor * this->lpTmpVariance[ch];
+			this->layerData.lpMean[ch]     = (F32)((1.0 - factor) * this->layerData.lpMean[ch]     + factor * this->lpTmpMean[ch]);
+			this->layerData.lpVariance[ch] = (F32)((1.0 - factor) * this->layerData.lpVariance[ch] + factor * this->lpTmpVariance[ch]);
 		}
 
 

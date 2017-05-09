@@ -1,10 +1,19 @@
 //======================================
-// 活性関レイヤー
+// バッチ正規化レイヤー
 //======================================
 #ifndef __BatchNormalization_BASE_H__
 #define __BatchNormalization_BASE_H__
 
-#include<Layer/NeuralNetwork/INNLayer.h>
+#pragma warning(push)
+#pragma warning(disable : 4267)
+#pragma warning(disable : 4819)
+#include <cuda.h>
+#include <cudnn.h>
+#include <cublas_v2.h>
+#include <thrust/device_vector.h>
+#include <thrust/host_vector.h>
+#include "device_launch_parameters.h"
+#pragma warning(pop)
 
 #include<vector>
 

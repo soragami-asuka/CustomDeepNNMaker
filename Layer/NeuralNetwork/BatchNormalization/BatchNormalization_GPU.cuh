@@ -1,9 +1,9 @@
 //======================================
-// プーリングレイヤー
+// 活性関数レイヤー
 // GPU処理用
 //======================================
-#ifndef __POOLING_GPU_H__
-#define __POOLING_GPU_H__
+#ifndef __BatchNormalization_GPU_H__
+#define __BatchNormalization_GPU_H__
 
 #pragma warning(push)
 #pragma warning(disable : 4267)
@@ -16,30 +16,36 @@
 #include "device_launch_parameters.h"
 #pragma warning(pop)
 
-#include"Pooling_DATA.hpp"
-#include"Pooling_FUNC.hpp"
-#include"Pooling_Base.h"
+#include"BatchNormalization_DATA.hpp"
+#include"BatchNormalization_FUNC.hpp"
+#include"BatchNormalization_Base.h"
 
-using namespace Gravisbell;
-using namespace Gravisbell::Layer::NeuralNetwork;
 
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-class Pooling_GPU : public Pooling_Base
+class BatchNormalization_GPU : public BatchNormalization_Base
 {
 private:
 	// データ本体
-	class Pooling_LayerData_GPU& layerData;
+	class BatchNormalization_LayerData_GPU& layerData;
+	BatchNormalization::LearnDataStructure learnData;
 
 	// 入出力バッファ
-	thrust::device_vector<F32>			lpOutputBuffer;		/**< 出力バッファ <バッチ数><出力信号数> */
+	thrust::device_vector<F32>			lpOutputBuffer;		/**< 出力バッファ <バッチ数><入力信号数> */
 	thrust::device_vector<F32>			lpDInputBuffer;		/**< 入力誤差差分 <バッチ数><入力信号数> */
 
 	// Get関数を使うと処理負荷がかさむので一時保存用. PreCalculateで値を格納.
 	U32 inputBufferCount;				/**< 入力バッファ数 */
 	U32 outputBufferCount;				/**< 出力バッファ数 */
+	U32 channeclBufferCount;				/**< 1チャンネル当たりのバッファ数 */
+
+	// 学習用のデータ
+	bool onLearnMode;	/**< 学習処理中フラグ */
+	U32 learnCount;		/**< 学習実行回数 */
+	thrust::device_vector<F32> lpTmpMean;			/**< 平均値格納用の一時変数 */
+	thrust::device_vector<F32> lpTmpVariance;		/**< 分散値格納用の一時変数 */
 
 	// 演算時の入力データ
 	CONST_BATCH_BUFFER_POINTER m_lppInputBuffer;		/**< 演算時の入力データ */
@@ -51,13 +57,13 @@ private:
 	// CUDNN用データ構造定義
 	cudnnTensorDescriptor_t			inputTensorDesc;			/**< 入力データ構造 */
 	cudnnTensorDescriptor_t			outputTensorDesc;			/**< 出力データ構造 */
-    cudnnPoolingDescriptor_t		poolingDesc;				/**< プーリング設定 */
+	cudnnTensorDescriptor_t			paramTensorDesc;			/**< スケール,バイアス,平均の各値のデータ構造 */
 
 public:
 	/** コンストラクタ */
-	Pooling_GPU(Gravisbell::GUID guid, class Pooling_LayerData_GPU& i_layerData);
+	BatchNormalization_GPU(Gravisbell::GUID guid, class BatchNormalization_LayerData_GPU& i_layerData);
 	/** デストラクタ */
-	virtual ~Pooling_GPU();
+	virtual ~BatchNormalization_GPU();
 
 public:
 	//================================
@@ -75,8 +81,8 @@ public:
 	// レイヤーデータ関連
 	//===========================
 	/** レイヤーデータを取得する */
-	Pooling_LayerData_Base& GetLayerData();
-	const Pooling_LayerData_Base& GetLayerData()const;
+	BatchNormalization_LayerData_Base& GetLayerData();
+	const BatchNormalization_LayerData_Base& GetLayerData()const;
 
 
 	//===========================

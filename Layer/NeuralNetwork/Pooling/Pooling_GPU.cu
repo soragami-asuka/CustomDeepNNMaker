@@ -147,10 +147,10 @@ namespace NeuralNetwork {
 
 			dimInput.resize(dataDim);
 			dimInput[0] = this->batchSize;
-			dimInput[1] = this->layerData.inputDataStruct.z;
-			dimInput[2] = this->layerData.inputDataStruct.y;
-			dimInput[3] = this->layerData.inputDataStruct.x;
-			dimInput[4] = this->layerData.inputDataStruct.ch;
+			dimInput[1] = this->layerData.inputDataStruct.ch;
+			dimInput[2] = this->layerData.inputDataStruct.z;
+			dimInput[3] = this->layerData.inputDataStruct.y;
+			dimInput[4] = this->layerData.inputDataStruct.x;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2] * dimInput[3] * dimInput[4];

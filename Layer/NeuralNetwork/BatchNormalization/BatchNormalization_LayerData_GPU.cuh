@@ -1,8 +1,19 @@
 //======================================
 // バッチ正規化のレイヤーデータ
 //======================================
-#ifndef __BatchNormalization_LAYERDATA_CPU_H__
-#define __BatchNormalization_LAYERDATA_CPU_H__
+#ifndef __BatchNormalization_LAYERDATA_GPU_H__
+#define __BatchNormalization_LAYERDATA_GPU_H__
+
+#pragma warning(push)
+#pragma warning(disable : 4267)
+#pragma warning(disable : 4819)
+#include <cuda.h>
+#include <cudnn.h>
+#include <cublas_v2.h>
+#include <thrust/device_vector.h>
+#include <thrust/host_vector.h>
+#include "device_launch_parameters.h"
+#pragma warning(pop)
 
 #include"BatchNormalization_LayerData_Base.h"
 
@@ -11,16 +22,16 @@ namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-	class BatchNormalization_LayerData_CPU : public BatchNormalization_LayerData_Base
+	class BatchNormalization_LayerData_GPU : public BatchNormalization_LayerData_Base
 	{
-		friend class BatchNormalization_CPU;
+		friend class BatchNormalization_GPU;
 
 	private:
-		std::vector<F32> lpMean;		/**< 各Chの平均 */
-		std::vector<F32> lpVariance;	/**< 各Chの分散 */
+		thrust::device_vector<F32> lpMean;		/**< 各Chの平均 */
+		thrust::device_vector<F32> lpVariance;	/**< 各Chの分散 */
 
-		std::vector<F32>	lpScale;	/**< 各Chのスケール値 */
-		std::vector<F32>	lpBias;		/**< 各Chのバイアス値 */
+		thrust::device_vector<F32>	lpScale;	/**< 各Chのスケール値 */
+		thrust::device_vector<F32>	lpBias;		/**< 各Chのバイアス値 */
 
 
 		//===========================
@@ -28,9 +39,9 @@ namespace NeuralNetwork {
 		//===========================
 	public:
 		/** コンストラクタ */
-		BatchNormalization_LayerData_CPU(const Gravisbell::GUID& guid);
+		BatchNormalization_LayerData_GPU(const Gravisbell::GUID& guid);
 		/** デストラクタ */
-		~BatchNormalization_LayerData_CPU();
+		~BatchNormalization_LayerData_GPU();
 
 
 		//===========================

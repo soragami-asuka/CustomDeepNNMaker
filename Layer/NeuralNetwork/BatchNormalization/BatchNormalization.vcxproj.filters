@@ -153,6 +153,12 @@
     <ClInclude Include="BatchNormalization_LayerData_CPU.h">
       <Filter>LayerData</Filter>
     </ClInclude>
+    <ClInclude Include="BatchNormalization_LayerData_GPU.cuh">
+      <Filter>LayerData</Filter>
+    </ClInclude>
+    <ClInclude Include="BatchNormalization_GPU.cuh">
+      <Filter>Layer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -179,5 +185,13 @@
   </ItemGroup>
   <ItemGroup>
     <Xml Include="Config.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="BatchNormalization_LayerData_GPU.cu">
+      <Filter>LayerData</Filter>
+    </CudaCompile>
+    <CudaCompile Include="BatchNormalization_GPU.cu">
+      <Filter>Layer</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>
