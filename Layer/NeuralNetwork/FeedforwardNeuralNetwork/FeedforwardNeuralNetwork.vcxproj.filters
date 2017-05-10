@@ -52,6 +52,12 @@
     <Filter Include="include\DataFormat\Binary">
       <UniqueIdentifier>{24d65bf7-83eb-4bcd-8800-4cb86b3d5ca1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LayerData">
+      <UniqueIdentifier>{3718a144-5576-4216-9340-0aaf9d712a35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Layer">
+      <UniqueIdentifier>{872aa6db-3874-4e32-8b55-b6e49838430d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -126,9 +132,6 @@
     <ClInclude Include="FeedforwardNeuralNetwork_DATA.hpp">
       <Filter>FromXML</Filter>
     </ClInclude>
-    <ClInclude Include="FeedforwardNeuralNetwork_Base.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="LayerConnect.h">
       <Filter>LayerConnect</Filter>
     </ClInclude>
@@ -150,12 +153,6 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerData.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
-    <ClInclude Include="FeedforwardNeuralNetwork_LayerData_Base.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="FeedforwardNeuralNetwork_CPU.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\DataFormat\IDataFormatBase.h">
       <Filter>include\DataFormat</Filter>
     </ClInclude>
@@ -165,8 +162,17 @@
     <ClInclude Include="..\..\..\include\DataFormat\Binary\IDataFormat.h">
       <Filter>include\DataFormat\Binary</Filter>
     </ClInclude>
+    <ClInclude Include="FeedforwardNeuralNetwork_LayerData_Base.h">
+      <Filter>LayerData</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedforwardNeuralNetwork_Base.h">
+      <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedforwardNeuralNetwork_CPU.h">
+      <Filter>Layer</Filter>
+    </ClInclude>
     <ClInclude Include="FeedforwardNeuralNetwork_GPU.cuh">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>Layer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -191,17 +197,17 @@
     <ClCompile Include="LayerConnectSingle2Single.cpp">
       <Filter>LayerConnect</Filter>
     </ClCompile>
-    <ClCompile Include="FeedforwardNeuralNetwork_Base.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="FeedforwardNeuralNetwork_CPU.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="FeedforwardNeuralNetwork_LayerData_Base.cpp">
+      <Filter>LayerData</Filter>
     </ClCompile>
     <ClCompile Include="FeedforwardNeuralNetwork_LayerData_CPU.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>LayerData</Filter>
     </ClCompile>
-    <ClCompile Include="FeedforwardNeuralNetwork_LayerData_Base.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="FeedforwardNeuralNetwork_Base.cpp">
+      <Filter>Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedforwardNeuralNetwork_CPU.cpp">
+      <Filter>Layer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -209,10 +215,10 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="FeedforwardNeuralNetwork_LayerData_GPU.cu">
-      <Filter>ソース ファイル</Filter>
+      <Filter>LayerData</Filter>
     </CudaCompile>
     <CudaCompile Include="FeedforwardNeuralNetwork_GPU.cu">
-      <Filter>ソース ファイル</Filter>
+      <Filter>Layer</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

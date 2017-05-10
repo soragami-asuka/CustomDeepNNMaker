@@ -75,6 +75,31 @@ namespace NeuralNetwork {
 		@return	成功した場合0 */
 	ErrorCode FeedforwardNeuralNetwork_LayerData_Base::InitializeFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize)
 	{
+		int readBufferByte = 0;
+
+		// 入力データ構造
+		memcpy(&this->inputDataStruct, &i_lpBuffer[readBufferByte], sizeof(this->inputDataStruct));
+		readBufferByte += sizeof(this->inputDataStruct);
+
+		// 設定情報
+		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, readBufferByte);
+		if(pLayerStructure == NULL)
+			return ErrorCode::ERROR_CODE_INITLAYER_READ_CONFIG;
+		this->SetLayerConfig(*pLayerStructure);
+		delete pLayerStructure;
+
+		// 内部保有のレイヤーデータを削除
+		for(auto pLayerData : this->lpLayerData)
+			delete pLayerData;
+
+		// レイヤー構造を削除
+		if(this->pLayerStructure)
+			delete this->pLayerStructure;
+
+
+		// 初期化する
+		this->Initialize();
+
 		return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
 	}
 
@@ -112,7 +137,77 @@ namespace NeuralNetwork {
 	/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
 	U32 FeedforwardNeuralNetwork_LayerData_Base::GetUseBufferByteCount()const
 	{
-		// TODO
+		U32 bufferSize = 0;
+
+		if(pLayerStructure == NULL)
+			return 0;
+
+		// レイヤーデータの一覧を作成する
+		std::map<Gravisbell::GUID, INNLayerData*> lpTmpLayerData;
+		{
+			// 本体を保有しているレイヤー
+			for(auto& it : this->lpLayerData)
+				lpTmpLayerData[it->GetGUID()] = it;
+			// 接続レイヤー
+			for(auto& it : this->lpConnectInfo)
+				lpTmpLayerData[it.second.pLayerData->GetGUID()] = it.second.pLayerData;
+		}
+
+
+		// 入力データ構造
+		bufferSize += sizeof(this->inputDataStruct);
+
+		// 設定情報
+		bufferSize += pLayerStructure->GetUseBufferByteCount();
+
+		// レイヤーの数
+		bufferSize += sizeof(U32);
+
+		// 各レイヤーデータ
+		for(auto& it : lpTmpLayerData)
+		{
+			// レイヤー種別コード
+			bufferSize += sizeof(Gravisbell::GUID);
+
+			// レイヤーGUID
+			bufferSize += sizeof(Gravisbell::GUID);
+
+			// レイヤー本体
+			bufferSize += it.second->GetUseBufferByteCount();
+		}
+
+		// レイヤー接続情報
+		{
+			// レイヤー接続情報数
+			bufferSize += sizeof(U32);
+
+			// レイヤー接続情報
+			for(auto& it : this->lpConnectInfo)
+			{
+				// レイヤーのGUID
+				bufferSize += sizeof(Gravisbell::GUID);
+
+				// レイヤーデータのGUID
+				bufferSize += sizeof(Gravisbell::GUID);
+
+				// 入力レイヤーの数
+				bufferSize += sizeof(U32);
+
+				// 入力レイヤー
+				bufferSize += sizeof(Gravisbell::GUID) * it.second.lpInputLayerGUID.size();
+
+				// バイパス入力レイヤーの数
+				bufferSize += sizeof(U32);
+
+				// バイパス入力レイヤー
+				bufferSize += sizeof(Gravisbell::GUID) * it.second.lpBypassLayerGUID.size();
+			}
+		}
+
+		// 出力レイヤーGUID
+		bufferSize += sizeof(Gravisbell::GUID);
+
+
 		return 0;
 	}
 
@@ -121,42 +216,108 @@ namespace NeuralNetwork {
 		@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
 	S32 FeedforwardNeuralNetwork_LayerData_Base::WriteToBuffer(BYTE* o_lpBuffer)const
 	{
+		if(this->pLayerStructure == NULL)
+			return ErrorCode::ERROR_CODE_NONREGIST_CONFIG;
 
-		//if(this->pLayerStructure == NULL)
-		//	return ErrorCode::ERROR_CODE_NONREGIST_CONFIG;
+		// レイヤーデータの一覧を作成する
+		std::map<Gravisbell::GUID, INNLayerData*> lpTmpLayerData;
+		{
+			// 本体を保有しているレイヤー
+			for(auto& it : this->lpLayerData)
+				lpTmpLayerData[it->GetGUID()] = it;
+			// 接続レイヤー
+			for(auto& it : this->lpConnectInfo)
+				lpTmpLayerData[it.second.pLayerData->GetGUID()] = it.second.pLayerData;
+		}
 
-		//// 設定情報
 
-		//// レイヤーの数
+		int writeBufferByte = 0;
 
-		//// 各レイヤー本体
-		//for(auto& it : lpLayerInfo)
-		//{
-		//	// レイヤー種別コード
+		U32 tmpCount = 0;
+		Gravisbell::GUID tmpGUID;
 
-		//	// レイヤーGUID
+		// 入力データ構造
+		memcpy(&o_lpBuffer[writeBufferByte], &this->inputDataStruct, sizeof(this->inputDataStruct));
+		writeBufferByte += sizeof(this->inputDataStruct);
 
-		//	// レイヤー本体
-		//}
+		// 設定情報
+		writeBufferByte += this->pLayerStructure->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
 
-		//// レイヤー接続情報
-		//{
-		//	// レイヤー接続情報一覧を作成
-		//	for(auto& it : lpLayerInfo)
-		//	{
-		//	}
+		// レイヤーの数
+		tmpCount = lpTmpLayerData.size();
+		memcpy(&o_lpBuffer[writeBufferByte], &tmpCount, sizeof(U32));
+		writeBufferByte += sizeof(U32);
 
-		//	// レイヤー接続情報数
+		// 各レイヤーデータ
+		for(auto& it : lpTmpLayerData)
+		{
+			// レイヤー種別コード
+			tmpGUID = it.second->GetLayerCode();
+			memcpy(&o_lpBuffer[writeBufferByte], &tmpGUID, sizeof(Gravisbell::GUID));
+			writeBufferByte += sizeof(Gravisbell::GUID);
 
-		//	// レイヤー接続情報
-		//}
+			// レイヤーGUID
+			tmpGUID = it.second->GetGUID();
+			memcpy(&o_lpBuffer[writeBufferByte], &tmpGUID, sizeof(Gravisbell::GUID));
+			writeBufferByte += sizeof(Gravisbell::GUID);
 
-#ifdef _DEBUG
-		return -1;
-#endif
+			// レイヤー本体
+			writeBufferByte += it.second->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
+		}
 
-		// TODO
-		return -1;
+		// レイヤー接続情報
+		{
+			// レイヤー接続情報数
+			tmpCount = this->lpConnectInfo.size();
+			memcpy(&o_lpBuffer[writeBufferByte], &tmpCount, sizeof(U32));
+			writeBufferByte += sizeof(U32);
+
+			// レイヤー接続情報
+			for(auto& it : this->lpConnectInfo)
+			{
+				// レイヤーのGUID
+				tmpGUID = it.first;
+				memcpy(&o_lpBuffer[writeBufferByte], &tmpGUID, sizeof(Gravisbell::GUID));
+				writeBufferByte += sizeof(Gravisbell::GUID);
+
+				// レイヤーデータのGUID
+				tmpGUID = it.second.pLayerData->GetGUID();
+				memcpy(&o_lpBuffer[writeBufferByte], &tmpGUID, sizeof(Gravisbell::GUID));
+				writeBufferByte += sizeof(Gravisbell::GUID);
+
+				// 入力レイヤーの数
+				tmpCount = it.second.lpInputLayerGUID.size();
+				memcpy(&o_lpBuffer[writeBufferByte], &tmpCount, sizeof(U32));
+				writeBufferByte += sizeof(U32);
+
+				// 入力レイヤー
+				for(auto guid : it.second.lpInputLayerGUID)
+				{
+					memcpy(&o_lpBuffer[writeBufferByte], &guid, sizeof(Gravisbell::GUID));
+					writeBufferByte += sizeof(Gravisbell::GUID);
+				}
+
+				// バイパス入力レイヤーの数
+				tmpCount = it.second.lpBypassLayerGUID.size();
+				memcpy(&o_lpBuffer[writeBufferByte], &tmpCount, sizeof(U32));
+				writeBufferByte += sizeof(U32);
+
+				// バイパス入力レイヤー
+				for(auto guid : it.second.lpBypassLayerGUID)
+				{
+					memcpy(&o_lpBuffer[writeBufferByte], &guid, sizeof(Gravisbell::GUID));
+					writeBufferByte += sizeof(Gravisbell::GUID);
+				}
+			}
+		}
+
+		// 出力レイヤーGUID
+		tmpGUID = this->outputLayerGUID;
+		memcpy(&o_lpBuffer[writeBufferByte], &tmpGUID, sizeof(Gravisbell::GUID));
+		writeBufferByte += sizeof(Gravisbell::GUID);
+
+
+		return writeBufferByte;
 	}
 
 

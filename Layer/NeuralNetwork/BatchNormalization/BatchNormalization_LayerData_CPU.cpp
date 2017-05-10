@@ -77,8 +77,12 @@ namespace NeuralNetwork {
 	{
 		int readBufferByte = 0;
 
-		// 設定情報を読み込む
-		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(i_lpBuffer, i_bufferSize, readBufferByte);
+		// 入力データ構造
+		memcpy(&this->inputDataStruct, &i_lpBuffer[readBufferByte], sizeof(this->inputDataStruct));
+		readBufferByte += sizeof(this->inputDataStruct);
+
+		// 設定情報
+		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, readBufferByte);
 		if(pLayerStructure == NULL)
 			return ErrorCode::ERROR_CODE_INITLAYER_READ_CONFIG;
 		this->SetLayerConfig(*pLayerStructure);
@@ -86,6 +90,16 @@ namespace NeuralNetwork {
 
 		// 初期化する
 		this->Initialize();
+
+		// 平均
+		memcpy(&this->lpMean[0], &i_lpBuffer[readBufferByte], sizeof(F32)*this->lpMean.size());
+		// 分散
+		memcpy(&this->lpVariance[0], &i_lpBuffer[readBufferByte], sizeof(F32)*this->lpMean.size());
+		// スケーリング値
+		memcpy(&this->lpScale[0], &i_lpBuffer[readBufferByte], sizeof(F32)*this->lpMean.size());
+		// バイアス値
+		memcpy(&this->lpBias[0], &i_lpBuffer[readBufferByte], sizeof(F32)*this->lpMean.size());
+
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -104,8 +118,27 @@ namespace NeuralNetwork {
 
 		int writeBufferByte = 0;
 
+		// 入力データ構造
+		memcpy(&o_lpBuffer[writeBufferByte], &this->inputDataStruct, sizeof(this->inputDataStruct));
+		writeBufferByte += sizeof(this->inputDataStruct);
+
 		// 設定情報
 		writeBufferByte += this->pLayerStructure->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
+
+
+		// 平均
+		memcpy(&o_lpBuffer[writeBufferByte], &this->lpMean[0], sizeof(F32)*this->lpMean.size());
+		writeBufferByte += sizeof(F32)*this->lpMean.size();
+		// 分散
+		memcpy(&o_lpBuffer[writeBufferByte], &this->lpVariance[0], sizeof(F32)*this->lpVariance.size());
+		writeBufferByte += sizeof(F32)*this->lpVariance.size();
+		// スケーリング値
+		memcpy(&o_lpBuffer[writeBufferByte], &this->lpScale[0], sizeof(F32)*this->lpScale.size());
+		writeBufferByte += sizeof(F32)*this->lpScale.size();
+		// バイアス値
+		memcpy(&o_lpBuffer[writeBufferByte], &this->lpBias[0], sizeof(F32)*this->lpBias.size());
+		writeBufferByte += sizeof(F32)*this->lpBias.size();
+
 
 		return writeBufferByte;
 	}

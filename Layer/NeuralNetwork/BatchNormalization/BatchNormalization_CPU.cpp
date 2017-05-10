@@ -221,17 +221,17 @@ namespace NeuralNetwork {
 			// •ªU‚ğ‹‚ß‚é
 			for(U32 ch=0; ch<this->layerData.inputDataStruct.ch; ch++)
 			{
-				this->lpTmpVariance[ch] = 0.0f;
+				F64 tmp = 0.0f;
 				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 				{
 					for(U32 bufNum=0; bufNum<this->channeclBufferCount; bufNum++)
 					{
-						F32 value = this->m_lppInputBuffer[batchNum][this->channeclBufferCount*ch + bufNum];
+						F64 value = this->m_lppInputBuffer[batchNum][this->channeclBufferCount*ch + bufNum];
 
-						this->lpTmpVariance[ch] += (value - this->lpTmpMean[ch]) * (value - this->lpTmpMean[ch]);
+						tmp += (value - this->lpTmpMean[ch]) * (value - this->lpTmpMean[ch]);
 					}
 				}
-				this->lpTmpVariance[ch] /= (this->batchSize * this->channeclBufferCount);
+				this->lpTmpVariance[ch]    = tmp / (this->batchSize * this->channeclBufferCount);
 			}
 		}
 
@@ -360,7 +360,8 @@ namespace NeuralNetwork {
 		{
 			F32 mean = this->lpTmpMean[ch];
 			F32 variance = this->lpTmpVariance[ch] + max(this->layerData.layerStructure.epsilon, 1e-5);
-			F32 sqrtVariance = (F32)sqrt(variance);
+			F64 sqrtVariance = (F32)sqrt(variance);
+			F64 sqrtVarianceInv = 1.0f / sqrtVariance;
 
 			F32 dBias = 0.0f;
 			F32 dScale = 0.0f;
@@ -372,7 +373,7 @@ namespace NeuralNetwork {
 					F32 value = this->m_lppInputBuffer[batchNum][this->channeclBufferCount*ch + bufNum];
 
 					// ³‹K‰»
-					F32 value2 = (value - mean) / sqrtVariance;
+					F32 value2 = (value - mean) * sqrtVarianceInv;
 
 					dScale += this->m_lppDOutputBufferPrev[batchNum][this->channeclBufferCount*ch + bufNum] * value2;
 					dBias  += this->m_lppDOutputBufferPrev[batchNum][this->channeclBufferCount*ch + bufNum];
@@ -385,7 +386,7 @@ namespace NeuralNetwork {
 
 			// •½‹Ï‚Æ•ªU‚ğXV
 			this->layerData.lpMean[ch]     = (F32)((1.0 - factor) * this->layerData.lpMean[ch]     + factor * this->lpTmpMean[ch]);
-			this->layerData.lpVariance[ch] = (F32)((1.0 - factor) * this->layerData.lpVariance[ch] + factor * this->lpTmpVariance[ch]);
+			this->layerData.lpVariance[ch] = (F32)((1.0 - factor) * this->layerData.lpVariance[ch] + factor * variance);
 		}
 
 

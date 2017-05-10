@@ -366,8 +366,9 @@ namespace NeuralNetwork {
 			F32 alpha = 1.0f;
 			F32 beta = 0.0f;
 
-			F32 varianceLast = this->layerData.lpVariance[0];
-			F32 meanLast = this->layerData.lpMean[0];
+			std::vector<F32> lpVarianceLast(this->layerData.inputDataStruct.ch);
+			for(U32 i=0; i<lpVarianceLast.size(); i++)
+				lpVarianceLast[i] = this->layerData.lpVariance[i];
 
 			err_cudnn = cudnnBatchNormalizationForwardTraining(
 				this->cudnnHandle,
@@ -390,11 +391,13 @@ namespace NeuralNetwork {
 			if(err_cudnn != 0)
 				return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
 
-			F32 varianceNext = this->layerData.lpVariance[0];
-			F32 meanNext     = this->layerData.lpMean[0];
+			std::vector<F32> lpVarianceNext(this->layerData.inputDataStruct.ch);
+			for(U32 i=0; i<lpVarianceNext.size(); i++)
+				lpVarianceNext[i] = this->layerData.lpVariance[i];
 
-			F32 varianceTmp  = this->lpTmpVariance[0];
-			F32 meatTmp      = this->lpTmpMean[0];
+			std::vector<F32> lpVarianceTmp(this->layerData.inputDataStruct.ch);
+			for(U32 i=0; i<lpVarianceTmp.size(); i++)
+				lpVarianceTmp[i] = this->lpTmpVariance[i];
 
 			// 学習処理の実行回数をカウントアップ
 			this->learnCount++;

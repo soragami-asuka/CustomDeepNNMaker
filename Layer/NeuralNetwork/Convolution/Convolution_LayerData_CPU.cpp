@@ -101,8 +101,12 @@ namespace NeuralNetwork {
 	{
 		int readBufferByte = 0;
 
-		// 設定情報を読み込む
-		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(i_lpBuffer, i_bufferSize, readBufferByte);
+		// 入力データ構造
+		memcpy(&this->inputDataStruct, &i_lpBuffer[readBufferByte], sizeof(this->inputDataStruct));
+		readBufferByte += sizeof(this->inputDataStruct);
+
+		// 設定情報
+		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, readBufferByte);
 		if(pLayerStructure == NULL)
 			return ErrorCode::ERROR_CODE_INITLAYER_READ_CONFIG;
 		this->SetLayerConfig(*pLayerStructure);
@@ -139,6 +143,10 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_NONREGIST_CONFIG;
 
 		int writeBufferByte = 0;
+
+		// 入力データ構造
+		memcpy(&o_lpBuffer[writeBufferByte], &this->inputDataStruct, sizeof(this->inputDataStruct));
+		writeBufferByte += sizeof(this->inputDataStruct);
 
 		// 設定情報
 		writeBufferByte += this->pLayerStructure->WriteToBuffer(&o_lpBuffer[writeBufferByte]);

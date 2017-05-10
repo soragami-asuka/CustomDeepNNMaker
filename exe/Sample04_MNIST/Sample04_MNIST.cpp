@@ -436,6 +436,11 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::Neur
 			lppLayerData,
 			inputDataStruct, lastLayerGUID,
 			Gravisbell::Utility::NeuralNetworkLayer::CreateActivationLayer(layerDLLManager, inputDataStruct, L"ReLU"));
+		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lppLayerData,
+			inputDataStruct, lastLayerGUID,
+			Gravisbell::Utility::NeuralNetworkLayer::CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.2f));
 
 		// 2‘w–Ú
 		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
@@ -458,6 +463,11 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::Neur
 			lppLayerData,
 			inputDataStruct, lastLayerGUID,
 			Gravisbell::Utility::NeuralNetworkLayer::CreateActivationLayer(layerDLLManager, inputDataStruct, L"ReLU"));
+		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lppLayerData,
+			inputDataStruct, lastLayerGUID,
+			Gravisbell::Utility::NeuralNetworkLayer::CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.5f));
 
 		// 3‘w–Ú
 		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
@@ -494,8 +504,8 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 	Gravisbell::ErrorCode err;
 
 	// ŠwKŒW”‚ðÝ’è
-	pNeuralNetworkLearn->SetLearnSettingData(L"LearnCoeff", 0.001f);
-//	pNeuralNetworkLearn->SetLearnSettingData(L"LearnCoeff", 0.005f);
+//	pNeuralNetworkLearn->SetLearnSettingData(L"LearnCoeff", 0.001f);
+	pNeuralNetworkLearn->SetLearnSettingData(L"LearnCoeff", 0.005f);
 
 	// Ž–‘Oˆ—‚ðŽÀs
 	err = pNeuralNetworkLearn->PreProcessLearn(BATCH_SIZE);

@@ -106,8 +106,12 @@ namespace NeuralNetwork {
 	{
 		int readBufferByte = 0;
 
-		// 設定情報を読み込む
-		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(i_lpBuffer, i_bufferSize, readBufferByte);
+		// 入力データ構造
+		memcpy(&this->inputDataStruct, &i_lpBuffer[readBufferByte], sizeof(this->inputDataStruct));
+		readBufferByte += sizeof(this->inputDataStruct);
+
+		// 設定情報
+		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, readBufferByte);
 		if(pLayerStructure == NULL)
 			return ErrorCode::ERROR_CODE_INITLAYER_READ_CONFIG;
 		this->SetLayerConfig(*pLayerStructure);
@@ -116,17 +120,22 @@ namespace NeuralNetwork {
 		// 初期化する
 		this->Initialize();
 
-		//// ニューロン係数
-		//for(unsigned int neuronNum=0; neuronNum<this->lppNeuron.size(); neuronNum++)
-		//{
-		//	memcpy(&this->lppNeuron[neuronNum][0], &i_lpBuffer[readBufferByte], this->lppNeuron[neuronNum].size() * sizeof(NEURON_TYPE));
-		//	readBufferByte += this->lppNeuron[neuronNum].size() * sizeof(NEURON_TYPE);
-		//}
+		// バッファからコピー
+		// ニューロン
+		cudaMemcpy(
+			thrust::raw_pointer_cast(&this->lppNeuron_d[0]),
+			&i_lpBuffer[readBufferByte],
+			sizeof(F32) * this->lppNeuron_d.size(),
+			cudaMemcpyDeviceToHost);
+		readBufferByte += sizeof(F32) * (S32)this->lppNeuron_d.size();
 
-		//// バイアス
-		//memcpy(&this->lpBias[0], &i_lpBuffer[readBufferByte], this->lpBias.size() * sizeof(NEURON_TYPE));
-		//readBufferByte += this->lpBias.size() * sizeof(NEURON_TYPE);
-
+		// バイアス
+		cudaMemcpy(
+			thrust::raw_pointer_cast(&this->lpBias_d[0]),
+			&i_lpBuffer[readBufferByte],
+			sizeof(F32) * this->lpBias_d.size(),
+			cudaMemcpyDeviceToHost);
+		readBufferByte += sizeof(F32) * (S32)this->lpBias_d.size();
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -145,19 +154,29 @@ namespace NeuralNetwork {
 
 		int writeBufferByte = 0;
 
+		// 入力データ構造
+		memcpy(&o_lpBuffer[writeBufferByte], &this->inputDataStruct, sizeof(this->inputDataStruct));
+		writeBufferByte += sizeof(this->inputDataStruct);
+
 		// 設定情報
 		writeBufferByte += this->pLayerStructure->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
 
-		//// ニューロン係数
-		//for(unsigned int neuronNum=0; neuronNum<this->lppNeuron.size(); neuronNum++)
-		//{
-		//	memcpy(&o_lpBuffer[writeBufferByte], &this->lppNeuron[neuronNum][0], this->lppNeuron[neuronNum].size() * sizeof(NEURON_TYPE));
-		//	writeBufferByte += this->lppNeuron[neuronNum].size() * sizeof(NEURON_TYPE);
-		//}
+		// ニューロン
+		cudaMemcpy(
+			&o_lpBuffer[writeBufferByte],
+			thrust::raw_pointer_cast(&this->lppNeuron_d[0]),
+			sizeof(F32) * this->lppNeuron_d.size(),
+			cudaMemcpyDeviceToHost);
+		writeBufferByte += sizeof(F32) * (S32)this->lppNeuron_d.size();
 
-		//// バイアス
-		//memcpy(&o_lpBuffer[writeBufferByte], &this->lpBias[0], this->lpBias.size() * sizeof(NEURON_TYPE));
-		//writeBufferByte += this->lpBias.size() * sizeof(NEURON_TYPE);
+		// バイアス
+		cudaMemcpy(
+			&o_lpBuffer[writeBufferByte],
+			thrust::raw_pointer_cast(&this->lpBias_d[0]),
+			sizeof(F32) * this->lpBias_d.size(),
+			cudaMemcpyDeviceToHost);
+		writeBufferByte += sizeof(F32) * (S32)this->lpBias_d.size();
+
 
 		return writeBufferByte;
 	}

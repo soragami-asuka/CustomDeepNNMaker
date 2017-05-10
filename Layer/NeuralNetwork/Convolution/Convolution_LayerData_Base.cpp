@@ -102,6 +102,9 @@ namespace NeuralNetwork {
 		if(pLayerStructure == NULL)
 			return 0;
 
+		// 入力データ構造
+		bufferSize += sizeof(this->inputDataStruct);
+
 		// 設定情報
 		bufferSize += pLayerStructure->GetUseBufferByteCount();
 

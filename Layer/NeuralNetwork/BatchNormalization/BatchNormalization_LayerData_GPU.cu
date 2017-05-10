@@ -77,8 +77,12 @@ namespace NeuralNetwork {
 	{
 		int readBufferByte = 0;
 
-		// 設定情報を読み込む
-		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(i_lpBuffer, i_bufferSize, readBufferByte);
+		// 入力データ構造
+		memcpy(&this->inputDataStruct, &i_lpBuffer[readBufferByte], sizeof(this->inputDataStruct));
+		readBufferByte += sizeof(this->inputDataStruct);
+
+		// 設定情報
+		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, readBufferByte);
 		if(pLayerStructure == NULL)
 			return ErrorCode::ERROR_CODE_INITLAYER_READ_CONFIG;
 		this->SetLayerConfig(*pLayerStructure);
@@ -86,6 +90,16 @@ namespace NeuralNetwork {
 
 		// 初期化する
 		this->Initialize();
+
+		// 平均
+		cudaMemcpy(thrust::raw_pointer_cast(&this->lpMean[0]), &i_lpBuffer[readBufferByte], sizeof(F32)*this->lpMean.size(), cudaMemcpyHostToDevice);
+		// 分散
+		cudaMemcpy(thrust::raw_pointer_cast(&this->lpVariance[0]), &i_lpBuffer[readBufferByte], sizeof(F32)*this->lpMean.size(), cudaMemcpyHostToDevice);
+		// スケーリング値
+		cudaMemcpy(thrust::raw_pointer_cast(&this->lpScale[0]), &i_lpBuffer[readBufferByte], sizeof(F32)*this->lpMean.size(), cudaMemcpyHostToDevice);
+		// バイアス値
+		cudaMemcpy(thrust::raw_pointer_cast(&this->lpBias[0]), &i_lpBuffer[readBufferByte], sizeof(F32)*this->lpMean.size(), cudaMemcpyHostToDevice);
+
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -104,8 +118,25 @@ namespace NeuralNetwork {
 
 		int writeBufferByte = 0;
 
+		// 入力データ構造
+		memcpy(&o_lpBuffer[writeBufferByte], &this->inputDataStruct, sizeof(this->inputDataStruct));
+		writeBufferByte += sizeof(this->inputDataStruct);
+
 		// 設定情報
 		writeBufferByte += this->pLayerStructure->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
+
+		// 平均
+		cudaMemcpy(&o_lpBuffer[writeBufferByte], thrust::raw_pointer_cast(&this->lpMean[0]), sizeof(F32)*this->lpMean.size(), cudaMemcpyHostToDevice);
+		writeBufferByte += sizeof(F32)*this->lpMean.size();
+		// 分散
+		cudaMemcpy(&o_lpBuffer[writeBufferByte], thrust::raw_pointer_cast(&this->lpVariance[0]), sizeof(F32)*this->lpVariance.size(), cudaMemcpyHostToDevice);
+		writeBufferByte += sizeof(F32)*this->lpVariance.size();
+		// スケーリング値
+		cudaMemcpy(&o_lpBuffer[writeBufferByte], thrust::raw_pointer_cast(&this->lpScale[0]), sizeof(F32)*this->lpScale.size(), cudaMemcpyHostToDevice);
+		writeBufferByte += sizeof(F32)*this->lpScale.size();
+		// バイアス値
+		cudaMemcpy(&o_lpBuffer[writeBufferByte], thrust::raw_pointer_cast(&this->lpBias[0]), sizeof(F32)*this->lpBias.size(), cudaMemcpyHostToDevice);
+		writeBufferByte += sizeof(F32)*this->lpBias.size();
 
 		return writeBufferByte;
 	}
