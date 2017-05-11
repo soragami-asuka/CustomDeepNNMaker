@@ -116,6 +116,17 @@ int _tmain(int argc, _TCHAR* argv[])
 		return -1;
 	}
 
+
+	// ファイルに保存する
+	Gravisbell::Utility::NeuralNetworkLayer::WriteNetworkToBinaryFile(*pNeuralNetworkData, "test.bin");
+	// ファイルから読み込む
+	delete pNeuralNetworkData;
+	Gravisbell::Utility::NeuralNetworkLayer::ReadNetworkFromBinaryFile(*pLayerDLLManager, &pNeuralNetworkData, "test.bin");
+	// 別ファイルに保存する
+	Gravisbell::Utility::NeuralNetworkLayer::WriteNetworkToBinaryFile(*pNeuralNetworkData, "test2.bin");
+
+
+
 	// 学習用ニューラルネットワーク作成
 	Layer::NeuralNetwork::INeuralNetwork* pNeuralNetworkLearn = NULL;
 	{
@@ -156,7 +167,6 @@ int _tmain(int argc, _TCHAR* argv[])
 		delete pLayerDLLManager;
 		return -1;
 	}
-
 
 	// 学習, テスト実行
 	{
@@ -436,11 +446,11 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::Neur
 			lppLayerData,
 			inputDataStruct, lastLayerGUID,
 			Gravisbell::Utility::NeuralNetworkLayer::CreateActivationLayer(layerDLLManager, inputDataStruct, L"ReLU"));
-		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
-			*pNeuralNetwork,
-			lppLayerData,
-			inputDataStruct, lastLayerGUID,
-			Gravisbell::Utility::NeuralNetworkLayer::CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.2f));
+		//Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+		//	*pNeuralNetwork,
+		//	lppLayerData,
+		//	inputDataStruct, lastLayerGUID,
+		//	Gravisbell::Utility::NeuralNetworkLayer::CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.2f));
 
 		// 2層目
 		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
@@ -463,11 +473,11 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::Neur
 			lppLayerData,
 			inputDataStruct, lastLayerGUID,
 			Gravisbell::Utility::NeuralNetworkLayer::CreateActivationLayer(layerDLLManager, inputDataStruct, L"ReLU"));
-		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
-			*pNeuralNetwork,
-			lppLayerData,
-			inputDataStruct, lastLayerGUID,
-			Gravisbell::Utility::NeuralNetworkLayer::CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.5f));
+		//Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+		//	*pNeuralNetwork,
+		//	lppLayerData,
+		//	inputDataStruct, lastLayerGUID,
+		//	Gravisbell::Utility::NeuralNetworkLayer::CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.5f));
 
 		// 3層目
 		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(

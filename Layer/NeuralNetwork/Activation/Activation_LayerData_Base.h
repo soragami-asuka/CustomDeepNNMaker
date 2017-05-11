@@ -67,7 +67,7 @@ namespace NeuralNetwork {
 			@param i_lpBuffer	読み込みバッファの先頭アドレス.
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@return	成功した場合0 */
-		ErrorCode InitializeFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize);
+		ErrorCode InitializeFromBuffer(const BYTE* i_lpBuffer, U32 i_bufferSize, S32& o_useBufferSize );
 
 
 		//===========================

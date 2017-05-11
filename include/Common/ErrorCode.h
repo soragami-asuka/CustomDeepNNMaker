@@ -29,6 +29,7 @@ namespace Gravisbell {
 		ERROR_CODE_DLL_LOAD_FUNCTION,			///< ŠÖ”‚Ì“Ç‚Ýž‚Ý‚ÉŽ¸”s
 		ERROR_CODE_DLL_ADD_ALREADY_SAMEID,		///< Šù‚É“¯ˆêID‚ÌDLL‚ª“o˜^Ï‚Ý
 		ERROR_CODE_DLL_ERASE_NOTFOUND,			///< ‘ÎÛ‚ÌIDŒŸõ‚ÉŽ¸”s
+		ERROR_CODE_DLL_NOTFOUND,				///< DLL‚ªŒ©‚Â‚©‚ç‚È‚¢
 
 		// “üo—ÍŒnƒGƒ‰[
 		ERROR_CODE_IO = 0x03000000,
@@ -48,6 +49,7 @@ namespace Gravisbell {
 		ERROR_CODE_FRAUD_INPUT_COUNT,			///< “ü—Í”‚ª•s³
 		ERROR_CODE_FRAUD_OUTPUT_COUNT,			///< o—Í”‚ª•s³
 		ERROR_CODE_FRAUD_NEURON_COUNT,			///< ƒjƒ…[ƒƒ“”‚ª•s³
+		ERROR_CODE_LAYER_CREATE,				///< ƒŒƒCƒ„[‚Ìì¬‚ÉŽ¸”s
 		// ƒŒƒCƒ„[’Ç‰ÁŒnƒGƒ‰[
 		ERROR_CODE_ADDLAYER = 0x10010000,
 		ERROR_CODE_ADDLAYER_ALREADY_SAMEID,		///< “¯‚¶ID‚ÌƒŒƒCƒ„[‚ªŠù‚É“o˜^Ï‚Ý

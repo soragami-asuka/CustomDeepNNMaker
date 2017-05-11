@@ -109,7 +109,7 @@ namespace NeuralNetwork {
 		bufferSize += pLayerStructure->GetUseBufferByteCount();
 
 		// 本体のバイト数
-		bufferSize += (this->layerStructure.Output_Channel * this->layerStructure.FilterSize.x * this->layerStructure.FilterSize.y * this->layerStructure.FilterSize.z) * sizeof(NEURON_TYPE);	// ニューロン係数
+		bufferSize += (this->layerStructure.Output_Channel * this->layerStructure.FilterSize.x * this->layerStructure.FilterSize.y * this->layerStructure.FilterSize.z * this->inputDataStruct.ch) * sizeof(NEURON_TYPE);	// ニューロン係数
 		bufferSize += this->layerStructure.Output_Channel * sizeof(NEURON_TYPE);	// バイアス係数
 
 

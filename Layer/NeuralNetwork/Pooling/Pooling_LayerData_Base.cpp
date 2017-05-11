@@ -87,7 +87,7 @@ namespace NeuralNetwork {
 		@param i_lpBuffer	読み込みバッファの先頭アドレス.
 		@param i_bufferSize	読み込み可能バッファのサイズ.
 		@return	成功した場合0 */
-	ErrorCode Pooling_LayerData_Base::InitializeFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize)
+	ErrorCode Pooling_LayerData_Base::InitializeFromBuffer(const BYTE* i_lpBuffer, U32 i_bufferSize, S32& o_useBufferSize)
 	{
 		int readBufferByte = 0;
 
@@ -96,14 +96,18 @@ namespace NeuralNetwork {
 		readBufferByte += sizeof(this->inputDataStruct);
 
 		// 設定情報
-		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, readBufferByte);
+		S32 useBufferByte = 0;
+		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, useBufferByte);
 		if(pLayerStructure == NULL)
 			return ErrorCode::ERROR_CODE_INITLAYER_READ_CONFIG;
+		readBufferByte += useBufferByte;
 		this->SetLayerConfig(*pLayerStructure);
 		delete pLayerStructure;
 
 		// 初期化する
 		this->Initialize();
+
+		o_useBufferSize = readBufferByte;
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

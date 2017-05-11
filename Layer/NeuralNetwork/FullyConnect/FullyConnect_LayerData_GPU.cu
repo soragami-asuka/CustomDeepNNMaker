@@ -102,7 +102,7 @@ namespace NeuralNetwork {
 		@param i_lpBuffer	読み込みバッファの先頭アドレス.
 		@param i_bufferSize	読み込み可能バッファのサイズ.
 		@return	成功した場合0 */
-	ErrorCode FullyConnect_LayerData_GPU::InitializeFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize)
+	ErrorCode FullyConnect_LayerData_GPU::InitializeFromBuffer(const BYTE* i_lpBuffer, U32 i_bufferSize, S32& o_useBufferSize )
 	{
 		int readBufferByte = 0;
 
@@ -111,9 +111,11 @@ namespace NeuralNetwork {
 		readBufferByte += sizeof(this->inputDataStruct);
 
 		// 設定情報
-		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, readBufferByte);
+		S32 useBufferByte = 0;
+		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, useBufferByte);
 		if(pLayerStructure == NULL)
 			return ErrorCode::ERROR_CODE_INITLAYER_READ_CONFIG;
+		readBufferByte += useBufferByte;
 		this->SetLayerConfig(*pLayerStructure);
 		delete pLayerStructure;
 
@@ -136,6 +138,8 @@ namespace NeuralNetwork {
 			sizeof(F32) * this->lpBias_d.size(),
 			cudaMemcpyDeviceToHost);
 		readBufferByte += sizeof(F32) * (S32)this->lpBias_d.size();
+
+		o_useBufferSize = readBufferByte;
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -226,16 +230,9 @@ EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayerData* CreateLayerDataGPUfro
 	if(pLayerData == NULL)
 		return NULL;
 
-	// 読み取りに使用するバッファ数を取得
-	U32 useBufferSize = pLayerData->GetUseBufferByteCount();
-	if(useBufferSize >= (U32)i_bufferSize)
-	{
-		delete pLayerData;
-		return NULL;
-	}
-
 	// 初期化
-	Gravisbell::ErrorCode errCode = pLayerData->InitializeFromBuffer(i_lpBuffer, i_bufferSize);
+	S32 useBufferSize = 0;
+	Gravisbell::ErrorCode errCode = pLayerData->InitializeFromBuffer(i_lpBuffer, i_bufferSize, useBufferSize);
 	if(errCode != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 	{
 		delete pLayerData;

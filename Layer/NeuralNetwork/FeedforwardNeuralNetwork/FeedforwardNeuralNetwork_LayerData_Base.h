@@ -61,8 +61,8 @@ namespace NeuralNetwork {
 		const Gravisbell::GUID inputLayerGUID;	/**< 入力信号に割り当てられているGUID.入力信号レイヤーの代用として使用する. */
 		Gravisbell::GUID outputLayerGUID;		/**< 出力信号に割り当てられているGUID. */
 
-		std::set<INNLayerData*> lpLayerData;
-		std::map<Gravisbell::GUID, LayerConnect> lpConnectInfo;
+		std::map<Gravisbell::GUID, INNLayerData*> lpLayerData;	/**< レイヤーデータGUID, レイヤーデータ */
+		std::map<Gravisbell::GUID, LayerConnect> lpConnectInfo;	/**< レイヤーGUID, レイヤー接続情報 */
 
 		IODataStruct inputDataStruct;	/**< 入力データ構造 */
 
@@ -95,7 +95,7 @@ namespace NeuralNetwork {
 			@param i_lpBuffer	読み込みバッファの先頭アドレス.
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@return	成功した場合0 */
-		ErrorCode InitializeFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize);
+		ErrorCode InitializeFromBuffer(const BYTE* i_lpBuffer, U32 i_bufferSize, S32& o_useBufferSize);
 
 
 		//===========================

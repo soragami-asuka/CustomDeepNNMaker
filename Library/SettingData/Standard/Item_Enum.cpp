@@ -339,7 +339,7 @@ namespace Standard {
 			U32 byteCount = 0;
 
 			byteCount += sizeof(U32);		// 値のバッファサイズ
-			byteCount += (U32)this->value.size();		// 値
+			byteCount += (U32)(this->value.size() * sizeof(wchar_t));		// 値
 
 			return byteCount;
 		}
@@ -363,14 +363,9 @@ namespace Standard {
 
 				// 値
 				std::vector<wchar_t> szBuf(bufferSize+1, NULL);
-				for(U32 i=0; i<bufferSize; i++)
-				{
-					szBuf[i] = i_lpBuffer[bufferPos++];
-				}
-				std::wstring value = &szBuf[0];
-
-
-				this->SetValue(value.c_str());
+				memcpy(&szBuf[0], &i_lpBuffer[bufferPos], bufferSize);
+				this->SetValue(&szBuf[0]);
+				bufferPos += bufferSize;
 			}
 
 
@@ -386,7 +381,7 @@ namespace Standard {
 			// 値
 			{
 				// バッファサイズ
-				U32 bufferSize = (U32)this->value.size();;
+				U32 bufferSize = (U32)(this->value.size() * sizeof(wchar_t));
 				*(U32*)&o_lpBuffer[bufferPos] = bufferSize;
 				bufferPos += sizeof(U32);
 

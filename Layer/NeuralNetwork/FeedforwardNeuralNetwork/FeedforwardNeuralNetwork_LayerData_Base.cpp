@@ -28,8 +28,8 @@ namespace NeuralNetwork {
 	FeedforwardNeuralNetwork_LayerData_Base::~FeedforwardNeuralNetwork_LayerData_Base()
 	{
 		// 内部保有のレイヤーデータを削除
-		for(auto pLayerData : this->lpLayerData)
-			delete pLayerData;
+		for(auto it : this->lpLayerData)
+			delete it.second;
 
 		// レイヤー構造を削除
 		if(this->pLayerStructure)
@@ -73,7 +73,7 @@ namespace NeuralNetwork {
 		@param i_lpBuffer	読み込みバッファの先頭アドレス.
 		@param i_bufferSize	読み込み可能バッファのサイズ.
 		@return	成功した場合0 */
-	ErrorCode FeedforwardNeuralNetwork_LayerData_Base::InitializeFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize)
+	ErrorCode FeedforwardNeuralNetwork_LayerData_Base::InitializeFromBuffer(const BYTE* i_lpBuffer, U32 i_bufferSize, S32& o_useBufferSize)
 	{
 		int readBufferByte = 0;
 
@@ -82,25 +82,124 @@ namespace NeuralNetwork {
 		readBufferByte += sizeof(this->inputDataStruct);
 
 		// 設定情報
-		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, readBufferByte);
+		S32 useBufferByte = 0;
+		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, useBufferByte);
 		if(pLayerStructure == NULL)
 			return ErrorCode::ERROR_CODE_INITLAYER_READ_CONFIG;
+		readBufferByte += useBufferByte;
 		this->SetLayerConfig(*pLayerStructure);
 		delete pLayerStructure;
 
 		// 内部保有のレイヤーデータを削除
-		for(auto pLayerData : this->lpLayerData)
-			delete pLayerData;
-
-		// レイヤー構造を削除
-		if(this->pLayerStructure)
-			delete this->pLayerStructure;
-
+		for(auto it : this->lpLayerData)
+			delete it.second;
+		this->lpLayerData.clear();
 
 		// 初期化する
 		this->Initialize();
+		
+		// レイヤーの数
+		U32 layerDataCount = 0;
+		memcpy(&layerDataCount, &i_lpBuffer[readBufferByte], sizeof(U32));
+		readBufferByte += sizeof(U32);
 
-		return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+		// 各レイヤーデータ
+		for(U32 layerDataNum=0; layerDataNum<layerDataCount; layerDataNum++)
+		{
+			// レイヤー種別コード
+			Gravisbell::GUID typeCode;
+			memcpy(&typeCode, &i_lpBuffer[readBufferByte], sizeof(Gravisbell::GUID));
+			readBufferByte += sizeof(Gravisbell::GUID);
+
+			// レイヤーGUID
+			Gravisbell::GUID guid;
+			memcpy(&guid, &i_lpBuffer[readBufferByte], sizeof(Gravisbell::GUID));
+			readBufferByte += sizeof(Gravisbell::GUID);
+
+			// レイヤー本体
+			auto pLayerDLL = this->layerDLLManager.GetLayerDLLByGUID(typeCode);
+			if(pLayerDLL == NULL)
+				return ErrorCode::ERROR_CODE_DLL_NOTFOUND;
+			S32 useBufferSize = 0;
+			auto pLayerData = pLayerDLL->CreateLayerDataFromBuffer(guid, &i_lpBuffer[readBufferByte], readBufferByte, useBufferSize);
+			if(pLayerData == NULL)
+				return ErrorCode::ERROR_CODE_LAYER_CREATE;
+			readBufferByte += useBufferSize;
+
+			// レイヤーデータ一覧に追加
+			this->lpLayerData[guid] = pLayerData;
+		}
+
+		// レイヤー接続情報
+		{
+			// レイヤー接続情報数
+			U32 connectDataCount = 0;
+			memcpy(&connectDataCount, &i_lpBuffer[readBufferByte], sizeof(U32));
+			readBufferByte += sizeof(U32);
+
+			// レイヤー接続情報
+			for(U32 connectDataNum=0; connectDataNum<connectDataCount; connectDataNum++)
+			{
+				// レイヤーのGUID
+				Gravisbell::GUID layerGUID;
+				memcpy(&layerGUID, &i_lpBuffer[readBufferByte], sizeof(Gravisbell::GUID));
+				readBufferByte += sizeof(Gravisbell::GUID);
+
+				// レイヤーデータのGUID
+				Gravisbell::GUID layerDataGUID;
+				memcpy(&layerDataGUID, &i_lpBuffer[readBufferByte], sizeof(Gravisbell::GUID));
+				readBufferByte += sizeof(Gravisbell::GUID);
+
+				// レイヤーデータ取得
+				auto pLayerData = this->lpLayerData[layerDataGUID];
+				if(pLayerData == NULL)
+					return ErrorCode::ERROR_CODE_LAYER_CREATE;
+
+				// レイヤー接続情報を作成
+				LayerConnect layerConnect(layerGUID, pLayerData);
+
+				// 入力レイヤーの数
+				U32 inputLayerCount = 0;
+				memcpy(&inputLayerCount, &i_lpBuffer[readBufferByte], sizeof(U32));
+				readBufferByte += sizeof(U32);
+
+				// 入力レイヤー
+				for(U32 inputLayerNum=0; inputLayerNum<inputLayerCount; inputLayerNum++)
+				{
+					Gravisbell::GUID inputGUID;
+					memcpy(&inputGUID, &i_lpBuffer[readBufferByte], sizeof(Gravisbell::GUID));
+					readBufferByte += sizeof(Gravisbell::GUID);
+
+					layerConnect.lpInputLayerGUID.insert(inputGUID);
+				}
+
+				// バイパス入力レイヤーの数
+				U32 bypassLayerCount = 0;
+				memcpy(&bypassLayerCount, &i_lpBuffer[readBufferByte], sizeof(U32));
+				readBufferByte += sizeof(U32);
+
+				// バイパス入力レイヤー
+				for(U32 bypassLayerNum=0; bypassLayerNum<bypassLayerCount; bypassLayerNum++)
+				{
+					Gravisbell::GUID bypassGUID;
+					memcpy(&bypassGUID, &i_lpBuffer[readBufferByte], sizeof(Gravisbell::GUID));
+					readBufferByte += sizeof(Gravisbell::GUID);
+
+					layerConnect.lpBypassLayerGUID.insert(bypassGUID);
+				}
+
+				// レイヤーを接続
+				this->lpConnectInfo[layerGUID] = layerConnect;
+			}
+		}
+
+		// 出力レイヤーGUID
+		memcpy(&this->outputLayerGUID, &i_lpBuffer[readBufferByte], sizeof(Gravisbell::GUID));
+		readBufferByte += sizeof(Gravisbell::GUID);
+
+		o_useBufferSize = readBufferByte;
+
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 
 
@@ -147,7 +246,7 @@ namespace NeuralNetwork {
 		{
 			// 本体を保有しているレイヤー
 			for(auto& it : this->lpLayerData)
-				lpTmpLayerData[it->GetGUID()] = it;
+				lpTmpLayerData[it.first] = it.second;
 			// 接続レイヤー
 			for(auto& it : this->lpConnectInfo)
 				lpTmpLayerData[it.second.pLayerData->GetGUID()] = it.second.pLayerData;
@@ -194,13 +293,13 @@ namespace NeuralNetwork {
 				bufferSize += sizeof(U32);
 
 				// 入力レイヤー
-				bufferSize += sizeof(Gravisbell::GUID) * it.second.lpInputLayerGUID.size();
+				bufferSize += sizeof(Gravisbell::GUID) * (U32)it.second.lpInputLayerGUID.size();
 
 				// バイパス入力レイヤーの数
 				bufferSize += sizeof(U32);
 
 				// バイパス入力レイヤー
-				bufferSize += sizeof(Gravisbell::GUID) * it.second.lpBypassLayerGUID.size();
+				bufferSize += sizeof(Gravisbell::GUID) * (U32)it.second.lpBypassLayerGUID.size();
 			}
 		}
 
@@ -208,7 +307,7 @@ namespace NeuralNetwork {
 		bufferSize += sizeof(Gravisbell::GUID);
 
 
-		return 0;
+		return bufferSize;
 	}
 
 	/** レイヤーをバッファに書き込む.
@@ -224,7 +323,7 @@ namespace NeuralNetwork {
 		{
 			// 本体を保有しているレイヤー
 			for(auto& it : this->lpLayerData)
-				lpTmpLayerData[it->GetGUID()] = it;
+				lpTmpLayerData[it.first] = it.second;
 			// 接続レイヤー
 			for(auto& it : this->lpConnectInfo)
 				lpTmpLayerData[it.second.pLayerData->GetGUID()] = it.second.pLayerData;
@@ -244,7 +343,7 @@ namespace NeuralNetwork {
 		writeBufferByte += this->pLayerStructure->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
 
 		// レイヤーの数
-		tmpCount = lpTmpLayerData.size();
+		tmpCount = (U32)lpTmpLayerData.size();
 		memcpy(&o_lpBuffer[writeBufferByte], &tmpCount, sizeof(U32));
 		writeBufferByte += sizeof(U32);
 
@@ -261,6 +360,16 @@ namespace NeuralNetwork {
 			memcpy(&o_lpBuffer[writeBufferByte], &tmpGUID, sizeof(Gravisbell::GUID));
 			writeBufferByte += sizeof(Gravisbell::GUID);
 
+			// テスト用
+#ifdef _DEBUG
+			U32 useBufferByte  = it.second->GetUseBufferByteCount();
+			U32 useBufferByte2 = it.second->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
+			if(useBufferByte != useBufferByte2)
+			{
+				return ErrorCode::ERROR_CODE_COMMON_OUT_OF_ARRAYRANGE;
+			}
+#endif
+
 			// レイヤー本体
 			writeBufferByte += it.second->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
 		}
@@ -268,7 +377,7 @@ namespace NeuralNetwork {
 		// レイヤー接続情報
 		{
 			// レイヤー接続情報数
-			tmpCount = this->lpConnectInfo.size();
+			tmpCount = (U32)this->lpConnectInfo.size();
 			memcpy(&o_lpBuffer[writeBufferByte], &tmpCount, sizeof(U32));
 			writeBufferByte += sizeof(U32);
 
@@ -286,7 +395,7 @@ namespace NeuralNetwork {
 				writeBufferByte += sizeof(Gravisbell::GUID);
 
 				// 入力レイヤーの数
-				tmpCount = it.second.lpInputLayerGUID.size();
+				tmpCount = (U32)it.second.lpInputLayerGUID.size();
 				memcpy(&o_lpBuffer[writeBufferByte], &tmpCount, sizeof(U32));
 				writeBufferByte += sizeof(U32);
 
@@ -298,7 +407,7 @@ namespace NeuralNetwork {
 				}
 
 				// バイパス入力レイヤーの数
-				tmpCount = it.second.lpBypassLayerGUID.size();
+				tmpCount = (U32)it.second.lpBypassLayerGUID.size();
 				memcpy(&o_lpBuffer[writeBufferByte], &tmpCount, sizeof(U32));
 				writeBufferByte += sizeof(U32);
 
@@ -479,11 +588,29 @@ namespace NeuralNetwork {
 
 		// レイヤーデータ本体を持つ場合は削除
 		{
-			auto it_pLayerData = this->lpLayerData.find(it->second.pLayerData);
+			auto it_pLayerData = this->lpLayerData.find(it->second.pLayerData->GetGUID());
 			if(it_pLayerData != this->lpLayerData.end())
 			{
-				delete *it_pLayerData;
-				this->lpLayerData.erase(it_pLayerData);
+				// 削除対象のレイヤー以外に同一のレイヤーデータを使用しているレイヤーが存在しないか確認
+				bool onCanErase = true;
+				for(auto& it_search : this->lpConnectInfo)
+				{
+					if(it_search.first != i_guid)
+					{
+						if(it_search.second.pLayerData->GetGUID() == it_pLayerData->first)
+						{
+							onCanErase = false;
+							break;
+						}
+					}
+				}
+
+				// レイヤーデータを削除
+				if(onCanErase)
+				{
+					delete it_pLayerData->second;
+					this->lpLayerData.erase(it_pLayerData);
+				}
 			}
 		}
 
@@ -503,9 +630,9 @@ namespace NeuralNetwork {
 		this->lpConnectInfo.clear();
 
 		// レイヤーデータ本体を削除
-		for(auto pLayerData : this->lpLayerData)
+		for(auto it : this->lpLayerData)
 		{
-			delete pLayerData;
+			delete it.second;
 		}
 		this->lpLayerData.clear();
 
@@ -518,7 +645,7 @@ namespace NeuralNetwork {
 	/** 登録されているレイヤー数を取得する */
 	U32 FeedforwardNeuralNetwork_LayerData_Base::GetLayerCount()
 	{
-		return this->lpConnectInfo.size();
+		return (U32)this->lpConnectInfo.size();
 	}
 	/** レイヤーのGUIDを番号指定で取得する */
 	ErrorCode FeedforwardNeuralNetwork_LayerData_Base::GetLayerGUIDbyNum(U32 i_layerNum, Gravisbell::GUID& o_guid)
@@ -657,7 +784,7 @@ namespace NeuralNetwork {
 		if(it_layer == this->lpConnectInfo.end())
 			return 0;
 
-		return it_layer->second.lpInputLayerGUID.size();
+		return (U32)it_layer->second.lpInputLayerGUID.size();
 	}
 	/** レイヤーに接続しているバイパスレイヤーの数を取得する.
 		@param	i_layerGUID		接続されているレイヤーのGUID. */
@@ -668,7 +795,7 @@ namespace NeuralNetwork {
 		if(it_layer == this->lpConnectInfo.end())
 			return 0;
 
-		return it_layer->second.lpBypassLayerGUID.size();
+		return (U32)it_layer->second.lpBypassLayerGUID.size();
 	}
 	/** レイヤーに接続している出力レイヤーの数を取得する */
 	U32 FeedforwardNeuralNetwork_LayerData_Base::GetOutputLayerCount(const Gravisbell::GUID& i_layerGUID)

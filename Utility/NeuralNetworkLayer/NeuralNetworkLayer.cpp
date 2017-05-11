@@ -283,6 +283,85 @@ Gravisbell::ErrorCode AddLayerToNetworkLast( Layer::NeuralNetwork::INNLayerConne
 }
 
 
+/** ニューラルネットワークをバイナリファイルに保存する */
+Gravisbell::ErrorCode WriteNetworkToBinaryFile(const Layer::NeuralNetwork::INNLayerData& neuralNetwork, const boost::filesystem::path& filePath)
+{
+	// バッファを用意する
+	std::vector<BYTE> lpBuffer;
+	S32 writeByteCount = 0;
+	lpBuffer.resize(sizeof(Gravisbell::GUID) + neuralNetwork.GetUseBufferByteCount());
+
+	// レイヤー種別を書き込む
+	Gravisbell::GUID typeCode = neuralNetwork.GetLayerCode();
+	memcpy(&lpBuffer[writeByteCount], &typeCode, sizeof(Gravisbell::GUID));
+	writeByteCount += sizeof(Gravisbell::GUID);
+
+	// バッファへ読み込む
+	writeByteCount += neuralNetwork.WriteToBuffer(&lpBuffer[writeByteCount]);
+	if(writeByteCount != lpBuffer.size())
+		return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+
+	// バッファをファイルへ書き込む
+	{
+		// ファイルオープン
+		FILE* fp = fopen(filePath.string().c_str(), "wb");
+		if(fp == NULL)
+			return ErrorCode::ERROR_CODE_COMMON_FILE_NOT_FOUND;
+
+		// 書き込み
+		fwrite(&lpBuffer[0], 1, lpBuffer.size(),fp);
+
+		// ファイルクローズ
+		fclose(fp);
+	}
+
+	return ErrorCode::ERROR_CODE_NONE;
+}
+/** ニューラルネットワークをバイナリファイルから読み込むする */
+Gravisbell::ErrorCode ReadNetworkFromBinaryFile(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::INNLayerData** ppNeuralNetwork, const boost::filesystem::path& filePath)
+{
+	std::vector<BYTE> lpBuffer;
+	S32 readByteCount = 0;
+
+	// ファイルの中身をバッファにコピーする
+	{
+		// ファイルオープン
+		FILE* fp = fopen(filePath.string().c_str(), "rb");
+		if(fp == NULL)
+			return ErrorCode::ERROR_CODE_COMMON_FILE_NOT_FOUND;
+
+		// ファイルサイズを調べてバッファを作成する
+		fseek(fp, 0, SEEK_END);
+		U32 fileSize = ftell(fp);
+		lpBuffer.resize(fileSize);
+
+		// 読込
+		fseek(fp, 0, SEEK_SET);
+		fread(&lpBuffer[0], 1, fileSize, fp);
+
+		// ファイルクローズ
+		fclose(fp);
+	}
+
+	// 種別コードを読み込む
+	Gravisbell::GUID typeCode;
+	memcpy(&typeCode, &lpBuffer[readByteCount], sizeof(Gravisbell::GUID));
+	readByteCount += sizeof(Gravisbell::GUID);
+
+	// DLLを取得
+	auto pLayerDLL = layerDLLManager.GetLayerDLLByGUID(typeCode);
+	if(pLayerDLL == NULL)
+		return ErrorCode::ERROR_CODE_DLL_NOTFOUND;
+
+	// ネットワークを作成
+	S32 useBufferCount = 0;
+	*ppNeuralNetwork = pLayerDLL->CreateLayerDataFromBuffer(&lpBuffer[readByteCount], (S32)lpBuffer.size()-readByteCount, useBufferCount);
+	readByteCount += useBufferCount;
+
+	return ErrorCode::ERROR_CODE_NONE;
+}
+
+
 }	// NeuralNetworkLayer
 }	// Utility
 }	// Gravisbell

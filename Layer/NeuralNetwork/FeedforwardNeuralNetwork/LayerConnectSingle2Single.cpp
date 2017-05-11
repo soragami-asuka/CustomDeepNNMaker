@@ -207,7 +207,7 @@ namespace NeuralNetwork {
 		@param	i_layerGUID		接続されているレイヤーのGUID. */
 	U32 LayerConnectSingle2Single::GetInputLayerCount()const
 	{
-		return this->lppInputFromLayer.size();
+		return (U32)this->lppInputFromLayer.size();
 	}
 	/** レイヤーに接続している入力レイヤーのGUIDを番号指定で取得する.
 		@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
@@ -266,7 +266,7 @@ namespace NeuralNetwork {
 		@param	i_layerGUID		接続されているレイヤーのGUID. */
 	U32 LayerConnectSingle2Single::GetOutputToLayerCount()const
 	{
-		return this->lppOutputToLayer.size();
+		return (U32)this->lppOutputToLayer.size();
 	}
 	/** レイヤーに接続している出力先レイヤーを番号指定で取得する.
 		@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */

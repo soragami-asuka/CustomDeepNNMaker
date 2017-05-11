@@ -73,7 +73,7 @@ namespace NeuralNetwork {
 		@param i_lpBuffer	読み込みバッファの先頭アドレス.
 		@param i_bufferSize	読み込み可能バッファのサイズ.
 		@return	成功した場合0 */
-	ErrorCode BatchNormalization_LayerData_GPU::InitializeFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize)
+	ErrorCode BatchNormalization_LayerData_GPU::InitializeFromBuffer(const BYTE* i_lpBuffer, U32 i_bufferSize, S32& o_useBufferSize )
 	{
 		int readBufferByte = 0;
 
@@ -82,9 +82,11 @@ namespace NeuralNetwork {
 		readBufferByte += sizeof(this->inputDataStruct);
 
 		// 設定情報
-		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, readBufferByte);
+		S32 useBufferByte = 0;
+		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, useBufferByte);
 		if(pLayerStructure == NULL)
 			return ErrorCode::ERROR_CODE_INITLAYER_READ_CONFIG;
+		readBufferByte += useBufferByte;
 		this->SetLayerConfig(*pLayerStructure);
 		delete pLayerStructure;
 
@@ -93,13 +95,19 @@ namespace NeuralNetwork {
 
 		// 平均
 		cudaMemcpy(thrust::raw_pointer_cast(&this->lpMean[0]), &i_lpBuffer[readBufferByte], sizeof(F32)*this->lpMean.size(), cudaMemcpyHostToDevice);
+		readBufferByte += sizeof(F32)*(U32)this->lpMean.size();
 		// 分散
 		cudaMemcpy(thrust::raw_pointer_cast(&this->lpVariance[0]), &i_lpBuffer[readBufferByte], sizeof(F32)*this->lpMean.size(), cudaMemcpyHostToDevice);
+		readBufferByte += sizeof(F32)*(U32)this->lpMean.size();
 		// スケーリング値
 		cudaMemcpy(thrust::raw_pointer_cast(&this->lpScale[0]), &i_lpBuffer[readBufferByte], sizeof(F32)*this->lpMean.size(), cudaMemcpyHostToDevice);
+		readBufferByte += sizeof(F32)*(U32)this->lpMean.size();
 		// バイアス値
 		cudaMemcpy(thrust::raw_pointer_cast(&this->lpBias[0]), &i_lpBuffer[readBufferByte], sizeof(F32)*this->lpMean.size(), cudaMemcpyHostToDevice);
+		readBufferByte += sizeof(F32)*(U32)this->lpMean.size();
 
+
+		o_useBufferSize = readBufferByte;
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -127,16 +135,16 @@ namespace NeuralNetwork {
 
 		// 平均
 		cudaMemcpy(&o_lpBuffer[writeBufferByte], thrust::raw_pointer_cast(&this->lpMean[0]), sizeof(F32)*this->lpMean.size(), cudaMemcpyHostToDevice);
-		writeBufferByte += sizeof(F32)*this->lpMean.size();
+		writeBufferByte += sizeof(F32)*(U32)this->lpMean.size();
 		// 分散
 		cudaMemcpy(&o_lpBuffer[writeBufferByte], thrust::raw_pointer_cast(&this->lpVariance[0]), sizeof(F32)*this->lpVariance.size(), cudaMemcpyHostToDevice);
-		writeBufferByte += sizeof(F32)*this->lpVariance.size();
+		writeBufferByte += sizeof(F32)*(U32)this->lpVariance.size();
 		// スケーリング値
 		cudaMemcpy(&o_lpBuffer[writeBufferByte], thrust::raw_pointer_cast(&this->lpScale[0]), sizeof(F32)*this->lpScale.size(), cudaMemcpyHostToDevice);
-		writeBufferByte += sizeof(F32)*this->lpScale.size();
+		writeBufferByte += sizeof(F32)*(U32)this->lpScale.size();
 		// バイアス値
 		cudaMemcpy(&o_lpBuffer[writeBufferByte], thrust::raw_pointer_cast(&this->lpBias[0]), sizeof(F32)*this->lpBias.size(), cudaMemcpyHostToDevice);
-		writeBufferByte += sizeof(F32)*this->lpBias.size();
+		writeBufferByte += sizeof(F32)*(U32)this->lpBias.size();
 
 		return writeBufferByte;
 	}
@@ -184,16 +192,9 @@ EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayerData* CreateLayerDataGPUfro
 	if(pLayerData == NULL)
 		return NULL;
 
-	// 読み取りに使用するバッファ数を取得
-	U32 useBufferSize = pLayerData->GetUseBufferByteCount();
-	if(useBufferSize >= (U32)i_bufferSize)
-	{
-		delete pLayerData;
-		return NULL;
-	}
-
 	// 初期化
-	Gravisbell::ErrorCode errCode = pLayerData->InitializeFromBuffer(i_lpBuffer, i_bufferSize);
+	S32 useBufferSize = 0;
+	Gravisbell::ErrorCode errCode = pLayerData->InitializeFromBuffer(i_lpBuffer, i_bufferSize, useBufferSize);
 	if(errCode != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 	{
 		delete pLayerData;

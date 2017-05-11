@@ -35,6 +35,12 @@ namespace NeuralNetworkLayer {
 		std::list<Layer::ILayerData*>& lppLayerData, Gravisbell::IODataStruct& inputDataStruct, Gravisbell::GUID& lastLayerGUID, Layer::NeuralNetwork::INNLayerData* pAddlayer);
 
 
+	/** ニューラルネットワークをバイナリファイルに保存する */
+	Gravisbell::ErrorCode WriteNetworkToBinaryFile(const Layer::NeuralNetwork::INNLayerData& neuralNetwork, const boost::filesystem::path& filePath);
+	/** ニューラルネットワークをバイナリファイルから読み込むする */
+	Gravisbell::ErrorCode ReadNetworkFromBinaryFile(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::INNLayerData** ppNeuralNetwork, const boost::filesystem::path& filePath);
+
+
 }	// NeuralNetworkLayer
 }	// Utility
 }	// Gravisbell

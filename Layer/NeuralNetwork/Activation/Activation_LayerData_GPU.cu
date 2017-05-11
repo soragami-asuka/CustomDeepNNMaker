@@ -71,16 +71,9 @@ EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayerData* CreateLayerDataGPUfro
 	if(pLayerData == NULL)
 		return NULL;
 
-	// 読み取りに使用するバッファ数を取得
-	U32 useBufferSize = pLayerData->GetUseBufferByteCount();
-	if(useBufferSize >= (U32)i_bufferSize)
-	{
-		delete pLayerData;
-		return NULL;
-	}
-
 	// 初期化
-	Gravisbell::ErrorCode errCode = pLayerData->InitializeFromBuffer(i_lpBuffer, i_bufferSize);
+	S32 useBufferSize = 0;
+	Gravisbell::ErrorCode errCode = pLayerData->InitializeFromBuffer(i_lpBuffer, i_bufferSize, useBufferSize);
 	if(errCode != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 	{
 		delete pLayerData;
