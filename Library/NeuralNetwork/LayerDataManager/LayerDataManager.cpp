@@ -100,7 +100,7 @@ namespace NeuralNetwork {
 		/** レイヤーデータ数を取得する */
 		U32 GetLayerDataCount()
 		{
-			return this->lpLayerData.size();
+			return (U32)this->lpLayerData.size();
 		}
 		/** レイヤーデータを番号指定で取得する */
 		INNLayerData* GetLayerDataByNum(U32 i_num)
