@@ -702,6 +702,11 @@ namespace NeuralNetwork {
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
+	/** 出力信号レイヤーのGUIDを取得する */
+	Gravisbell::GUID FeedforwardNeuralNetwork_LayerData_Base::GetOutputLayerGUID()
+	{
+		return this->outputLayerGUID;
+	}
 
 
 	//====================================

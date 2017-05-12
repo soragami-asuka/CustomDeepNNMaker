@@ -206,6 +206,8 @@ namespace NeuralNetwork {
 
 		/** 出力信号レイヤーを設定する */
 		ErrorCode SetOutputLayerGUID(const Gravisbell::GUID& i_guid);
+		/** 出力信号レイヤーのGUIDを取得する */
+		Gravisbell::GUID GetOutputLayerGUID();
 
 
 		//====================================

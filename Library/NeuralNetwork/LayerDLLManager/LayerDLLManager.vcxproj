@@ -22,6 +22,7 @@
     <ProjectGuid>{AC9B4528-AB0B-4549-A844-CFDC8837A7C6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>LayerDLLManager</RootNamespace>
+    <ProjectName>NeuralNetwork.LayerDLLManager</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -68,19 +69,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>$(SolutionName).NeuralNetwork.$(ProjectName)</TargetName>
+    <TargetName>$(SolutionName).$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>$(SolutionName).NeuralNetwork.$(ProjectName)</TargetName>
+    <TargetName>$(SolutionName).$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>$(SolutionName).NeuralNetwork.$(ProjectName)</TargetName>
+    <TargetName>$(SolutionName).$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>$(SolutionName).NeuralNetwork.$(ProjectName)</TargetName>
+    <TargetName>$(SolutionName).$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -162,8 +163,10 @@
     <ClInclude Include="..\..\..\include\Layer\IO\ISingleOutputLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h" />
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDataManager.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INeuralNetwork.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayer.h" />
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerData.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
     <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h" />
     <ClInclude Include="LayerDLLManager.h" />

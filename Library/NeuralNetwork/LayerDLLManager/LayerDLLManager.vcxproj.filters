@@ -111,6 +111,12 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INeuralNetwork.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerData.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDataManager.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

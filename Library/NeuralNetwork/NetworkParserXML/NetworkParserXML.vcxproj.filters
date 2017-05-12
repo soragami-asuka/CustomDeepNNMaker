@@ -13,38 +13,29 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="FromXML">
-      <UniqueIdentifier>{f7bec02c-98a9-476a-805a-1d3df31d8ffe}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include">
-      <UniqueIdentifier>{70172639-1cec-4963-9cdd-df53324c48e0}</UniqueIdentifier>
+      <UniqueIdentifier>{0063508d-6789-4315-b53f-055c4bdce4e5}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\Common">
-      <UniqueIdentifier>{9a971003-fc9f-4914-9446-5b7f05d1d801}</UniqueIdentifier>
+      <UniqueIdentifier>{134a41ae-ea4c-416b-abd2-1df4c0f96313}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\SettingData">
-      <UniqueIdentifier>{1acf46a5-dd9b-4d77-a1dd-fbeca6c2917e}</UniqueIdentifier>
+      <UniqueIdentifier>{918052ae-3516-4afd-a4fb-f1356ecd0964}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\SettingData\Standard">
-      <UniqueIdentifier>{8f8a8ac5-2c2a-43b0-8609-e80c37fd06b1}</UniqueIdentifier>
+      <UniqueIdentifier>{9083ee6a-6830-44b2-94e6-f9e57186920e}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\Layer">
-      <UniqueIdentifier>{d76b888c-51e9-47c7-b161-1b8c82f8fa40}</UniqueIdentifier>
+      <UniqueIdentifier>{594102e3-06ad-4db4-ad18-31faf8bc63f5}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\Layer\IOData">
-      <UniqueIdentifier>{1ffc9360-858a-4c65-9dd2-34ebea05dc75}</UniqueIdentifier>
+      <UniqueIdentifier>{cb262f80-538c-4f6a-8f08-0e4d3c186dc6}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\Layer\NeuralNetwork">
-      <UniqueIdentifier>{c3328bc0-27e7-4ed6-af5c-ef401dab5f04}</UniqueIdentifier>
+      <UniqueIdentifier>{48b860c0-4856-47f0-8941-58e1216123ec}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\Layer\IO">
-      <UniqueIdentifier>{c25a0088-3043-4729-8838-ba94658cf357}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Layer">
-      <UniqueIdentifier>{d33be59a-b25c-46b4-a4fb-3d2867602395}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="LayerData">
-      <UniqueIdentifier>{7f756651-cf39-4ef5-895c-29a97761d20e}</UniqueIdentifier>
+      <UniqueIdentifier>{d70f7f8c-a687-4fbd-b718-a44052a9cd49}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -57,7 +48,7 @@
     <ClInclude Include="targetver.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
+    <ClInclude Include="XMLParser.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Common\Common.h">
@@ -84,16 +75,37 @@
     <ClInclude Include="..\..\..\include\Layer\ILayerBase.h">
       <Filter>include\Layer</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\ILayerData.h">
+      <Filter>include\Layer</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\IOData\IDataLayer.h">
       <Filter>include\Layer\IOData</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer.h">
       <Filter>include\Layer\IOData</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INeuralNetwork.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayer.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerData.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDataManager.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerConnectData.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\IO\IInputLayer.h">
@@ -111,54 +123,6 @@
     <ClInclude Include="..\..\..\include\Layer\IO\ISingleOutputLayer.h">
       <Filter>include\Layer\IO</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INeuralNetwork.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
-    <ClInclude Include="FullyConnect_FUNC.hpp">
-      <Filter>FromXML</Filter>
-    </ClInclude>
-    <ClInclude Include="FullyConnect_DATA.hpp">
-      <Filter>FromXML</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\ILayerData.h">
-      <Filter>include\Layer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerData.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
-    <ClInclude Include="RandomUtility.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="FullyConnect_Base.h">
-      <Filter>Layer</Filter>
-    </ClInclude>
-    <ClInclude Include="FullyConnect_CPU.h">
-      <Filter>Layer</Filter>
-    </ClInclude>
-    <ClInclude Include="FullyConnect_LayerData_Base.h">
-      <Filter>LayerData</Filter>
-    </ClInclude>
-    <ClInclude Include="FullyConnect_LayerData_CPU.h">
-      <Filter>LayerData</Filter>
-    </ClInclude>
-    <ClInclude Include="FullyConnect_GPU.cuh">
-      <Filter>Layer</Filter>
-    </ClInclude>
-    <ClInclude Include="FullyConnect_LayerData_GPU.cuh">
-      <Filter>LayerData</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDataManager.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerConnectData.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -167,40 +131,8 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="FullyConnect_FUNC.cpp">
-      <Filter>FromXML</Filter>
-    </ClCompile>
-    <ClCompile Include="RandomUtility.cpp">
+    <ClCompile Include="XMLParser.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="FullyConnect_Base.cpp">
-      <Filter>Layer</Filter>
-    </ClCompile>
-    <ClCompile Include="FullyConnect_CPU.cpp">
-      <Filter>Layer</Filter>
-    </ClCompile>
-    <ClCompile Include="FullyConnect_LayerData_Base.cpp">
-      <Filter>LayerData</Filter>
-    </ClCompile>
-    <ClCompile Include="FullyConnect_LayerData_CPU.cpp">
-      <Filter>LayerData</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="FullyConnect.rc">
-      <Filter>リソース ファイル</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Xml Include="Config.xml" />
-    <Xml Include="LanguagePack-en.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <CudaCompile Include="FullyConnect_LayerData_GPU.cu">
-      <Filter>LayerData</Filter>
-    </CudaCompile>
-    <CudaCompile Include="FullyConnect_GPU.cu">
-      <Filter>Layer</Filter>
-    </CudaCompile>
   </ItemGroup>
 </Project>
