@@ -376,14 +376,9 @@ namespace NeuralNetwork {
 		return this->pLayer->Calculate(lppInputFromLayer[0]->GetOutputBuffer());
 	}
 	/** ŠwKŒë·‚ðŒvŽZ‚·‚é. */
-	ErrorCode LayerConnectSingle2Single::CalculateLearnError(void)
+	ErrorCode LayerConnectSingle2Single::Training(void)
 	{
-		return this->pLayer->CalculateLearnError(this->lppOutputToLayer[0].pLayer->GetDInputBufferByNum(this->lppOutputToLayer[0].position));
-	}
-	/** ŠwK·•ª‚ðƒŒƒCƒ„[‚É”½‰f‚³‚¹‚é.*/
-	ErrorCode LayerConnectSingle2Single::ReflectionLearnError(void)
-	{
-		return this->pLayer->ReflectionLearnError();
+		return this->pLayer->Training(this->lppOutputToLayer[0].pLayer->GetDInputBufferByNum(this->lppOutputToLayer[0].position));
 	}
 
 

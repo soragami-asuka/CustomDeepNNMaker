@@ -890,47 +890,30 @@ namespace NeuralNetwork {
 	//================================
 	// 学習処理
 	//================================
-	/** 学習誤差を計算する.
+	/** 学習処理を実行する.
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode FeedforwardNeuralNetwork_Base::CalculateLearnError(CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode FeedforwardNeuralNetwork_Base::Training(CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		// 出力差分バッファを一時保存
 		this->m_lppDOutputBuffer = i_lppDOutputBuffer;
 
-		// 学習誤差計算を実行
-		auto it = this->lpCalculateLayerList.rbegin();
-		while(it != this->lpCalculateLayerList.rend())
+		// 学習処理を実行
 		{
-			ErrorCode err = (*it)->CalculateLearnError();
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return err;
+			auto it = this->lpCalculateLayerList.rbegin();
+			while(it != this->lpCalculateLayerList.rend())
+			{
+				ErrorCode err = (*it)->Training();
+				if(err != ErrorCode::ERROR_CODE_NONE)
+					return err;
 
-			it++;
+				it++;
+			}
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
-	/** 学習差分をレイヤーに反映させる.
-		入力信号、出力信号は直前のCalculateの値を参照する.
-		出力誤差差分、入力誤差差分は直前のCalculateLearnErrorの値を参照する. */
-	ErrorCode FeedforwardNeuralNetwork_Base::ReflectionLearnError(void)
-	{
-		// 学習誤差反映を実行
-		auto it = this->lpCalculateLayerList.begin();
-		while(it != this->lpCalculateLayerList.end())
-		{
-			ErrorCode err = (*it)->ReflectionLearnError();
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return err;
-
-			it++;
-		}
-
-		return ErrorCode::ERROR_CODE_NONE;
-	}
-
 
 
 }	// NeuralNetwork

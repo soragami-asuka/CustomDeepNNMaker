@@ -191,7 +191,7 @@ namespace NeuralNetwork {
 		@param	i_layerGUID		接続されているレイヤーのGUID. */
 	U32 LayerConnectInput::GetOutputToLayerCount()const
 	{
-		return this->lppOutputToLayer.size();
+		return (U32)this->lppOutputToLayer.size();
 	}
 	/** レイヤーに接続している出力先レイヤーを番号指定で取得する.
 		@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
@@ -290,13 +290,8 @@ namespace NeuralNetwork {
 	{
 		return ErrorCode::ERROR_CODE_NONE;
 	}
-	/** 学習誤差を計算する. */
-	ErrorCode LayerConnectInput::CalculateLearnError(void)
-	{
-		return ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 学習差分をレイヤーに反映させる.*/
-	ErrorCode LayerConnectInput::ReflectionLearnError(void)
+	/** 学習処理を実行する. */
+	ErrorCode LayerConnectInput::Training(void)
 	{
 		return ErrorCode::ERROR_CODE_NONE;
 	}

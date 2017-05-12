@@ -239,7 +239,7 @@ namespace NeuralNetwork {
 		for(U32 ch=0; ch<this->layerData.inputDataStruct.ch; ch++)
 		{
 			F32 mean = this->lpTmpMean[ch];
-			F32 variance = this->lpTmpVariance[ch] + max(this->layerData.layerStructure.epsilon, 1e-5);
+			F32 variance = this->lpTmpVariance[ch] + (F32)max(this->layerData.layerStructure.epsilon, 1e-5);
 			F32 sqrtVariance = (F32)sqrt(variance);
 
 			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
@@ -290,12 +290,15 @@ namespace NeuralNetwork {
 	//================================
 	// 学習処理
 	//================================
-	/** 学習誤差を計算する.
+	/** 学習処理を実行する.
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode BatchNormalization_CPU::CalculateLearnError(CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
+	ErrorCode BatchNormalization_CPU::Training(CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
 	{
+		// 平均値更新用の係数を算出
+		F64 factor = 1.0 / (this->learnCount+1);
+
 		// 出力誤差バッファのアドレスを配列に格納
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 			this->m_lppDOutputBufferPrev[batchNum] = &i_lpDOutputBufferPrev[batchNum * this->outputBufferCount];
@@ -303,7 +306,7 @@ namespace NeuralNetwork {
 		for(U32 ch=0; ch<this->layerData.inputDataStruct.ch; ch++)
 		{
 			F32 mean = this->lpTmpMean[ch];
-			F32 variance = this->lpTmpVariance[ch] + max(this->layerData.layerStructure.epsilon, 1e-5);
+			F32 variance = this->lpTmpVariance[ch] + (F32)max(this->layerData.layerStructure.epsilon, 1e-5);
 			F32 sqrtVariance  = (F32)sqrt(variance);
 			F32 sqrtVariance3 = sqrtVariance*sqrtVariance*sqrtVariance;
 			F32 scale = this->layerData.lpScale[ch];
@@ -342,24 +345,13 @@ namespace NeuralNetwork {
 		}
 
 
-		return ErrorCode::ERROR_CODE_NONE;
-	}
-
-
-	/** 学習差分をレイヤーに反映させる.
-		入力信号、出力信号は直前のCalculateの値を参照する.
-		出力誤差差分、入力誤差差分は直前のCalculateLearnErrorの値を参照する. */
-	ErrorCode BatchNormalization_CPU::ReflectionLearnError(void)
-	{
 		// 学習処理の実行回数をカウントアップ
-		F64 factor = 1.0 / (this->learnCount+1);
-//		F32 factor = 0.5f;
 		this->learnCount++;
 
 		for(U32 ch=0; ch<this->layerData.inputDataStruct.ch; ch++)
 		{
 			F32 mean = this->lpTmpMean[ch];
-			F32 variance = this->lpTmpVariance[ch] + max(this->layerData.layerStructure.epsilon, 1e-5);
+			F32 variance = this->lpTmpVariance[ch] + (F32)max(this->layerData.layerStructure.epsilon, 1e-5);
 			F64 sqrtVariance = (F32)sqrt(variance);
 			F64 sqrtVarianceInv = 1.0f / sqrtVariance;
 
@@ -392,6 +384,7 @@ namespace NeuralNetwork {
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
+
 
 	/** 学習差分を取得する.
 		配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]

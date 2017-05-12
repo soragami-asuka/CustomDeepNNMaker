@@ -248,11 +248,11 @@ namespace NeuralNetwork {
 	//================================
 	// 学習処理
 	//================================
-	/** 学習誤差を計算する.
+	/** 学習処理を実行する.
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Dropout_CPU::CalculateLearnError(CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
+	ErrorCode Dropout_CPU::Training(CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
 	{
 		// 出力誤差バッファのアドレスを配列に格納
 		this->m_lpDOutputBufferPrev = i_lpDOutputBufferPrev;
@@ -275,14 +275,6 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
-
-	/** 学習差分をレイヤーに反映させる.
-		入力信号、出力信号は直前のCalculateの値を参照する.
-		出力誤差差分、入力誤差差分は直前のCalculateLearnErrorの値を参照する. */
-	ErrorCode Dropout_CPU::ReflectionLearnError(void)
-	{
-		return ErrorCode::ERROR_CODE_NONE;
-	}
 
 	/** 学習差分を取得する.
 		配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]

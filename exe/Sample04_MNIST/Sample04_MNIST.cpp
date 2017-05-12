@@ -446,11 +446,11 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::Neur
 			lppLayerData,
 			inputDataStruct, lastLayerGUID,
 			Gravisbell::Utility::NeuralNetworkLayer::CreateActivationLayer(layerDLLManager, inputDataStruct, L"ReLU"));
-		//Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
-		//	*pNeuralNetwork,
-		//	lppLayerData,
-		//	inputDataStruct, lastLayerGUID,
-		//	Gravisbell::Utility::NeuralNetworkLayer::CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.2f));
+		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lppLayerData,
+			inputDataStruct, lastLayerGUID,
+			Gravisbell::Utility::NeuralNetworkLayer::CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.2f));
 
 		// 2‘w–Ú
 		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
@@ -473,11 +473,11 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::Neur
 			lppLayerData,
 			inputDataStruct, lastLayerGUID,
 			Gravisbell::Utility::NeuralNetworkLayer::CreateActivationLayer(layerDLLManager, inputDataStruct, L"ReLU"));
-		//Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
-		//	*pNeuralNetwork,
-		//	lppLayerData,
-		//	inputDataStruct, lastLayerGUID,
-		//	Gravisbell::Utility::NeuralNetworkLayer::CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.5f));
+		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lppLayerData,
+			inputDataStruct, lastLayerGUID,
+			Gravisbell::Utility::NeuralNetworkLayer::CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.5f));
 
 		// 3‘w–Ú
 		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
@@ -593,10 +593,10 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 				// Œë·ŒvŽZ
 				// ‹³ŽtM†‚Æ‚ÌŒë·ŒvŽZ
 				pTeachOutputLayer->CalculateLearnError(pNeuralNetworkLearn->GetOutputBuffer());
-				pNeuralNetworkLearn->CalculateLearnError(pTeachOutputLayer->GetDInputBuffer());
 
-				// Œë·‚ð”½‰f
-				pNeuralNetworkLearn->ReflectionLearnError();
+				// ŠwK
+				pNeuralNetworkLearn->Training(pTeachOutputLayer->GetDInputBuffer());
+
 
 				// ³‰ð—¦‚ðŽZo‚·‚é
 				pTeachOutputLayer->GetOutputBuffer(&lpTeachBuffer[0]);

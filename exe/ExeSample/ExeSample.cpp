@@ -428,21 +428,18 @@ void NNTest_IN1_1_1_O1(Layer::NeuralNetwork::ILayerDLLManager& dllManager, const
 			// Œë·ŒvZ
 			// ‹³tM†‚Æ‚ÌŒë·ŒvZ
 			pTeachLayerA->CalculateLearnError((*lpCalcLayer.rbegin())->GetOutputBuffer());
+
 			// Œë·ŒvZ‚Í‹t‡
 			auto it = lpCalcLayer.rbegin();
-			(*it)->CalculateLearnError(pTeachLayerA->GetDInputBuffer());
+			(*it)->Training(pTeachLayerA->GetDInputBuffer());
 			auto it_last = it;
 			it++;
 			while(it != lpCalcLayer.rend())
 			{
-				(*it)->CalculateLearnError((*it_last)->GetDInputBuffer());
+				(*it)->Training((*it_last)->GetDInputBuffer());
 				it_last = it;
 				it++;
 			}
-
-			// Œë·‚ğ”½‰f
-			for(auto pLayer : lpCalcLayer)
-				pLayer->ReflectionLearnError();
 		}
 
 		// Œë·•\¦

@@ -157,10 +157,8 @@ namespace NeuralNetwork {
 
 		/** 演算処理を実行する. */
 		virtual ErrorCode Calculate(void) = 0;
-		/** 学習誤差を計算する. */
-		virtual ErrorCode CalculateLearnError(void) = 0;
-		/** 学習差分をレイヤーに反映させる.*/
-		virtual ErrorCode ReflectionLearnError(void) = 0;
+		/** 学習処理を実行する. */
+		virtual ErrorCode Training(void) = 0;
 
 	public:
 		//==================================

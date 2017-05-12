@@ -619,10 +619,9 @@ Gravisbell::ErrorCode LearnNeuralNetwork(
 			// Œë·ŒvŽZ
 			// ‹³ŽtM†‚Æ‚ÌŒë·ŒvŽZ
 			pTeachLayer->CalculateLearnError(pNeuralNetwork->GetOutputBuffer());
-			pNeuralNetwork->CalculateLearnError(pTeachLayer->GetDInputBuffer());
 
-			// Œë·‚ð”½‰f
-			pNeuralNetwork->ReflectionLearnError();
+			// ŠwK
+			pNeuralNetwork->Training(pTeachLayer->GetDInputBuffer());
 		}
 
 		// Œë·•\Ž¦
@@ -774,10 +773,9 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 				// Œë·ŒvŽZ
 				// ‹³ŽtM†‚Æ‚ÌŒë·ŒvŽZ
 				pTeachOutputLayer->CalculateLearnError(pNeuralNetworkLearn->GetOutputBuffer());
-				pNeuralNetworkLearn->CalculateLearnError(pTeachOutputLayer->GetDInputBuffer());
 
-				// Œë·‚ð”½‰f
-				pNeuralNetworkLearn->ReflectionLearnError();
+				// ŠwK
+				pNeuralNetworkLearn->Training(pTeachOutputLayer->GetDInputBuffer());
 			}
 		}
 
