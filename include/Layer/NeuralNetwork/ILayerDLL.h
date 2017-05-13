@@ -76,7 +76,8 @@ namespace NeuralNetwork {
 		/** レイヤーを作成.
 			GUIDは自動割り当て.
 			@param	i_lpBuffer		読み取り用バッファ.
-			@param	i_bufferSize	使用可能なバッファサイズ. */
+			@param	i_bufferSize	使用可能なバッファサイズ.
+			@param	o_useBufferSize	実際に使用したバッファサイズ. */
 		virtual INNLayerData* CreateLayerDataFromBuffer(const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)const = 0;
 		/** レイヤーを作成
 			@param guid	作成レイヤーのGUID */

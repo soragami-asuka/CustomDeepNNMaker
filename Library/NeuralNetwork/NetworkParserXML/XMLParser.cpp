@@ -3,7 +3,7 @@
 //=========================================
 #include"stdafx.h"
 
-#include<set>;
+#include<set>
 
 #include<boost/filesystem.hpp>
 #include<boost/property_tree/ptree.hpp>
@@ -59,6 +59,10 @@ namespace
 			return Gravisbell::GUID();
 		}
 	}
+	Gravisbell::GUID String2GUID(const std::string& i_buf)
+	{
+		return String2GUID(::ShiftjisToUnicode(i_buf));
+	}
 }
 
 
@@ -81,11 +85,11 @@ namespace Parser {
 			{
 				if(pConnectLayerData == NULL)
 				{
-					layerFilePath = i_layerDirPath / (::GUID2WString(i_NNLayer.GetGUID()) + L".xml");
+					layerFilePath = i_layerDirPath / (::GUID2WString(i_NNLayer.GetGUID()) + L".bin");
 				}
 				else
 				{
-					layerFilePath = i_layerDirPath / (::GUID2WString(i_NNLayer.GetGUID()) + L".bin");
+					layerFilePath = i_layerDirPath / (::GUID2WString(i_NNLayer.GetGUID()) + L".xml");
 				}
 			}
 			else
@@ -111,6 +115,14 @@ namespace Parser {
 				ptree_rootLayer.put("<xmlattr>.guid", ::GUID2String(pConnectLayerData->GetGUID()));
 				ptree_rootLayer.put("<xmlattr>.outputLayerGUID", ::GUID2String(pConnectLayerData->GetOutputLayerGUID()));
 
+				// 入力データ構造を出力
+				{
+					boost::property_tree::ptree& ptree_input = ptree_rootLayer.add("input", "");
+					ptree_input.put("x", pConnectLayerData->GetInputDataStruct().x);
+					ptree_input.put("y", pConnectLayerData->GetInputDataStruct().y);
+					ptree_input.put("z", pConnectLayerData->GetInputDataStruct().z);
+					ptree_input.put("ch", pConnectLayerData->GetInputDataStruct().ch);
+				}
 
 				// レイヤーの接続情報を記載する
 				boost::property_tree::ptree& ptree_layerConnect = ptree_rootLayer.add("layerConnect", "");
@@ -168,14 +180,41 @@ namespace Parser {
 			else
 			{
 				// 通常レイヤーの場合
+				
+				// バッファを用意する
+				std::vector<BYTE> lpBuffer;
+				S32 writeByteCount = 0;
+				lpBuffer.resize(sizeof(Gravisbell::GUID) + i_NNLayer.GetUseBufferByteCount());
 
+				// レイヤー種別を書き込む
+				Gravisbell::GUID typeCode = i_NNLayer.GetLayerCode();
+				memcpy(&lpBuffer[writeByteCount], &typeCode, sizeof(Gravisbell::GUID));
+				writeByteCount += sizeof(Gravisbell::GUID);
+
+				// バッファへ読み込む
+				writeByteCount += i_NNLayer.WriteToBuffer(&lpBuffer[writeByteCount]);
+				if(writeByteCount != lpBuffer.size())
+					return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+
+				// バッファをファイルへ書き込む
+				{
+					// ファイルオープン
+					FILE* fp = fopen(layerFilePath.generic_string().c_str(), "wb");
+					if(fp == NULL)
+						return ErrorCode::ERROR_CODE_COMMON_FILE_NOT_FOUND;
+
+					// 書き込み
+					fwrite(&lpBuffer[0], 1, lpBuffer.size(),fp);
+
+					// ファイルクローズ
+					fclose(fp);
+				}
 			}
 
 			return ErrorCode::ERROR_CODE_NONE;
 		}
 	}
 	
-
 
 
 	/** レイヤーデータをXMLファイルから作成する.
@@ -187,6 +226,250 @@ namespace Parser {
 		*/
 	NetworkParserXML_API INNLayerData* CreateLayerFromXML(const ILayerDLLManager& i_layerDLLManager, ILayerDataManager& io_layerDataManager, const wchar_t i_layerDirPath[], const wchar_t i_rootLayerFilePath[])
 	{
+		// ディレクトリが存在することを確認
+		boost::filesystem::wpath layerDirPath = i_layerDirPath;
+		if(!boost::filesystem::exists(layerDirPath) || !boost::filesystem::is_directory(layerDirPath))
+			return NULL;
+		// ファイルが存在することを確認
+		boost::filesystem::wpath layerFilePath = i_rootLayerFilePath;
+		if(!boost::filesystem::is_directory(layerFilePath.parent_path()))
+		{
+			layerFilePath = layerDirPath / layerFilePath;
+		}
+		if(!boost::filesystem::exists(layerFilePath))
+			return NULL;
+
+		// XMLファイルかbinファイル化を確認する
+		try
+		{
+			boost::property_tree::ptree pTree;
+			boost::property_tree::read_xml(layerFilePath.generic_string(), pTree);
+			// XMLファイルとして扱う
+			try
+			{
+				auto pTreeOpt_root = pTree.get_child_optional("rootLayer");
+				if(pTreeOpt_root)
+				{
+					boost::property_tree::ptree& pTree_root = pTreeOpt_root.get();
+					// 属性を取得
+					Gravisbell::GUID layerCode_root;
+					{
+						auto pValue = pTree_root.get_optional<std::string>("<xmlattr>.layerCode");
+						if(pValue != NULL)
+							layerCode_root = String2GUID(pValue.get());
+						else
+							return NULL;
+					}
+					Gravisbell::GUID layerGUID_root;
+					{
+						auto pValue = pTree_root.get_optional<std::string>("<xmlattr>.guid");
+						if(pValue != NULL)
+							layerGUID_root = String2GUID(pValue.get());
+						else
+							return NULL;
+					}
+					Gravisbell::GUID outputLayerGUID_root;
+					{
+						auto pValue = pTree_root.get_optional<std::string>("<xmlattr>.outputLayerGUID");
+						if(pValue != NULL)
+							outputLayerGUID_root = String2GUID(pValue.get());
+						else
+							return NULL;
+					}
+
+					// レイヤーDLLを取得
+					auto pLayerDLL = i_layerDLLManager.GetLayerDLLByGUID(layerCode_root);
+					if(pLayerDLL == NULL)
+						return NULL;
+
+					// 入力データ構造を作成する
+					IODataStruct inputDataStruct;
+					{
+						auto ptreeOpt_input = pTree_root.get_child_optional("input");
+						if(ptreeOpt_input)
+						{
+							boost::property_tree::ptree& ptree_input = ptreeOpt_input.get();
+							{
+								auto pValue = ptree_input.get_optional<int>("x");
+								if(pValue)
+									inputDataStruct.x = pValue.get();
+							}
+							{
+								auto pValue = ptree_input.get_optional<int>("y");
+								if(pValue)
+									inputDataStruct.y = pValue.get();
+							}
+							{
+								auto pValue = ptree_input.get_optional<int>("z");
+								if(pValue)
+									inputDataStruct.z = pValue.get();
+							}
+							{
+								auto pValue = ptree_input.get_optional<int>("ch");
+								if(pValue)
+									inputDataStruct.ch = pValue.get();
+							}
+						}
+					}
+
+					// レイヤー構造データを作成する
+					auto pLayerStructure = pLayerDLL->CreateLayerStructureSetting();
+					if(pLayerStructure == NULL)
+						return NULL;
+
+					// レイヤーを作成
+					auto pLayer_root = io_layerDataManager.CreateLayerData(
+						i_layerDLLManager,
+						layerCode_root,
+						layerGUID_root,
+						*pLayerStructure,
+						inputDataStruct);
+					delete pLayerStructure;
+
+					// レイヤーの接続情報を作成する
+					INNLayerConnectData* pLayerConnect = dynamic_cast<INNLayerConnectData*>(pLayer_root);
+					if(pLayerConnect)
+					{
+						// レイヤーを追加する
+						for(const boost::property_tree::ptree::value_type &it : pTree_root.get_child("layerConnect"))
+						{
+							if(it.first == "layer")
+							{
+								Gravisbell::GUID layerCode;
+								{
+									auto pValue = it.second.get_optional<std::string>("<xmlattr>.layerCode");
+									if(pValue != NULL)
+										layerCode = String2GUID(pValue.get());
+									else
+										return NULL;
+								}
+								Gravisbell::GUID layerGUID;
+								{
+									auto pValue = it.second.get_optional<std::string>("<xmlattr>.guid");
+									if(pValue != NULL)
+										layerGUID = String2GUID(pValue.get());
+									else
+										return NULL;
+								}
+								Gravisbell::GUID layerDataGUID;
+								{
+									auto pValue = it.second.get_optional<std::string>("<xmlattr>.layerData");
+									if(pValue != NULL)
+										layerDataGUID = String2GUID(pValue.get());
+									else
+										return NULL;
+								}
+
+								INNLayerData* pLayerData = io_layerDataManager.GetLayerData(layerDataGUID);
+								if(pLayerData == NULL)
+								{
+									pLayerData = CreateLayerFromXML(
+										i_layerDLLManager,
+										io_layerDataManager,
+										i_layerDirPath,
+										(GUID2WString(layerDataGUID) + L".xml").c_str());
+									if(pLayerData == NULL)
+									{
+										pLayerData = CreateLayerFromXML(
+											i_layerDLLManager,
+											io_layerDataManager,
+											i_layerDirPath,
+											(GUID2WString(layerDataGUID) + L".bin").c_str());
+									}
+								}
+								if(pLayerData == NULL)
+								{
+									delete pLayer_root;
+									return NULL;
+								}
+
+								// レイヤーに追加
+								pLayerConnect->AddLayer(layerGUID, pLayerData);
+							}
+						}
+
+						// レイヤーの接続情報を追加する
+						for(const boost::property_tree::ptree::value_type &it_layer : pTree_root.get_child("layerConnect"))
+						{
+							if(it_layer.first == "layer")
+							{
+								Gravisbell::GUID layerGUID;
+								{
+									auto pValue = it_layer.second.get_optional<std::string>("<xmlattr>.guid");
+									if(pValue != NULL)
+										layerGUID = String2GUID(pValue.get());
+									else
+									{
+										delete pLayer_root;
+										return NULL;
+									}
+								}
+
+								// 入力を読み込む
+								for(const boost::property_tree::ptree::value_type &it_input : it_layer.second.get_child(""))
+								{
+									if(it_input.first == "input")
+									{
+										pLayerConnect->AddInputLayerToLayer(layerGUID, String2GUID(it_input.second.get<std::string>("")));
+									}
+								}
+							}
+						}
+
+						// 出力レイヤーを接続
+						pLayerConnect->SetOutputLayerGUID(outputLayerGUID_root);
+					}
+
+					// レイヤーデータ管理に追加
+					return pLayer_root;
+				}
+			}
+			catch(boost::exception& e)
+			{
+			}
+		}
+		catch(boost::exception& e)
+		{
+			// binファイルとして取り扱う
+			std::vector<BYTE> lpBuffer;
+			S32 readByteCount = 0;
+
+			// ファイルの中身をバッファにコピーする
+			{
+				// ファイルオープン
+				FILE* fp = fopen(layerFilePath.generic_string().c_str(), "rb");
+				if(fp == NULL)
+					return NULL;
+
+				// ファイルサイズを調べてバッファを作成する
+				fseek(fp, 0, SEEK_END);
+				U32 fileSize = ftell(fp);
+				lpBuffer.resize(fileSize);
+
+				// 読込
+				fseek(fp, 0, SEEK_SET);
+				fread(&lpBuffer[0], 1, fileSize, fp);
+
+				// ファイルクローズ
+				fclose(fp);
+			}
+
+			// 種別コードを読み込む
+			Gravisbell::GUID typeCode;
+			memcpy(&typeCode, &lpBuffer[readByteCount], sizeof(Gravisbell::GUID));
+			readByteCount += sizeof(Gravisbell::GUID);
+
+			// GUIDを調べる
+			Gravisbell::GUID guid = ::String2GUID(layerFilePath.stem().string());
+
+			S32 useBufferCount = 0;
+			return io_layerDataManager.CreateLayerData(
+				i_layerDLLManager,
+				typeCode,
+				guid,
+				&lpBuffer[readByteCount], (S32)lpBuffer.size()-readByteCount, useBufferCount);
+		}
+
 		return NULL;
 	}
 

@@ -172,8 +172,14 @@
     <ProjectReference Include="..\..\Library\DataFormat\Binary\Binary.vcxproj">
       <Project>{b3700b28-5d2c-4b7b-9857-09682f048974}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\Library\NeuralNetwork\LayerDataManager\LayerDataManager.vcxproj">
+      <Project>{0d56f731-5409-4b4c-8a69-d74e3ac68cda}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\Library\NeuralNetwork\LayerDLLManager\LayerDLLManager.vcxproj">
       <Project>{ac9b4528-ab0b-4549-a844-cfdc8837a7c6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Library\NeuralNetwork\NetworkParserXML\NetworkParserXML.vcxproj">
+      <Project>{919c80f1-a324-47d4-9e5f-1accb15b3a52}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\Utility\NeuralNetworkLayer\NeuralNetworkLayer.vcxproj">
       <Project>{b9fa3b73-f9b8-4bf7-a52f-5a397190755b}</Project>

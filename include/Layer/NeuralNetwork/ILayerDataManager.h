@@ -40,6 +40,26 @@ namespace NeuralNetwork {
 			const SettingData::Standard::IData& i_layerStructure,
 			const IODataStruct& i_inputDataStruct,
 			Gravisbell::ErrorCode* o_pErrorCode = NULL) = 0;
+		
+		/** レイヤーデータをバッファから作成.内部的に管理まで行う.
+			@param	i_layerDLLManager	レイヤーDLL管理クラス.
+			@param	i_typeCode			レイヤー種別コード
+			@param	i_guid				新規作成するレイヤーデータのGUID
+			@param	i_lpBuffer			読み取り用バッファ.
+			@param	i_bufferSize		使用可能なバッファサイズ.
+			@param	o_useBufferSize		実際に使用したバッファサイズ.
+			@param	o_pErrorCode		エラーコード格納先のアドレス. NULL指定可.
+			@return
+			typeCodeが存在しない場合、NULLを返す.
+			既に存在するguidでtypeCodeも一致した場合、内部保有のレイヤーデータを返す.
+			既に存在するguidでtypeCodeが異なる場合、NULLを返す. */
+		virtual INNLayerData* CreateLayerData(
+			const ILayerDLLManager& i_layerDLLManager,
+			const Gravisbell::GUID& i_typeCode,
+			const Gravisbell::GUID& i_guid,
+			const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize,
+			Gravisbell::ErrorCode* o_pErrorCode = NULL) = 0;
+
 
 		/** レイヤーデータをGUID指定で取得する */
 		virtual INNLayerData* GetLayerData(const Gravisbell::GUID& i_guid) = 0;

@@ -11,6 +11,8 @@
 #include"Library/Common/BatchDataNoListGenerator/BatchDataNoListGenerator.h"
 #include"Library/DataFormat/Binary/DataFormat.h"
 #include"Library/NeuralNetwork/LayerDLLManager/LayerDLLManager.h"
+#include"Library/NeuralNetwork/LayerDataManager/LayerDataManager.h"
+#include"Library/NeuralNetwork/NetworkParserXML/XMLParser.h"
 #include"Layer/IOData/IODataLayer/IODataLayer.h"
 #include"Layer/NeuralNetwork/INNLayerConnectData.h"
 #include"Layer/NeuralNetwork/INeuralNetwork.h"
@@ -18,7 +20,7 @@
 
 using namespace Gravisbell;
 
-#define USE_GPU	1
+#define USE_GPU	0
 #define USE_HOST_MEMORY 1
 
 
@@ -118,13 +120,25 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 	// ファイルに保存する
-	Gravisbell::Utility::NeuralNetworkLayer::WriteNetworkToBinaryFile(*pNeuralNetworkData, "test.bin");
-	// ファイルから読み込む
-	delete pNeuralNetworkData;
-	Gravisbell::Utility::NeuralNetworkLayer::ReadNetworkFromBinaryFile(*pLayerDLLManager, &pNeuralNetworkData, "test.bin");
-	// 別ファイルに保存する
-	Gravisbell::Utility::NeuralNetworkLayer::WriteNetworkToBinaryFile(*pNeuralNetworkData, "test2.bin");
+	Gravisbell::Utility::NeuralNetworkLayer::WriteNetworkToBinaryFile(*pNeuralNetworkData, "../../LayerData/test.bin");
+	//// ファイルから読み込む
+	//delete pNeuralNetworkData;
+	//Gravisbell::Utility::NeuralNetworkLayer::ReadNetworkFromBinaryFile(*pLayerDLLManager, &pNeuralNetworkData, "test.bin");
+	//// 別ファイルに保存する
+	//Gravisbell::Utility::NeuralNetworkLayer::WriteNetworkToBinaryFile(*pNeuralNetworkData, "test2.bin");
 
+	// XMLファイルに保存する
+	Gravisbell::Layer::NeuralNetwork::Parser::SaveLayerToXML(*pNeuralNetworkData, L"../../LayerData/", L"test.xml");
+	// ファイルから読み込む
+	for(auto pLayerData : lppLayerData)
+		delete pLayerData;
+	lppLayerData.clear();
+	Gravisbell::Layer::NeuralNetwork::ILayerDataManager* pLayerDataManager = Gravisbell::Layer::NeuralNetwork::CreateLayerDataManager();
+	pNeuralNetworkData = Gravisbell::Layer::NeuralNetwork::Parser::CreateLayerFromXML(*pLayerDLLManager, *pLayerDataManager, L"../../LayerData/", L"test.xml");
+	// バイナリファイルに保存する
+	Gravisbell::Utility::NeuralNetworkLayer::WriteNetworkToBinaryFile(*pNeuralNetworkData, "../../LayerData/test2.bin");
+	// 別のXMLファイルに保存する
+	Gravisbell::Layer::NeuralNetwork::Parser::SaveLayerToXML(*pNeuralNetworkData, L"../../LayerData/", L"test2.xml");
 
 
 	// 学習用ニューラルネットワーク作成
@@ -143,6 +157,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		delete pDataLayerTeach_Output;
 		delete pDataLayerTest_Input;
 		delete pDataLayerTest_Output;
+		delete pLayerDataManager;
 		delete pLayerDLLManager;
 		return -1;
 	}
@@ -164,6 +179,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		delete pDataLayerTeach_Output;
 		delete pDataLayerTest_Input;
 		delete pDataLayerTest_Output;
+		delete pLayerDataManager;
 		delete pLayerDLLManager;
 		return -1;
 	}
@@ -181,6 +197,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			delete pDataLayerTeach_Output;
 			delete pDataLayerTest_Input;
 			delete pDataLayerTest_Output;
+			delete pLayerDataManager;
 			delete pLayerDLLManager;
 
 			return -1;
@@ -198,6 +215,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	delete pDataLayerTeach_Output;
 	delete pDataLayerTest_Input;
 	delete pDataLayerTest_Output;
+	delete pLayerDataManager;
 	delete pLayerDLLManager;
 
 	printf("Press any key to continue");
