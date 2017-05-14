@@ -51,8 +51,7 @@ namespace NeuralNetwork {
 		//====================================
 		// コンストラクタ/デストラクタ
 		//====================================
-		/** コンストラクタ
-			@param	i_inputGUID	入力信号に割り当てられたGUID.自分で作ることができないので外部で作成して引き渡す. */
+		/** コンストラクタ */
 		FeedforwardNeuralNetwork_Base(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData);
 		/** デストラクタ */
 		virtual ~FeedforwardNeuralNetwork_Base();

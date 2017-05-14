@@ -111,9 +111,6 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayer.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerDLL.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
@@ -152,6 +149,15 @@
     </ClInclude>
     <ClInclude Include="Dropout_LayerData_CPU.h">
       <Filter>LayerData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IO\IMultOutputLayer.h">
+      <Filter>include\Layer\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerData.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
