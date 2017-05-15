@@ -9,8 +9,7 @@
 #include"../../Common/ErrorCode.h"
 
 #include"ILayerDLLManager.h"
-#include"INNLayer.h"
-#include"INNLayerData.h"
+#include"../ILayerData.h"
 
 
 namespace Gravisbell {
@@ -48,8 +47,8 @@ namespace NeuralNetwork {
 
 
 	/** ÉåÉCÉÑÅ[ÇçÏê¨ */
-	typedef INNLayerData* (*FuncCreateLayerData)		  (const ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const SettingData::Standard::IData& i_layerStructure, const IODataStruct& i_inputDataStruct);
-	typedef INNLayerData* (*FuncCreateLayerDataFromBuffer)(const ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize);
+	typedef ILayerData* (*FuncCreateLayerData)			(const ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const SettingData::Standard::IData& i_layerStructure, const IODataStruct& i_inputDataStruct);
+	typedef ILayerData* (*FuncCreateLayerDataFromBuffer)(const ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize);
 
 }	// NeuralNetwork
 }	// Layer

@@ -242,7 +242,7 @@ namespace NeuralNetwork {
 			return 0;
 
 		// レイヤーデータの一覧を作成する
-		std::map<Gravisbell::GUID, INNLayerData*> lpTmpLayerData;
+		std::map<Gravisbell::GUID, ILayerData*> lpTmpLayerData;
 		{
 			// 本体を保有しているレイヤー
 			for(auto& it : this->lpLayerData)
@@ -319,7 +319,7 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_NONREGIST_CONFIG;
 
 		// レイヤーデータの一覧を作成する
-		std::map<Gravisbell::GUID, INNLayerData*> lpTmpLayerData;
+		std::map<Gravisbell::GUID, ILayerData*> lpTmpLayerData;
 		{
 			// 本体を保有しているレイヤー
 			for(auto& it : this->lpLayerData)
@@ -495,7 +495,12 @@ namespace NeuralNetwork {
 		if(it == this->lpConnectInfo.end())
 			return IODataStruct();
 
-		return it->second.pLayerData->GetOutputDataStruct();
+		if(const ISingleOutputLayerData* pLayerData = dynamic_cast<const ISingleOutputLayerData*>(it->second.pLayerData))
+		{
+			return pLayerData->GetOutputDataStruct();
+		}
+
+		return IODataStruct();
 	}
 
 	/** 出力バッファ数を取得する */
@@ -559,7 +564,7 @@ namespace NeuralNetwork {
 	/** レイヤーデータを追加する.
 		@param	i_guid			追加するレイヤーに割り当てられるGUID.
 		@param	i_pLayerData	追加するレイヤーデータのアドレス. */
-	ErrorCode FeedforwardNeuralNetwork_LayerData_Base::AddLayer(const Gravisbell::GUID& i_guid, INNLayerData* i_pLayerData)
+	ErrorCode FeedforwardNeuralNetwork_LayerData_Base::AddLayer(const Gravisbell::GUID& i_guid, ILayerData* i_pLayerData)
 	{
 		// レイヤーを検索
 		if(this->lpConnectInfo.count(i_guid) != 0)
@@ -663,7 +668,7 @@ namespace NeuralNetwork {
 	}
 
 	/** 登録されているレイヤーデータを番号指定で取得する */
-	INNLayerData* FeedforwardNeuralNetwork_LayerData_Base::GetLayerDataByNum(U32 i_layerNum)
+	ILayerData* FeedforwardNeuralNetwork_LayerData_Base::GetLayerDataByNum(U32 i_layerNum)
 	{
 		Gravisbell::GUID layerGUID;
 		ErrorCode err = this->GetLayerGUIDbyNum(i_layerNum, layerGUID);
@@ -673,7 +678,7 @@ namespace NeuralNetwork {
 		return this->GetLayerDataByGUID(layerGUID);
 	}
 	/** 登録されているレイヤーデータをGUID指定で取得する */
-	INNLayerData* FeedforwardNeuralNetwork_LayerData_Base::GetLayerDataByGUID(const Gravisbell::GUID& i_guid)
+	ILayerData* FeedforwardNeuralNetwork_LayerData_Base::GetLayerDataByGUID(const Gravisbell::GUID& i_guid)
 	{
 		auto it = this->lpConnectInfo.find(i_guid);
 		if(it == this->lpConnectInfo.end())
@@ -698,9 +703,14 @@ namespace NeuralNetwork {
 		if(this->lpConnectInfo.count(i_guid) == 0)
 			return ErrorCode::ERROR_CODE_ADDLAYER_NOT_EXIST;
 
-		this->outputLayerGUID = i_guid;
+		if(dynamic_cast<ISingleOutputLayerData*>(this->lpConnectInfo[i_guid].pLayerData))
+		{
+			this->outputLayerGUID = i_guid;
 
-		return ErrorCode::ERROR_CODE_NONE;
+			return ErrorCode::ERROR_CODE_NONE;
+		}
+
+		return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
 	}
 	/** 出力信号レイヤーのGUIDを取得する */
 	Gravisbell::GUID FeedforwardNeuralNetwork_LayerData_Base::GetOutputLayerGUID()

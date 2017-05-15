@@ -14,7 +14,7 @@ namespace NeuralNetwork {
 
 	/** コンストラクタ */
 	Dropout_LayerData_Base::Dropout_LayerData_Base(const Gravisbell::GUID& guid)
-		:	INNLayerData()
+		:	ISingleInputLayerData(), ISingleOutputLayerData()
 		,	guid	(guid)
 		,	inputDataStruct	()	/**< 入力データ構造 */
 		,	pLayerStructure	(NULL)	/**< レイヤー構造を定義したコンフィグクラス */

@@ -12,6 +12,8 @@
 
 #include"../SettingData/Standard/IData.h"
 
+#include"./ILayerBase.h"
+
 namespace Gravisbell {
 namespace Layer {
 
@@ -22,7 +24,7 @@ namespace Layer {
 		ILayerData(){}
 		/** デストラクタ */
 		virtual ~ILayerData(){}
-		
+
 		//===========================
 		// 初期化
 		//===========================
@@ -44,6 +46,9 @@ namespace Layer {
 			@return 成功した場合0 */
 		virtual Gravisbell::GUID GetLayerCode(void)const = 0;
 
+		/** レイヤーの設定情報を取得する */
+		virtual const SettingData::Standard::IData* GetLayerStructure()const = 0;
+
 
 		//===========================
 		// レイヤー保存
@@ -56,6 +61,14 @@ namespace Layer {
 			@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
 			@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
 		virtual S32 WriteToBuffer(BYTE* o_lpBuffer)const = 0;
+		
+	public:
+		//===========================
+		// レイヤー作成
+		//===========================
+		/** レイヤーを作成する.
+			@param guid	新規生成するレイヤーのGUID. */
+		virtual ILayerBase* CreateLayer(const Gravisbell::GUID& guid) = 0;
 	};
 
 }	// Layer

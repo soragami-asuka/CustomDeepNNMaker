@@ -11,7 +11,7 @@
 #include<boost/regex.hpp>
 
 #include"../../Common/StringUtility/StringUtility.h"
-#include"Layer/NeuralNetwork/INNLayerConnectData.h"
+#include<Layer/Connect/ILayerConnectData.h>
 
 #include"XMLParser.h"
 
@@ -74,10 +74,10 @@ namespace Parser {
 	namespace
 	{
 		/** レイヤーデータをXMLファイルに書き出す. */
-		Gravisbell::ErrorCode SaveLayerToXML(INNLayerData& i_NNLayer, std::set<Gravisbell::GUID>& lpAlreadyExportLayerDataGUID, const boost::filesystem::wpath& i_layerDirPath, const boost::filesystem::wpath& i_layerFilePath)
+		Gravisbell::ErrorCode SaveLayerToXML(ILayerData& i_NNLayer, std::set<Gravisbell::GUID>& lpAlreadyExportLayerDataGUID, const boost::filesystem::wpath& i_layerDirPath, const boost::filesystem::wpath& i_layerFilePath)
 		{
 			// 出力レイヤーがレイヤー接続型であることを確認
-			INNLayerConnectData* pConnectLayerData = dynamic_cast<INNLayerConnectData*>(&i_NNLayer);
+			Connect::ILayerConnectData* pConnectLayerData = dynamic_cast<Connect::ILayerConnectData*>(&i_NNLayer);
 
 			// 出力先ファイルが書き込める状態か確認する
 			boost::filesystem::wpath layerFilePath = "";
@@ -116,12 +116,13 @@ namespace Parser {
 				ptree_rootLayer.put("<xmlattr>.outputLayerGUID", ::GUID2String(pConnectLayerData->GetOutputLayerGUID()));
 
 				// 入力データ構造を出力
+				if(Layer::IO::ISingleInputLayerData* pSingleInputLayerData = dynamic_cast<Layer::IO::ISingleInputLayerData*>(&i_NNLayer))
 				{
 					boost::property_tree::ptree& ptree_input = ptree_rootLayer.add("input", "");
-					ptree_input.put("x", pConnectLayerData->GetInputDataStruct().x);
-					ptree_input.put("y", pConnectLayerData->GetInputDataStruct().y);
-					ptree_input.put("z", pConnectLayerData->GetInputDataStruct().z);
-					ptree_input.put("ch", pConnectLayerData->GetInputDataStruct().ch);
+					ptree_input.put("x", pSingleInputLayerData->GetInputDataStruct().x);
+					ptree_input.put("y", pSingleInputLayerData->GetInputDataStruct().y);
+					ptree_input.put("z", pSingleInputLayerData->GetInputDataStruct().z);
+					ptree_input.put("ch", pSingleInputLayerData->GetInputDataStruct().ch);
 				}
 
 				// レイヤーの接続情報を記載する
@@ -224,7 +225,7 @@ namespace Parser {
 		@param	i_rootLayerFilePath	基準となるレイヤーデータが格納されているXMLファイルパス
 		@return	成功した場合レイヤーデータが返る.
 		*/
-	NetworkParserXML_API INNLayerData* CreateLayerFromXML(const ILayerDLLManager& i_layerDLLManager, ILayerDataManager& io_layerDataManager, const wchar_t i_layerDirPath[], const wchar_t i_rootLayerFilePath[])
+	NetworkParserXML_API ILayerData* CreateLayerFromXML(const ILayerDLLManager& i_layerDLLManager, ILayerDataManager& io_layerDataManager, const wchar_t i_layerDirPath[], const wchar_t i_rootLayerFilePath[])
 	{
 		// ディレクトリが存在することを確認
 		boost::filesystem::wpath layerDirPath = i_layerDirPath;
@@ -327,7 +328,7 @@ namespace Parser {
 					delete pLayerStructure;
 
 					// レイヤーの接続情報を作成する
-					INNLayerConnectData* pLayerConnect = dynamic_cast<INNLayerConnectData*>(pLayer_root);
+					Connect::ILayerConnectData* pLayerConnect = dynamic_cast<Connect::ILayerConnectData*>(pLayer_root);
 					if(pLayerConnect)
 					{
 						// レイヤーを追加する
@@ -360,7 +361,7 @@ namespace Parser {
 										return NULL;
 								}
 
-								INNLayerData* pLayerData = io_layerDataManager.GetLayerData(layerDataGUID);
+								ILayerData* pLayerData = io_layerDataManager.GetLayerData(layerDataGUID);
 								if(pLayerData == NULL)
 								{
 									pLayerData = CreateLayerFromXML(
@@ -478,10 +479,10 @@ namespace Parser {
 		@param	i_layerDirPath		レイヤーデータが格納されているディレクトリパス.
 		@param	i_rootLayerFilePath	基準となるレイヤーデータが格納されているXMLファイルパス. 空白が指定された場合、i_layerDirPath内にi_NNLayerのGUIDを名前としたファイルが生成される.
 		*/
-	NetworkParserXML_API Gravisbell::ErrorCode SaveLayerToXML(INNLayerData& i_NNLayer, const wchar_t i_layerDirPath[], const wchar_t i_rootLayerFilePath[])
+	NetworkParserXML_API Gravisbell::ErrorCode SaveLayerToXML(ILayerData& i_NNLayer, const wchar_t i_layerDirPath[], const wchar_t i_rootLayerFilePath[])
 	{
 		// 出力レイヤーがレイヤー接続型であることを確認
-		INNLayerConnectData* pRootLayer = dynamic_cast<INNLayerConnectData*>(&i_NNLayer);
+		Connect::ILayerConnectData* pRootLayer = dynamic_cast<Connect::ILayerConnectData*>(&i_NNLayer);
 		if(pRootLayer == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
 

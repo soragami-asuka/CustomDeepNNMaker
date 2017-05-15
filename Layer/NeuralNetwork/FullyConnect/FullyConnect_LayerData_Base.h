@@ -4,7 +4,8 @@
 #ifndef __FullyConnect_DATA_BASE_H__
 #define __FullyConnect_DATA_BASE_H__
 
-#include<Layer/NeuralNetwork/INNLayerData.h>
+#include<Layer/IO/ISingleInputLayerData.h>
+#include<Layer/IO/ISingleOutputLayerData.h>
 #include<Layer/NeuralNetwork/INNLayer.h>
 
 #include<vector>
@@ -18,7 +19,7 @@ namespace NeuralNetwork {
 	
 	typedef F32 NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class FullyConnect_LayerData_Base : public INNLayerData
+	class FullyConnect_LayerData_Base : public IO::ISingleInputLayerData, public IO::ISingleOutputLayerData
 	{
 	protected:
 		Gravisbell::GUID guid;	/**< レイヤーデータ識別用のGUID */

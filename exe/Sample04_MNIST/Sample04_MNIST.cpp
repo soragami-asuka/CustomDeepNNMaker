@@ -14,7 +14,7 @@
 #include"Library/NeuralNetwork/LayerDataManager/LayerDataManager.h"
 #include"Library/NeuralNetwork/NetworkParserXML/XMLParser.h"
 #include"Layer/IOData/IODataLayer/IODataLayer.h"
-#include"Layer/NeuralNetwork/INNLayerConnectData.h"
+#include"Layer/Connect/ILayerConnectData.h"
 #include"Layer/NeuralNetwork/INeuralNetwork.h"
 #include"Utility/NeuralNetworkLayer/NeuralNetworkLayer.h"
 
@@ -43,7 +43,7 @@ Gravisbell::ErrorCode LoadSampleData_label(
 	boost::filesystem::wpath i_dataFilePath);
 
 /** ニューラルネットワーククラスを作成する */
-Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, std::list<Layer::ILayerData*>& lppLayerData, const IODataStruct& inputDataStruct, const IODataStruct& outputDataStruct);
+Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, std::list<Layer::ILayerData*>& lppLayerData, const IODataStruct& inputDataStruct, const IODataStruct& outputDataStruct);
 
 /** ニューラルネットワークの学習とサンプル実行を同時実行 */
 Gravisbell::ErrorCode LearnWithCalculateSampleError(
@@ -107,7 +107,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	// ニューラルネットワーク作成
 	std::list<Layer::ILayerData*> lppLayerData;
-	Gravisbell::Layer::NeuralNetwork::INNLayerData* pNeuralNetworkData = CreateNeuralNetwork(*pLayerDLLManager, lppLayerData, pDataLayerTeach_Input->GetInputDataStruct(), pDataLayerTeach_Output->GetDataStruct());
+	Gravisbell::Layer::ILayerData* pNeuralNetworkData = CreateNeuralNetwork(*pLayerDLLManager, lppLayerData, pDataLayerTeach_Input->GetInputDataStruct(), pDataLayerTeach_Output->GetDataStruct());
 	if(pNeuralNetworkData == NULL)
 	{
 		delete pDataLayerTeach_Input;
@@ -144,7 +144,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	// 学習用ニューラルネットワーク作成
 	Layer::NeuralNetwork::INeuralNetwork* pNeuralNetworkLearn = NULL;
 	{
-		Layer::NeuralNetwork::INNLayer* pLayer = pNeuralNetworkData->CreateLayer(boost::uuids::random_generator()().data);
+		Layer::ILayerBase* pLayer = pNeuralNetworkData->CreateLayer(boost::uuids::random_generator()().data);
 		pNeuralNetworkLearn = dynamic_cast<Layer::NeuralNetwork::INeuralNetwork*>(pLayer);
 		if(pNeuralNetworkLearn == NULL)
 			delete pLayer;
@@ -165,7 +165,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	// テスト用ニューラルネットワーク作成
 	Layer::NeuralNetwork::INeuralNetwork* pNeuralNetworkTest = NULL;
 	{
-		Layer::NeuralNetwork::INNLayer* pLayer = pNeuralNetworkData->CreateLayer(boost::uuids::random_generator()().data);
+		Layer::ILayerBase* pLayer = pNeuralNetworkData->CreateLayer(boost::uuids::random_generator()().data);
 		pNeuralNetworkTest = dynamic_cast<Layer::NeuralNetwork::INeuralNetwork*>(pLayer);
 		if(pNeuralNetworkTest == NULL)
 			delete pLayer;
@@ -187,7 +187,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	// 学習, テスト実行
 	{
 		// 学習
-		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkTest, pDataLayerTeach_Input, pDataLayerTeach_Output, pDataLayerTest_Input, pDataLayerTest_Output, 8, 100) != ErrorCode::ERROR_CODE_NONE)
+		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkTest, pDataLayerTeach_Input, pDataLayerTeach_Output, pDataLayerTest_Input, pDataLayerTest_Output, 8, 1) != ErrorCode::ERROR_CODE_NONE)
 		{
 			delete pNeuralNetworkLearn;
 			delete pNeuralNetworkTest;
@@ -404,10 +404,10 @@ Gravisbell::ErrorCode LoadSampleData_label(
 
 
 /** ニューラルネットワーククラスを作成する */
-Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, std::list<Layer::ILayerData*>& lppLayerData, const IODataStruct& inputDataStruct, const IODataStruct& outputDataStruct)
+Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, std::list<Layer::ILayerData*>& lppLayerData, const IODataStruct& inputDataStruct, const IODataStruct& outputDataStruct)
 {
 	// ニューラルネットワークを作成
-	Layer::NeuralNetwork::INNLayerConnectData* pNeuralNetwork = NULL;
+	Layer::Connect::ILayerConnectData* pNeuralNetwork = NULL;
 	{
 		// DLL取得
 		const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(Gravisbell::GUID(0x1c38e21f, 0x6f01, 0x41b2, 0xb4, 0x0e, 0x7f, 0x67, 0x26, 0x7a, 0x36, 0x92));
@@ -420,7 +420,7 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::Neur
 			return NULL;
 
 		// レイヤーの作成
-		Layer::NeuralNetwork::INNLayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, inputDataStruct);
+		Layer::ILayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, inputDataStruct);
 		if(pLayer == NULL)
 			return NULL;
 		lppLayerData.push_back(pLayer);
@@ -429,7 +429,7 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::Neur
 		delete pConfig;
 
 		// キャスト
-		pNeuralNetwork = dynamic_cast<Layer::NeuralNetwork::INNLayerConnectData*>(pLayer);
+		pNeuralNetwork = dynamic_cast<Layer::Connect::ILayerConnectData*>(pLayer);
 		if(pNeuralNetwork == NULL)
 		{
 			delete pLayer;
@@ -438,9 +438,10 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::Neur
 	}
 
 	// レイヤーを追加する
+	if(Layer::IO::ISingleInputLayerData* pNeuralNetworkInput = dynamic_cast<Layer::IO::ISingleInputLayerData*>(pNeuralNetwork))
 	{
 		// 入力信号を直前レイヤーに設定
-		Gravisbell::IODataStruct inputDataStruct = pNeuralNetwork->GetInputDataStruct();
+		Gravisbell::IODataStruct inputDataStruct = pNeuralNetworkInput->GetInputDataStruct();
 		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID();
 
 		// 1層目

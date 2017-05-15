@@ -141,7 +141,7 @@ namespace Binary {
 				return ErrorCode::ERROR_CODE_COMMON_ALLOCATION_MEMORY;
 
 			// データ数が足りないためメモリを確保
-			U32 pos = pDataInfo->lpData.size();
+			U32 pos = (U32)pDataInfo->lpData.size();
 
 			// リサイズ
 			pDataInfo->lpData.resize(i_no+1);
@@ -332,7 +332,7 @@ namespace Binary {
 	/** カテゴリー数を取得する */
 	U32 CDataFormat::GetCategoryCount()const
 	{
-		return this->lpData.size();
+		return (U32)this->lpData.size();
 	}
 	/** カテゴリー名を番号指定で取得する */
 	const wchar_t* CDataFormat::GetCategoryNameByNum(U32 categoryNo)const
@@ -359,7 +359,7 @@ namespace Binary {
 		if(this->lpData.empty())
 			return 0;
 
-		return this->lpData.begin()->second.lpData.size();;
+		return (U32)this->lpData.begin()->second.lpData.size();;
 	}
 
 	/** データを取得する */
@@ -386,7 +386,7 @@ namespace Binary {
 	/** データフォーマット数を取得する */
 	U32 CDataFormat::GetDataFormatCount()const
 	{
-		return this->lpDataFormat.size();
+		return (U32)this->lpDataFormat.size();
 	}
 
 	/** データフォーマットを全削除する */

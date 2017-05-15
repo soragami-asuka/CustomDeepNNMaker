@@ -9,7 +9,7 @@
 #include"../../Common/VersionCode.h"
 
 #include"INNLayer.h"
-#include"INNLayerData.h"
+#include"../ILayerData.h"
 
 namespace Gravisbell {
 namespace Layer {
@@ -66,22 +66,22 @@ namespace NeuralNetwork {
 			GUIDは自動割り当て.
 			@param	i_layerStructure	レイヤー構造.
 			@param	i_inputDataStruct	入力データ構造. */
-		virtual INNLayerData* CreateLayerData(const SettingData::Standard::IData& i_layerStructure, const IODataStruct& i_inputDataStruct)const = 0;
+		virtual ILayerData* CreateLayerData(const SettingData::Standard::IData& i_layerStructure, const IODataStruct& i_inputDataStruct)const = 0;
 		/** レイヤーデータを作成
 			@param guid	作成レイヤーのGUID
 			@param	i_layerStructure	レイヤー構造.
 			@param	i_inputDataStruct	入力データ構造. */
-		virtual INNLayerData* CreateLayerData(const Gravisbell::GUID& guid, const SettingData::Standard::IData& i_layerStructure, const IODataStruct& i_inputDataStruct)const = 0;
+		virtual ILayerData* CreateLayerData(const Gravisbell::GUID& guid, const SettingData::Standard::IData& i_layerStructure, const IODataStruct& i_inputDataStruct)const = 0;
 		
 		/** レイヤーを作成.
 			GUIDは自動割り当て.
 			@param	i_lpBuffer		読み取り用バッファ.
 			@param	i_bufferSize	使用可能なバッファサイズ.
 			@param	o_useBufferSize	実際に使用したバッファサイズ. */
-		virtual INNLayerData* CreateLayerDataFromBuffer(const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)const = 0;
+		virtual ILayerData* CreateLayerDataFromBuffer(const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)const = 0;
 		/** レイヤーを作成
 			@param guid	作成レイヤーのGUID */
-		virtual INNLayerData* CreateLayerDataFromBuffer(const Gravisbell::GUID& guid, const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)const = 0;
+		virtual ILayerData* CreateLayerDataFromBuffer(const Gravisbell::GUID& guid, const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)const = 0;
 	};
 
 }	// NeuralNetwork

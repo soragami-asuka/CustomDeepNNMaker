@@ -6,6 +6,8 @@
 #include"stdafx.h"
 
 #include"NeuralNetworkLayer.h"
+#include"Layer/IO/ISingleInputLayerData.h"
+#include"Layer/IO/ISingleOutputLayerData.h"
 
 #include<boost/uuid/uuid_generators.hpp>
 #include<boost/foreach.hpp>
@@ -49,7 +51,7 @@ Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManagerGPU(const boost::fi
 
 
 /** レイヤーデータを作成 */
-Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct)
+Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct)
 {
 	// DLL取得
 	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(Gravisbell::GUID(0x1c38e21f, 0x6f01, 0x41b2, 0xb4, 0x0e, 0x7f, 0x67, 0x26, 0x7a, 0x36, 0x92));
@@ -62,7 +64,7 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::Neur
 		return NULL;
 
 	// レイヤーの作成
-	Layer::NeuralNetwork::INNLayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, inputDataStruct);
+	Layer::ILayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, inputDataStruct);
 	if(pLayer == NULL)
 		return NULL;
 
@@ -70,7 +72,7 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::Neur
 	delete pConfig;
 
 	// キャスト
-	Layer::NeuralNetwork::INNLayerConnectData* pNeuralNetwork = dynamic_cast<Layer::NeuralNetwork::INNLayerConnectData*>(pLayer);
+	Layer::Connect::ILayerConnectData* pNeuralNetwork = dynamic_cast<Layer::Connect::ILayerConnectData*>(pLayer);
 	if(pNeuralNetwork == NULL)
 	{
 		delete pLayer;
@@ -79,7 +81,7 @@ Layer::NeuralNetwork::INNLayerConnectData* CreateNeuralNetwork(const Layer::Neur
 
 	return pNeuralNetwork;
 }
-Layer::NeuralNetwork::INNLayerData* CreateConvolutionLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, Vector3D<S32> filterSize, U32 outputChannelCount, Vector3D<S32> stride, Vector3D<S32> paddingSize)
+Layer::ILayerData* CreateConvolutionLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, Vector3D<S32> filterSize, U32 outputChannelCount, Vector3D<S32> stride, Vector3D<S32> paddingSize)
 {
 	// DLL取得
 	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(Gravisbell::GUID(0xf6662e0e, 0x1ca4, 0x4d59, 0xac, 0xca, 0xca, 0xc2, 0x9a, 0x16, 0xc0, 0xaa));
@@ -117,7 +119,7 @@ Layer::NeuralNetwork::INNLayerData* CreateConvolutionLayer(const Layer::NeuralNe
 	}
 
 	// レイヤーの作成
-	Layer::NeuralNetwork::INNLayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, inputDataStruct);
+	Layer::ILayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, inputDataStruct);
 	if(pLayer == NULL)
 		return NULL;
 
@@ -126,7 +128,7 @@ Layer::NeuralNetwork::INNLayerData* CreateConvolutionLayer(const Layer::NeuralNe
 
 	return pLayer;
 }
-Layer::NeuralNetwork::INNLayerData* CreateFullyConnectLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, U32 neuronCount)
+Layer::ILayerData* CreateFullyConnectLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, U32 neuronCount)
 {
 	// DLL取得
 	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(Gravisbell::GUID(0x14cc33f4, 0x8cd3, 0x4686, 0x9c, 0x48, 0xef, 0x45, 0x2b, 0xa5, 0xd2, 0x02));
@@ -144,7 +146,7 @@ Layer::NeuralNetwork::INNLayerData* CreateFullyConnectLayer(const Layer::NeuralN
 	}
 
 	// レイヤーの作成
-	Layer::NeuralNetwork::INNLayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, inputDataStruct);
+	Layer::ILayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, inputDataStruct);
 	if(pLayer == NULL)
 		return NULL;
 
@@ -153,7 +155,7 @@ Layer::NeuralNetwork::INNLayerData* CreateFullyConnectLayer(const Layer::NeuralN
 
 	return pLayer;
 }
-Layer::NeuralNetwork::INNLayerData* CreateActivationLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, const std::wstring activationType)
+Layer::ILayerData* CreateActivationLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, const std::wstring activationType)
 {
 	// DLL取得
 	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(Gravisbell::GUID(0x99904134, 0x83b7, 0x4502, 0xa0, 0xca, 0x72, 0x8a, 0x2c, 0x9d, 0x80, 0xc7));
@@ -171,7 +173,7 @@ Layer::NeuralNetwork::INNLayerData* CreateActivationLayer(const Layer::NeuralNet
 	}
 
 	// レイヤーの作成
-	Layer::NeuralNetwork::INNLayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, inputDataStruct);
+	Layer::ILayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, inputDataStruct);
 	if(pLayer == NULL)
 		return NULL;
 
@@ -180,7 +182,7 @@ Layer::NeuralNetwork::INNLayerData* CreateActivationLayer(const Layer::NeuralNet
 
 	return pLayer;
 }
-Layer::NeuralNetwork::INNLayerData* CreateDropoutLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, F32 rate)
+Layer::ILayerData* CreateDropoutLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, F32 rate)
 {
 	// DLL取得
 	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(Gravisbell::GUID(0x298243e4, 0x2111, 0x474f, 0xa8, 0xf4, 0x35, 0xbd, 0xc8, 0x76, 0x45, 0x88));
@@ -198,7 +200,7 @@ Layer::NeuralNetwork::INNLayerData* CreateDropoutLayer(const Layer::NeuralNetwor
 	}
 
 	// レイヤーの作成
-	Layer::NeuralNetwork::INNLayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, inputDataStruct);
+	Layer::ILayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, inputDataStruct);
 	if(pLayer == NULL)
 		return NULL;
 
@@ -207,7 +209,7 @@ Layer::NeuralNetwork::INNLayerData* CreateDropoutLayer(const Layer::NeuralNetwor
 
 	return pLayer;
 }
-Layer::NeuralNetwork::INNLayerData* CreatePoolingLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, Vector3D<S32> filterSize, Vector3D<S32> stride)
+Layer::ILayerData* CreatePoolingLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, Vector3D<S32> filterSize, Vector3D<S32> stride)
 {
 	// DLL取得
 	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(Gravisbell::GUID(0xeb80e0d0, 0x9d5a, 0x4ed1, 0xa8, 0x0d, 0xa1, 0x66, 0x7d, 0xe0, 0xc8, 0x90));
@@ -230,7 +232,7 @@ Layer::NeuralNetwork::INNLayerData* CreatePoolingLayer(const Layer::NeuralNetwor
 	}
 
 	// レイヤーの作成
-	Layer::NeuralNetwork::INNLayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, inputDataStruct);
+	Layer::ILayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, inputDataStruct);
 	if(pLayer == NULL)
 		return NULL;
 
@@ -239,7 +241,7 @@ Layer::NeuralNetwork::INNLayerData* CreatePoolingLayer(const Layer::NeuralNetwor
 
 	return pLayer;
 }
-Layer::NeuralNetwork::INNLayerData* CreateBatchNormalizationLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct)
+Layer::ILayerData* CreateBatchNormalizationLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct)
 {
 	// DLL取得
 	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(Gravisbell::GUID(0xacd11a5a, 0xbfb5, 0x4951, 0x83, 0x82, 0x1d, 0xe8, 0x9d, 0xfa, 0x96, 0xa8));
@@ -252,7 +254,7 @@ Layer::NeuralNetwork::INNLayerData* CreateBatchNormalizationLayer(const Layer::N
 		return NULL;
 	
 	// レイヤーの作成
-	Layer::NeuralNetwork::INNLayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, inputDataStruct);
+	Layer::ILayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, inputDataStruct);
 	if(pLayer == NULL)
 		return NULL;
 
@@ -264,27 +266,32 @@ Layer::NeuralNetwork::INNLayerData* CreateBatchNormalizationLayer(const Layer::N
 
 
 /** レイヤーをネットワークの末尾に追加する.GUIDは自動割り当て.入力データ構造、最終GUIDも更新する. */
-Gravisbell::ErrorCode AddLayerToNetworkLast( Layer::NeuralNetwork::INNLayerConnectData& neuralNetwork, std::list<Layer::ILayerData*>& lppLayerData, Gravisbell::IODataStruct& inputDataStruct, Gravisbell::GUID& lastLayerGUID, Layer::NeuralNetwork::INNLayerData* pAddlayer)
+Gravisbell::ErrorCode AddLayerToNetworkLast( Layer::Connect::ILayerConnectData& neuralNetwork, std::list<Layer::ILayerData*>& lppLayerData, Gravisbell::IODataStruct& inputDataStruct, Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddlayer)
 {
-	// GUID生成
-	Gravisbell::GUID guid = boost::uuids::random_generator()().data;
+	if(Layer::IO::ISingleOutputLayerData* pOutputLayerData = dynamic_cast<Layer::IO::ISingleOutputLayerData*>(pAddlayer))
+	{
+		// GUID生成
+		Gravisbell::GUID guid = boost::uuids::random_generator()().data;
 
-	lppLayerData.push_back(pAddlayer);
-	neuralNetwork.AddLayer(guid, pAddlayer);
+		lppLayerData.push_back(pAddlayer);
+		neuralNetwork.AddLayer(guid, pAddlayer);
 
-	// 接続
-	neuralNetwork.AddInputLayerToLayer(guid, lastLayerGUID);
+		// 接続
+		neuralNetwork.AddInputLayerToLayer(guid, lastLayerGUID);
 
-	// 現在レイヤーを直前レイヤーに変更
-	inputDataStruct = pAddlayer->GetOutputDataStruct();
-	lastLayerGUID = guid;
+		// 現在レイヤーを直前レイヤーに変更
+		inputDataStruct = pOutputLayerData->GetOutputDataStruct();
+		lastLayerGUID = guid;
 
-	return Gravisbell::ErrorCode::ERROR_CODE_NONE;
+		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
+	}
+
+	return Gravisbell::ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
 }
 
 
 /** ニューラルネットワークをバイナリファイルに保存する */
-Gravisbell::ErrorCode WriteNetworkToBinaryFile(const Layer::NeuralNetwork::INNLayerData& neuralNetwork, const boost::filesystem::path& filePath)
+Gravisbell::ErrorCode WriteNetworkToBinaryFile(const Layer::ILayerData& neuralNetwork, const boost::filesystem::path& filePath)
 {
 	// バッファを用意する
 	std::vector<BYTE> lpBuffer;
@@ -318,7 +325,7 @@ Gravisbell::ErrorCode WriteNetworkToBinaryFile(const Layer::NeuralNetwork::INNLa
 	return ErrorCode::ERROR_CODE_NONE;
 }
 /** ニューラルネットワークをバイナリファイルから読み込むする */
-Gravisbell::ErrorCode ReadNetworkFromBinaryFile(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::INNLayerData** ppNeuralNetwork, const boost::filesystem::path& filePath)
+Gravisbell::ErrorCode ReadNetworkFromBinaryFile(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::ILayerData** ppNeuralNetwork, const boost::filesystem::path& filePath)
 {
 	std::vector<BYTE> lpBuffer;
 	S32 readByteCount = 0;

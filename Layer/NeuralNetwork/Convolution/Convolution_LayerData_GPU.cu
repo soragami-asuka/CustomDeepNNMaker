@@ -199,7 +199,7 @@ using namespace Gravisbell;
 /** Create a layer for GPU processing.
   * @param GUID of layer to create.
   */
-EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayerData* CreateLayerDataGPU(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const Gravisbell::SettingData::Standard::IData& i_data, const Gravisbell::IODataStruct& i_inputDataStruct)
+EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataGPU(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const Gravisbell::SettingData::Standard::IData& i_data, const Gravisbell::IODataStruct& i_inputDataStruct)
 {
 	// çÏê¨
 	Gravisbell::Layer::NeuralNetwork::Convolution_LayerData_GPU* pLayerData = new Gravisbell::Layer::NeuralNetwork::Convolution_LayerData_GPU(guid);
@@ -216,7 +216,7 @@ EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayerData* CreateLayerDataGPU(co
 
 	return pLayerData;
 }
-EXPORT_API Gravisbell::Layer::NeuralNetwork::INNLayerData* CreateLayerDataGPUfromBuffer(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, Gravisbell::S32 i_bufferSize, Gravisbell::S32& o_useBufferSize)
+EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataGPUfromBuffer(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, Gravisbell::S32 i_bufferSize, Gravisbell::S32& o_useBufferSize)
 {
 	// çÏê¨
 	Gravisbell::Layer::NeuralNetwork::Convolution_LayerData_GPU* pLayerData = new Gravisbell::Layer::NeuralNetwork::Convolution_LayerData_GPU(guid);

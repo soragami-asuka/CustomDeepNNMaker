@@ -4,7 +4,8 @@
 #ifndef __POOLING_DATA_BASE_H__
 #define __POOLING_DATA_BASE_H__
 
-#include<Layer/NeuralNetwork/INNLayerData.h>
+#include<Layer/IO/ISingleInputLayerData.h>
+#include<Layer/IO/ISingleOutputLayerData.h>
 #include<Layer/NeuralNetwork/INNLayer.h>
 
 #include<vector>
@@ -18,7 +19,7 @@ namespace NeuralNetwork {
 	
 	typedef F32 NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class Pooling_LayerData_Base : public INNLayerData
+	class Pooling_LayerData_Base : public IO::ISingleInputLayerData, public IO::ISingleOutputLayerData
 	{
 	protected:
 		Gravisbell::GUID guid;	/**< レイヤーデータ識別用のGUID */

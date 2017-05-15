@@ -15,7 +15,7 @@ namespace NeuralNetwork {
 	class LayerDataManager : public ILayerDataManager
 	{
 	private:
-		std::map<Gravisbell::GUID, INNLayerData*> lpLayerData;
+		std::map<Gravisbell::GUID, ILayerData*> lpLayerData;
 
 	public:
 		LayerDataManager()
@@ -39,7 +39,7 @@ namespace NeuralNetwork {
 			typeCodeが存在しない場合、NULLを返す.
 			既に存在するguidでtypeCodeも一致した場合、内部保有のレイヤーデータを返す.
 			既に存在するguidでtypeCodeが異なる場合、NULLを返す. */
-		INNLayerData* CreateLayerData(
+		ILayerData* CreateLayerData(
 			const ILayerDLLManager& i_layerDLLManager,
 			const Gravisbell::GUID& i_typeCode,
 			const Gravisbell::GUID& i_guid,
@@ -100,7 +100,7 @@ namespace NeuralNetwork {
 			typeCodeが存在しない場合、NULLを返す.
 			既に存在するguidでtypeCodeも一致した場合、内部保有のレイヤーデータを返す.
 			既に存在するguidでtypeCodeが異なる場合、NULLを返す. */
-		INNLayerData* CreateLayerData(
+		ILayerData* CreateLayerData(
 			const ILayerDLLManager& i_layerDLLManager,
 			const Gravisbell::GUID& i_typeCode,
 			const Gravisbell::GUID& i_guid,
@@ -153,7 +153,7 @@ namespace NeuralNetwork {
 
 
 		/** レイヤーデータをGUID指定で取得する */
-		INNLayerData* GetLayerData(const Gravisbell::GUID& i_guid)
+		ILayerData* GetLayerData(const Gravisbell::GUID& i_guid)
 		{
 			if(this->lpLayerData.count(i_guid))
 				return this->lpLayerData[i_guid];
@@ -166,7 +166,7 @@ namespace NeuralNetwork {
 			return (U32)this->lpLayerData.size();
 		}
 		/** レイヤーデータを番号指定で取得する */
-		INNLayerData* GetLayerDataByNum(U32 i_num)
+		ILayerData* GetLayerDataByNum(U32 i_num)
 		{
 			if(i_num >= this->lpLayerData.size())
 				return NULL;

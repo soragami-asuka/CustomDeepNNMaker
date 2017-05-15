@@ -2,25 +2,25 @@
 // ニューラルネットワークのレイヤーに関するデータを取り扱うインターフェース
 // バッファなどを管理する.
 //=======================================
-#ifndef __GRAVISBELL_I_NN_CONNECT_LAYER_DATA_H__
-#define __GRAVISBELL_I_NN_CONNECT_LAYER_DATA_H__
+#ifndef __GRAVISBELL_I_LAYER_CONNECT_DATA_H__
+#define __GRAVISBELL_I_LAYER_CONNECT_DATA_H__
 
-#include"./INNLayerData.h"
+#include"../ILayerData.h"
 
 namespace Gravisbell {
 namespace Layer {
-namespace NeuralNetwork {
+namespace Connect {
 
-	class INNLayerConnectData : public INNLayerData
+	class ILayerConnectData : public virtual ILayerData
 	{
 		//====================================
 		// コンストラクタ/デストラクタ
 		//====================================
 	public:
 		/** コンストラクタ */
-		INNLayerConnectData() : INNLayerData(){}
+		ILayerConnectData() : ILayerData(){}
 		/** デストラクタ */
-		virtual ~INNLayerConnectData(){}
+		virtual ~ILayerConnectData(){}
 
 
 		//====================================
@@ -30,7 +30,7 @@ namespace NeuralNetwork {
 		/** レイヤーデータを追加する.
 			@param	i_guid			追加するレイヤーに割り当てられるGUID.
 			@param	i_pLayerData	追加するレイヤーデータのアドレス. */
-		virtual ErrorCode AddLayer(const Gravisbell::GUID& i_guid, INNLayerData* i_pLayerData) = 0;
+		virtual ErrorCode AddLayer(const Gravisbell::GUID& i_guid, ILayerData* i_pLayerData) = 0;
 		/** レイヤーデータを削除する.
 			@param i_guid	削除するレイヤーのGUID */
 		virtual ErrorCode EraseLayer(const Gravisbell::GUID& i_guid) = 0;
@@ -43,9 +43,9 @@ namespace NeuralNetwork {
 		virtual ErrorCode GetLayerGUIDbyNum(U32 i_layerNum, Gravisbell::GUID& o_guid) = 0;
 
 		/** 登録されているレイヤーデータを番号指定で取得する */
-		virtual INNLayerData* GetLayerDataByNum(U32 i_layerNum) = 0;
+		virtual ILayerData* GetLayerDataByNum(U32 i_layerNum) = 0;
 		/** 登録されているレイヤーデータをGUID指定で取得する */
-		virtual INNLayerData* GetLayerDataByGUID(const Gravisbell::GUID& i_guid) = 0;
+		virtual ILayerData* GetLayerDataByGUID(const Gravisbell::GUID& i_guid) = 0;
 
 
 		//====================================
@@ -100,7 +100,7 @@ namespace NeuralNetwork {
 		virtual ErrorCode GetBypassLayerGUIDbyNum(const Gravisbell::GUID& i_layerGUID, U32 i_inputNum, Gravisbell::GUID& o_postLayerGUID) = 0;
 	};
 
-}	// NeuralNetwork
+}	// Connect
 }	// Layer
 }	// Gravisbell
 

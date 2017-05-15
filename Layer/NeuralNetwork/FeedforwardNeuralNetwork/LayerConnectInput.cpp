@@ -296,23 +296,6 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
-	//==================================
-	// 保存関連
-	//==================================
-	/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
-	U32 LayerConnectInput::GetUseBufferByteCount()const
-	{
-		return 0;
-	}
-
-	/** レイヤーをバッファに書き込む.
-		@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
-		@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
-	S32 LayerConnectInput::WriteToBuffer(BYTE* o_lpBuffer)const
-	{
-		return -1;
-	}
-
 }	// Gravisbell
 }	// Layer
 }	// NeuralNetwork

@@ -641,24 +641,6 @@ namespace NeuralNetwork {
 
 
 	//===========================
-	// レイヤー保存
-	//===========================
-	/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
-	U32 FeedforwardNeuralNetwork_Base::GetUseBufferByteCount()const
-	{
-		return this->layerData.GetUseBufferByteCount();
-	}
-
-	/** レイヤーをバッファに書き込む.
-		@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
-		@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
-	S32 FeedforwardNeuralNetwork_Base::WriteToBuffer(BYTE* o_lpBuffer)const
-	{
-		return this->layerData.WriteToBuffer(o_lpBuffer);
-	}
-
-
-	//===========================
 	// 入力レイヤー関連
 	//===========================
 	/** 入力データ構造を取得する.

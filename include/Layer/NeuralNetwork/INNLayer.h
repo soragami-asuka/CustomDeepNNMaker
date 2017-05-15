@@ -24,20 +24,7 @@ namespace NeuralNetwork {
 		virtual ~INNLayer(){}
 
 	public:
-		/** 初期化. 各ニューロンの値をランダムに初期化
-			@return	成功した場合0 */
-		virtual ErrorCode Initialize(void) = 0;
 
-		/** レイヤーの設定情報を取得する */
-		virtual const SettingData::Standard::IData* GetLayerStructure()const = 0;
-
-		/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
-		virtual unsigned int GetUseBufferByteCount()const = 0;
-
-		/** レイヤーをバッファに書き込む.
-			@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
-			@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
-		virtual S32 WriteToBuffer(BYTE* o_lpBuffer)const = 0;
 
 	public:
 		/** 演算処理を実行する.

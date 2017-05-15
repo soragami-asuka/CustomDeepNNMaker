@@ -83,15 +83,6 @@ unsigned int BatchNormalization_Base::GetInputBufferCount()const
 }
 
 
-//===========================
-// レイヤー保存
-//===========================
-/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
-unsigned int BatchNormalization_Base::GetUseBufferByteCount()const
-{
-	return this->GetLayerData().GetUseBufferByteCount();
-}
-
 
 //===========================
 // 出力レイヤー関連

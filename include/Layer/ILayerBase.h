@@ -9,17 +9,18 @@
 #include"../Common/IODataStruct.h"
 #include"../Common/Guiddef.h"
 
-#include"./ILayerData.h"
-
 #include"../SettingData/Standard/IData.h"
 
 namespace Gravisbell {
 namespace Layer {
 
+
 	/** レイヤー種別 */
 	enum ELayerKind : U32
 	{
 		LAYER_KIND_IOTYPE		 = 0xFF << 0,
+		LAYER_KIND_INPUTTYPE	 = 0x01 << 0,
+		LAYER_KIND_OUTPUTTYPE	 = 0x01 << 1,
 		LAYER_KIND_SINGLE_INPUT  = (0x00 << 0) << 0,	/**< 入力レイヤー */
 		LAYER_KIND_MULT_INPUT    = (0x01 << 0) << 0,	/**< 入力レイヤー */
 		LAYER_KIND_SINGLE_OUTPUT = (0x00 << 1) << 0,	/**< 出力レイヤー */
@@ -46,6 +47,9 @@ namespace Layer {
 		virtual ~ILayerBase(){}
 
 	public:
+		//=======================================
+		// 共通処理
+		//=======================================
 		/** レイヤー種別の取得.
 			ELayerKind の組み合わせ. */
 		virtual U32 GetLayerKind(void)const = 0;
@@ -58,7 +62,22 @@ namespace Layer {
 			@return 成功した場合0 */
 		virtual Gravisbell::GUID GetLayerCode(void)const = 0;
 
+		/** レイヤーの設定情報を取得する */
+		virtual const SettingData::Standard::IData* GetLayerStructure()const = 0;
+
 	public:
+		//=======================================
+		// 初期化処理
+		//=======================================
+		/** 初期化. 各ニューロンの値をランダムに初期化
+			@return	成功した場合0 */
+		virtual ErrorCode Initialize(void) = 0;
+
+
+	public:
+		//=======================================
+		// 演算前処理
+		//=======================================
 		/** 演算前処理を実行する.(学習用)
 			@param batchSize	同時に演算を行うバッチのサイズ.
 			NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
@@ -70,18 +89,20 @@ namespace Layer {
 			失敗した場合はCalculate以降の処理は実行不可. */
 		virtual ErrorCode PreProcessCalculate(unsigned int batchSize) = 0;
 
+		/** バッチサイズを取得する.
+			@return 同時に演算を行うバッチのサイズ */
+		virtual unsigned int GetBatchSize()const = 0;
 
+	public:
+		//=======================================
+		// 演算ループ前処理
+		//=======================================
 		/** 学習ループの初期化処理.データセットの学習開始前に実行する
 			失敗した場合はCalculate以降の処理は実行不可. */
 		virtual ErrorCode PreProcessLearnLoop(const SettingData::Standard::IData& data) = 0;
 		/** 演算ループの初期化処理.データセットの演算開始前に実行する
 			失敗した場合はCalculate以降の処理は実行不可. */
 		virtual ErrorCode PreProcessCalculateLoop() = 0;
-
-
-		/** バッチサイズを取得する.
-			@return 同時に演算を行うバッチのサイズ */
-		virtual unsigned int GetBatchSize()const = 0;
 	};
 
 }	// Layer

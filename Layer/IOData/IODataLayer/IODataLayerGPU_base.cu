@@ -73,6 +73,17 @@ namespace IOData {
 	}
 
 
+	//===========================
+	// 初期化
+	//===========================
+	/** 初期化. 各ニューロンの値をランダムに初期化
+		@return	成功した場合0 */
+	ErrorCode IODataLayerGPU_base::Initialize(void)
+	{
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+
+
 	//==============================
 	// レイヤー共通系
 	//==============================
@@ -97,6 +108,12 @@ namespace IOData {
 		Gravisbell::Layer::IOData::GetLayerCode(layerCode);
 
 		return layerCode;
+	}
+	
+	/** レイヤーの設定情報を取得する */
+	const SettingData::Standard::IData* IODataLayerGPU_base::GetLayerStructure()const
+	{
+		return NULL;
 	}
 
 	//==============================

@@ -34,7 +34,7 @@ namespace NeuralNetwork {
 			typeCodeが存在しない場合、NULLを返す.
 			既に存在するguidでtypeCodeも一致した場合、内部保有のレイヤーデータを返す.
 			既に存在するguidでtypeCodeが異なる場合、NULLを返す. */
-		virtual INNLayerData* CreateLayerData(
+		virtual ILayerData* CreateLayerData(
 			const ILayerDLLManager& i_layerDLLManager, const Gravisbell::GUID& i_typeCode,
 			const Gravisbell::GUID& i_guid,
 			const SettingData::Standard::IData& i_layerStructure,
@@ -53,7 +53,7 @@ namespace NeuralNetwork {
 			typeCodeが存在しない場合、NULLを返す.
 			既に存在するguidでtypeCodeも一致した場合、内部保有のレイヤーデータを返す.
 			既に存在するguidでtypeCodeが異なる場合、NULLを返す. */
-		virtual INNLayerData* CreateLayerData(
+		virtual ILayerData* CreateLayerData(
 			const ILayerDLLManager& i_layerDLLManager,
 			const Gravisbell::GUID& i_typeCode,
 			const Gravisbell::GUID& i_guid,
@@ -62,12 +62,12 @@ namespace NeuralNetwork {
 
 
 		/** レイヤーデータをGUID指定で取得する */
-		virtual INNLayerData* GetLayerData(const Gravisbell::GUID& i_guid) = 0;
+		virtual ILayerData* GetLayerData(const Gravisbell::GUID& i_guid) = 0;
 
 		/** レイヤーデータ数を取得する */
 		virtual U32 GetLayerDataCount() = 0;
 		/** レイヤーデータを番号指定で取得する */
-		virtual INNLayerData* GetLayerDataByNum(U32 i_num) = 0;
+		virtual ILayerData* GetLayerDataByNum(U32 i_num) = 0;
 
 		/** レイヤーデータをGUID指定で削除する */
 		virtual Gravisbell::ErrorCode EraseLayerByGUID(const Gravisbell::GUID& i_guid) = 0;

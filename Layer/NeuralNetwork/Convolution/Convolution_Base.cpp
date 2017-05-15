@@ -84,16 +84,6 @@ unsigned int Convolution_Base::GetInputBufferCount()const
 
 
 //===========================
-// レイヤー保存
-//===========================
-/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
-unsigned int Convolution_Base::GetUseBufferByteCount()const
-{
-	return this->GetLayerData().GetUseBufferByteCount();
-}
-
-
-//===========================
 // 出力レイヤー関連
 //===========================
 /** 出力データ構造を取得する */

@@ -8,7 +8,9 @@
 #include<set>
 #include<map>
 
-#include<Layer/NeuralNetwork/INNLayerConnectData.h>
+#include<Layer/Connect/ILayerConnectData.h>
+#include<Layer/IO/ISingleInputLayerData.h>
+#include<Layer/IO/ISingleOutputLayerData.h>
 #include<Layer/NeuralNetwork/ILayerDLLManager.h>
 
 namespace Gravisbell {
@@ -16,14 +18,14 @@ namespace Layer {
 namespace NeuralNetwork {
 
 
-	class FeedforwardNeuralNetwork_LayerData_Base : public INNLayerConnectData
+	class FeedforwardNeuralNetwork_LayerData_Base : public Connect::ILayerConnectData, public IO::ISingleInputLayerData, public IO::ISingleOutputLayerData
 	{
 	protected:
 		/** レイヤーデータ間の接続情報定義 */
 		struct LayerConnect
 		{
 			Gravisbell::GUID guid;		/**< レイヤー自身のGUID */
-			INNLayerData* pLayerData;	/**< レイヤーデータ本体 */
+			ILayerData* pLayerData;	/**< レイヤーデータ本体 */
 			std::set<Gravisbell::GUID> lpInputLayerGUID;	/**< 入力レイヤーのGUID一覧 */
 			std::set<Gravisbell::GUID> lpBypassLayerGUID;	/**< バイパスレイヤーのGUID一覧 */
 
@@ -31,7 +33,7 @@ namespace NeuralNetwork {
 				:	pLayerData	(NULL)
 			{
 			}
-			LayerConnect(const Gravisbell::GUID guid, INNLayerData* pLayerData)
+			LayerConnect(const Gravisbell::GUID guid, ILayerData* pLayerData)
 				:	guid		(guid)
 				,	pLayerData	(pLayerData)
 			{
@@ -61,7 +63,7 @@ namespace NeuralNetwork {
 		const Gravisbell::GUID inputLayerGUID;	/**< 入力信号に割り当てられているGUID.入力信号レイヤーの代用として使用する. */
 		Gravisbell::GUID outputLayerGUID;		/**< 出力信号に割り当てられているGUID. */
 
-		std::map<Gravisbell::GUID, INNLayerData*> lpLayerData;	/**< レイヤーデータGUID, レイヤーデータ */
+		std::map<Gravisbell::GUID, ILayerData*> lpLayerData;	/**< レイヤーデータGUID, レイヤーデータ */
 		std::map<Gravisbell::GUID, LayerConnect> lpConnectInfo;	/**< レイヤーGUID, レイヤー接続情報 */
 
 		IODataStruct inputDataStruct;	/**< 入力データ構造 */
@@ -179,7 +181,7 @@ namespace NeuralNetwork {
 		/** レイヤーデータを追加する.
 			@param	i_guid			追加するレイヤーに割り当てられるGUID.
 			@param	i_pLayerData	追加するレイヤーデータのアドレス. */
-		ErrorCode AddLayer(const Gravisbell::GUID& i_guid, INNLayerData* i_pLayerData);
+		ErrorCode AddLayer(const Gravisbell::GUID& i_guid, ILayerData* i_pLayerData);
 		/** レイヤーデータを削除する.
 			@param i_guid	削除するレイヤーのGUID */
 		ErrorCode EraseLayer(const Gravisbell::GUID& i_guid);
@@ -192,9 +194,9 @@ namespace NeuralNetwork {
 		ErrorCode GetLayerGUIDbyNum(U32 i_layerNum, Gravisbell::GUID& o_guid);
 
 		/** 登録されているレイヤーデータを番号指定で取得する */
-		INNLayerData* GetLayerDataByNum(U32 i_layerNum);
+		ILayerData* GetLayerDataByNum(U32 i_layerNum);
 		/** 登録されているレイヤーデータをGUID指定で取得する */
-		INNLayerData* GetLayerDataByGUID(const Gravisbell::GUID& i_guid);
+		ILayerData* GetLayerDataByGUID(const Gravisbell::GUID& i_guid);
 
 
 		//====================================

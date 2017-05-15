@@ -63,13 +63,6 @@ namespace NeuralNetwork {
 		const SettingData::Standard::IData* GetLayerStructure()const;
 
 
-		//===========================
-		// レイヤー保存
-		//===========================
-	public:
-		/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
-		unsigned int GetUseBufferByteCount()const;
-
 
 		//===========================
 		// 入力レイヤー関連
