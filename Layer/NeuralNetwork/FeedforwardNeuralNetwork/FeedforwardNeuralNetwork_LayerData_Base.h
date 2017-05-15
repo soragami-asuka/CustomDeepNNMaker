@@ -27,8 +27,8 @@ namespace NeuralNetwork {
 		{
 			Gravisbell::GUID guid;		/**< レイヤー自身のGUID */
 			ILayerData* pLayerData;	/**< レイヤーデータ本体 */
-			std::set<Gravisbell::GUID> lpInputLayerGUID;	/**< 入力レイヤーのGUID一覧 */
-			std::set<Gravisbell::GUID> lpBypassLayerGUID;	/**< バイパスレイヤーのGUID一覧 */
+			std::vector<Gravisbell::GUID> lpInputLayerGUID;	/**< 入力レイヤーのGUID一覧 */
+			std::vector<Gravisbell::GUID> lpBypassLayerGUID;	/**< バイパスレイヤーのGUID一覧 */
 
 			LayerConnect()
 				:	pLayerData	(NULL)
@@ -231,6 +231,15 @@ namespace NeuralNetwork {
 			@param	receiveLayer	入力を受け取るレイヤー
 			@param	postLayer		入力を渡す(出力する)レイヤー. */
 		ErrorCode AddBypassLayerToLayer(const Gravisbell::GUID& receiveLayer, const Gravisbell::GUID& postLayer);
+
+		/** レイヤーから入力レイヤーを削除する. 
+			@param	receiveLayer	入力を受け取るレイヤー
+			@param	postLayer		入力を渡す(出力する)レイヤー. */
+		ErrorCode EraseInputLayerFromLayer(const Gravisbell::GUID& receiveLayer, const Gravisbell::GUID& postLayer);
+		/** レイヤーからバイパスレイヤーを削除する.
+			@param	receiveLayer	入力を受け取るレイヤー
+			@param	postLayer		入力を渡す(出力する)レイヤー. */
+		ErrorCode EraseBypassLayerFromLayer(const Gravisbell::GUID& receiveLayer, const Gravisbell::GUID& postLayer);
 
 		/** レイヤーの入力レイヤー設定をリセットする.
 			@param	layerGUID	リセットするレイヤーのGUID. */

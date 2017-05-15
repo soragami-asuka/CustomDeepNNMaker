@@ -20,7 +20,7 @@
 
 using namespace Gravisbell;
 
-#define USE_GPU	0
+#define USE_GPU	1
 #define USE_HOST_MEMORY 1
 
 
@@ -187,7 +187,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	// 学習, テスト実行
 	{
 		// 学習
-		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkTest, pDataLayerTeach_Input, pDataLayerTeach_Output, pDataLayerTest_Input, pDataLayerTest_Output, 8, 1) != ErrorCode::ERROR_CODE_NONE)
+		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkTest, pDataLayerTeach_Input, pDataLayerTeach_Output, pDataLayerTest_Input, pDataLayerTest_Output, 8, 200) != ErrorCode::ERROR_CODE_NONE)
 		{
 			delete pNeuralNetworkLearn;
 			delete pNeuralNetworkTest;

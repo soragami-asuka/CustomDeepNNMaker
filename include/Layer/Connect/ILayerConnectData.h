@@ -74,6 +74,15 @@ namespace Connect {
 			@param	postLayer		入力を渡す(出力する)レイヤー. */
 		virtual ErrorCode AddBypassLayerToLayer(const Gravisbell::GUID& receiveLayer, const Gravisbell::GUID& postLayer) = 0;
 
+		/** レイヤーから入力レイヤーを削除する. 
+			@param	receiveLayer	入力を受け取るレイヤー
+			@param	postLayer		入力を渡す(出力する)レイヤー. */
+		virtual ErrorCode EraseInputLayerFromLayer(const Gravisbell::GUID& receiveLayer, const Gravisbell::GUID& postLayer) = 0;
+		/** レイヤーからバイパスレイヤーを削除する.
+			@param	receiveLayer	入力を受け取るレイヤー
+			@param	postLayer		入力を渡す(出力する)レイヤー. */
+		virtual ErrorCode EraseBypassLayerFromLayer(const Gravisbell::GUID& receiveLayer, const Gravisbell::GUID& postLayer) = 0;
+
 		/** レイヤーの入力レイヤー設定をリセットする.
 			@param	layerGUID	リセットするレイヤーのGUID. */
 		virtual ErrorCode ResetInputLayer(const Gravisbell::GUID& layerGUID) = 0;
