@@ -75,7 +75,7 @@ namespace NeuralNetwork {
 	public:
 		/** レイヤーを作成する.
 			@param guid	新規生成するレイヤーのGUID. */
-		INNLayer* CreateLayer(const Gravisbell::GUID& guid);
+		ILayerBase* CreateLayer(const Gravisbell::GUID& guid);
 	};
 
 } // Gravisbell;

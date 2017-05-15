@@ -5,9 +5,12 @@
 #ifndef __CONVOLUTION_BASE_H__
 #define __CONVOLUTION_BASE_H__
 
-#include<Layer/NeuralNetwork/INNLayer.h>
+#include<Layer/NeuralNetwork/INNSingleInputLayer.h>
+#include<Layer/NeuralNetwork/INNSingleOutputLayer.h>
 
 #include<vector>
+#include<Layer/NeuralNetwork/INNSingleInputLayer.h>
+#include<Layer/NeuralNetwork/INNSingleOutputLayer.h>
 
 #include"Convolution_DATA.hpp"
 
@@ -19,7 +22,7 @@ namespace NeuralNetwork {
 
 	typedef float NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class Convolution_Base : public Gravisbell::Layer::NeuralNetwork::INNLayer
+	class Convolution_Base : public INNSingleInputLayer, public INNSingleOutputLayer
 	{
 	protected:
 		Gravisbell::GUID guid;	/**< レイヤー識別用のGUID */

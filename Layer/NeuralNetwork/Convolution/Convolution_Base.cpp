@@ -13,8 +13,7 @@ using namespace Gravisbell::Layer::NeuralNetwork;
 
 /** コンストラクタ */
 Convolution_Base::Convolution_Base(Gravisbell::GUID guid)
-	:	INNLayer()
-	,	guid				(guid)
+	:	guid				(guid)
 	,	pLearnData			(NULL)
 {
 }

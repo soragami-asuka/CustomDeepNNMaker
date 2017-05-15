@@ -13,8 +13,7 @@ using namespace Gravisbell::Layer::NeuralNetwork;
 
 /** コンストラクタ */
 Dropout_Base::Dropout_Base(Gravisbell::GUID guid)
-	:	INNLayer()
-	,	guid				(guid)
+	:	guid				(guid)
 	,	pLearnData			(NULL)
 {
 }

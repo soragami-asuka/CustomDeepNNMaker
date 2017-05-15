@@ -19,14 +19,15 @@ namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-	
-
 
 	/** レイヤーの接続に関するクラス(単一入力,単一出力) */
 	class LayerConnectSingle2Single : public ILayerConnect
 	{
 	public:
-		INNLayer* pLayer;	/**< レイヤーのアドレス */
+		ILayerBase* pLayer;	/**< レイヤーのアドレス */
+		INNSingleInputLayer*  pLayer_input;
+		INNSingleOutputLayer* pLayer_output;
+
 		Gravisbell::SettingData::Standard::IData* pLearnSettingData;	/**< 学習設定情報のアドレス */
 
 		std::vector<LayerPosition>  lppOutputToLayer;		/**< 出力先レイヤー. SingleOutput扱いなので、必ず1個 */
@@ -34,7 +35,7 @@ namespace NeuralNetwork {
 
 	public:
 		/** コンストラクタ */
-		LayerConnectSingle2Single(class INNLayer* pLayer, Gravisbell::SettingData::Standard::IData* pLearnSettingData);
+		LayerConnectSingle2Single(ILayerBase* pLayer, Gravisbell::SettingData::Standard::IData* pLearnSettingData);
 		/** デストラクタ */
 		virtual ~LayerConnectSingle2Single();
 

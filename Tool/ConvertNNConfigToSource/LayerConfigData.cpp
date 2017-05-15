@@ -1036,7 +1036,6 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"#include<Common/ErrorCode.h>\n");
 		fwprintf(fp, L"#include<SettingData/Standard/IData.h>\n");
-		fwprintf(fp, L"#include<Layer/NeuralNetwork/INNLayer.h>\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"namespace Gravisbell {\n");
 		fwprintf(fp, L"namespace Layer {\n");
@@ -1112,7 +1111,6 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"#include<Common/VersionCode.h>\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"#include<SettingData/Standard/IData.h>\n");
-		fwprintf(fp, L"#include<Layer/NeuralNetwork/INNLayer.h>\n");
 		fwprintf(fp, L"#include<Layer/NeuralNetwork/ILayerDLLManager.h>\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"#include\"%ls\"\n", dataHeaderFilePath.filename().wstring().c_str());

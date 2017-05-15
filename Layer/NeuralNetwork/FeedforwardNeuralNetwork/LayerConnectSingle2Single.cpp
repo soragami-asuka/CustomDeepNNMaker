@@ -13,8 +13,10 @@ namespace NeuralNetwork {
 
 	
 	/** コンストラクタ */
-	LayerConnectSingle2Single::LayerConnectSingle2Single(INNLayer* pLayer, Gravisbell::SettingData::Standard::IData* pLearnSettingData)
+	LayerConnectSingle2Single::LayerConnectSingle2Single(ILayerBase* pLayer, Gravisbell::SettingData::Standard::IData* pLearnSettingData)
 		:	pLayer				(pLayer)
+		,	pLayer_input		(dynamic_cast<INNSingleInputLayer*>(pLayer))
+		,	pLayer_output		(dynamic_cast<INNSingleOutputLayer*>(pLayer))
 		,	pLearnSettingData	(pLearnSettingData)
 	{
 	}
@@ -50,14 +52,14 @@ namespace NeuralNetwork {
 		@return	出力データ構造 */
 	IODataStruct LayerConnectSingle2Single::GetOutputDataStruct()const
 	{
-		return this->pLayer->GetOutputDataStruct();
+		return this->pLayer_output->GetOutputDataStruct();
 	}
 	/** 出力データバッファを取得する.
 		配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
 		@return 出力データ配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER LayerConnectSingle2Single::GetOutputBuffer()const
 	{
-		return this->pLayer->GetOutputBuffer();
+		return this->pLayer_output->GetOutputBuffer();
 	}
 
 	/** 入力誤差バッファの位置を入力元レイヤーのGUID指定で取得する */
@@ -74,7 +76,7 @@ namespace NeuralNetwork {
 	/** 入力誤差バッファを位置指定で取得する */
 	CONST_BATCH_BUFFER_POINTER LayerConnectSingle2Single::GetDInputBufferByNum(S32 num)const
 	{
-		return this->pLayer->GetDInputBuffer();
+		return this->pLayer_input->GetDInputBuffer();
 	}
 
 	/** レイヤーリストを作成する.
@@ -322,7 +324,7 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_FRAUD_INPUT_COUNT;
 
 		// 入力元レイヤーのバッファ数を確認
-		if(this->lppInputFromLayer[0]->GetOutputDataStruct().GetDataCount() != this->pLayer->GetInputBufferCount())
+		if(this->lppInputFromLayer[0]->GetOutputDataStruct().GetDataCount() != this->pLayer_input->GetInputBufferCount())
 			return ErrorCode::ERROR_CODE_FRAUD_INPUT_COUNT;
 
 		// 出力先レイヤー数の確認
@@ -373,12 +375,12 @@ namespace NeuralNetwork {
 	/** 演算処理を実行する. */
 	ErrorCode LayerConnectSingle2Single::Calculate(void)
 	{
-		return this->pLayer->Calculate(lppInputFromLayer[0]->GetOutputBuffer());
+		return this->pLayer_input->Calculate(lppInputFromLayer[0]->GetOutputBuffer());
 	}
 	/** 学習誤差を計算する. */
 	ErrorCode LayerConnectSingle2Single::Training(void)
 	{
-		return this->pLayer->Training(this->lppOutputToLayer[0].pLayer->GetDInputBufferByNum(this->lppOutputToLayer[0].position));
+		return this->pLayer_output->Training(this->lppOutputToLayer[0].pLayer->GetDInputBufferByNum(this->lppOutputToLayer[0].position));
 	}
 
 

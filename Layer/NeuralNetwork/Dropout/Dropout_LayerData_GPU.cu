@@ -32,7 +32,7 @@ namespace NeuralNetwork {
 	//===========================
 	/** レイヤーを作成する.
 		@param guid	新規生成するレイヤーのGUID. */
-	INNLayer* Dropout_LayerData_GPU::CreateLayer(const Gravisbell::GUID& guid)
+	ILayerBase* Dropout_LayerData_GPU::CreateLayer(const Gravisbell::GUID& guid)
 	{
 		return new Dropout_GPU(guid, *this);
 	}

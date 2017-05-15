@@ -16,7 +16,6 @@
 #include<Common/VersionCode.h>
 
 #include<SettingData/Standard/IData.h>
-#include<Layer/NeuralNetwork/INNLayer.h>
 #include<Layer/NeuralNetwork/ILayerDLLManager.h>
 
 #include"Activation_DATA.hpp"

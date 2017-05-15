@@ -19,10 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{8C696A26-6D74-441D-9DD1-EA2DE5C4C303}</ProjectGuid>
+    <ProjectGuid>{AD565A1F-8937-4595-9B3D-DB2D3B97525B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Activation</RootNamespace>
-    <ProjectName>Layer.NeuralNetwork.Activation</ProjectName>
+    <RootNamespace>SimpleSeparateOutput</RootNamespace>
+    <ProjectName>Layer.NeuralNetwork.SimpleSeparateOutput</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -53,7 +53,6 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 7.5.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -70,54 +69,39 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>$(SolutionName).$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>$(SolutionName).$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>$(SolutionName).$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>$(SolutionName).$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;ACTIVATION_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir);$(CUDA_PATH_V7_5)\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;SIMPLESEPARATEOUTPUT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CudaCompile>
-      <AdditionalOptions>-Xcompiler "/wd 4819" %(AdditionalOptions)</AdditionalOptions>
-    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;ACTIVATION_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir);$(CUDA_PATH_V7_5)\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;SIMPLESEPARATEOUTPUT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>cudart.lib;cublas.lib;cudnn.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <LargeAddressAware>true</LargeAddressAware>
     </Link>
-    <CudaCompile>
-      <AdditionalOptions>-Xcompiler "/wd 4819" %(AdditionalOptions)</AdditionalOptions>
-    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -126,19 +110,14 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;ACTIVATION_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir);$(CUDA_PATH_V7_5)\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SIMPLESEPARATEOUTPUT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CudaCompile>
-      <AdditionalOptions>-Xcompiler "/wd 4819" %(AdditionalOptions)</AdditionalOptions>
-    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -147,74 +126,23 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;ACTIVATION_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir);$(CUDA_PATH_V7_5)\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SIMPLESEPARATEOUTPUT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>cudart.lib;cublas.lib;cudnn.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <LargeAddressAware>true</LargeAddressAware>
     </Link>
-    <CudaCompile>
-      <AdditionalOptions>-Xcompiler "/wd 4819" %(AdditionalOptions)</AdditionalOptions>
-    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\include\Common\Common.h" />
-    <ClInclude Include="..\..\..\include\Common\ErrorCode.h" />
-    <ClInclude Include="..\..\..\include\Common\Guiddef.h" />
-    <ClInclude Include="..\..\..\include\Common\IBatchDataNoListGenerator.h" />
-    <ClInclude Include="..\..\..\include\Common\IODataStruct.h" />
-    <ClInclude Include="..\..\..\include\Common\VersionCode.h" />
-    <ClInclude Include="..\..\..\include\DataFormat\Binary\IDataFormat.h" />
-    <ClInclude Include="..\..\..\include\DataFormat\IDataFormatBase.h" />
-    <ClInclude Include="..\..\..\include\DataFormat\StringArray\IDataFormat.h" />
-    <ClInclude Include="..\..\..\include\Layer\Connect\ILayerConnectData.h" />
-    <ClInclude Include="..\..\..\include\Layer\ILayerBase.h" />
-    <ClInclude Include="..\..\..\include\Layer\ILayerData.h" />
-    <ClInclude Include="..\..\..\include\Layer\IOData\IDataLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\IO\IInputLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\IO\IMultInputLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\IO\IMultInputLayerData.h" />
-    <ClInclude Include="..\..\..\include\Layer\IO\IMultOutputLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\IO\IMultOutputLayerData.h" />
-    <ClInclude Include="..\..\..\include\Layer\IO\IOutputLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\IO\ISingleInputLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\IO\ISingleInputLayerData.h" />
-    <ClInclude Include="..\..\..\include\Layer\IO\ISingleOutputLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\IO\ISingleOutputLayerData.h" />
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDataManager.h" />
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h" />
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h" />
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INeuralNetwork.h" />
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNMultOutputLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingleInputLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingleOutputLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
-    <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h" />
-    <ClInclude Include="Activation_Base.h" />
-    <ClInclude Include="Activation_CPU.h" />
-    <ClInclude Include="Activation_DATA.hpp" />
-    <ClInclude Include="Activation_FUNC.hpp" />
-    <ClInclude Include="Activation_LayerData_Base.h" />
-    <ClInclude Include="Activation_LayerData_CPU.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Activation_Base.cpp" />
-    <ClCompile Include="Activation_CPU.cpp" />
-    <ClCompile Include="Activation_LayerData_CPU.cpp" />
-    <ClCompile Include="Activation_LayerData_Base.cpp" />
-    <ClCompile Include="Activation_FUNC.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
@@ -229,6 +157,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="SimpleSeparateOutput.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -236,36 +165,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <Xml Include="Config.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Library\SettingData\Standard\Standard.vcxproj">
-      <Project>{79fd5f13-1407-43ab-834c-04c1aeccdbb5}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <CudaCompile Include="Activation_GPU.cu">
-      <FileType>Document</FileType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </CudaCompile>
-    <None Include="Activation_GPU.cuh">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </None>
-    <CudaCompile Include="Activation_LayerData_GPU.cu">
-      <FileType>Document</FileType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </CudaCompile>
-    <None Include="Activation_LayerData_GPU.cuh">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </None>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 7.5.targets" />
   </ImportGroup>
 </Project>

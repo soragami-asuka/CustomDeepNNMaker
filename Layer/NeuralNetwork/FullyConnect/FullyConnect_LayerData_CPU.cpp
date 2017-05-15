@@ -170,7 +170,7 @@ namespace NeuralNetwork {
 	//===========================
 	/** レイヤーを作成する.
 		@param guid	新規生成するレイヤーのGUID. */
-	INNLayer* FullyConnect_LayerData_CPU::CreateLayer(const Gravisbell::GUID& guid)
+	ILayerBase* FullyConnect_LayerData_CPU::CreateLayer(const Gravisbell::GUID& guid)
 	{
 		return new FullyConnect_CPU(guid, *this);
 	}

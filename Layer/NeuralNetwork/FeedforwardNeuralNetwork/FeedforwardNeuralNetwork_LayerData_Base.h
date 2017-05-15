@@ -7,6 +7,7 @@
 
 #include<set>
 #include<map>
+#include<vector>
 
 #include<Layer/Connect/ILayerConnectData.h>
 #include<Layer/IO/ISingleInputLayerData.h>
@@ -64,7 +65,7 @@ namespace NeuralNetwork {
 		Gravisbell::GUID outputLayerGUID;		/**< 出力信号に割り当てられているGUID. */
 
 		std::map<Gravisbell::GUID, ILayerData*> lpLayerData;	/**< レイヤーデータGUID, レイヤーデータ */
-		std::map<Gravisbell::GUID, LayerConnect> lpConnectInfo;	/**< レイヤーGUID, レイヤー接続情報 */
+		std::vector<LayerConnect> lpConnectInfo;	/**< レイヤーGUID, レイヤー接続情報 */
 
 		IODataStruct inputDataStruct;	/**< 入力データ構造 */
 
@@ -168,7 +169,7 @@ namespace NeuralNetwork {
 		//===========================
 		/** レイヤーを作成する.
 			@param guid	新規生成するレイヤーのGUID. */
-		virtual INNLayer* CreateLayer(const Gravisbell::GUID& guid) = 0;
+		virtual ILayerBase* CreateLayer(const Gravisbell::GUID& guid) = 0;
 
 		/** 作成された新規ニューラルネットワークに対して内部レイヤーを追加する */
 		ErrorCode AddConnectionLayersToNeuralNetwork(class FeedforwardNeuralNetwork_Base& neuralNetwork);
@@ -192,6 +193,12 @@ namespace NeuralNetwork {
 		U32 GetLayerCount();
 		/** レイヤーのGUIDを番号指定で取得する */
 		ErrorCode GetLayerGUIDbyNum(U32 i_layerNum, Gravisbell::GUID& o_guid);
+
+		/** 登録されているレイヤーを番号指定で取得する */
+		LayerConnect* GetLayerByNum(U32 i_layerNum);
+		/** 登録されているレイヤーをGUID指定で取得する */
+		LayerConnect* GetLayerByGUID(const Gravisbell::GUID& i_guid);
+		LayerConnect* GetLayerByGUID(const Gravisbell::GUID& i_guid)const;
 
 		/** 登録されているレイヤーデータを番号指定で取得する */
 		ILayerData* GetLayerDataByNum(U32 i_layerNum);

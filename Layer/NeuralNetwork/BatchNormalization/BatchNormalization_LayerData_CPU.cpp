@@ -156,7 +156,7 @@ namespace NeuralNetwork {
 	//===========================
 	/** レイヤーを作成する.
 		@param guid	新規生成するレイヤーのGUID. */
-	INNLayer* BatchNormalization_LayerData_CPU::CreateLayer(const Gravisbell::GUID& guid)
+	ILayerBase* BatchNormalization_LayerData_CPU::CreateLayer(const Gravisbell::GUID& guid)
 	{
 		return new BatchNormalization_CPU(guid, *this);
 	}

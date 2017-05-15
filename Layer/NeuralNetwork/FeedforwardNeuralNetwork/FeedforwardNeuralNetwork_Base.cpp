@@ -76,7 +76,7 @@ namespace NeuralNetwork {
 		{
 		case LAYER_KIND_SINGLE_INPUT | LAYER_KIND_SINGLE_OUTPUT | LAYER_KIND_NEURALNETWORK:
 			{
-				INNLayer* pNNLayer = dynamic_cast<INNLayer*>(pLayer);
+				ILayerBase* pNNLayer = dynamic_cast<ILayerBase*>(pLayer);
 				if(pNNLayer)
 				{
 					this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectSingle2Single(pNNLayer, this->layerData.GetLayerDLLManager().GetLayerDLLByGUID(pLayer->GetLayerCode())->CreateLearningSetting());

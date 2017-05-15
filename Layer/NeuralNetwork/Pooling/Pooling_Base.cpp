@@ -13,8 +13,7 @@ using namespace Gravisbell::Layer::NeuralNetwork;
 
 /** コンストラクタ */
 Pooling_Base::Pooling_Base(Gravisbell::GUID guid)
-	:	INNLayer()
-	,	guid				(guid)
+	:	guid				(guid)
 	,	pLearnData			(NULL)
 {
 }

@@ -34,7 +34,7 @@ namespace NeuralNetwork {
 	//===========================
 	/** レイヤーを作成する.
 		@param guid	新規生成するレイヤーのGUID. */
-	INNLayer* Activation_LayerData_CPU::CreateLayer(const Gravisbell::GUID& guid)
+	ILayerBase* Activation_LayerData_CPU::CreateLayer(const Gravisbell::GUID& guid)
 	{
 		return new Activation_CPU(guid, *this);
 	}
