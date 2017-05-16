@@ -8,6 +8,8 @@ call ConvertNNConfigToSource.exe "./Activation/Config.xml" "./Activation/" "Acti
 call ConvertNNConfigToSource.exe "./Dropout/Config.xml" "./Dropout/" "Dropout"
 call ConvertNNConfigToSource.exe "./Pooling/Config.xml" "./Pooling/" "Pooling"
 call ConvertNNConfigToSource.exe "./BatchNormalization/Config.xml" "./BatchNormalization/" "BatchNormalization"
+call ConvertNNConfigToSource.exe "./SeparateOutput/Config.xml" "./SeparateOutput/" "SeparateOutput"
+call ConvertNNConfigToSource.exe "./MergeInput/Config.xml" "./MergeInput/" "MergeInput"
 
 
 pause

@@ -192,6 +192,12 @@
     <ClInclude Include="..\..\..\include\Layer\IO\IMultOutputLayerData.h">
       <Filter>include\Layer\IO</Filter>
     </ClInclude>
+    <ClInclude Include="LayerConnectSingle2Mult.h">
+      <Filter>LayerConnect</Filter>
+    </ClInclude>
+    <ClInclude Include="LayerConnectMult2Single.h">
+      <Filter>LayerConnect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -226,6 +232,12 @@
     </ClCompile>
     <ClCompile Include="FeedforwardNeuralNetwork_CPU.cpp">
       <Filter>Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="LayerConnectSingle2Mult.cpp">
+      <Filter>LayerConnect</Filter>
+    </ClCompile>
+    <ClCompile Include="LayerConnectMult2Single.cpp">
+      <Filter>LayerConnect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="53DAEC93-DBDB-4048-BD5A-401DD005C74E" version="1.0.0.0" default-language="ja" mult-input="true">
+
+  <SourceName>MergeInput</SourceName>
+  <Name>入力結合レイヤー</Name>
+  <Text>入力信号を結合して出力する</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+    <Enum id="mergeDirection">
+      <Name>結合方向</Name>
+      <Text>どの次元を使用して結合を行うかの設定.&#x0A;指定された次元以外の値は全て同じサイズである必要がある.</Text>
+      <Items>
+        <Item id="x">
+          <Name>X</Name>
+          <Text>X軸</Text>
+        </Item>
+        <Item id="y">
+          <Name>Y</Name>
+          <Text>Y軸</Text>
+        </Item>
+        <Item id="z">
+          <Name>Z</Name>
+          <Text>Z軸</Text>
+        </Item>
+        <Item id="ch">
+          <Name>CH</Name>
+          <Text>CH</Text>
+        </Item>
+      </Items>
+      <Default>ch</Default>
+    </Enum>
+    
+  </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <Learn>
+  </Learn>
+
+</Config>

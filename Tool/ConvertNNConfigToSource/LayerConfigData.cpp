@@ -916,6 +916,16 @@ int LayerConfigData::ReadFromXMLFile(const boost::filesystem::wpath& configFileP
 			this->default_language = L"ja";
 		}
 
+		// ï°êîì¸óÕ
+		if(boost::optional<bool> mult_input = pXmlTree.get_optional<bool>("Config.<xmlattr>.mult-input"))
+		{
+			this->onMultInput = mult_input.get();
+		}
+		else
+		{
+			this->onMultInput = false;
+		}
+
 		// ñºëO
 		if(boost::optional<std::string> name_str = pXmlTree.get_optional<std::string>("Config.Name"))
 		{
@@ -1159,13 +1169,27 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"/** Create a layer for CPU processing.\n");
 		fwprintf(fp, L"  * @param GUID of layer to create.\n");
 		fwprintf(fp, L"  */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPU(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const Gravisbell::SettingData::Standard::IData& i_data, const Gravisbell::IODataStruct& i_inputDataStruct);\n");
+		if(!this->onMultInput)
+		{
+			fwprintf(fp, L"EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPU(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const Gravisbell::SettingData::Standard::IData& i_data, const Gravisbell::IODataStruct& i_inputDataStruct);\n");
+		}
+		else
+		{
+			fwprintf(fp, L"EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPU_MultInput(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const Gravisbell::SettingData::Standard::IData& i_data, const Gravisbell::IODataStruct i_inputDataStruct[], Gravisbell::U32 i_inputDataCount);\n");
+		}
 		fwprintf(fp, L"EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPUfromBuffer(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, Gravisbell::S32 i_bufferSize, Gravisbell::S32& o_useBufferSize );\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"/** Create a layer for GPU processing.\n");
 		fwprintf(fp, L"  * @param GUID of layer to create.\n");
 		fwprintf(fp, L"  */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataGPU(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const Gravisbell::SettingData::Standard::IData& i_data, const Gravisbell::IODataStruct& i_inputDataStruct);\n");
+		if(!this->onMultInput)
+		{
+			fwprintf(fp, L"EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataGPU(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const Gravisbell::SettingData::Standard::IData& i_data, const Gravisbell::IODataStruct& i_inputDataStruct);\n");
+		}
+		else
+		{
+			fwprintf(fp, L"EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataGPU_MultInput(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const Gravisbell::SettingData::Standard::IData& i_data, const Gravisbell::IODataStruct i_inputDataStruct[], Gravisbell::U32 i_inputDataCount);\n");
+		}
 		fwprintf(fp, L"EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataGPUfromBuffer(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, Gravisbell::S32 i_bufferSize, Gravisbell::S32& o_useBufferSize);\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");

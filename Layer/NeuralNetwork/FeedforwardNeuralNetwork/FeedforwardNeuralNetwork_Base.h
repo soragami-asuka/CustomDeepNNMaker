@@ -31,6 +31,7 @@ namespace NeuralNetwork {
 		class FeedforwardNeuralNetwork_LayerData_Base& layerData;
 
 		std::map<Gravisbell::GUID, ILayerConnect*>	lpLayerInfo;	/**< 全レイヤーの管理クラス. <レイヤーGUID, レイヤー接続情報のアドレス> */
+		std::vector<ILayerData*>	lpTemporaryLayerData;			/**< 一時保存されたレイヤーデータ. */
 
 		std::list<ILayerConnect*> lpCalculateLayerList;		/**< レイヤーを処理順に並べたリスト.  */
 
@@ -46,6 +47,7 @@ namespace NeuralNetwork {
 		// 演算時の入力データ
 		CONST_BATCH_BUFFER_POINTER m_lppInputBuffer;	/**< 演算時の入力データ */
 		CONST_BATCH_BUFFER_POINTER m_lppDOutputBuffer;	/**< 入力誤差計算時の出力誤差データ */
+
 
 	public:
 		//====================================
@@ -65,6 +67,11 @@ namespace NeuralNetwork {
 			追加したレイヤーの所有権はNeuralNetworkに移るため、メモリの開放処理などは全てINeuralNetwork内で行われる.
 			@param pLayer	追加するレイヤーのアドレス. */
 		ErrorCode AddLayer(ILayerBase* pLayer);
+		/** 一時レイヤーを追加する.
+			追加したレイヤーデータの所有権はNeuralNetworkに移るため、メモリの開放処理などは全てINeuralNetwork内で行われる.
+			@param	i_pLayerData	追加するレイヤーデータ.
+			@param	o_player		追加されたレイヤーのアドレス. */
+		ErrorCode AddTemporaryLayer(ILayerData* i_pLayerData, ILayerBase** o_pLayer);
 		/** レイヤーを削除する.
 			@param i_guid	削除するレイヤーのGUID */
 		ErrorCode EraseLayer(const Gravisbell::GUID& i_guid);

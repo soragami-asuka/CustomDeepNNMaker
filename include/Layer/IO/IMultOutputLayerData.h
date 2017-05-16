@@ -10,7 +10,7 @@ namespace Gravisbell {
 namespace Layer {
 namespace IO {
 
-	class IMultOutputLayerData : public ILayerData
+	class IMultOutputLayerData : public virtual ILayerData
 	{
 	public:
 		/** コンストラクタ */
@@ -23,14 +23,14 @@ namespace IO {
 		// 出力レイヤー関連
 		//===========================
 	public:
-		/** 出力データの数を取得する */
-		virtual U32 GetOutputDataCount()const = 0;
+		/** 出力データの出力先レイヤー数. */
+		virtual U32 GetOutputToLayerCount()const = 0;
 
 		/** 出力データ構造を取得する */
-		virtual IODataStruct GetOutputDataStruct(U32 i_dataNum)const = 0;
+		virtual IODataStruct GetOutputDataStruct()const = 0;
 
 		/** 出力バッファ数を取得する */
-		virtual U32 GetOutputBufferCount(U32 i_dataNum)const = 0;
+		virtual U32 GetOutputBufferCount()const = 0;
 	};
 
 }	// IO

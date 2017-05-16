@@ -14,7 +14,6 @@
 
 #include<Common/ErrorCode.h>
 #include<SettingData/Standard/IData.h>
-#include<Layer/NeuralNetwork/INNLayer.h>
 
 namespace Gravisbell {
 namespace Layer {

@@ -20,7 +20,7 @@
 
 using namespace Gravisbell;
 
-#define USE_GPU	1
+#define USE_GPU	0
 #define USE_HOST_MEMORY 1
 
 
@@ -471,7 +471,11 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 			inputDataStruct, lastLayerGUID,
 			Gravisbell::Utility::NeuralNetworkLayer::CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.2f));
 
-		// 2‘w–Ú
+		// 1‘w–Ú‚ÌGUID‚ð‹L˜^
+		Gravisbell::GUID layerGUID_1st = lastLayerGUID;
+		Gravisbell::IODataStruct inputDataStruct_1st = inputDataStruct;;
+
+		// 2‘w–ÚA
 		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lppLayerData,
@@ -497,6 +501,14 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 			lppLayerData,
 			inputDataStruct, lastLayerGUID,
 			Gravisbell::Utility::NeuralNetworkLayer::CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.5f));
+
+		// 2‘w–ÚB
+		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lppLayerData,
+			inputDataStruct_1st, layerGUID_1st,
+			Gravisbell::Utility::NeuralNetworkLayer::CreateConvolutionLayer(layerDLLManager, inputDataStruct_1st, Vector3D<S32>(4,4,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
+
 
 		// 3‘w–Ú
 		Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(

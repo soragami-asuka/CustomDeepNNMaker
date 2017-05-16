@@ -519,6 +519,9 @@ namespace NeuralNetwork {
 	{
 		ErrorCode err;
 
+		// 出力分割レイヤーの識別ID
+		static const Gravisbell::GUID SEPARATE_LAYER_GUID(0xc13c30da, 0x056e, 0x46d0, 0x90, 0xfc, 0x60, 0x87, 0x66, 0xfb, 0x43, 0x2e);
+
 		// 全レイヤーを追加する
 		for(auto it : this->lpConnectInfo)
 		{
@@ -527,15 +530,72 @@ namespace NeuralNetwork {
 				return err;
 		}
 
+		// 複数出力を持つレイヤーで、単一出力の能力しか持たないものを探し、代替レイヤーを作成する
+		std::map<Gravisbell::GUID, Gravisbell::GUID>	lpSubstitutionLayer;	// 代替レイヤー<元レイヤーGUID, 代替レイヤーGUID>
+		for(auto it : this->lpConnectInfo)
+		{
+			if(this->GetOutputLayerCount(it.guid) > 1)
+			{
+				ISingleOutputLayerData* pSingleOutputLayerData = dynamic_cast<ISingleOutputLayerData*>(it.pLayerData);
+				if(pSingleOutputLayerData)
+				{
+					// 単一出力機能しか持たないのに複数出力を持っている
+
+					// 出力分割レイヤ－のDLLを取得
+					auto pDLL = this->layerDLLManager.GetLayerDLLByGUID(SEPARATE_LAYER_GUID);
+					if(pDLL == NULL)
+						return ErrorCode::ERROR_CODE_DLL_NOTFOUND;
+
+					// レイヤー構造情報を作成
+					auto pLayerStructure = pDLL->CreateLayerStructureSetting();
+					if(pLayerStructure == NULL)
+						return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+					auto pItem = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Int*>(pLayerStructure->GetItemByID(L"separateCount"));
+					if(pItem == NULL)
+						return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+
+					pItem->SetValue(this->GetOutputLayerCount(it.guid));
+
+					// レイヤーデータを作成
+					auto pSubstitutionLayerData = pDLL->CreateLayerData(*pLayerStructure, pSingleOutputLayerData->GetOutputDataStruct());
+					delete pLayerStructure;
+
+					// レイヤーを追加
+					ILayerBase* pSubstitutionLayer = NULL;
+					err = neuralNetwork.AddTemporaryLayer(pSubstitutionLayerData, &pSubstitutionLayer);
+					if(err != ErrorCode::ERROR_CODE_NONE)
+						return err;
+
+					lpSubstitutionLayer[it.guid] = pSubstitutionLayer->GetGUID();
+
+					// 代替レイヤーの入力を代替先レイヤーに設定
+					err = neuralNetwork.AddInputLayerToLayer(pSubstitutionLayer->GetGUID(), it.guid);
+					if(err != ErrorCode::ERROR_CODE_NONE)
+						return err;
+				}
+			}
+		}
+
+
 		// レイヤー間の接続を設定する
 		for(auto it_connectInfo : this->lpConnectInfo)
 		{
 			// 入力レイヤー
 			for(auto inputGUID : it_connectInfo.lpInputLayerGUID)
 			{
-				err = neuralNetwork.AddInputLayerToLayer(it_connectInfo.guid, inputGUID);
-				if(err != ErrorCode::ERROR_CODE_NONE)
-					return err;
+				if(lpSubstitutionLayer.count(inputGUID))
+				{
+					// 代替レイヤーを使用する
+					err = neuralNetwork.AddInputLayerToLayer(it_connectInfo.guid, lpSubstitutionLayer[inputGUID]);
+					if(err != ErrorCode::ERROR_CODE_NONE)
+						return err;
+				}
+				else
+				{
+					err = neuralNetwork.AddInputLayerToLayer(it_connectInfo.guid, inputGUID);
+					if(err != ErrorCode::ERROR_CODE_NONE)
+						return err;
+				}
 			}
 
 			// バイパスレイヤー
@@ -916,9 +976,9 @@ namespace NeuralNetwork {
 		U32 outputCount = 0;
 		for(auto it : this->lpConnectInfo)
 		{
-			for(U32 inputNum=0; inputNum<pLayerConnet->lpInputLayerGUID.size(); inputNum++)
+			for(U32 inputNum=0; inputNum<it.lpInputLayerGUID.size(); inputNum++)
 			{
-				if(pLayerConnet->lpInputLayerGUID[inputNum] == i_layerGUID)
+				if(it.lpInputLayerGUID[inputNum] == i_layerGUID)
 					outputCount++;
 			}
 		}

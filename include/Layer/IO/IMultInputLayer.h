@@ -24,8 +24,8 @@ namespace IO {
 		virtual ~IMultInputLayer(){}
 
 	public:
-		/** 出力データの数を取得する */
-		virtual U32 GetOutputDataCount()const = 0;
+		/** 入力データの数を取得する */
+		virtual U32 GetInputDataCount()const = 0;
 
 		/** 入力データ構造を取得する.
 			@return	入力データ構造 */

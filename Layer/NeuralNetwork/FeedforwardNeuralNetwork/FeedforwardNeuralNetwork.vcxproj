@@ -92,6 +92,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;FeedforwardNeuralNetwork_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir);$(CUDA_PATH_V7_5)\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>/D _SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -111,6 +112,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;FeedforwardNeuralNetwork_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir);$(CUDA_PATH_V7_5)\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>/D _SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -133,6 +135,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;FeedforwardNeuralNetwork_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir);$(CUDA_PATH_V7_5)\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>/D _SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -156,6 +159,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;FeedforwardNeuralNetwork_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir);$(CUDA_PATH_V7_5)\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>/D _SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -216,7 +220,9 @@
     <ClInclude Include="FeedforwardNeuralNetwork_LayerData_Base.h" />
     <ClInclude Include="LayerConnect.h" />
     <ClInclude Include="LayerConnectInput.h" />
+    <ClInclude Include="LayerConnectMult2Single.h" />
     <ClInclude Include="LayerConnectOutput.h" />
+    <ClInclude Include="LayerConnectSingle2Mult.h" />
     <ClInclude Include="LayerConnectSingle2Single.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -243,7 +249,9 @@
     <ClCompile Include="FeedforwardNeuralNetwork_LayerData_Base.cpp" />
     <ClCompile Include="FeedforwardNeuralNetwork_LayerData_CPU.cpp" />
     <ClCompile Include="LayerConnectInput.cpp" />
+    <ClCompile Include="LayerConnectMult2Single.cpp" />
     <ClCompile Include="LayerConnectOutput.cpp" />
+    <ClCompile Include="LayerConnectSingle2Mult.cpp" />
     <ClCompile Include="LayerConnectSingle2Single.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

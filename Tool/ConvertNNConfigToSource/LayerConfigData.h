@@ -23,6 +23,7 @@ namespace NeuralNetwork {
 		GUID guid;	/**< 識別コード */
 		VersionCode version;	/**< バージョン */
 		std::wstring default_language;	/**< 基本言語 */
+		bool onMultInput;	/**< 複数入力を持つレイヤー */
 
 		std::wstring name;	/**< 名前 */
 		std::wstring text;	/**< 説明テキスト */

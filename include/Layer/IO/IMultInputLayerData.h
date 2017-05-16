@@ -10,13 +10,13 @@ namespace Gravisbell {
 namespace Layer {
 namespace IO {
 
-	class IMultInputlayerData : public virtual ILayerData
+	class IMultInputLayerData : public virtual ILayerData
 	{
 	public:
 		/** コンストラクタ */
-		IMultInputlayerData() : ILayerData(){}
+		IMultInputLayerData() : ILayerData(){}
 		/** デストラクタ */
-		virtual ~IMultInputlayerData(){}
+		virtual ~IMultInputLayerData(){}
 
 
 		//===========================

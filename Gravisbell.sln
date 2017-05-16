@@ -73,7 +73,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NeuralNetwork.NetworkParser
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NeuralNetwork.LayerDataManager", "Library\NeuralNetwork\LayerDataManager\LayerDataManager.vcxproj", "{0D56F731-5409-4B4C-8A69-D74E3AC68CDA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.SimpleSeparateOutput", "Layer\NeuralNetwork\SimpleSeparateOutput\SimpleSeparateOutput.vcxproj", "{AD565A1F-8937-4595-9B3D-DB2D3B97525B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.SeparateOutput", "Layer\NeuralNetwork\SeparateOutput\SeparateOutput.vcxproj", "{C5446699-0E53-4641-8A6A-9106169D88D1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.MergeInput", "Layer\NeuralNetwork\MergeInput\MergeInput.vcxproj", "{DA081870-2E5B-4742-9864-64FB38FFE7E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -370,16 +372,28 @@ Global
 		{0D56F731-5409-4B4C-8A69-D74E3AC68CDA}.Release|Win32.Build.0 = Release|Win32
 		{0D56F731-5409-4B4C-8A69-D74E3AC68CDA}.Release|x64.ActiveCfg = Release|x64
 		{0D56F731-5409-4B4C-8A69-D74E3AC68CDA}.Release|x64.Build.0 = Release|x64
-		{AD565A1F-8937-4595-9B3D-DB2D3B97525B}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{AD565A1F-8937-4595-9B3D-DB2D3B97525B}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{AD565A1F-8937-4595-9B3D-DB2D3B97525B}.Debug|Win32.ActiveCfg = Debug|Win32
-		{AD565A1F-8937-4595-9B3D-DB2D3B97525B}.Debug|Win32.Build.0 = Debug|Win32
-		{AD565A1F-8937-4595-9B3D-DB2D3B97525B}.Debug|x64.ActiveCfg = Debug|x64
-		{AD565A1F-8937-4595-9B3D-DB2D3B97525B}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{AD565A1F-8937-4595-9B3D-DB2D3B97525B}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{AD565A1F-8937-4595-9B3D-DB2D3B97525B}.Release|Win32.ActiveCfg = Release|Win32
-		{AD565A1F-8937-4595-9B3D-DB2D3B97525B}.Release|Win32.Build.0 = Release|Win32
-		{AD565A1F-8937-4595-9B3D-DB2D3B97525B}.Release|x64.ActiveCfg = Release|x64
+		{C5446699-0E53-4641-8A6A-9106169D88D1}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{C5446699-0E53-4641-8A6A-9106169D88D1}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{C5446699-0E53-4641-8A6A-9106169D88D1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C5446699-0E53-4641-8A6A-9106169D88D1}.Debug|Win32.Build.0 = Debug|Win32
+		{C5446699-0E53-4641-8A6A-9106169D88D1}.Debug|x64.ActiveCfg = Debug|x64
+		{C5446699-0E53-4641-8A6A-9106169D88D1}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{C5446699-0E53-4641-8A6A-9106169D88D1}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{C5446699-0E53-4641-8A6A-9106169D88D1}.Release|Win32.ActiveCfg = Release|Win32
+		{C5446699-0E53-4641-8A6A-9106169D88D1}.Release|Win32.Build.0 = Release|Win32
+		{C5446699-0E53-4641-8A6A-9106169D88D1}.Release|x64.ActiveCfg = Release|x64
+		{DA081870-2E5B-4742-9864-64FB38FFE7E1}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{DA081870-2E5B-4742-9864-64FB38FFE7E1}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{DA081870-2E5B-4742-9864-64FB38FFE7E1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DA081870-2E5B-4742-9864-64FB38FFE7E1}.Debug|Win32.Build.0 = Debug|Win32
+		{DA081870-2E5B-4742-9864-64FB38FFE7E1}.Debug|x64.ActiveCfg = Debug|x64
+		{DA081870-2E5B-4742-9864-64FB38FFE7E1}.Debug|x64.Build.0 = Debug|x64
+		{DA081870-2E5B-4742-9864-64FB38FFE7E1}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{DA081870-2E5B-4742-9864-64FB38FFE7E1}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{DA081870-2E5B-4742-9864-64FB38FFE7E1}.Release|Win32.ActiveCfg = Release|Win32
+		{DA081870-2E5B-4742-9864-64FB38FFE7E1}.Release|Win32.Build.0 = Release|Win32
+		{DA081870-2E5B-4742-9864-64FB38FFE7E1}.Release|x64.ActiveCfg = Release|x64
+		{DA081870-2E5B-4742-9864-64FB38FFE7E1}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -415,7 +429,8 @@ Global
 		{75436C3B-8E10-4719-886C-8920E5235024} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
 		{919C80F1-A324-47D4-9E5F-1ACCB15B3A52} = {D9D2E199-15AC-4BC5-B86F-466DEB2F97F9}
 		{0D56F731-5409-4B4C-8A69-D74E3AC68CDA} = {D9D2E199-15AC-4BC5-B86F-466DEB2F97F9}
-		{AD565A1F-8937-4595-9B3D-DB2D3B97525B} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
+		{C5446699-0E53-4641-8A6A-9106169D88D1} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
+		{DA081870-2E5B-4742-9864-64FB38FFE7E1} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		VisualSVNWorkingCopyRoot = .

@@ -189,6 +189,9 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNMultOutputLayer.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNMultInputLayer.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

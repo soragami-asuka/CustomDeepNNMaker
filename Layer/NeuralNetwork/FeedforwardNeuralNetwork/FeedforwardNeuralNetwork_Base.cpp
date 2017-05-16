@@ -4,12 +4,21 @@
 //======================================
 #include"stdafx.h"
 
+#include<boost/uuid/uuid_generators.hpp>
+
 #include"FeedforwardNeuralNetwork_Base.h"
 #include"FeedforwardNeuralNetwork_LayerData_Base.h"
+
+#include"Layer/NeuralNetwork/INNSingleInputLayer.h"
+#include"Layer/NeuralNetwork/INNSingleOutputLayer.h"
+#include"Layer/NeuralNetwork/INNMultInputLayer.h"
+#include"Layer/NeuralNetwork/INNMultOutputLayer.h"
 
 #include"LayerConnectInput.h"
 #include"LayerConnectOutput.h"
 #include"LayerConnectSingle2Single.h"
+#include"LayerConnectSingle2Mult.h"
+#include"LayerConnectMult2Single.h"
 
 
 namespace Gravisbell {
@@ -49,6 +58,11 @@ namespace NeuralNetwork {
 			}
 		}
 
+		// 一時レイヤーのレイヤーデータを削除
+		for(U32 i=0; i<this->lpTemporaryLayerData.size(); i++)
+			delete this->lpTemporaryLayerData[i];
+		this->lpTemporaryLayerData.clear();
+
 		// 学習データの削除
 		if(this->pLearnData)
 			delete this->pLearnData;
@@ -72,27 +86,64 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_ADDLAYER_ALREADY_SAMEID;
 
 		// レイヤーの入出力種別に応じて分岐
-		switch(pLayer->GetLayerKind() & (Gravisbell::Layer::LAYER_KIND_IOTYPE | Gravisbell::Layer::LAYER_KIND_USETYPE))
+		if((pLayer->GetLayerKind() & Gravisbell::Layer::LAYER_KIND_USETYPE) == LAYER_KIND_NEURALNETWORK)
 		{
-		case LAYER_KIND_SINGLE_INPUT | LAYER_KIND_SINGLE_OUTPUT | LAYER_KIND_NEURALNETWORK:
+			INNSingleInputLayer*  pSingleInputLayer  = dynamic_cast<INNSingleInputLayer*>(pLayer);
+			INNSingleOutputLayer* pSingleOutputLayer = dynamic_cast<INNSingleOutputLayer*>(pLayer);
+			INNMultInputLayer*    pMultInputLayer    = dynamic_cast<INNMultInputLayer*>(pLayer);
+			INNMultOutputLayer*   pMultOutputLayer   = dynamic_cast<INNMultOutputLayer*>(pLayer);
+
+			if(pSingleInputLayer && pSingleOutputLayer)
 			{
-				ILayerBase* pNNLayer = dynamic_cast<ILayerBase*>(pLayer);
-				if(pNNLayer)
-				{
-					this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectSingle2Single(pNNLayer, this->layerData.GetLayerDLLManager().GetLayerDLLByGUID(pLayer->GetLayerCode())->CreateLearningSetting());
-				}
-				else
-				{
-					// 未対応
-					return ErrorCode::ERROR_CODE_ADDLAYER_NOT_COMPATIBLE;
-				}
+				// 単一入力, 単一出力
+				this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectSingle2Single(pLayer, this->layerData.GetLayerDLLManager().GetLayerDLLByGUID(pLayer->GetLayerCode())->CreateLearningSetting());
 			}
-			break;
-		default:
+			else if(pSingleInputLayer && pMultOutputLayer)
+			{
+				// 単一入力, 複数出力
+				this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectSingle2Mult(pLayer, this->layerData.GetLayerDLLManager().GetLayerDLLByGUID(pLayer->GetLayerCode())->CreateLearningSetting());
+			}
+			else if(pMultInputLayer && pMultOutputLayer)
+			{
+				// 複数入力, 単一出力
+				this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectMult2Single(pLayer, this->layerData.GetLayerDLLManager().GetLayerDLLByGUID(pLayer->GetLayerCode())->CreateLearningSetting());
+			}
+			else
+			{
+				// 複数入力, 複数出力
+				// 未対応
+				return ErrorCode::ERROR_CODE_ADDLAYER_NOT_COMPATIBLE;
+			}
+		}
+		else
+		{
 			// 未対応
 			return ErrorCode::ERROR_CODE_ADDLAYER_NOT_COMPATIBLE;
-			break;
 		}
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+	/** 一時レイヤーを追加する.
+			追加したレイヤーデータの所有権はNeuralNetworkに移るため、メモリの開放処理などは全てINeuralNetwork内で行われる.
+			@param	i_pLayerData	追加するレイヤーデータ.
+			@param	o_player		追加されたレイヤーのアドレス. */
+	ErrorCode FeedforwardNeuralNetwork_Base::AddTemporaryLayer(ILayerData* i_pLayerData, ILayerBase** o_pLayer)
+	{
+		if(i_pLayerData == NULL)
+			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
+		lpTemporaryLayerData.push_back(i_pLayerData);
+
+		ILayerBase* pLayer = i_pLayerData->CreateLayer(boost::uuids::random_generator()().data);
+		if(pLayer == NULL)
+			return ErrorCode::ERROR_CODE_LAYER_CREATE;
+
+		ErrorCode err = this->AddLayer(pLayer);
+		if(err != ErrorCode::ERROR_CODE_NONE)
+		{
+			delete pLayer;
+			return err;
+		}
+		*o_pLayer = pLayer;
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
