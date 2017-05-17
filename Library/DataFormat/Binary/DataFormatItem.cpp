@@ -102,7 +102,7 @@ namespace
 		U32 buf = ConvertString2UInt(i_buf);
 		if(this->dataFormat.GetOnReverseByteOrder())
 		{
-			memcpy_reverse(&this->m_lpBuf[0], &buf, this->m_lpBuf.size(), sizeof(buf));
+			memcpy_reverse(&this->m_lpBuf[0], &buf, (U32)this->m_lpBuf.size(), sizeof(buf));
 		}
 		else
 		{

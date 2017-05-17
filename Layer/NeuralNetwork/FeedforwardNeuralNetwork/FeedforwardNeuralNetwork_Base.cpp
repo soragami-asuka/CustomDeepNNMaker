@@ -103,7 +103,7 @@ namespace NeuralNetwork {
 				// 単一入力, 複数出力
 				this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectSingle2Mult(pLayer, this->layerData.GetLayerDLLManager().GetLayerDLLByGUID(pLayer->GetLayerCode())->CreateLearningSetting());
 			}
-			else if(pMultInputLayer && pMultOutputLayer)
+			else if(pMultInputLayer && pSingleOutputLayer)
 			{
 				// 複数入力, 単一出力
 				this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectMult2Single(pLayer, this->layerData.GetLayerDLLManager().GetLayerDLLByGUID(pLayer->GetLayerCode())->CreateLearningSetting());
@@ -764,7 +764,7 @@ namespace NeuralNetwork {
 						continue;
 
 					// 追加待機状態に含まれていないことを確認
-					if(lpAddWaitList.count(pOutputToLayer) > 0)
+					if(lpAddWaitList.count(pOutputToLayer) == 0)
 						continue;
 
 					onHaveNonAddedOutputLayer = true;

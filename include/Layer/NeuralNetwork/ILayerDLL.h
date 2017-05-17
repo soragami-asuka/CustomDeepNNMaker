@@ -72,7 +72,21 @@ namespace NeuralNetwork {
 			@param	i_layerStructure	レイヤー構造.
 			@param	i_inputDataStruct	入力データ構造. */
 		virtual ILayerData* CreateLayerData(const Gravisbell::GUID& guid, const SettingData::Standard::IData& i_layerStructure, const IODataStruct& i_inputDataStruct)const = 0;
-		
+
+		/** 複数入力を持つレイヤーデータを作成.
+			GUIDは自動割り当て.
+			@param	i_layerStructure	レイヤー構造.
+			@param	i_lpInputDataStruct	入力データ構造の配列.
+			@param	i_inputDataCount	入力データ構造の数. */
+		virtual ILayerData* CreateLayerData(const SettingData::Standard::IData& i_layerStructure, const IODataStruct i_lpInputDataStruct[], U32 i_inputDataCount)const = 0;
+		/** 複数入力を持つレイヤーデータを作成.
+			@param guid	作成レイヤーのGUID
+			@param	i_layerStructure	レイヤー構造.
+			@param	i_lpInputDataStruct	入力データ構造の配列.
+			@param	i_inputDataCount	入力データ構造の数. */
+		virtual ILayerData* CreateLayerData(const Gravisbell::GUID& guid, const SettingData::Standard::IData& i_layerStructure, const IODataStruct i_lpInputDataStruct[], U32 i_inputDataCount)const = 0;
+
+
 		/** レイヤーを作成.
 			GUIDは自動割り当て.
 			@param	i_lpBuffer		読み取り用バッファ.

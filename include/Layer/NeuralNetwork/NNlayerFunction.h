@@ -48,6 +48,7 @@ namespace NeuralNetwork {
 
 	/** ÉåÉCÉÑÅ[ÇçÏê¨ */
 	typedef ILayerData* (*FuncCreateLayerData)			(const ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const SettingData::Standard::IData& i_layerStructure, const IODataStruct& i_inputDataStruct);
+	typedef ILayerData* (*FuncCreateLayerData_MultIput)	(const ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const SettingData::Standard::IData& i_layerStructure, const IODataStruct  i_lpInputDataStruct[], U32 inputCount);
 	typedef ILayerData* (*FuncCreateLayerDataFromBuffer)(const ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize);
 
 }	// NeuralNetwork

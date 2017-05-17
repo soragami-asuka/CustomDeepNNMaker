@@ -151,6 +151,36 @@ namespace NeuralNetwork {
 		for(U32 inputNum=0; inputNum<this->GetInputDataCount(); inputNum++)
 			this->m_lppInputBuffer[inputNum] = i_lpInputBuffer[inputNum];
 
+		switch(this->layerData.layerStructure.mergeDirection)
+		{
+		case MergeInput::LayerStructure::mergeDirection_ch:
+			{
+				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+				{
+					U32 offset = 0;
+					for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
+					{
+						cudaError_t err = cudaMemcpyAsync(
+							thrust::raw_pointer_cast(&this->lpOutputBuffer[batchNum*this->outputBufferCount + offset]),
+							&this->m_lppInputBuffer[inputNum][batchNum*this->lpInputBufferCount[inputNum]],
+							sizeof(F32) * this->lpInputBufferCount[inputNum],
+							cudaMemcpyDeviceToDevice);
+						if(err != 0)
+							return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
+
+						offset += this->lpInputBufferCount[inputNum];
+					}
+				}
+				cudaThreadSynchronize();
+			}
+			break;
+		case MergeInput::LayerStructure::mergeDirection_x:
+			break;
+		case MergeInput::LayerStructure::mergeDirection_y:
+			break;
+		case MergeInput::LayerStructure::mergeDirection_z:
+			break;
+		}
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -192,6 +222,37 @@ namespace NeuralNetwork {
 		// 出力誤差バッファのアドレスを配列に格納
 		this->m_lppDOutputBufferPrev = i_lppDOutputBufferPrev;
 
+		switch(this->layerData.layerStructure.mergeDirection)
+		{
+		case MergeInput::LayerStructure::mergeDirection_ch:
+			{
+				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+				{
+					U32 offset = 0;
+					for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
+					{
+						cudaError_t err = cudaMemcpyAsync(
+							thrust::raw_pointer_cast(&this->lpDInputBuffer[inputNum][batchNum*this->lpInputBufferCount[inputNum]]),
+							&this->m_lppDOutputBufferPrev[batchNum*this->outputBufferCount + offset],
+							sizeof(F32) * this->lpInputBufferCount[inputNum],
+							cudaMemcpyDeviceToDevice);
+						if(err != 0)
+							return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
+
+						offset += this->lpInputBufferCount[inputNum];
+					}
+				}
+				cudaThreadSynchronize();
+			}
+			break;
+		case MergeInput::LayerStructure::mergeDirection_x:
+			break;
+		case MergeInput::LayerStructure::mergeDirection_y:
+			break;
+		case MergeInput::LayerStructure::mergeDirection_z:
+			break;
+		}
+		
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

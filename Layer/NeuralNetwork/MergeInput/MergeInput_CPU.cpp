@@ -85,9 +85,15 @@ namespace NeuralNetwork {
 
 		// 入力差分バッファを作成
 		this->lpDInputBuffer.resize(this->GetInputDataCount());
+		this->lppBatchDInputBuffer.resize(this->GetInputDataCount());
 		for(U32 inputNum=0; inputNum<this->GetInputDataCount(); inputNum++)
 		{
 			this->lpDInputBuffer[inputNum].resize(this->batchSize * this->GetInputBufferCount(inputNum));
+			this->lppBatchDInputBuffer[inputNum].resize(this->batchSize);
+			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			{
+				this->lppBatchDInputBuffer[inputNum][batchNum] = &this->lpDInputBuffer[inputNum][batchNum*this->lpInputBufferCount[inputNum]];
+			}
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
@@ -164,6 +170,33 @@ namespace NeuralNetwork {
 				this->m_lppInputBuffer[inputNum][batchNum] = &i_lpInputBuffer[inputNum][batchNum * this->lpInputBufferCount[inputNum]];
 		}
 
+		switch(this->layerData.layerStructure.mergeDirection)
+		{
+		case MergeInput::LayerStructure::mergeDirection_ch:
+			{
+				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+				{
+					U32 offset = 0;
+					for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
+					{
+						memcpy(
+							&this->lppBatchOutputBuffer[batchNum][offset],
+							this->m_lppInputBuffer[inputNum][batchNum],
+							sizeof(F32) * this->lpInputBufferCount[inputNum]);
+
+						offset += this->lpInputBufferCount[inputNum];
+					}
+				}
+			}
+			break;
+		case MergeInput::LayerStructure::mergeDirection_x:
+			break;
+		case MergeInput::LayerStructure::mergeDirection_y:
+			break;
+		case MergeInput::LayerStructure::mergeDirection_z:
+			break;
+		}
+
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
@@ -204,6 +237,33 @@ namespace NeuralNetwork {
 		// 出力誤差バッファのアドレスを配列に格納
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 			this->m_lppDOutputBufferPrev[batchNum] = &i_lppDOutputBufferPrev[batchNum * this->outputBufferCount];
+
+		switch(this->layerData.layerStructure.mergeDirection)
+		{
+		case MergeInput::LayerStructure::mergeDirection_ch:
+			{
+				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+				{
+					U32 offset = 0;
+					for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
+					{
+						memcpy(
+							this->lppBatchDInputBuffer[inputNum][batchNum],
+							&this->m_lppDOutputBufferPrev[batchNum][offset],
+							sizeof(F32) * this->lpInputBufferCount[inputNum]);
+
+						offset += this->lpInputBufferCount[inputNum];
+					}
+				}
+			}
+			break;
+		case MergeInput::LayerStructure::mergeDirection_x:
+			break;
+		case MergeInput::LayerStructure::mergeDirection_y:
+			break;
+		case MergeInput::LayerStructure::mergeDirection_z:
+			break;
+		}
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

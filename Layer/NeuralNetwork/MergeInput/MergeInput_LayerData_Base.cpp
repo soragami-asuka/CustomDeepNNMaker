@@ -132,6 +132,7 @@ namespace NeuralNetwork {
 		// 入力データ数
 		U32 inputDataCount = 0;
 		memcpy(&inputDataCount, i_lpBuffer, sizeof(U32));
+		readBufferByte += sizeof(U32);
 		// 入力データ構造
 		std::vector<IODataStruct> lpTmpInputDataStruct(inputDataCount);
 		for(U32 inputNum=0; inputNum<inputDataCount; inputNum++)
@@ -147,7 +148,7 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_INITLAYER_READ_CONFIG;
 
 		// 初期化する
-		ErrorCode err = this->Initialize(*pLayerStructure, &lpInputDataStruct[0], (U32)lpInputDataStruct.size());
+		ErrorCode err = this->Initialize(*pLayerStructure, &lpTmpInputDataStruct[0], (U32)lpTmpInputDataStruct.size());
 		delete pLayerStructure;
 		if(err != ErrorCode::ERROR_CODE_NONE)
 			return err;
