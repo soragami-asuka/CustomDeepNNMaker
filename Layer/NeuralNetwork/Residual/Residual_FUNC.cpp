@@ -1,9 +1,9 @@
 /*--------------------------------------------
- * FileName  : Activation_FUNC.cpp
- * LayerName : 活性化関数
- * guid      : 99904134-83B7-4502-A0CA-728A2C9D80C7
+ * FileName  : Residual_FUNC.cpp
+ * LayerName : 残差レイヤー
+ * guid      : 0519E7FA-311D-4A1D-A615-959AFDD00526
  * 
- * Text      : 活性化関数
+ * Text      : 入力信号のCHを加算して出力する.ResNet用.
 --------------------------------------------*/
 #include"stdafx.h"
 
@@ -12,11 +12,11 @@
 
 #include<Library/SettingData/Standard/SettingData.h>
 
-#include"Activation_FUNC.hpp"
+#include"Residual_FUNC.hpp"
 
 
-// {99904134-83B7-4502-A0CA-728A2C9D80C7}
-static const Gravisbell::GUID g_guid(0x99904134, 0x83b7, 0x4502, 0xa0, 0xca, 0x72, 0x8a, 0x2c, 0x9d, 0x80, 0xc7);
+// {0519E7FA-311D-4A1D-A615-959AFDD00526}
+static const Gravisbell::GUID g_guid(0x0519e7fa, 0x311d, 0x4a1d, 0xa6, 0x15, 0x95, 0x9a, 0xfd, 0xd0, 0x05, 0x26);
 
 // VersionCode
 static const Gravisbell::VersionCode g_version = {   1,   0,   0,   0}; 
@@ -37,95 +37,20 @@ namespace DefaultLanguage
     /** Base */
     static const StringData g_baseData = 
     {
-        L"活性化関数",
-        L"活性化関数"
+        L"残差レイヤー",
+        L"入力信号のCHを加算して出力する.ResNet用."
     };
 
 
     /** ItemData Layer Structure <id, StringData> */
     static const std::map<std::wstring, StringData> g_lpItemData_LayerStructure = 
     {
-        {
-            L"ActivationType",
-            {
-                L"活性化関数種別",
-                L"使用する活性化関数の種類を定義する",
-            }
-        },
     };
 
 
     /** ItemData Layer Structure Enum <id, enumID, StringData> */
     static const std::map<std::wstring, std::map<std::wstring, StringData>> g_lpItemDataEnum_LayerStructure =
     {
-        {
-            L"ActivationType",
-            {
-                {
-                    L"lenear",
-                    {
-                        L"リニア関数",
-                        L"y = x;",
-                    },
-                },
-                {
-                    L"sigmoid",
-                    {
-                        L"シグモイド関数",
-                        L"y = 1 / (1 + e^(-x));\n範囲 0 < y < 1\n(x=0, y=0.5)を通る",
-                    },
-                },
-                {
-                    L"sigmoid_crossEntropy",
-                    {
-                        L"シグモイド関数(出力レイヤー用)",
-                        L"y = 1 / (1 + e^(-x));\n範囲 0 < y < 1\n(x=0, y=0.5)を通る",
-                    },
-                },
-                {
-                    L"ReLU",
-                    {
-                        L"ReLU（ランプ関数）",
-                        L"y = max(0, x);\n範囲 0 <= y\n(x=0, y=0)を通る",
-                    },
-                },
-                {
-                    L"tanh",
-                    {
-                        L"tanh(双曲線関数)",
-                        L"y = sin(x)/cos(x);",
-                    },
-                },
-                {
-                    L"softmax_ALL",
-                    {
-                        L"SoftMax関数",
-                        L"全体における自身の割合を返す関数.\ny = e^x / Σe^x;\n",
-                    },
-                },
-                {
-                    L"softmax_ALL_crossEntropy",
-                    {
-                        L"SoftMax関数(出力レイヤー用)",
-                        L"全体における自身の割合を返す関数.\ny = e^x / Σe^x;\n",
-                    },
-                },
-                {
-                    L"softmax_CH",
-                    {
-                        L"SoftMax関数(CH内のみ)",
-                        L"同一のX,Y,Zにおける各CHの自身の割合を返す関数.\ny = e^x / Σe^x;\n",
-                    },
-                },
-                {
-                    L"softmax_CH_crossEntropy",
-                    {
-                        L"SoftMax関数(CH内のみ)(出力レイヤー用)",
-                        L"同一のX,Y,Zにおける各CHの自身の割合を返す関数.\ny = e^x / Σe^x;\n",
-                    },
-                },
-            }
-        },
     };
 
 
@@ -214,68 +139,6 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 
 
 	// Create Item
-	/** Name : 活性化関数種別
-	  * ID   : ActivationType
-	  * Text : 使用する活性化関数の種類を定義する
-	  */
-	{
-		Gravisbell::SettingData::Standard::IItemEx_Enum* pItemEnum = Gravisbell::SettingData::Standard::CreateItem_Enum(
-			L"ActivationType",
-			CurrentLanguage::g_lpItemData_LayerStructure[L"ActivationType"].name.c_str(),
-			CurrentLanguage::g_lpItemData_LayerStructure[L"ActivationType"].text.c_str());
-
-		// 0
-		pItemEnum->AddEnumItem(
-			L"lenear",
-			L"リニア関数",
-			L"y = x;");
-		// 1
-		pItemEnum->AddEnumItem(
-			L"sigmoid",
-			L"シグモイド関数",
-			L"y = 1 / (1 + e^(-x));\n範囲 0 < y < 1\n(x=0, y=0.5)を通る");
-		// 2
-		pItemEnum->AddEnumItem(
-			L"sigmoid_crossEntropy",
-			L"シグモイド関数(出力レイヤー用)",
-			L"y = 1 / (1 + e^(-x));\n範囲 0 < y < 1\n(x=0, y=0.5)を通る");
-		// 3
-		pItemEnum->AddEnumItem(
-			L"ReLU",
-			L"ReLU（ランプ関数）",
-			L"y = max(0, x);\n範囲 0 <= y\n(x=0, y=0)を通る");
-		// 4
-		pItemEnum->AddEnumItem(
-			L"tanh",
-			L"tanh(双曲線関数)",
-			L"y = sin(x)/cos(x);");
-		// 5
-		pItemEnum->AddEnumItem(
-			L"softmax_ALL",
-			L"SoftMax関数",
-			L"全体における自身の割合を返す関数.\ny = e^x / Σe^x;\n");
-		// 6
-		pItemEnum->AddEnumItem(
-			L"softmax_ALL_crossEntropy",
-			L"SoftMax関数(出力レイヤー用)",
-			L"全体における自身の割合を返す関数.\ny = e^x / Σe^x;\n");
-		// 7
-		pItemEnum->AddEnumItem(
-			L"softmax_CH",
-			L"SoftMax関数(CH内のみ)",
-			L"同一のX,Y,Zにおける各CHの自身の割合を返す関数.\ny = e^x / Σe^x;\n");
-		// 8
-		pItemEnum->AddEnumItem(
-			L"softmax_CH_crossEntropy",
-			L"SoftMax関数(CH内のみ)(出力レイヤー用)",
-			L"同一のX,Y,Zにおける各CHの自身の割合を返す関数.\ny = e^x / Σe^x;\n");
-
-pItemEnum->SetDefaultItem(1);
-pItemEnum->SetValue(pItemEnum->GetDefault());
-
-		pLayerConfig->AddItem(pItemEnum);
-	}
-
 	return pLayerConfig;
 }
 

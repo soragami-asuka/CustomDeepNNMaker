@@ -295,6 +295,9 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			L"SoftMax関数(出力レイヤー用)",
 			L"全体における自身の割合を返す関数.\ny = e^x / Σe^x;\n");
 
+pItemEnum->SetDefaultItem(1);
+pItemEnum->SetValue(pItemEnum->GetDefault());
+
 		pLayerConfig->AddItem(pItemEnum);
 	}
 

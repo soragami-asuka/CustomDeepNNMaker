@@ -30,28 +30,24 @@ namespace MergeInput {
 			/** Name : X
 			  * ID   : x
 			  * Text : XŽ²
-			  *      : (null)
 			  */
 			mergeDirection_x,
 
 			/** Name : Y
 			  * ID   : y
 			  * Text : YŽ²
-			  *      : (null)
 			  */
 			mergeDirection_y,
 
 			/** Name : Z
 			  * ID   : z
 			  * Text : ZŽ²
-			  *      : 
 			  */
 			mergeDirection_z,
 
 			/** Name : CH
 			  * ID   : ch
 			  * Text : CH
-			  *      : (null)
 			  */
 			mergeDirection_ch,
 

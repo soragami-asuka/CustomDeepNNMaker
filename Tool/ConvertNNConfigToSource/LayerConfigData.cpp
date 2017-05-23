@@ -583,10 +583,10 @@ namespace
 
 						fwprintf(fp, L"			/** Name : %ls\n", szEnumName);
 						fwprintf(fp, L"			  * ID   : %ls\n", szEnumID);
-						if(lpText.size() > 0)
+						if(lpEnumText.size() > 0)
 						{
 							fwprintf(fp, L"			  * Text : %ls\n", lpEnumText[0].c_str());
-							for(unsigned int i=1; i<lpText.size(); i++)
+							for(unsigned int i=1; i<lpEnumText.size(); i++)
 							fwprintf(fp, L"			  *      : %ls\n", lpEnumText[i].c_str());
 						}
 						fwprintf(fp, L"			  */\n");
@@ -758,6 +758,9 @@ namespace
 						fwprintf(fp, L"			L\"%ls\",\n",   szEnumName);
 						fwprintf(fp, L"			L\"%ls\");\n", TextToSingleLine(szEnumText).c_str());
 					}
+					fwprintf(fp, L"\n");
+					fwprintf(fp, L"pItemEnum->SetDefaultItem(%d);\n", pItemEnum->GetDefault());
+					fwprintf(fp, L"pItemEnum->SetValue(pItemEnum->GetDefault());\n");
 					fwprintf(fp, L"\n");
 					fwprintf(fp, L"		pLayerConfig->AddItem(pItemEnum);\n");
 					fwprintf(fp, L"	}\n");

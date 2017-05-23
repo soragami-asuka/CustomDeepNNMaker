@@ -277,6 +277,9 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			L"ゼロパディング",
 			L"不足分を0で埋める");
 
+pItemEnum->SetDefaultItem(0);
+pItemEnum->SetValue(pItemEnum->GetDefault());
+
 		pLayerConfig->AddItem(pItemEnum);
 	}
 

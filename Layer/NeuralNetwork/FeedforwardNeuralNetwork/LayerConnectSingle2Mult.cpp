@@ -330,7 +330,10 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
 		// o—ÍæƒŒƒCƒ„[‚ÌˆÊ’u‚ð“o˜^
-		this->lppOutputToLayer[0].position = this->lppOutputToLayer[0].pLayer->GetDInputPositionByGUID(this->GetGUID());
+		for(U32 outputLayerNum=0; outputLayerNum<this->lppOutputToLayer.size(); outputLayerNum++)
+		{
+			this->lppOutputToLayer[outputLayerNum].position = this->lppOutputToLayer[outputLayerNum].pLayer->GetDInputPositionByGUID(this->GetGUID());
+		}
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

@@ -211,8 +211,8 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			L"CH",
 			L"CH");
 
-		pItemEnum->SetDefaultItem(L"ch");
-		pItemEnum->SetValue(pItemEnum->GetDefault());
+pItemEnum->SetDefaultItem(3);
+pItemEnum->SetValue(pItemEnum->GetDefault());
 
 		pLayerConfig->AddItem(pItemEnum);
 	}

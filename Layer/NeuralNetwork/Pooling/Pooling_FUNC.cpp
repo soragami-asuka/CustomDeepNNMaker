@@ -214,6 +214,9 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			L"MAXプーリング",
 			L"範囲内の最大値を使用する");
 
+pItemEnum->SetDefaultItem(0);
+pItemEnum->SetValue(pItemEnum->GetDefault());
+
 		pLayerConfig->AddItem(pItemEnum);
 	}
 

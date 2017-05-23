@@ -47,6 +47,24 @@ namespace NeuralNetworkLayer {
 		return CreateMergeInputLayer(layerDLLManager, lpInputDataStruct, lpInputDataStruct_rest...);
 	}
 
+	Layer::ILayerData* CreateResidualLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct lpInputDataStruct[], U32 inputDataCount);
+	Layer::ILayerData* CreateResidualLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const std::vector<IODataStruct>& lpInputDataStruct);
+	template<typename... Rest>
+	Layer::ILayerData* CreateResidualLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, std::vector<IODataStruct>& lpInputDataStruct, const IODataStruct& inputDataStruct_first, const Rest&... lpInputDataStruct_rest)
+	{
+		lpInputDataStruct.push_back(inputDataStruct_first);
+
+		return CreateResidualLayer(layerDLLManager, lpInputDataStruct, lpInputDataStruct_rest...);
+	}
+	template<typename... Rest>
+	Layer::ILayerData* CreateResidualLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct_first, const Rest&... lpInputDataStruct_rest)
+	{
+		std::vector<IODataStruct> lpInputDataStruct;
+		lpInputDataStruct.push_back(inputDataStruct_first);
+
+		return CreateResidualLayer(layerDLLManager, lpInputDataStruct, lpInputDataStruct_rest...);
+	}
+
 
 	/** レイヤーをネットワークの末尾に追加する.GUIDは自動割り当て.入力データ構造、最終GUIDも更新する. */
 	Gravisbell::ErrorCode AddLayerToNetworkLast(

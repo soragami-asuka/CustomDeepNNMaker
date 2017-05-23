@@ -51,30 +51,38 @@ namespace FullyConnect_Activation {
 			/** Name : シグモイド関数
 			  * ID   : sigmoid
 			  * Text : y = 1 / (1 + e^(-x));
+			  *      : 範囲 0 < y < 1
+			  *      : (x=0, y=0.5)を通る
 			  */
 			ActivationType_sigmoid,
 
 			/** Name : シグモイド関数(出力レイヤー用)
 			  * ID   : sigmoid_crossEntropy
 			  * Text : y = 1 / (1 + e^(-x));
+			  *      : 範囲 0 < y < 1
+			  *      : (x=0, y=0.5)を通る
 			  */
 			ActivationType_sigmoid_crossEntropy,
 
 			/** Name : ReLU（ランプ関数）
 			  * ID   : ReLU
 			  * Text : y = max(0, x);
+			  *      : 範囲 0 <= y
+			  *      : (x=0, y=0)を通る
 			  */
 			ActivationType_ReLU,
 
 			/** Name : SoftMax関数
 			  * ID   : softmax
 			  * Text : 全体における自身の割合を返す関数.
+			  *      : y = e^x / Σe^x;
 			  */
 			ActivationType_softmax,
 
 			/** Name : SoftMax関数(出力レイヤー用)
 			  * ID   : softmax_crossEntropy
 			  * Text : 全体における自身の割合を返す関数.
+			  *      : y = e^x / Σe^x;
 			  */
 			ActivationType_softmax_crossEntropy,
 

@@ -10,6 +10,7 @@ call ConvertNNConfigToSource.exe "./Pooling/Config.xml" "./Pooling/" "Pooling"
 call ConvertNNConfigToSource.exe "./BatchNormalization/Config.xml" "./BatchNormalization/" "BatchNormalization"
 call ConvertNNConfigToSource.exe "./SeparateOutput/Config.xml" "./SeparateOutput/" "SeparateOutput"
 call ConvertNNConfigToSource.exe "./MergeInput/Config.xml" "./MergeInput/" "MergeInput"
+call ConvertNNConfigToSource.exe "./Residual/Config.xml" "./Residual/" "Residual"
 
 
 pause

@@ -292,6 +292,35 @@ Layer::ILayerData* CreateMergeInputLayer(const Layer::NeuralNetwork::ILayerDLLMa
 }
 
 
+Layer::ILayerData* CreateResidualLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct lpInputDataStruct[], U32 inputDataCount)
+{
+	// DLL取得
+	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(Gravisbell::GUID(0x0519e7fa, 0x311d, 0x4a1d, 0xa6, 0x15, 0x95, 0x9a, 0xfd, 0xd0, 0x05, 0x26));
+	if(pLayerDLL == NULL)
+		return NULL;
+
+	// 設定の作成
+	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
+	if(pConfig == NULL)
+		return NULL;
+
+	// レイヤーの作成
+	Layer::ILayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, lpInputDataStruct, inputDataCount);
+	if(pLayer == NULL)
+		return NULL;
+
+	// 設定情報を削除
+	delete pConfig;
+
+	return pLayer;
+}
+Layer::ILayerData* CreateResidualLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const std::vector<IODataStruct>& lpInputDataStruct)
+{
+	return CreateResidualLayer(layerDLLManager, &lpInputDataStruct[0], (U32)lpInputDataStruct.size());
+}
+
+
+
 /** レイヤーをネットワークの末尾に追加する.GUIDは自動割り当て.入力データ構造、最終GUIDも更新する. */
 Gravisbell::ErrorCode AddLayerToNetworkLast( Layer::Connect::ILayerConnectData& neuralNetwork, std::list<Layer::ILayerData*>& lppLayerData, Gravisbell::IODataStruct& inputDataStruct, Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddlayer)
 {
