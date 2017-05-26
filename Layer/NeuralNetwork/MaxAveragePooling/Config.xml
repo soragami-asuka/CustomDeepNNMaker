@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="F405D6D7-434C-4ED2-82C3-5D7E49F403DB" version="1.0.0.0" default-language="ja">
+  
+  <SourceName>MaxAveragePooling</SourceName>
+  <Name>MaxAveragePooling</Name>
+  <Text>入力チャンネルごとの平均値を返すレイヤー</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+
+  </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <Learn>
+  </Learn>
+
+</Config>

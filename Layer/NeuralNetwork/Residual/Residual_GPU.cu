@@ -153,8 +153,11 @@ namespace NeuralNetwork {
 		for(U32 inputNum=0; inputNum<this->GetInputDataCount(); inputNum++)
 			this->m_lppInputBuffer[inputNum] = i_lpInputBuffer[inputNum];
 
-		F32 alpha = 1.0f;
 
+		// 出力バッファを初期化
+		cudaMemset(thrust::raw_pointer_cast(&this->lpOutputBuffer[0]), 0, sizeof(F32)*this->lpOutputBuffer.size());
+
+		F32 alpha = 1.0f;
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 		{
 			for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)

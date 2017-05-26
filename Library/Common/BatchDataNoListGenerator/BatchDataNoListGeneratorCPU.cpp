@@ -79,12 +79,12 @@ namespace Common {
 			// シャッフル
 			std::shuffle(this->lpAllDataNoList.begin(), this->it_addDataBegin, random_generator);
 
-			// 端数部分を穴埋め
-			U32 addDataCount = (U32)this->lpAllDataNoList.size() - this->dataCount;
-			for(unsigned int i=0; i<addDataCount; i++)
-			{
-				this->lpAllDataNoList[this->dataCount + i] = this->lpAllDataNoList[i];
-			}
+			//// 端数部分を穴埋め
+			//U32 addDataCount = (U32)this->lpAllDataNoList.size() - this->dataCount;
+			//for(unsigned int i=0; i<addDataCount; i++)
+			//{
+			//	this->lpAllDataNoList[this->dataCount + i] = this->lpAllDataNoList[i];
+			//}
 
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
