@@ -12,10 +12,6 @@
 #include"MaxAveragePooling_GPU.cuh"
 #include"MaxAveragePooling_LayerData_GPU.cuh"
 
-#ifndef __CUDACC__  
-    #define __CUDACC__
-#endif
-
 #include<device_functions.hpp>
 
 using namespace Gravisbell;
@@ -111,11 +107,14 @@ namespace NeuralNetwork {
 		,	outputBufferCount				(0)				/**< 出力バッファ数 */
 		,	m_lppInputBuffer				(NULL)			/**< 演算時の入力データ */
 		,	m_lppDOutputBufferPrev			(NULL)			/**< 入力誤差計算時の出力誤差データ */
+		,	cublasHandle					(NULL)
 	{
+		cublasCreate(&cublasHandle);
 	}
 	/** デストラクタ */
 	MaxAveragePooling_GPU::~MaxAveragePooling_GPU()
 	{
+		cublasDestroy(cublasHandle);
 	}
 
 
@@ -236,19 +235,31 @@ namespace NeuralNetwork {
 
 			cuda_func_average_input<<<grid, BLOCK_SIZE>>>(i_lpInputBuffer, thrust::raw_pointer_cast(&this->lpTmpBuffer0[0]), tmpInputBufferCount, tmpOutputBufferCount);
 		}
+		F32* pTmpBufferIn  = thrust::raw_pointer_cast(&this->lpTmpBuffer0[0]);
+		F32* pTmpBufferOut = thrust::raw_pointer_cast(&this->lpTmpBuffer1[0]);
 
 		while(tmpOutputBufferCount > 1)
 		{
 			tmpInputBufferCount = tmpOutputBufferCount;
 			tmpOutputBufferCount = (tmpInputBufferCount + (BLOCK_SIZE-1))/BLOCK_SIZE;
 
-			cuda_func_average<<<grid, BLOCK_SIZE>>>(i_lpInputBuffer, thrust::raw_pointer_cast(&this->lpTmpBuffer0[0]), tmpInputBufferCount, tmpOutputBufferCount);
+			dim3 grid(tmpOutputBufferCount, this->GetInputDataStruct().ch, this->batchSize);
+
+			cuda_func_average<<<grid, BLOCK_SIZE>>>(pTmpBufferIn, pTmpBufferOut, tmpInputBufferCount, tmpOutputBufferCount);
+
+			F32* pTmpBufferTmp = pTmpBufferIn;
+			pTmpBufferIn  = pTmpBufferOut;
+			pTmpBufferOut = pTmpBufferTmp;
 		}
 
 		// 各CHの要素をchサイズで除算して本体に格納
+		std::vector<F32> lpTmpOutputBuffer_host(this->lpOutputBuffer.size());
+		cudaMemcpy(&lpTmpOutputBuffer_host[0], pTmpBufferIn, sizeof(F32)*lpTmpOutputBuffer_host.size(), cudaMemcpyDeviceToHost);
 
-
-
+		for(U32 outputNum=0; outputNum<this->lpOutputBuffer.size(); outputNum++)
+		{
+			this->lpOutputBuffer[outputNum] = lpTmpOutputBuffer_host[outputNum] / this->chSize;
+		}
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -290,6 +301,21 @@ namespace NeuralNetwork {
 		// 出力誤差バッファのアドレスを配列に格納
 		this->m_lppDOutputBufferPrev = i_lppDOutputBufferPrev;
 
+		// 入力誤差バッファを0クリア
+		cudaMemset(thrust::raw_pointer_cast(&this->lpDInputBuffer[0]), 0, sizeof(F32)*this->lpDInputBuffer.size());
+
+		// ch数で割った値を代入
+		F32 alpha = 1.0f / this->chSize;
+		cublasStatus_t err = cublasSaxpy(
+			this->cublasHandle,
+			this->outputBufferCount * this->batchSize,
+			&alpha,
+			m_lppDOutputBufferPrev,
+			1,
+			thrust::raw_pointer_cast(&this->lpDInputBuffer[0]),
+			1);
+		if(err != 0)
+			return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

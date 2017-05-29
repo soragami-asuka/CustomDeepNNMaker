@@ -51,6 +51,8 @@ private:
 	thrust::device_vector<F32>			lpTmpBuffer0;	/**< 計算用の一時バッファ */
 	thrust::device_vector<F32>			lpTmpBuffer1;	/**< 計算用の一時バッファ */
 
+	cublasHandle_t cublasHandle;
+
 public:
 	/** コンストラクタ */
 	MaxAveragePooling_GPU(Gravisbell::GUID guid, class MaxAveragePooling_LayerData_GPU& i_layerData);
