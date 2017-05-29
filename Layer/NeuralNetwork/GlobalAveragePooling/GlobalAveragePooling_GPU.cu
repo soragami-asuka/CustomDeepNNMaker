@@ -5,12 +5,12 @@
 //======================================
 #include"stdafx.h"
 
-#include"MaxAveragePooling_DATA.hpp"
-#include"MaxAveragePooling_FUNC.hpp"
-#include"MaxAveragePooling_Base.h"
+#include"GlobalAveragePooling_DATA.hpp"
+#include"GlobalAveragePooling_FUNC.hpp"
+#include"GlobalAveragePooling_Base.h"
 
-#include"MaxAveragePooling_GPU.cuh"
-#include"MaxAveragePooling_LayerData_GPU.cuh"
+#include"GlobalAveragePooling_GPU.cuh"
+#include"GlobalAveragePooling_LayerData_GPU.cuh"
 
 #include<device_functions.hpp>
 
@@ -100,8 +100,8 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	MaxAveragePooling_GPU::MaxAveragePooling_GPU(Gravisbell::GUID guid, MaxAveragePooling_LayerData_GPU& i_layerData)
-		:	MaxAveragePooling_Base	(guid)
+	GlobalAveragePooling_GPU::GlobalAveragePooling_GPU(Gravisbell::GUID guid, GlobalAveragePooling_LayerData_GPU& i_layerData)
+		:	GlobalAveragePooling_Base	(guid)
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount				(0)				/**< 入力バッファ数 */
 		,	outputBufferCount				(0)				/**< 出力バッファ数 */
@@ -112,7 +112,7 @@ namespace NeuralNetwork {
 		cublasCreate(&cublasHandle);
 	}
 	/** デストラクタ */
-	MaxAveragePooling_GPU::~MaxAveragePooling_GPU()
+	GlobalAveragePooling_GPU::~GlobalAveragePooling_GPU()
 	{
 		cublasDestroy(cublasHandle);
 	}
@@ -122,14 +122,14 @@ namespace NeuralNetwork {
 	// 基本処理
 	//================================
 	/** レイヤー種別の取得 */
-	U32 MaxAveragePooling_GPU::GetLayerKind()const
+	U32 GlobalAveragePooling_GPU::GetLayerKind()const
 	{
 		return Layer::ELayerKind::LAYER_KIND_GPU | GetLayerKindBase();
 	}
 
 	/** 初期化. 各ニューロンの値をランダムに初期化
 		@return	成功した場合0 */
-	ErrorCode MaxAveragePooling_GPU::Initialize(void)
+	ErrorCode GlobalAveragePooling_GPU::Initialize(void)
 	{
 		return this->layerData.Initialize();
 	}
@@ -139,11 +139,11 @@ namespace NeuralNetwork {
 	// レイヤーデータ関連
 	//===========================
 	/** レイヤーデータを取得する */
-	MaxAveragePooling_LayerData_Base& MaxAveragePooling_GPU::GetLayerData()
+	GlobalAveragePooling_LayerData_Base& GlobalAveragePooling_GPU::GetLayerData()
 	{
 		return this->layerData;
 	}
-	const MaxAveragePooling_LayerData_Base& MaxAveragePooling_GPU::GetLayerData()const
+	const GlobalAveragePooling_LayerData_Base& GlobalAveragePooling_GPU::GetLayerData()const
 	{
 		return this->layerData;
 	}
@@ -156,7 +156,7 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode MaxAveragePooling_GPU::PreProcessLearn(unsigned int batchSize)
+	ErrorCode GlobalAveragePooling_GPU::PreProcessLearn(unsigned int batchSize)
 	{
 		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
@@ -173,7 +173,7 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode MaxAveragePooling_GPU::PreProcessCalculate(unsigned int batchSize)
+	ErrorCode GlobalAveragePooling_GPU::PreProcessCalculate(unsigned int batchSize)
 	{
 		this->batchSize = batchSize;
 
@@ -203,7 +203,7 @@ namespace NeuralNetwork {
 
 	/** 学習ループの初期化処理.データセットの学習開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode MaxAveragePooling_GPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
+	ErrorCode GlobalAveragePooling_GPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
 	{
 		if(this->pLearnData != NULL)
 			delete this->pLearnData;
@@ -213,7 +213,7 @@ namespace NeuralNetwork {
 	}
 	/** 演算ループの初期化処理.データセットの演算開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode MaxAveragePooling_GPU::PreProcessCalculateLoop()
+	ErrorCode GlobalAveragePooling_GPU::PreProcessCalculateLoop()
 	{
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
@@ -222,7 +222,7 @@ namespace NeuralNetwork {
 	/** 演算処理を実行する.
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 		@return 成功した場合0が返る */
-	ErrorCode MaxAveragePooling_GPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
+	ErrorCode GlobalAveragePooling_GPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
 	{
 		// 入力バッファのアドレスを格納
 		this->m_lppInputBuffer = i_lpInputBuffer;
@@ -268,14 +268,14 @@ namespace NeuralNetwork {
 	/** 出力データバッファを取得する.
 		配列の要素数はGetOutputBufferCountの戻り値.
 		@return 出力データ配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER MaxAveragePooling_GPU::GetOutputBuffer()const
+	CONST_BATCH_BUFFER_POINTER GlobalAveragePooling_GPU::GetOutputBuffer()const
 	{
 		return thrust::raw_pointer_cast(&this->lpOutputBuffer[0]);
 	}
 	/** 出力データバッファを取得する.
 		@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
 		@return 成功した場合0 */
-	ErrorCode MaxAveragePooling_GPU::GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
+	ErrorCode GlobalAveragePooling_GPU::GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
 	{
 		if(o_lpOutputBuffer == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
@@ -296,7 +296,7 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode MaxAveragePooling_GPU::Training(CONST_BATCH_BUFFER_POINTER i_lppDOutputBufferPrev)
+	ErrorCode GlobalAveragePooling_GPU::Training(CONST_BATCH_BUFFER_POINTER i_lppDOutputBufferPrev)
 	{
 		// 出力誤差バッファのアドレスを配列に格納
 		this->m_lppDOutputBufferPrev = i_lppDOutputBufferPrev;
@@ -324,13 +324,13 @@ namespace NeuralNetwork {
 	/** 学習差分を取得する.
 		配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]
 		@return	誤差差分配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER MaxAveragePooling_GPU::GetDInputBuffer()const
+	CONST_BATCH_BUFFER_POINTER GlobalAveragePooling_GPU::GetDInputBuffer()const
 	{
 		return thrust::raw_pointer_cast(&this->lpDInputBuffer[0]);
 	}
 	/** 学習差分を取得する.
 		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
-	ErrorCode MaxAveragePooling_GPU::GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const
+	ErrorCode GlobalAveragePooling_GPU::GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const
 	{
 		if(o_lpDInputBuffer == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;

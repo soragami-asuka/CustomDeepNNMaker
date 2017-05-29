@@ -1,17 +1,17 @@
 //======================================
 // 活性関レイヤー
 //======================================
-#ifndef __MaxAveragePooling_BASE_H__
-#define __MaxAveragePooling_BASE_H__
+#ifndef __GlobalAveragePooling_BASE_H__
+#define __GlobalAveragePooling_BASE_H__
 
 #include<Layer/NeuralNetwork/INNSingleInputLayer.h>
 #include<Layer/NeuralNetwork/INNSingleOutputLayer.h>
 
 #include<vector>
 
-#include"MaxAveragePooling_DATA.hpp"
+#include"GlobalAveragePooling_DATA.hpp"
 
-#include"MaxAveragePooling_LayerData_Base.h"
+#include"GlobalAveragePooling_LayerData_Base.h"
 
 namespace Gravisbell {
 namespace Layer {
@@ -19,7 +19,7 @@ namespace NeuralNetwork {
 
 	typedef float NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class MaxAveragePooling_Base : public INNSingleInputLayer, public INNSingleOutputLayer
+	class GlobalAveragePooling_Base : public INNSingleInputLayer, public INNSingleOutputLayer
 	{
 	protected:
 		Gravisbell::GUID guid;	/**< レイヤー識別用のGUID */
@@ -30,10 +30,10 @@ namespace NeuralNetwork {
 
 	public:
 		/** コンストラクタ */
-		MaxAveragePooling_Base(Gravisbell::GUID guid);
+		GlobalAveragePooling_Base(Gravisbell::GUID guid);
 
 		/** デストラクタ */
-		virtual ~MaxAveragePooling_Base();
+		virtual ~GlobalAveragePooling_Base();
 
 		//===========================
 		// レイヤー共通
@@ -98,8 +98,8 @@ namespace NeuralNetwork {
 		//===========================
 	public:
 		/** レイヤーデータを取得する */
-		virtual MaxAveragePooling_LayerData_Base& GetLayerData() = 0;
-		virtual const MaxAveragePooling_LayerData_Base& GetLayerData()const = 0;
+		virtual GlobalAveragePooling_LayerData_Base& GetLayerData() = 0;
+		virtual const GlobalAveragePooling_LayerData_Base& GetLayerData()const = 0;
 	};
 
 }	// NeuralNetwork

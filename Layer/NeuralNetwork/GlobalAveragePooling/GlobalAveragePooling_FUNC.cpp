@@ -1,6 +1,6 @@
 /*--------------------------------------------
- * FileName  : MaxAveragePooling_FUNC.cpp
- * LayerName : MaxAveragePooling
+ * FileName  : GlobalAveragePooling_FUNC.cpp
+ * LayerName : GlobalAveragePooling
  * guid      : F405D6D7-434C-4ED2-82C3-5D7E49F403DB
  * 
  * Text      : 入力チャンネルごとの平均値を返すレイヤー
@@ -12,7 +12,7 @@
 
 #include<Library/SettingData/Standard/SettingData.h>
 
-#include"MaxAveragePooling_FUNC.hpp"
+#include"GlobalAveragePooling_FUNC.hpp"
 
 
 // {F405D6D7-434C-4ED2-82C3-5D7E49F403DB}
@@ -37,7 +37,7 @@ namespace DefaultLanguage
     /** Base */
     static const StringData g_baseData = 
     {
-        L"MaxAveragePooling",
+        L"GlobalAveragePooling",
         L"入力チャンネルごとの平均値を返すレイヤー"
     };
 

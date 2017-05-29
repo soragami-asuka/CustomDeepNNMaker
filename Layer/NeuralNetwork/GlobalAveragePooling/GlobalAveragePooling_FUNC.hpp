@@ -1,12 +1,12 @@
 /*--------------------------------------------
- * FileName  : MaxAveragePooling_DATA.hpp
- * LayerName : MaxAveragePooling
+ * FileName  : GlobalAveragePooling_DATA.hpp
+ * LayerName : GlobalAveragePooling
  * guid      : F405D6D7-434C-4ED2-82C3-5D7E49F403DB
  * 
  * Text      : 入力チャンネルごとの平均値を返すレイヤー
 --------------------------------------------*/
-#ifndef __GRAVISBELL_NEURALNETWORK_LAYER_FUNC_MaxAveragePooling_H__
-#define __GRAVISBELL_NEURALNETWORK_LAYER_FUNC_MaxAveragePooling_H__
+#ifndef __GRAVISBELL_NEURALNETWORK_LAYER_FUNC_GlobalAveragePooling_H__
+#define __GRAVISBELL_NEURALNETWORK_LAYER_FUNC_GlobalAveragePooling_H__
 
 #define EXPORT_API extern "C" __declspec(dllexport)
 
@@ -18,7 +18,7 @@
 #include<SettingData/Standard/IData.h>
 #include<Layer/NeuralNetwork/ILayerDLLManager.h>
 
-#include"MaxAveragePooling_DATA.hpp"
+#include"GlobalAveragePooling_DATA.hpp"
 
 
 /** Acquire the layer identification code.
@@ -75,4 +75,4 @@ EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataGPUfromBuffer(const Gra
 
 
 
-#endif // __GRAVISBELL_NEURAULNETWORK_LAYER_FUNC_MaxAveragePooling_H__
+#endif // __GRAVISBELL_NEURAULNETWORK_LAYER_FUNC_GlobalAveragePooling_H__

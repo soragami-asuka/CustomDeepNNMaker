@@ -57,10 +57,10 @@
     <ClInclude Include="targetver.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="MaxAveragePooling_FUNC.hpp">
+    <ClInclude Include="GlobalAveragePooling_FUNC.hpp">
       <Filter>FromXML</Filter>
     </ClInclude>
-    <ClInclude Include="MaxAveragePooling_DATA.hpp">
+    <ClInclude Include="GlobalAveragePooling_DATA.hpp">
       <Filter>FromXML</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Common\Common.h">
@@ -129,22 +129,22 @@
     <ClInclude Include="..\..\..\include\Layer\IO\ISingleOutputLayer.h">
       <Filter>include\Layer\IO</Filter>
     </ClInclude>
-    <ClInclude Include="MaxAveragePooling_LayerData_Base.h">
+    <ClInclude Include="GlobalAveragePooling_LayerData_Base.h">
       <Filter>LayerData</Filter>
     </ClInclude>
-    <ClInclude Include="MaxAveragePooling_LayerData_CPU.h">
+    <ClInclude Include="GlobalAveragePooling_LayerData_CPU.h">
       <Filter>LayerData</Filter>
     </ClInclude>
-    <ClInclude Include="MaxAveragePooling_CPU.h">
+    <ClInclude Include="GlobalAveragePooling_CPU.h">
       <Filter>Layer</Filter>
     </ClInclude>
-    <ClInclude Include="MaxAveragePooling_Base.h">
+    <ClInclude Include="GlobalAveragePooling_Base.h">
       <Filter>Layer</Filter>
     </ClInclude>
-    <ClInclude Include="MaxAveragePooling_LayerData_GPU.cuh">
+    <ClInclude Include="GlobalAveragePooling_LayerData_GPU.cuh">
       <Filter>LayerData</Filter>
     </ClInclude>
-    <ClInclude Include="MaxAveragePooling_GPU.cuh">
+    <ClInclude Include="GlobalAveragePooling_GPU.cuh">
       <Filter>Layer</Filter>
     </ClInclude>
   </ItemGroup>
@@ -152,25 +152,25 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="MaxAveragePooling.cpp">
+    <ClCompile Include="GlobalAveragePooling.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="MaxAveragePooling_FUNC.cpp">
+    <ClCompile Include="GlobalAveragePooling_FUNC.cpp">
       <Filter>FromXML</Filter>
     </ClCompile>
-    <ClCompile Include="MaxAveragePooling_LayerData_CPU.cpp">
+    <ClCompile Include="GlobalAveragePooling_LayerData_CPU.cpp">
       <Filter>LayerData</Filter>
     </ClCompile>
-    <ClCompile Include="MaxAveragePooling_LayerData_Base.cpp">
+    <ClCompile Include="GlobalAveragePooling_LayerData_Base.cpp">
       <Filter>LayerData</Filter>
     </ClCompile>
-    <ClCompile Include="MaxAveragePooling_CPU.cpp">
+    <ClCompile Include="GlobalAveragePooling_CPU.cpp">
       <Filter>Layer</Filter>
     </ClCompile>
-    <ClCompile Include="MaxAveragePooling_Base.cpp">
+    <ClCompile Include="GlobalAveragePooling_Base.cpp">
       <Filter>Layer</Filter>
     </ClCompile>
   </ItemGroup>
@@ -178,10 +178,10 @@
     <Xml Include="Config.xml" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="MaxAveragePooling_LayerData_GPU.cu">
+    <CudaCompile Include="GlobalAveragePooling_LayerData_GPU.cu">
       <Filter>LayerData</Filter>
     </CudaCompile>
-    <CudaCompile Include="MaxAveragePooling_GPU.cu">
+    <CudaCompile Include="GlobalAveragePooling_GPU.cu">
       <Filter>Layer</Filter>
     </CudaCompile>
   </ItemGroup>

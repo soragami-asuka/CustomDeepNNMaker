@@ -19,10 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{DD935EE3-28DC-41CD-AAA1-2AB8845BC6B4}</ProjectGuid>
+    <ProjectGuid>{3BD5E50B-AF45-4DB5-A2A2-FE3F2C239828}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>MaxAveragePooling</RootNamespace>
-    <ProjectName>Layer.NeuralNetwork.MaxAveragePooling</ProjectName>
+    <RootNamespace>GlobalAveragePooling</RootNamespace>
+    <ProjectName>Layer.NeuralNetwork.GlobalAveragePooling</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -89,7 +89,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MaxAveragePooling_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;GlobalAveragePooling_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -102,7 +102,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MaxAveragePooling_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;GlobalAveragePooling_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir);$(CUDA_PATH_V7_5)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -122,7 +122,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MaxAveragePooling_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;GlobalAveragePooling_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -139,7 +139,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MaxAveragePooling_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;GlobalAveragePooling_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir);$(CUDA_PATH_V7_5)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -180,14 +180,14 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerData.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
     <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h" />
-    <ClInclude Include="MaxAveragePooling_Base.h" />
-    <ClInclude Include="MaxAveragePooling_CPU.h" />
-    <ClInclude Include="MaxAveragePooling_DATA.hpp" />
-    <ClInclude Include="MaxAveragePooling_FUNC.hpp" />
-    <ClInclude Include="MaxAveragePooling_GPU.cuh" />
-    <ClInclude Include="MaxAveragePooling_LayerData_Base.h" />
-    <ClInclude Include="MaxAveragePooling_LayerData_CPU.h" />
-    <ClInclude Include="MaxAveragePooling_LayerData_GPU.cuh" />
+    <ClInclude Include="GlobalAveragePooling_Base.h" />
+    <ClInclude Include="GlobalAveragePooling_CPU.h" />
+    <ClInclude Include="GlobalAveragePooling_DATA.hpp" />
+    <ClInclude Include="GlobalAveragePooling_FUNC.hpp" />
+    <ClInclude Include="GlobalAveragePooling_GPU.cuh" />
+    <ClInclude Include="GlobalAveragePooling_LayerData_Base.h" />
+    <ClInclude Include="GlobalAveragePooling_LayerData_CPU.h" />
+    <ClInclude Include="GlobalAveragePooling_LayerData_GPU.cuh" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -206,12 +206,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="MaxAveragePooling.cpp" />
-    <ClCompile Include="MaxAveragePooling_Base.cpp" />
-    <ClCompile Include="MaxAveragePooling_CPU.cpp" />
-    <ClCompile Include="MaxAveragePooling_FUNC.cpp" />
-    <ClCompile Include="MaxAveragePooling_LayerData_Base.cpp" />
-    <ClCompile Include="MaxAveragePooling_LayerData_CPU.cpp" />
+    <ClCompile Include="GlobalAveragePooling.cpp" />
+    <ClCompile Include="GlobalAveragePooling_Base.cpp" />
+    <ClCompile Include="GlobalAveragePooling_CPU.cpp" />
+    <ClCompile Include="GlobalAveragePooling_FUNC.cpp" />
+    <ClCompile Include="GlobalAveragePooling_LayerData_Base.cpp" />
+    <ClCompile Include="GlobalAveragePooling_LayerData_CPU.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -228,8 +228,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="MaxAveragePooling_GPU.cu" />
-    <CudaCompile Include="MaxAveragePooling_LayerData_GPU.cu" />
+    <CudaCompile Include="GlobalAveragePooling_GPU.cu" />
+    <CudaCompile Include="GlobalAveragePooling_LayerData_GPU.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

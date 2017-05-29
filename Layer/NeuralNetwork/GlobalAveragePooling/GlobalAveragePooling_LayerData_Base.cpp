@@ -3,8 +3,8 @@
 //======================================
 #include"stdafx.h"
 
-#include"MaxAveragePooling_LayerData_Base.h"
-#include"MaxAveragePooling_FUNC.hpp"
+#include"GlobalAveragePooling_LayerData_Base.h"
+#include"GlobalAveragePooling_FUNC.hpp"
 
 
 namespace Gravisbell {
@@ -13,7 +13,7 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	MaxAveragePooling_LayerData_Base::MaxAveragePooling_LayerData_Base(const Gravisbell::GUID& guid)
+	GlobalAveragePooling_LayerData_Base::GlobalAveragePooling_LayerData_Base(const Gravisbell::GUID& guid)
 		:	ISingleInputLayerData(), ISingleOutputLayerData()
 		,	guid	(guid)
 		,	inputDataStruct	()	/**< 入力データ構造 */
@@ -22,7 +22,7 @@ namespace NeuralNetwork {
 	{
 	}
 	/** デストラクタ */
-	MaxAveragePooling_LayerData_Base::~MaxAveragePooling_LayerData_Base()
+	GlobalAveragePooling_LayerData_Base::~GlobalAveragePooling_LayerData_Base()
 	{
 		if(pLayerStructure != NULL)
 			delete pLayerStructure;
@@ -33,7 +33,7 @@ namespace NeuralNetwork {
 	// 共通処理
 	//===========================
 	/** レイヤー固有のGUIDを取得する */
-	Gravisbell::GUID MaxAveragePooling_LayerData_Base::GetGUID(void)const
+	Gravisbell::GUID GlobalAveragePooling_LayerData_Base::GetGUID(void)const
 	{
 		return this->guid;
 	}
@@ -41,7 +41,7 @@ namespace NeuralNetwork {
 	/** レイヤー種別識別コードを取得する.
 		@param o_layerCode	格納先バッファ
 		@return 成功した場合0 */
-	Gravisbell::GUID MaxAveragePooling_LayerData_Base::GetLayerCode(void)const
+	Gravisbell::GUID GlobalAveragePooling_LayerData_Base::GetLayerCode(void)const
 	{
 		Gravisbell::GUID layerCode;
 		::GetLayerCode(layerCode);
@@ -55,7 +55,7 @@ namespace NeuralNetwork {
 	//===========================
 	/** 初期化. 各ニューロンの値をランダムに初期化
 		@return	成功した場合0 */
-	ErrorCode MaxAveragePooling_LayerData_Base::Initialize(void)
+	ErrorCode GlobalAveragePooling_LayerData_Base::Initialize(void)
 	{
 		// 出力データ構造を決定する
 		this->outputDataStruct.ch = this->inputDataStruct.ch;
@@ -69,7 +69,7 @@ namespace NeuralNetwork {
 		@param	i_config			設定情報
 		@oaram	i_inputDataStruct	入力データ構造情報
 		@return	成功した場合0 */
-	ErrorCode MaxAveragePooling_LayerData_Base::Initialize(const SettingData::Standard::IData& i_data, const IODataStruct& i_inputDataStruct)
+	ErrorCode GlobalAveragePooling_LayerData_Base::Initialize(const SettingData::Standard::IData& i_data, const IODataStruct& i_inputDataStruct)
 	{
 		ErrorCode err;
 
@@ -87,7 +87,7 @@ namespace NeuralNetwork {
 		@param i_lpBuffer	読み込みバッファの先頭アドレス.
 		@param i_bufferSize	読み込み可能バッファのサイズ.
 		@return	成功した場合0 */
-	ErrorCode MaxAveragePooling_LayerData_Base::InitializeFromBuffer(const BYTE* i_lpBuffer, U32 i_bufferSize, S32& o_useBufferSize)
+	ErrorCode GlobalAveragePooling_LayerData_Base::InitializeFromBuffer(const BYTE* i_lpBuffer, U32 i_bufferSize, S32& o_useBufferSize)
 	{
 		int readBufferByte = 0;
 
@@ -117,7 +117,7 @@ namespace NeuralNetwork {
 	// レイヤー設定
 	//===========================
 	/** 設定情報を設定 */
-	ErrorCode MaxAveragePooling_LayerData_Base::SetLayerConfig(const SettingData::Standard::IData& config)
+	ErrorCode GlobalAveragePooling_LayerData_Base::SetLayerConfig(const SettingData::Standard::IData& config)
 	{
 		Gravisbell::ErrorCode err = ERROR_CODE_NONE;
 
@@ -148,7 +148,7 @@ namespace NeuralNetwork {
 	}
 
 	/** レイヤーの設定情報を取得する */
-	const SettingData::Standard::IData* MaxAveragePooling_LayerData_Base::GetLayerStructure()const
+	const SettingData::Standard::IData* GlobalAveragePooling_LayerData_Base::GetLayerStructure()const
 	{
 		return this->pLayerStructure;
 	}
@@ -158,7 +158,7 @@ namespace NeuralNetwork {
 	// レイヤー保存
 	//===========================
 	/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
-	U32 MaxAveragePooling_LayerData_Base::GetUseBufferByteCount()const
+	U32 GlobalAveragePooling_LayerData_Base::GetUseBufferByteCount()const
 	{
 		U32 bufferSize = 0;
 
@@ -178,7 +178,7 @@ namespace NeuralNetwork {
 	/** レイヤーをバッファに書き込む.
 		@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
 		@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
-	S32 MaxAveragePooling_LayerData_Base::WriteToBuffer(BYTE* o_lpBuffer)const
+	S32 GlobalAveragePooling_LayerData_Base::WriteToBuffer(BYTE* o_lpBuffer)const
 	{
 		if(this->pLayerStructure == NULL)
 			return ErrorCode::ERROR_CODE_NONREGIST_CONFIG;
@@ -202,13 +202,13 @@ namespace NeuralNetwork {
 	//===========================
 	/** 入力データ構造を取得する.
 		@return	入力データ構造 */
-	IODataStruct MaxAveragePooling_LayerData_Base::GetInputDataStruct()const
+	IODataStruct GlobalAveragePooling_LayerData_Base::GetInputDataStruct()const
 	{
 		return this->inputDataStruct;
 	}
 
 	/** 入力バッファ数を取得する. */
-	U32 MaxAveragePooling_LayerData_Base::GetInputBufferCount()const
+	U32 GlobalAveragePooling_LayerData_Base::GetInputBufferCount()const
 	{
 		return this->inputDataStruct.GetDataCount();
 	}
@@ -218,13 +218,13 @@ namespace NeuralNetwork {
 	// 出力レイヤー関連
 	//===========================
 	/** 出力データ構造を取得する */
-	IODataStruct MaxAveragePooling_LayerData_Base::GetOutputDataStruct()const
+	IODataStruct GlobalAveragePooling_LayerData_Base::GetOutputDataStruct()const
 	{
 		return this->outputDataStruct;
 	}
 
 	/** 出力バッファ数を取得する */
-	unsigned int MaxAveragePooling_LayerData_Base::GetOutputBufferCount()const
+	unsigned int GlobalAveragePooling_LayerData_Base::GetOutputBufferCount()const
 	{
 		return GetOutputDataStruct().GetDataCount();
 	}

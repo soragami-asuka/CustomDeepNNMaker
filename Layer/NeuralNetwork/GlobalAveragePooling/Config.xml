@@ -11,8 +11,8 @@
 
 <Config guid="F405D6D7-434C-4ED2-82C3-5D7E49F403DB" version="1.0.0.0" default-language="ja">
   
-  <SourceName>MaxAveragePooling</SourceName>
-  <Name>MaxAveragePooling</Name>
+  <SourceName>GlobalAveragePooling</SourceName>
+  <Name>GlobalAveragePooling</Name>
   <Text>入力チャンネルごとの平均値を返すレイヤー</Text>
 
   <!--レイヤーのデータ構造-->

@@ -7,7 +7,7 @@ call ConvertNNConfigToSource.exe "./Convolution/Config.xml" "./Convolution/" "Co
 call ConvertNNConfigToSource.exe "./Activation/Config.xml" "./Activation/" "Activation"
 call ConvertNNConfigToSource.exe "./Dropout/Config.xml" "./Dropout/" "Dropout"
 call ConvertNNConfigToSource.exe "./Pooling/Config.xml" "./Pooling/" "Pooling"
-call ConvertNNConfigToSource.exe "./MaxAveragePooling/Config.xml" "./MaxAveragePooling/" "MaxAveragePooling"
+call ConvertNNConfigToSource.exe "./GlobalAveragePooling/Config.xml" "./GlobalAveragePooling/" "GlobalAveragePooling"
 call ConvertNNConfigToSource.exe "./BatchNormalization/Config.xml" "./BatchNormalization/" "BatchNormalization"
 call ConvertNNConfigToSource.exe "./SeparateOutput/Config.xml" "./SeparateOutput/" "SeparateOutput"
 call ConvertNNConfigToSource.exe "./MergeInput/Config.xml" "./MergeInput/" "MergeInput"

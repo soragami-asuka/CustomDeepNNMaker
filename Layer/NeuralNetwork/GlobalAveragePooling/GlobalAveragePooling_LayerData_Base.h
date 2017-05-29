@@ -1,8 +1,8 @@
 //======================================
 // プーリングレイヤーのデータ
 //======================================
-#ifndef __MaxAveragePooling_DATA_BASE_H__
-#define __MaxAveragePooling_DATA_BASE_H__
+#ifndef __GlobalAveragePooling_DATA_BASE_H__
+#define __GlobalAveragePooling_DATA_BASE_H__
 
 #include<Layer/IO/ISingleInputLayerData.h>
 #include<Layer/IO/ISingleOutputLayerData.h>
@@ -10,7 +10,7 @@
 
 #include<vector>
 
-#include"MaxAveragePooling_DATA.hpp"
+#include"GlobalAveragePooling_DATA.hpp"
 
 
 namespace Gravisbell {
@@ -19,7 +19,7 @@ namespace NeuralNetwork {
 	
 	typedef F32 NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class MaxAveragePooling_LayerData_Base : public IO::ISingleInputLayerData, public IO::ISingleOutputLayerData
+	class GlobalAveragePooling_LayerData_Base : public IO::ISingleInputLayerData, public IO::ISingleOutputLayerData
 	{
 	protected:
 		Gravisbell::GUID guid;	/**< レイヤーデータ識別用のGUID */
@@ -28,7 +28,7 @@ namespace NeuralNetwork {
 		IODataStruct outputDataStruct;	/**< 出力データ構造 */
 
 		SettingData::Standard::IData* pLayerStructure;	/**< レイヤー構造を定義したコンフィグクラス */
-		//MaxAveragePooling::LayerStructure layerStructure;	/**< レイヤー構造 */
+		//GlobalAveragePooling::LayerStructure layerStructure;	/**< レイヤー構造 */
 
 
 		//===========================
@@ -36,9 +36,9 @@ namespace NeuralNetwork {
 		//===========================
 	public:
 		/** コンストラクタ */
-		MaxAveragePooling_LayerData_Base(const Gravisbell::GUID& guid);
+		GlobalAveragePooling_LayerData_Base(const Gravisbell::GUID& guid);
 		/** デストラクタ */
-		virtual ~MaxAveragePooling_LayerData_Base();
+		virtual ~GlobalAveragePooling_LayerData_Base();
 
 
 		//===========================

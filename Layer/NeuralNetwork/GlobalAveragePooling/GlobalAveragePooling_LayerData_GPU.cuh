@@ -1,19 +1,19 @@
 //======================================
 // プーリングレイヤーのデータ
 //======================================
-#ifndef __MaxAveragePooling_LAYERDATA_GPU_H__
-#define __MaxAveragePooling_LAYERDATA_GPU_H__
+#ifndef __GlobalAveragePooling_LAYERDATA_GPU_H__
+#define __GlobalAveragePooling_LAYERDATA_GPU_H__
 
-#include"MaxAveragePooling_LayerData_Base.h"
+#include"GlobalAveragePooling_LayerData_Base.h"
 
 
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-	class MaxAveragePooling_LayerData_GPU : public MaxAveragePooling_LayerData_Base
+	class GlobalAveragePooling_LayerData_GPU : public GlobalAveragePooling_LayerData_Base
 	{
-		friend class MaxAveragePooling_GPU;
+		friend class GlobalAveragePooling_GPU;
 
 	private:
 
@@ -22,9 +22,9 @@ namespace NeuralNetwork {
 		//===========================
 	public:
 		/** コンストラクタ */
-		MaxAveragePooling_LayerData_GPU(const Gravisbell::GUID& guid);
+		GlobalAveragePooling_LayerData_GPU(const Gravisbell::GUID& guid);
 		/** デストラクタ */
-		~MaxAveragePooling_LayerData_GPU();
+		~GlobalAveragePooling_LayerData_GPU();
 
 
 		//===========================

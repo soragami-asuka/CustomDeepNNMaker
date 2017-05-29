@@ -1,15 +1,24 @@
 //======================================
-// 活性関数レイヤー
-// CPU処理用
+// プーリングレイヤー
+// GPU処理用
 //======================================
-#ifndef __MaxAveragePooling_CPU_H__
-#define __MaxAveragePooling_CPU_H__
+#ifndef __GlobalAveragePooling_GPU_H__
+#define __GlobalAveragePooling_GPU_H__
 
-#include"stdafx.h"
+#pragma warning(push)
+#pragma warning(disable : 4267)
+#pragma warning(disable : 4819)
+#include <cuda.h>
+#include <cudnn.h>
+#include <cublas_v2.h>
+#include <thrust/device_vector.h>
+#include <thrust/host_vector.h>
+#include "device_launch_parameters.h"
+#pragma warning(pop)
 
-#include"MaxAveragePooling_DATA.hpp"
-#include"MaxAveragePooling_FUNC.hpp"
-#include"MaxAveragePooling_Base.h"
+#include"GlobalAveragePooling_DATA.hpp"
+#include"GlobalAveragePooling_FUNC.hpp"
+#include"GlobalAveragePooling_Base.h"
 
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
@@ -18,35 +27,37 @@ namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-class MaxAveragePooling_CPU : public MaxAveragePooling_Base
+class GlobalAveragePooling_GPU : public GlobalAveragePooling_Base
 {
 private:
 	// データ本体
-	class MaxAveragePooling_LayerData_CPU& layerData;
+	class GlobalAveragePooling_LayerData_GPU& layerData;
 
 	// 入出力バッファ
-	std::vector<F32>			lpOutputBuffer;		/**< 出力バッファ <バッチ数><出力信号数> */
-	std::vector<F32>			lpDInputBuffer;		/**< 入力誤差差分 <バッチ数><入力信号数> */
-
-	std::vector<F32*>						lppBatchOutputBuffer;		/**< バッチ処理用出力バッファ <バッチ数> */
-	std::vector<F32*>						lppBatchDInputBuffer;		/**< バッチ処理用入力誤差差分 <バッチ数> */
-
-	U32 chSize;	/**< CH一つあたりのバッファ数 */
+	thrust::device_vector<F32>			lpOutputBuffer;		/**< 出力バッファ <バッチ数><出力信号数> */
+	thrust::device_vector<F32>			lpDInputBuffer;		/**< 入力誤差差分 <バッチ数><入力信号数> */
 
 	// Get関数を使うと処理負荷がかさむので一時保存用. PreCalculateで値を格納.
 	U32 inputBufferCount;				/**< 入力バッファ数 */
 	U32 outputBufferCount;				/**< 出力バッファ数 */
 
 	// 演算時の入力データ
-	std::vector<CONST_BATCH_BUFFER_POINTER> m_lppInputBuffer;		/**< 演算時の入力データ */
-	std::vector<CONST_BATCH_BUFFER_POINTER> m_lppDOutputBufferPrev;	/**< 入力誤差計算時の出力誤差データ */
+	CONST_BATCH_BUFFER_POINTER m_lppInputBuffer;		/**< 演算時の入力データ */
+	CONST_BATCH_BUFFER_POINTER m_lppDOutputBufferPrev;	/**< 入力誤差計算時の出力誤差データ */
 
+	// 演算用の一時バッファ
+	U32 chSize;	/**< 1チャンネルあたりのサイズ */
+
+	thrust::device_vector<F32>			lpTmpBuffer0;	/**< 計算用の一時バッファ */
+	thrust::device_vector<F32>			lpTmpBuffer1;	/**< 計算用の一時バッファ */
+
+	cublasHandle_t cublasHandle;
 
 public:
 	/** コンストラクタ */
-	MaxAveragePooling_CPU(Gravisbell::GUID guid, class MaxAveragePooling_LayerData_CPU& i_layerData);
+	GlobalAveragePooling_GPU(Gravisbell::GUID guid, class GlobalAveragePooling_LayerData_GPU& i_layerData);
 	/** デストラクタ */
-	virtual ~MaxAveragePooling_CPU();
+	virtual ~GlobalAveragePooling_GPU();
 
 public:
 	//================================
@@ -64,8 +75,8 @@ public:
 	// レイヤーデータ関連
 	//===========================
 	/** レイヤーデータを取得する */
-	MaxAveragePooling_LayerData_Base& GetLayerData();
-	const MaxAveragePooling_LayerData_Base& GetLayerData()const;
+	GlobalAveragePooling_LayerData_Base& GetLayerData();
+	const GlobalAveragePooling_LayerData_Base& GetLayerData()const;
 
 
 public:

@@ -4,9 +4,9 @@
 //======================================
 #include"stdafx.h"
 
-#include"MaxAveragePooling_LayerData_GPU.cuh"
-#include"MaxAveragePooling_FUNC.hpp"
-#include"MaxAveragePooling_GPU.cuh"
+#include"GlobalAveragePooling_LayerData_GPU.cuh"
+#include"GlobalAveragePooling_FUNC.hpp"
+#include"GlobalAveragePooling_GPU.cuh"
 
 using namespace Gravisbell;
 
@@ -19,12 +19,12 @@ namespace NeuralNetwork {
 	// コンストラクタ / デストラクタ
 	//===========================
 	/** コンストラクタ */
-	MaxAveragePooling_LayerData_GPU::MaxAveragePooling_LayerData_GPU(const Gravisbell::GUID& guid)
-		:	MaxAveragePooling_LayerData_Base(guid)
+	GlobalAveragePooling_LayerData_GPU::GlobalAveragePooling_LayerData_GPU(const Gravisbell::GUID& guid)
+		:	GlobalAveragePooling_LayerData_Base(guid)
 	{
 	}
 	/** デストラクタ */
-	MaxAveragePooling_LayerData_GPU::~MaxAveragePooling_LayerData_GPU()
+	GlobalAveragePooling_LayerData_GPU::~GlobalAveragePooling_LayerData_GPU()
 	{
 	}
 
@@ -34,9 +34,9 @@ namespace NeuralNetwork {
 	//===========================
 	/** レイヤーを作成する.
 		@param guid	新規生成するレイヤーのGUID. */
-	ILayerBase* MaxAveragePooling_LayerData_GPU::CreateLayer(const Gravisbell::GUID& guid)
+	ILayerBase* GlobalAveragePooling_LayerData_GPU::CreateLayer(const Gravisbell::GUID& guid)
 	{
-		return new MaxAveragePooling_GPU(guid, *this);
+		return new GlobalAveragePooling_GPU(guid, *this);
 	}
 
 } // Gravisbell;
@@ -50,7 +50,7 @@ namespace NeuralNetwork {
 EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataGPU(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const Gravisbell::SettingData::Standard::IData& i_data, const Gravisbell::IODataStruct& i_inputDataStruct)
 {
 	// 作成
-	Gravisbell::Layer::NeuralNetwork::MaxAveragePooling_LayerData_GPU* pLayerData = new Gravisbell::Layer::NeuralNetwork::MaxAveragePooling_LayerData_GPU(guid);
+	Gravisbell::Layer::NeuralNetwork::GlobalAveragePooling_LayerData_GPU* pLayerData = new Gravisbell::Layer::NeuralNetwork::GlobalAveragePooling_LayerData_GPU(guid);
 	if(pLayerData == NULL)
 		return NULL;
 
@@ -67,7 +67,7 @@ EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataGPU(const Gravisbell::L
 EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataGPUfromBuffer(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)
 {
 	// 作成
-	Gravisbell::Layer::NeuralNetwork::MaxAveragePooling_LayerData_GPU* pLayerData = new Gravisbell::Layer::NeuralNetwork::MaxAveragePooling_LayerData_GPU(guid);
+	Gravisbell::Layer::NeuralNetwork::GlobalAveragePooling_LayerData_GPU* pLayerData = new Gravisbell::Layer::NeuralNetwork::GlobalAveragePooling_LayerData_GPU(guid);
 	if(pLayerData == NULL)
 		return NULL;
 

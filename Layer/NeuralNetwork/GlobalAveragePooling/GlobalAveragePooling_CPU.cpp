@@ -5,12 +5,12 @@
 //======================================
 #include"stdafx.h"
 
-#include"MaxAveragePooling_DATA.hpp"
-#include"MaxAveragePooling_FUNC.hpp"
-#include"MaxAveragePooling_Base.h"
+#include"GlobalAveragePooling_DATA.hpp"
+#include"GlobalAveragePooling_FUNC.hpp"
+#include"GlobalAveragePooling_Base.h"
 
-#include"MaxAveragePooling_CPU.h"
-#include"MaxAveragePooling_LayerData_CPU.h"
+#include"GlobalAveragePooling_CPU.h"
+#include"GlobalAveragePooling_LayerData_CPU.h"
 
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
@@ -22,15 +22,15 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	MaxAveragePooling_CPU::MaxAveragePooling_CPU(Gravisbell::GUID guid, MaxAveragePooling_LayerData_CPU& i_layerData)
-		:	MaxAveragePooling_Base	(guid)
+	GlobalAveragePooling_CPU::GlobalAveragePooling_CPU(Gravisbell::GUID guid, GlobalAveragePooling_LayerData_CPU& i_layerData)
+		:	GlobalAveragePooling_Base	(guid)
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount				(0)		/**< 入力バッファ数 */
 		,	outputBufferCount				(0)		/**< 出力バッファ数 */
 	{
 	}
 	/** デストラクタ */
-	MaxAveragePooling_CPU::~MaxAveragePooling_CPU()
+	GlobalAveragePooling_CPU::~GlobalAveragePooling_CPU()
 	{
 	}
 
@@ -39,14 +39,14 @@ namespace NeuralNetwork {
 	// 基本処理
 	//================================
 	/** レイヤー種別の取得 */
-	U32 MaxAveragePooling_CPU::GetLayerKind()const
+	U32 GlobalAveragePooling_CPU::GetLayerKind()const
 	{
 		return Layer::ELayerKind::LAYER_KIND_CPU | GetLayerKindBase();
 	}
 
 	/** 初期化. 各ニューロンの値をランダムに初期化
 		@return	成功した場合0 */
-	ErrorCode MaxAveragePooling_CPU::Initialize(void)
+	ErrorCode GlobalAveragePooling_CPU::Initialize(void)
 	{
 		return this->layerData.Initialize();
 	}
@@ -56,11 +56,11 @@ namespace NeuralNetwork {
 	// レイヤーデータ関連
 	//===========================
 	/** レイヤーデータを取得する */
-	MaxAveragePooling_LayerData_Base& MaxAveragePooling_CPU::GetLayerData()
+	GlobalAveragePooling_LayerData_Base& GlobalAveragePooling_CPU::GetLayerData()
 	{
 		return this->layerData;
 	}
-	const MaxAveragePooling_LayerData_Base& MaxAveragePooling_CPU::GetLayerData()const
+	const GlobalAveragePooling_LayerData_Base& GlobalAveragePooling_CPU::GetLayerData()const
 	{
 		return this->layerData;
 	}
@@ -73,7 +73,7 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode MaxAveragePooling_CPU::PreProcessLearn(unsigned int batchSize)
+	ErrorCode GlobalAveragePooling_CPU::PreProcessLearn(unsigned int batchSize)
 	{
 		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
@@ -98,7 +98,7 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode MaxAveragePooling_CPU::PreProcessCalculate(unsigned int batchSize)
+	ErrorCode GlobalAveragePooling_CPU::PreProcessCalculate(unsigned int batchSize)
 	{
 		this->batchSize = batchSize;
 
@@ -132,7 +132,7 @@ namespace NeuralNetwork {
 
 	/** 学習ループの初期化処理.データセットの学習開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode MaxAveragePooling_CPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
+	ErrorCode GlobalAveragePooling_CPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
 	{
 		if(this->pLearnData != NULL)
 			delete this->pLearnData;
@@ -142,7 +142,7 @@ namespace NeuralNetwork {
 	}
 	/** 演算ループの初期化処理.データセットの演算開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode MaxAveragePooling_CPU::PreProcessCalculateLoop()
+	ErrorCode GlobalAveragePooling_CPU::PreProcessCalculateLoop()
 	{
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
@@ -151,7 +151,7 @@ namespace NeuralNetwork {
 	/** 演算処理を実行する.
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 		@return 成功した場合0が返る */
-	ErrorCode MaxAveragePooling_CPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
+	ErrorCode GlobalAveragePooling_CPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
 	{
 		// 入力バッファのアドレスを配列に格納
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
@@ -177,14 +177,14 @@ namespace NeuralNetwork {
 	/** 出力データバッファを取得する.
 		配列の要素数はGetOutputBufferCountの戻り値.
 		@return 出力データ配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER MaxAveragePooling_CPU::GetOutputBuffer()const
+	CONST_BATCH_BUFFER_POINTER GlobalAveragePooling_CPU::GetOutputBuffer()const
 	{
 		return &this->lpOutputBuffer[0];
 	}
 	/** 出力データバッファを取得する.
 		@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
 		@return 成功した場合0 */
-	ErrorCode MaxAveragePooling_CPU::GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
+	ErrorCode GlobalAveragePooling_CPU::GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
 	{
 		if(o_lpOutputBuffer == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
@@ -205,7 +205,7 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode MaxAveragePooling_CPU::Training(CONST_BATCH_BUFFER_POINTER i_lppDOutputBufferPrev)
+	ErrorCode GlobalAveragePooling_CPU::Training(CONST_BATCH_BUFFER_POINTER i_lppDOutputBufferPrev)
 	{
 		// 出力誤差バッファのアドレスを配列に格納
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
@@ -232,13 +232,13 @@ namespace NeuralNetwork {
 	/** 学習差分を取得する.
 		配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]
 		@return	誤差差分配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER MaxAveragePooling_CPU::GetDInputBuffer()const
+	CONST_BATCH_BUFFER_POINTER GlobalAveragePooling_CPU::GetDInputBuffer()const
 	{
 		return &this->lpDInputBuffer[0];
 	}
 	/** 学習差分を取得する.
 		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
-	ErrorCode MaxAveragePooling_CPU::GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const
+	ErrorCode GlobalAveragePooling_CPU::GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const
 	{
 		if(o_lpDInputBuffer == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;

@@ -1,4 +1,4 @@
-// stdafx.cpp : 標準インクルード MaxAveragePooling.pch のみを
+// stdafx.cpp : 標準インクルード GlobalAveragePooling.pch のみを
 // 含むソース ファイルは、プリコンパイル済みヘッダーになります。
 // stdafx.obj にはプリコンパイル済み型情報が含まれます。
 
