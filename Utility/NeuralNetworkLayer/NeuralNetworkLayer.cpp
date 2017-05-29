@@ -263,6 +263,28 @@ Layer::ILayerData* CreateBatchNormalizationLayer(const Layer::NeuralNetwork::ILa
 
 	return pLayer;
 }
+Layer::ILayerData* CreateGlobalAveragePoolingLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct)
+{
+	// DLLæ“¾
+	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(Gravisbell::GUID(0xf405d6d7, 0x434c, 0x4ed2, 0x82, 0xc3, 0x5d, 0x7e, 0x49, 0xf4, 0x03, 0xdb));
+	if(pLayerDLL == NULL)
+		return NULL;
+
+	// İ’è‚Ìì¬
+	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
+	if(pConfig == NULL)
+		return NULL;
+	
+	// ƒŒƒCƒ„[‚Ìì¬
+	Layer::ILayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, inputDataStruct);
+	if(pLayer == NULL)
+		return NULL;
+
+	// İ’èî•ñ‚ğíœ
+	delete pConfig;
+
+	return pLayer;
+}
 
 Layer::ILayerData* CreateMergeInputLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct lpInputDataStruct[], U32 inputDataCount)
 {

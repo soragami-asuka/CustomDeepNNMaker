@@ -26,56 +26,22 @@ namespace NeuralNetwork {
 	namespace
 	{
 		// 初回用
-		__global__ void cuda_func_average_input(const F32* i_lpInputBuffer, F32* o_lpOutputBuffer, const U32 i_inputChSize, U32 i_outputChSize)
-		{
-			const U32 batchNo = blockIdx.z;
-			const U32 chNo    = blockIdx.y;
-			const U32 chCount = blockDim.y;
-
-			const U32 bufferPos = blockIdx.x * BLOCK_SIZE + threadIdx.x;
-
-			const U32 outputPos = batchNo * (i_outputChSize * chCount) + chNo * i_outputChSize + bufferPos;
-			const U32 inputPos  = batchNo * (i_inputChSize  * chCount) + chNo * i_inputChSize  + bufferPos;
-
-			__shared__ F32 lpTmpBuf[BLOCK_SIZE*2];
-			if(inputPos >= i_inputChSize)
-				lpTmpBuf[blockIdx.x]  = 0.0f;
-			else
-				lpTmpBuf[blockIdx.x + 0]  = i_lpInputBuffer[inputPos];
-			__syncthreads();
-
-			if(threadIdx.x < 16)
-				lpTmpBuf[threadIdx.x] += lpTmpBuf[threadIdx.x + 16];
-			__syncthreads();
-			if(threadIdx.x < 8)
-				lpTmpBuf[threadIdx.x] += lpTmpBuf[threadIdx.x + 8];
-			__syncthreads();
-			if(threadIdx.x < 4)
-				lpTmpBuf[threadIdx.x] += lpTmpBuf[threadIdx.x + 4];
-			__syncthreads();
-			if(threadIdx.x < 2)
-				lpTmpBuf[threadIdx.x] += lpTmpBuf[threadIdx.x + 2];
-			__syncthreads();
-			if(threadIdx.x < 1)
-				lpTmpBuf[threadIdx.x] += lpTmpBuf[threadIdx.x + 1];
-			__syncthreads();
-
-			o_lpOutputBuffer[outputPos] = lpTmpBuf[0];
-		}
-		// 途中計算用(軽量)
 		__global__ void cuda_func_average(const F32* i_lpInputBuffer, F32* o_lpOutputBuffer, const U32 i_inputChSize, U32 i_outputChSize)
 		{
 			const U32 batchNo = blockIdx.z;
 			const U32 chNo    = blockIdx.y;
-			const U32 chCount = blockDim.y;
+			const U32 chCount = gridDim.y;
 
 			const U32 bufferPos = blockIdx.x * BLOCK_SIZE + threadIdx.x;
 
-			const U32 outputPos = batchNo * (i_outputChSize * chCount) + chNo * i_outputChSize + bufferPos;
+			const U32 outputPos = batchNo * (i_outputChSize * chCount) + chNo * i_outputChSize + blockIdx.x;
 			const U32 inputPos  = batchNo * (i_inputChSize  * chCount) + chNo * i_inputChSize  + bufferPos;
 
 			__shared__ F32 lpTmpBuf[BLOCK_SIZE*2];
-			lpTmpBuf[blockIdx.x + 0]  = i_lpInputBuffer[inputPos];
+			if(bufferPos >= i_inputChSize)
+				lpTmpBuf[threadIdx.x]  = 0.0f;
+			else
+				lpTmpBuf[threadIdx.x]  = i_lpInputBuffer[inputPos];
 			__syncthreads();
 
 			if(threadIdx.x < 16)
@@ -94,7 +60,28 @@ namespace NeuralNetwork {
 				lpTmpBuf[threadIdx.x] += lpTmpBuf[threadIdx.x + 1];
 			__syncthreads();
 
-			o_lpOutputBuffer[outputPos] = lpTmpBuf[0];
+			if(threadIdx.x < 1)
+				o_lpOutputBuffer[outputPos] = lpTmpBuf[0];
+		}
+
+
+		// 出力誤差を入力誤差に変換する
+		__global__ void cuda_func_DOutput_to_DInput(const F32* i_lpDOutputBuffer, F32* o_lpDInputBuffer, const U32 i_inputChSize)
+		{
+			const U32 batchNo = blockIdx.z;
+			const U32 chNo    = blockIdx.y;
+			const U32 chCount = gridDim.y;
+
+			const U32 inpuBufferPos   = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+			
+			const U32 inputPos  = batchNo * (chCount * i_inputChSize) + chNo * i_inputChSize + inpuBufferPos;
+			const U32 outputPos = batchNo *  chCount + chNo;
+
+
+			if(inpuBufferPos < i_inputChSize)
+			{
+				o_lpDInputBuffer[inputPos] = i_lpDOutputBuffer[outputPos] / i_inputChSize;
+			}
 		}
 	}
 
@@ -196,6 +183,7 @@ namespace NeuralNetwork {
 		// 一時バッファの確保
 		this->lpTmpBuffer0.resize((this->chSize + 31)/32*32 * this->GetInputDataStruct().ch * this->batchSize, 0.0f);
 		this->lpTmpBuffer1.resize((this->chSize + 31)/32*32 * this->GetInputDataStruct().ch * this->batchSize, 0.0f);
+		this->lpTmpOutputBuffer_host.resize(this->outputBufferCount * this->batchSize);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -227,16 +215,28 @@ namespace NeuralNetwork {
 		// 入力バッファのアドレスを格納
 		this->m_lppInputBuffer = i_lpInputBuffer;
 
+#ifdef _DEBUG
+		std::vector<F32> lpInputBuffer_host(this->inputBufferCount * this->batchSize);
+		cudaMemcpy(&lpInputBuffer_host[0], i_lpInputBuffer, sizeof(F32)*lpInputBuffer_host.size(), cudaMemcpyDeviceToHost);
+#endif
+
 		// 初回処理
 		U32 tmpInputBufferCount = this->chSize;
 		U32 tmpOutputBufferCount = (tmpInputBufferCount + (BLOCK_SIZE-1))/BLOCK_SIZE;
 		{
 			dim3 grid(tmpOutputBufferCount, this->GetInputDataStruct().ch, this->batchSize);
 
-			cuda_func_average_input<<<grid, BLOCK_SIZE>>>(i_lpInputBuffer, thrust::raw_pointer_cast(&this->lpTmpBuffer0[0]), tmpInputBufferCount, tmpOutputBufferCount);
+			cuda_func_average<<<grid, BLOCK_SIZE>>>(i_lpInputBuffer, thrust::raw_pointer_cast(&this->lpTmpBuffer0[0]), tmpInputBufferCount, tmpOutputBufferCount);
 		}
-		F32* pTmpBufferIn  = thrust::raw_pointer_cast(&this->lpTmpBuffer0[0]);
-		F32* pTmpBufferOut = thrust::raw_pointer_cast(&this->lpTmpBuffer1[0]);
+		thrust::device_vector<F32>* pTmpBufferIn  = &this->lpTmpBuffer0;
+		thrust::device_vector<F32>* pTmpBufferOut = &this->lpTmpBuffer1;
+
+
+#ifdef _DEBUG
+		std::vector<F32> lpTmpBuffer_host(tmpOutputBufferCount * this->GetInputDataStruct().ch * this->batchSize);
+		cudaMemcpy(&lpTmpBuffer_host[0], thrust::raw_pointer_cast(&(*pTmpBufferIn)[0]), sizeof(F32)*lpTmpBuffer_host.size(), cudaMemcpyDeviceToHost);
+#endif
+
 
 		while(tmpOutputBufferCount > 1)
 		{
@@ -245,21 +245,33 @@ namespace NeuralNetwork {
 
 			dim3 grid(tmpOutputBufferCount, this->GetInputDataStruct().ch, this->batchSize);
 
-			cuda_func_average<<<grid, BLOCK_SIZE>>>(pTmpBufferIn, pTmpBufferOut, tmpInputBufferCount, tmpOutputBufferCount);
+			cuda_func_average<<<grid, BLOCK_SIZE>>>(
+				thrust::raw_pointer_cast(&(*pTmpBufferIn)[0]),
+				thrust::raw_pointer_cast(&(*pTmpBufferOut)[0]),
+				tmpInputBufferCount, tmpOutputBufferCount);
 
-			F32* pTmpBufferTmp = pTmpBufferIn;
+			thrust::device_vector<F32>* pTmpBufferTmp = pTmpBufferIn;
 			pTmpBufferIn  = pTmpBufferOut;
 			pTmpBufferOut = pTmpBufferTmp;
 		}
 
 		// 各CHの要素をchサイズで除算して本体に格納
-		std::vector<F32> lpTmpOutputBuffer_host(this->lpOutputBuffer.size());
-		cudaMemcpy(&lpTmpOutputBuffer_host[0], pTmpBufferIn, sizeof(F32)*lpTmpOutputBuffer_host.size(), cudaMemcpyDeviceToHost);
-
+		cudaMemcpy(
+			thrust::raw_pointer_cast(&this->lpTmpOutputBuffer_host[0]),
+			thrust::raw_pointer_cast(&(*pTmpBufferIn)[0]),
+			sizeof(F32)*this->outputBufferCount*this->batchSize,
+			cudaMemcpyDeviceToHost);
 		for(U32 outputNum=0; outputNum<this->lpOutputBuffer.size(); outputNum++)
 		{
-			this->lpOutputBuffer[outputNum] = lpTmpOutputBuffer_host[outputNum] / this->chSize;
+			lpTmpOutputBuffer_host[outputNum] /= this->chSize;
 		}
+		this->lpOutputBuffer = lpTmpOutputBuffer_host;
+		
+#ifdef _DEBUG
+		std::vector<F32> lpOutputBuffer_host(this->lpOutputBuffer.size());
+		cudaMemcpy(&lpOutputBuffer_host[0], thrust::raw_pointer_cast(&this->lpOutputBuffer[0]), sizeof(F32)*lpOutputBuffer_host.size(), cudaMemcpyDeviceToHost);
+#endif
+
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -305,17 +317,21 @@ namespace NeuralNetwork {
 		cudaMemset(thrust::raw_pointer_cast(&this->lpDInputBuffer[0]), 0, sizeof(F32)*this->lpDInputBuffer.size());
 
 		// ch数で割った値を代入
-		F32 alpha = 1.0f / this->chSize;
-		cublasStatus_t err = cublasSaxpy(
-			this->cublasHandle,
-			this->outputBufferCount * this->batchSize,
-			&alpha,
-			m_lppDOutputBufferPrev,
-			1,
-			thrust::raw_pointer_cast(&this->lpDInputBuffer[0]),
-			1);
-		if(err != 0)
-			return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
+		{
+			dim3 grid((this->chSize + (BLOCK_SIZE-1))/BLOCK_SIZE, this->GetInputDataStruct().ch, this->batchSize);
+
+			cuda_func_DOutput_to_DInput<<<grid, BLOCK_SIZE>>>(
+				this->m_lppDOutputBufferPrev,
+				thrust::raw_pointer_cast(&this->lpDInputBuffer[0]),
+				this->chSize);
+		}
+		
+#ifdef _DEBUG
+		std::vector<F32> lpTmpDOutputBuffer_host(this->outputBufferCount * this->batchSize);
+		std::vector<F32> lpTmpDInputBuffer_host(this->inputBufferCount * this->batchSize);
+		cudaMemcpy(&lpTmpDOutputBuffer_host[0], this->m_lppDOutputBufferPrev, sizeof(F32)*lpTmpDOutputBuffer_host.size(), cudaMemcpyDeviceToHost);
+		cudaMemcpy(&lpTmpDInputBuffer_host[0],  thrust::raw_pointer_cast(&this->lpDInputBuffer[0]), sizeof(F32)*lpTmpDInputBuffer_host.size(), cudaMemcpyDeviceToHost);
+#endif
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

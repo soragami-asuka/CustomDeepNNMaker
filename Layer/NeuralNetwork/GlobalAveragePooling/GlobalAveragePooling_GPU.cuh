@@ -50,6 +50,7 @@ private:
 
 	thrust::device_vector<F32>			lpTmpBuffer0;	/**< 計算用の一時バッファ */
 	thrust::device_vector<F32>			lpTmpBuffer1;	/**< 計算用の一時バッファ */
+	thrust::host_vector<F32>			lpTmpOutputBuffer_host;	/**< 計算用の一時バッファ */
 
 	cublasHandle_t cublasHandle;
 
