@@ -9,11 +9,11 @@
 [default-language]が設定されていない場合は[ja]が標準となる
 -->
 
-<Config guid="F6662E0E-1CA4-4D59-ACCA-CAC29A16C0AA" version="1.0.0.0" default-language="ja">
-
-  <SourceName>Convolution</SourceName>
-  <Name>畳みこみニューラルネットワーク</Name>
-  <Text>畳みこみニューラルネットワーク.</Text>
+<Config guid="B87B2A75-7EA3-4960-9E9C-EAF43AB073B0" version="1.0.0.0" default-language="ja">
+  
+  <SourceName>UpConvolution</SourceName>
+  <Name>拡張畳みこみニューラルネットワーク</Name>
+  <Text>フィルタ移動量を[Stride/UpScale]に拡張した畳み込みニューラルネットワーク.Stride=1,UpScale=2とした場合、特徴マップのサイズは2倍になる</Text>
 
   <!--レイヤーのデータ構造-->
   <Structure>
@@ -65,6 +65,25 @@
       </Default>
     </Vector3D>
 
+    <Vector3D type="Int" id="UpScale">
+      <Name>拡張幅</Name>
+      <Min>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
+      </Min>
+      <Max>
+        <x>32</x>
+        <y>32</y>
+        <z>32</z>
+      </Max>
+      <Default>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
+      </Default>
+    </Vector3D>
+    
     <Vector3D type="Int" id="Padding">
       <Name>パディングサイズ</Name>
       <Min>

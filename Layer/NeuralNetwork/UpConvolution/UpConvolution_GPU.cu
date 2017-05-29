@@ -4,12 +4,12 @@
 //======================================
 #include"stdafx.h"
 
-#include"Convolution_DATA.hpp"
-#include"Convolution_FUNC.hpp"
-#include"Convolution_Base.h"
+#include"UpConvolution_DATA.hpp"
+#include"UpConvolution_FUNC.hpp"
+#include"UpConvolution_Base.h"
 
-#include"Convolution_GPU.cuh"
-#include"Convolution_LayerData_GPU.cuh"
+#include"UpConvolution_GPU.cuh"
+#include"UpConvolution_LayerData_GPU.cuh"
 
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
@@ -21,8 +21,8 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	Convolution_GPU::Convolution_GPU(Gravisbell::GUID guid, Convolution_LayerData_GPU& i_layerData)
-		:	Convolution_Base	(guid)
+	UpConvolution_GPU::UpConvolution_GPU(Gravisbell::GUID guid, UpConvolution_LayerData_GPU& i_layerData)
+		:	UpConvolution_Base	(guid)
 		,	layerData			(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount	(0)		/**< 入力バッファ数 */
 		,	neuronCount			(0)		/**< ニューロン数 */
@@ -42,7 +42,7 @@ namespace NeuralNetwork {
 		cudnnCreateConvolutionDescriptor(&convDesc);
 	}
 	/** デストラクタ */
-	Convolution_GPU::~Convolution_GPU()
+	UpConvolution_GPU::~UpConvolution_GPU()
 	{
 		if(convDesc)			cudnnDestroyConvolutionDescriptor(convDesc);
 		if(filterDesc)			cudnnDestroyFilterDescriptor(filterDesc);
@@ -57,14 +57,14 @@ namespace NeuralNetwork {
 	// 基本処理
 	//================================
 	/** レイヤー種別の取得 */
-	U32 Convolution_GPU::GetLayerKind()const
+	U32 UpConvolution_GPU::GetLayerKind()const
 	{
 		return Layer::ELayerKind::LAYER_KIND_GPU | GetLayerKindBase();
 	}
 
 	/** 初期化. 各ニューロンの値をランダムに初期化
 		@return	成功した場合0 */
-	ErrorCode Convolution_GPU::Initialize(void)
+	ErrorCode UpConvolution_GPU::Initialize(void)
 	{
 		return this->layerData.Initialize();
 	}
@@ -74,11 +74,11 @@ namespace NeuralNetwork {
 	// レイヤーデータ関連
 	//===========================
 	/** レイヤーデータを取得する */
-	Convolution_LayerData_Base& Convolution_GPU::GetLayerData()
+	UpConvolution_LayerData_Base& UpConvolution_GPU::GetLayerData()
 	{
 		return this->layerData;
 	}
-	const Convolution_LayerData_Base& Convolution_GPU::GetLayerData()const
+	const UpConvolution_LayerData_Base& UpConvolution_GPU::GetLayerData()const
 	{
 		return this->layerData;
 	}
@@ -92,7 +92,7 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode Convolution_GPU::PreProcessLearn(unsigned int batchSize)
+	ErrorCode UpConvolution_GPU::PreProcessLearn(unsigned int batchSize)
 	{
 		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
@@ -113,7 +113,7 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Convolution_GPU::PreProcessCalculate(unsigned int batchSize)
+	ErrorCode UpConvolution_GPU::PreProcessCalculate(unsigned int batchSize)
 	{
 		this->batchSize = batchSize;
 
@@ -146,7 +146,7 @@ namespace NeuralNetwork {
 		std::vector<S32> dimFilter;
 		S32 convDim = 0;			// 畳み込み次元数	次元
 		std::vector<S32> dimStride;
-		std::vector<S32> dimUpscale;
+		std::vector<S32> dimDilation;
 		std::vector<S32> dimPadding;
 		if(this->layerData.inputDataStruct.z > 1)
 		{
@@ -155,9 +155,9 @@ namespace NeuralNetwork {
 			dimInput.resize(dataDim);
 			dimInput[0] = this->batchSize;
 			dimInput[1] = this->layerData.inputDataStruct.ch;
-			dimInput[2] = this->layerData.inputDataStruct.z;
-			dimInput[3] = this->layerData.inputDataStruct.y;
-			dimInput[4] = this->layerData.inputDataStruct.x;
+			dimInput[2] = this->layerData.inputDataStruct.z * this->layerData.layerStructure.UpScale.x;
+			dimInput[3] = this->layerData.inputDataStruct.y * this->layerData.layerStructure.UpScale.y;
+			dimInput[4] = this->layerData.inputDataStruct.x * this->layerData.layerStructure.UpScale.z;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2] * dimInput[3] * dimInput[4];
@@ -198,10 +198,10 @@ namespace NeuralNetwork {
 			dimPadding[1] = this->layerData.layerStructure.Padding.y;
 			dimPadding[2] = this->layerData.layerStructure.Padding.x;
 
-			dimUpscale.resize(convDim);
-			dimUpscale[0] = 1;
-			dimUpscale[1] = 1;
-			dimUpscale[2] = 1;
+			dimDilation.resize(convDim);
+			dimDilation[0] = 1;
+			dimDilation[1] = 1;
+			dimDilation[2] = 1;
 
 			dimStride.resize(convDim);
 			dimStride[0] = this->layerData.layerStructure.Stride.z;
@@ -215,8 +215,8 @@ namespace NeuralNetwork {
 			dimInput.resize(dataDim);
 			dimInput[0] = this->batchSize;
 			dimInput[1] = this->layerData.inputDataStruct.ch;
-			dimInput[2] = this->layerData.inputDataStruct.y;
-			dimInput[3] = this->layerData.inputDataStruct.x;
+			dimInput[2] = this->layerData.inputDataStruct.y * this->layerData.layerStructure.UpScale.y;
+			dimInput[3] = this->layerData.inputDataStruct.x * this->layerData.layerStructure.UpScale.x;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2] * dimInput[3];
@@ -252,9 +252,9 @@ namespace NeuralNetwork {
 			dimPadding[0] = this->layerData.layerStructure.Padding.y;
 			dimPadding[1] = this->layerData.layerStructure.Padding.x;
 
-			dimUpscale.resize(convDim);
-			dimUpscale[0] = 1;
-			dimUpscale[1] = 1;
+			dimDilation.resize(convDim);
+			dimDilation[0] = 1;
+			dimDilation[1] = 1;
 
 			dimStride.resize(convDim);
 			dimStride[0] = this->layerData.layerStructure.Stride.y;
@@ -267,7 +267,7 @@ namespace NeuralNetwork {
 			dimInput.resize(dataDim);
 			dimInput[0] = this->batchSize;
 			dimInput[1] = this->layerData.inputDataStruct.ch;
-			dimInput[2] = this->layerData.inputDataStruct.x;
+			dimInput[2] = this->layerData.inputDataStruct.x * this->layerData.layerStructure.UpScale.x;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2];
@@ -298,8 +298,8 @@ namespace NeuralNetwork {
 			dimPadding.resize(convDim);
 			dimPadding[0] = this->layerData.layerStructure.Padding.x;
 
-			dimUpscale.resize(convDim);
-			dimUpscale[0] = 1;
+			dimDilation.resize(convDim);
+			dimDilation[0] = 1;
 
 			dimStride.resize(convDim);
 			dimStride[0] = this->layerData.layerStructure.Stride.x;
@@ -335,7 +335,7 @@ namespace NeuralNetwork {
 			convDim,
 			&dimPadding[0],
 			&dimStride[0],
-			&dimUpscale[0],
+			&dimDilation[0],
 			CUDNN_CROSS_CORRELATION,
 			CUDNN_DATA_FLOAT);
 		if(err_cudnn != 0)
@@ -503,7 +503,7 @@ namespace NeuralNetwork {
 
 	/** 学習ループの初期化処理.データセットの学習開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Convolution_GPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
+	ErrorCode UpConvolution_GPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
 	{
 		if(this->pLearnData != NULL)
 			delete this->pLearnData;
@@ -522,7 +522,7 @@ namespace NeuralNetwork {
 	}
 	/** 演算ループの初期化処理.データセットの演算開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Convolution_GPU::PreProcessCalculateLoop()
+	ErrorCode UpConvolution_GPU::PreProcessCalculateLoop()
 	{
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
@@ -531,12 +531,16 @@ namespace NeuralNetwork {
 	/** 演算処理を実行する.
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 		@return 成功した場合0が返る */
-	ErrorCode Convolution_GPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
+	ErrorCode UpConvolution_GPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
 	{
 		cudnnStatus_t err_cudnn;
 
 		// 入力バッファを保存
 		this->m_lppInputBuffer_d = i_lpInputBuffer;
+
+		// 入力信号を拡張
+		{
+		}
 
 		// 畳み込み処理
 		{
@@ -584,14 +588,14 @@ namespace NeuralNetwork {
 	/** 出力データバッファを取得する.
 		配列の要素数はGetOutputBufferCountの戻り値.
 		@return 出力データ配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER Convolution_GPU::GetOutputBuffer()const
+	CONST_BATCH_BUFFER_POINTER UpConvolution_GPU::GetOutputBuffer()const
 	{
 		return thrust::raw_pointer_cast(&this->lpOutputBuffer[0]);
 	}
 	/** 出力データバッファを取得する.
 		@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
 		@return 成功した場合0 */
-	ErrorCode Convolution_GPU::GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
+	ErrorCode UpConvolution_GPU::GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
 	{
 		if(o_lpOutputBuffer == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
@@ -612,7 +616,7 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Convolution_GPU::Training(CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
+	ErrorCode UpConvolution_GPU::Training(CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
 	{
 		cudnnStatus_t err_cudnn;
 
@@ -689,13 +693,13 @@ namespace NeuralNetwork {
 	/** 学習差分を取得する.
 		配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]
 		@return	誤差差分配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER Convolution_GPU::GetDInputBuffer()const
+	CONST_BATCH_BUFFER_POINTER UpConvolution_GPU::GetDInputBuffer()const
 	{
 		return thrust::raw_pointer_cast(&this->lpDInputBuffer[0]);
 	}
 	/** 学習差分を取得する.
 		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
-	ErrorCode Convolution_GPU::GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const
+	ErrorCode UpConvolution_GPU::GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const
 	{
 		if(o_lpDInputBuffer == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;

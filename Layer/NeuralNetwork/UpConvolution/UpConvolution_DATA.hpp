@@ -1,12 +1,12 @@
 /*--------------------------------------------
- * FileName  : Convolution_DATA.hpp
- * LayerName : 畳みこみニューラルネットワーク
- * guid      : F6662E0E-1CA4-4D59-ACCA-CAC29A16C0AA
+ * FileName  : UpConvolution_DATA.hpp
+ * LayerName : 拡張畳みこみニューラルネットワーク
+ * guid      : B87B2A75-7EA3-4960-9E9C-EAF43AB073B0
  * 
- * Text      : 畳みこみニューラルネットワーク.
+ * Text      : フィルタ移動量を[Stride/UpScale]に拡張した畳み込みニューラルネットワーク.Stride=1,UpScale=2とした場合、特徴マップのサイズは2倍になる
 --------------------------------------------*/
-#ifndef __GRAVISBELL_NEURALNETWORK_LAYER_DATA_Convolution_H__
-#define __GRAVISBELL_NEURALNETWORK_LAYER_DATA_Convolution_H__
+#ifndef __GRAVISBELL_NEURALNETWORK_LAYER_DATA_UpConvolution_H__
+#define __GRAVISBELL_NEURALNETWORK_LAYER_DATA_UpConvolution_H__
 
 #include<guiddef.h>
 
@@ -16,7 +16,7 @@
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
-namespace Convolution {
+namespace UpConvolution {
 
 	/** Layer structure */
 	struct LayerStructure
@@ -38,6 +38,11 @@ namespace Convolution {
 		  * Text : 畳みこみごとに移動するフィルタの移動量
 		  */
 		Vector3D<S32> Stride;
+
+		/** Name : 拡張幅
+		  * ID   : UpScale
+		  */
+		Vector3D<S32> UpScale;
 
 		/** Name : パディングサイズ
 		  * ID   : Padding
@@ -69,10 +74,10 @@ namespace Convolution {
 
 	};
 
-} // Convolution
+} // UpConvolution
 } // NeuralNetwork
 } // Layer
 } // Gravisbell
 
 
-#endif // __CUSTOM_DEEP_NN_LAYER_DATA_Convolution_H__
+#endif // __CUSTOM_DEEP_NN_LAYER_DATA_UpConvolution_H__

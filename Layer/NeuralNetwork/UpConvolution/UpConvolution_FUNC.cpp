@@ -1,9 +1,9 @@
 /*--------------------------------------------
- * FileName  : Convolution_FUNC.cpp
- * LayerName : 畳みこみニューラルネットワーク
- * guid      : F6662E0E-1CA4-4D59-ACCA-CAC29A16C0AA
+ * FileName  : UpConvolution_FUNC.cpp
+ * LayerName : 拡張畳みこみニューラルネットワーク
+ * guid      : B87B2A75-7EA3-4960-9E9C-EAF43AB073B0
  * 
- * Text      : 畳みこみニューラルネットワーク.
+ * Text      : フィルタ移動量を[Stride/UpScale]に拡張した畳み込みニューラルネットワーク.Stride=1,UpScale=2とした場合、特徴マップのサイズは2倍になる
 --------------------------------------------*/
 #include"stdafx.h"
 
@@ -12,11 +12,11 @@
 
 #include<Library/SettingData/Standard/SettingData.h>
 
-#include"Convolution_FUNC.hpp"
+#include"UpConvolution_FUNC.hpp"
 
 
-// {F6662E0E-1CA4-4D59-ACCA-CAC29A16C0AA}
-static const Gravisbell::GUID g_guid(0xf6662e0e, 0x1ca4, 0x4d59, 0xac, 0xca, 0xca, 0xc2, 0x9a, 0x16, 0xc0, 0xaa);
+// {B87B2A75-7EA3-4960-9E9C-EAF43AB073B0}
+static const Gravisbell::GUID g_guid(0xb87b2a75, 0x7ea3, 0x4960, 0x9e, 0x9c, 0xea, 0xf4, 0x3a, 0xb0, 0x73, 0xb0);
 
 // VersionCode
 static const Gravisbell::VersionCode g_version = {   1,   0,   0,   0}; 
@@ -37,8 +37,8 @@ namespace DefaultLanguage
     /** Base */
     static const StringData g_baseData = 
     {
-        L"畳みこみニューラルネットワーク",
-        L"畳みこみニューラルネットワーク."
+        L"拡張畳みこみニューラルネットワーク",
+        L"フィルタ移動量を[Stride/UpScale]に拡張した畳み込みニューラルネットワーク.Stride=1,UpScale=2とした場合、特徴マップのサイズは2倍になる"
     };
 
 
@@ -64,6 +64,13 @@ namespace DefaultLanguage
             {
                 L"フィルタ移動量",
                 L"畳みこみごとに移動するフィルタの移動量",
+            }
+        },
+        {
+            L"UpScale",
+            {
+                L"拡張幅",
+                L"",
             }
         },
         {
@@ -228,6 +235,18 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			CurrentLanguage::g_lpItemData_LayerStructure[L"Stride"].text.c_str(),
 			1, 1, 1,
 			65535, 65535, 65535,
+			1, 1, 1));
+
+	/** Name : 拡張幅
+	  * ID   : UpScale
+	  */
+	pLayerConfig->AddItem(
+		Gravisbell::SettingData::Standard::CreateItem_Vector3D_Int(
+			L"UpScale",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"UpScale"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"UpScale"].text.c_str(),
+			1, 1, 1,
+			32, 32, 32,
 			1, 1, 1));
 
 	/** Name : パディングサイズ
