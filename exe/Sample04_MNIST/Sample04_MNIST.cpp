@@ -20,7 +20,7 @@
 
 using namespace Gravisbell;
 
-#define USE_GPU	1
+#define USE_GPU	0
 #define USE_HOST_MEMORY 1
 
 
@@ -484,7 +484,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		//	Gravisbell::Utility::NeuralNetworkLayer::CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.2f));
 		//if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 
-#if 1	// Single
+#if 0	// Single
 		// 2層目
 		err = Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
 			*pNeuralNetwork,
@@ -600,7 +600,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 			Gravisbell::Utility::NeuralNetworkLayer::CreateMergeInputLayer(layerDLLManager, inputDataStruct_A, inputDataStruct_B),
 			lastLayerGUID_A, lastLayerGUID_B);
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-#else	// ResNet
+#elif 0	// ResNet
 
 		// ショートカットレイヤーを保存する
 		Gravisbell::GUID lastLayerGUID_shortCut = lastLayerGUID;
@@ -675,12 +675,52 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		//	inputDataStruct, lastLayerGUID,
 		//	Gravisbell::Utility::NeuralNetworkLayer::CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.5f));
 		//if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+#else	// UpSampling
+
+		// 2層目
+		err = Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lppLayerData,
+			inputDataStruct, lastLayerGUID,
+			Gravisbell::Utility::NeuralNetworkLayer::CreateUpSamplingLayer(layerDLLManager, inputDataStruct, Vector3D<S32>(2,2,1), true));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+
+		err = Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lppLayerData,
+			inputDataStruct, lastLayerGUID,
+			Gravisbell::Utility::NeuralNetworkLayer::CreateConvolutionLayer(layerDLLManager, inputDataStruct, Vector3D<S32>(5,5,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+		err = Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lppLayerData,
+			inputDataStruct, lastLayerGUID,
+			Gravisbell::Utility::NeuralNetworkLayer::CreatePoolingLayer(layerDLLManager, inputDataStruct, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1)));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+		//err = Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+		//	*pNeuralNetwork,
+		//	lppLayerData,
+		//	inputDataStruct, lastLayerGUID,
+		//	Gravisbell::Utility::NeuralNetworkLayer::CreateBatchNormalizationLayer(layerDLLManager, inputDataStruct));
+		//if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+		err = Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lppLayerData,
+			inputDataStruct, lastLayerGUID,
+			Gravisbell::Utility::NeuralNetworkLayer::CreateActivationLayer(layerDLLManager, inputDataStruct, L"ReLU"));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+		//err = Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
+		//	*pNeuralNetwork,
+		//	lppLayerData,
+		//	inputDataStruct, lastLayerGUID,
+		//	Gravisbell::Utility::NeuralNetworkLayer::CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.5f));
+		//if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 
 #endif
 
 
 		// 3層目
-#if 0	// 全結合
+#if 1	// 全結合
 		err = Gravisbell::Utility::NeuralNetworkLayer::AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lppLayerData,

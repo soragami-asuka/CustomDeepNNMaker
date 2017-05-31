@@ -285,6 +285,46 @@ Layer::ILayerData* CreateGlobalAveragePoolingLayer(const Layer::NeuralNetwork::I
 
 	return pLayer;
 }
+Layer::ILayerData* CreateUpSamplingLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, Vector3D<S32> upScale, bool paddingUseValue)
+{
+	// DLL取得
+	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(Gravisbell::GUID(0x14eee4a7, 0x1b26, 0x4651, 0x8e, 0xbf, 0xb1, 0x15, 0x6d, 0x62, 0xce, 0x1b));
+	if(pLayerDLL == NULL)
+		return NULL;
+
+	// 設定の作成
+	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
+	if(pConfig == NULL)
+		return NULL;
+
+	// 拡大率
+	{
+		SettingData::Standard::IItem_Vector3D_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Vector3D_Int*>(pConfig->GetItemByID(L"UpScale"));
+		pItem->SetValue(upScale);
+	}
+	// パディング種別
+	{
+		SettingData::Standard::IItem_Enum* pItem = dynamic_cast<SettingData::Standard::IItem_Enum*>(pConfig->GetItemByID(L"PaddingType"));
+		if(paddingUseValue)
+		{
+			pItem->SetValue(L"value");
+		}
+		else
+		{
+			pItem->SetValue(L"zero");
+		}
+	}
+
+	// レイヤーの作成
+	Layer::ILayerData* pLayer = pLayerDLL->CreateLayerData(*pConfig, inputDataStruct);
+	if(pLayer == NULL)
+		return NULL;
+
+	// 設定情報を削除
+	delete pConfig;
+
+	return pLayer;
+}
 
 Layer::ILayerData* CreateMergeInputLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct lpInputDataStruct[], U32 inputDataCount)
 {

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="14EEE4A7-1B26-4651-8EBF-B1156D62CE1B" version="1.0.0.0" default-language="ja">
+  
+  <SourceName>UpSampling</SourceName>
+  <Name>アップサンプリング</Name>
+  <Text>値を拡張し、穴埋めする</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+    
+    <Vector3D type="Int" id="UpScale">
+      <Name>拡張幅</Name>
+      <Min>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
+      </Min>
+      <Max>
+        <x>32</x>
+        <y>32</y>
+        <z>32</z>
+      </Max>
+      <Default>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
+      </Default>
+    </Vector3D>
+
+    <Enum id="PaddingType">
+      <Name>パディング種別</Name>
+      <Text>パディングを行う際の方法設定</Text>
+      <Items>
+        <Item id="zero">
+          <Name>ゼロパディング</Name>
+          <Text>不足分を0で埋める</Text>
+        </Item>
+        <Item id="value">
+          <Name>値</Name>
+          <Text>不足分と隣接する値を参照する</Text>
+        </Item>
+      </Items>
+      <Default>zero</Default>
+    </Enum>
+
+  </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <Learn>
+  </Learn>
+
+</Config>
