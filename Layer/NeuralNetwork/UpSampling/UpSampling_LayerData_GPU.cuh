@@ -26,9 +26,6 @@ namespace NeuralNetwork {
 		friend class UpSampling_GPU;
 
 	private:
-		// 本体
-		thrust::device_vector<F32>	lppNeuron_d;			/**< 各ニューロンの係数<ニューロン数, 入力数> */
-		thrust::device_vector<F32>	lpBias_d;				/**< ニューロンのバイアス<ニューロン数> */
 
 		//===========================
 		// コンストラクタ / デストラクタ

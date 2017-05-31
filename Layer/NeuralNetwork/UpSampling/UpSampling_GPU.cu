@@ -29,17 +29,21 @@ namespace NeuralNetwork {
 		,	cudnnHandle			(NULL)
 		,	inputTensorDesc		(NULL)
 		,	outputTensorDesc	(NULL)
+		,	filterDesc			(NULL)
+		,	convDesc			(NULL)
 	{
 		cudnnCreate(&cudnnHandle);
 		cudnnCreateTensorDescriptor(&inputTensorDesc);
-		cudnnCreateTensorDescriptor(&upscaleTensorDesc);
 		cudnnCreateTensorDescriptor(&outputTensorDesc);
+		cudnnCreateFilterDescriptor(&filterDesc);
+		cudnnCreateConvolutionDescriptor(&convDesc);
 	}
 	/** デストラクタ */
 	UpSampling_GPU::~UpSampling_GPU()
 	{
+		if(convDesc)			cudnnDestroyConvolutionDescriptor(convDesc);
+		if(filterDesc)			cudnnDestroyFilterDescriptor(filterDesc);
 		if(outputTensorDesc)	cudnnDestroyTensorDescriptor(outputTensorDesc);
-		if(outputTensorDesc)	cudnnDestroyTensorDescriptor(upscaleTensorDesc);
 		if(inputTensorDesc)		cudnnDestroyTensorDescriptor(inputTensorDesc);
 		if(cudnnHandle)			cudnnDestroy(cudnnHandle);
 	}
@@ -93,10 +97,6 @@ namespace NeuralNetwork {
 		// 入力差分バッファを作成
 		this->lpDInputBuffer.resize(this->batchSize * this->inputBufferCount);
 
-		// ニューロン/バイアスの誤差を一時保存するバッファを作成
-		this->lpDBias.resize(this->layerData.lpBias_d.size());
-		this->lppDNeuron.resize(this->layerData.lppNeuron_d.size());
-
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
@@ -127,7 +127,12 @@ namespace NeuralNetwork {
 		std::vector<S32> dimInputStride;	// 入力データの各次元ごとのデータ数
 		std::vector<S32> dimOutput;
 		std::vector<S32> dimOutputStride;
-		std::vector<S32> dimUpScaleStride;
+		S32 filterDim = 0;			// フィルタ次元数	入力チャンネル + 出力チャンネル + 次元
+		std::vector<S32> dimFilter;
+		S32 convDim = 0;			// 畳み込み次元数	次元
+		std::vector<S32> dimStride;
+		std::vector<S32> dimDilation;
+		std::vector<S32> dimPadding;
 		if(this->layerData.inputDataStruct.z > 1)
 		{
 			dataDim = 1 + 1 + 3;
@@ -160,24 +165,36 @@ namespace NeuralNetwork {
 			dimOutputStride[3] = dimOutput[4];
 			dimOutputStride[4] = 1;
 
-			dimUpScaleStride.resize(dataDim);
-			dimUpScaleStride[0] = dimOutput[1] * dimOutput[2] * dimOutput[3] * dimOutput[4] * this->layerData.layerStructure.UpScale.x;
-			dimUpScaleStride[1] = dimOutput[2] * dimOutput[3] * dimOutput[4] * this->layerData.layerStructure.UpScale.x;
-			dimUpScaleStride[2] = dimOutput[3] * dimOutput[4] * this->layerData.layerStructure.UpScale.x;
-			dimUpScaleStride[3] = dimOutput[4] * this->layerData.layerStructure.UpScale.x;
-			dimUpScaleStride[4] = this->layerData.layerStructure.UpScale.x;
+			filterDim = 1 + 1 + 2;	// 入力チャンネル + 出力チャンネル + 次元3
 
-			upscaleStride.x = 1;
-			upscaleStride.y = this->layerData.layerStructure.UpScale.x * this->layerData.inputDataStruct.x;
-			upscaleStride.z = this->layerData.layerStructure.UpScale.x * this->layerData.inputDataStruct.x * this->layerData.layerStructure.UpScale.y * this->layerData.inputDataStruct.y;
+			dimFilter.resize(filterDim);
+			dimFilter[0] = this->layerData.GetOutputDataStruct().ch;
+			dimFilter[1] = this->layerData.inputDataStruct.ch;
+			dimFilter[2] = this->layerData.layerStructure.UpScale.y;
+			dimFilter[3] = this->layerData.layerStructure.UpScale.x;
+
+			convDim = 2;	// 次元3
+
+			dimPadding.resize(convDim);
+			dimPadding[0] = 0;
+			dimPadding[1] = 0;
+
+			dimDilation.resize(convDim);
+			dimDilation[0] = 1;
+			dimDilation[1] = 1;
+
+			dimStride.resize(convDim);
+			dimStride[0] = 1;
+			dimStride[1] = 1;
+
 		}
 		else if(this->layerData.inputDataStruct.y > 1)
 		{
 			dataDim = 1 + 1 + 2;
 
 			dimInput.resize(dataDim);
-			dimInput[0] = this->batchSize;
-			dimInput[1] = this->layerData.inputDataStruct.ch;
+			dimInput[0] = this->batchSize * this->layerData.inputDataStruct.ch;
+			dimInput[1] = 1;
 			dimInput[2] = this->layerData.inputDataStruct.y;
 			dimInput[3] = this->layerData.inputDataStruct.x;
 
@@ -188,8 +205,8 @@ namespace NeuralNetwork {
 			dimInputStride[3] = 1;
 
 			dimOutput.resize(dataDim);
-			dimOutput[0] = this->batchSize;
-			dimOutput[1] = this->layerData.outputDataStruct.ch;
+			dimOutput[0] = this->batchSize * this->layerData.outputDataStruct.ch;
+			dimOutput[1] = 1;
 			dimOutput[2] = this->layerData.outputDataStruct.y;
 			dimOutput[3] = this->layerData.outputDataStruct.x;
 
@@ -198,16 +215,28 @@ namespace NeuralNetwork {
 			dimOutputStride[1] = dimOutput[2] * dimOutput[3];
 			dimOutputStride[2] = dimOutput[3];
 			dimOutputStride[3] = 1;
-			
-			dimUpScaleStride.resize(dataDim);
-			dimUpScaleStride[0] = this->layerData.inputDataStruct.x * this->layerData.layerStructure.UpScale.x * this->layerData.inputDataStruct.y * this->layerData.layerStructure.UpScale.y * this->layerData.inputDataStruct.ch; 
-			dimUpScaleStride[1] = this->layerData.inputDataStruct.x * this->layerData.layerStructure.UpScale.x * this->layerData.inputDataStruct.y * this->layerData.layerStructure.UpScale.y;
-			dimUpScaleStride[2] = this->layerData.inputDataStruct.x * this->layerData.layerStructure.UpScale.x * this->layerData.layerStructure.UpScale.y;
-			dimUpScaleStride[3] = this->layerData.layerStructure.UpScale.x;
 
-			upscaleStride.x = 1;
-			upscaleStride.y = this->layerData.layerStructure.UpScale.x * this->layerData.inputDataStruct.x;
-			upscaleStride.z = 0;
+			filterDim = 1 + 1 + 2;	// 入力チャンネル + 出力チャンネル + 次元3
+
+			dimFilter.resize(filterDim);
+			dimFilter[0] = 1;
+			dimFilter[1] = 1;
+			dimFilter[2] = this->layerData.layerStructure.UpScale.y;
+			dimFilter[3] = this->layerData.layerStructure.UpScale.x;
+
+			convDim = 2;	// 次元2
+
+			dimPadding.resize(convDim);
+			dimPadding[0] = 0;
+			dimPadding[1] = 0;
+
+			dimDilation.resize(convDim);
+			dimDilation[0] = 1;
+			dimDilation[1] = 1;
+
+			dimStride.resize(convDim);
+			dimStride[0] = this->layerData.layerStructure.UpScale.y;
+			dimStride[1] = this->layerData.layerStructure.UpScale.x;
 		}
 		else if(this->layerData.inputDataStruct.x > 1)
 		{
@@ -233,14 +262,6 @@ namespace NeuralNetwork {
 			dimOutputStride[1] = dimOutput[2];
 			dimOutputStride[2] = 1;
 
-			dimUpScaleStride.resize(dataDim);
-			dimUpScaleStride[0] = dimOutput[1] * dimOutput[2] * this->layerData.layerStructure.UpScale.x;
-			dimUpScaleStride[1] = dimOutput[2] * this->layerData.layerStructure.UpScale.x;
-			dimUpScaleStride[2] = this->layerData.layerStructure.UpScale.x;
-			
-			upscaleStride.x = 1;
-			upscaleStride.y = 0;
-			upscaleStride.z = 0;
 		}
 		else
 		{
@@ -257,7 +278,6 @@ namespace NeuralNetwork {
 		if(err_cudnn != 0)
 			return ErrorCode::ERROR_CODE_CUDA_ALLOCATION_MEMORY;
 
-
 		// CUDNNの出力データ構造を設定
 		err_cudnn = cudnnSetTensorNdDescriptor(
 			this->outputTensorDesc,
@@ -268,20 +288,125 @@ namespace NeuralNetwork {
 		if(err_cudnn != 0)
 			return ErrorCode::ERROR_CODE_CUDA_ALLOCATION_MEMORY;
 
-		// CUDNNの入力>出力用データ構造を設定
-		err_cudnn = cudnnSetTensorNdDescriptor(
-			this->upscaleTensorDesc,
+		// フィルタサイズを設定
+		err_cudnn = cudnnSetFilterNdDescriptor(
+			this->filterDesc,
 			CUDNN_DATA_FLOAT,
-			dataDim,
-			&dimInput[0],
-			&dimUpScaleStride[0]);
+			CUDNN_TENSOR_NCHW,
+			filterDim,
+			&dimFilter[0]);
 		if(err_cudnn != 0)
-			return ErrorCode::ERROR_CODE_CUDA_ALLOCATION_MEMORY;
+			return ErrorCode::ERROR_CODE_CUDA_INITIALIZE;
+
+		// 畳み込み処理設定
+		err_cudnn = cudnnSetConvolutionNdDescriptor(
+			this->convDesc,
+			convDim,
+			&dimPadding[0],
+			&dimStride[0],
+			&dimDilation[0],
+			CUDNN_CROSS_CORRELATION,
+			CUDNN_DATA_FLOAT);
+		if(err_cudnn != 0)
+			return ErrorCode::ERROR_CODE_CUDA_INITIALIZE;
+
+		// 最速のアルゴリズムを検索する(前方伝播)
+		err_cudnn = cudnnGetConvolutionForwardAlgorithm(
+			this->cudnnHandle,
+			this->outputTensorDesc,
+			this->filterDesc,
+			this->convDesc,
+			this->inputTensorDesc,
+			CUDNN_CONVOLUTION_FWD_PREFER_FASTEST,	// メモリの使用量無制限で最速のアルゴリズムを調べる
+			0,										// 使用可能なメモリの上限
+			&this->useForwardAlgorithm
+			);
+		if(err_cudnn != 0)
+			return ErrorCode::ERROR_CODE_CUDA_INITIALIZE;
+
+		// 必要なメモリ量を調べる(前方伝播)
+		size_t workSpaceSizeByte_forward;
+		err_cudnn = cudnnGetConvolutionForwardWorkspaceSize(
+			this->cudnnHandle,
+			this->outputTensorDesc,
+			this->filterDesc,
+			this->convDesc,
+			this->inputTensorDesc,
+			this->useForwardAlgorithm,
+			&workSpaceSizeByte_forward);
+		if(err_cudnn != 0)
+			return ErrorCode::ERROR_CODE_CUDA_INITIALIZE;
+
+
+		// 最速のアルゴリズムを検索する(後方伝播-データ)
+		err_cudnn = cudnnGetConvolutionBackwardDataAlgorithm(
+			this->cudnnHandle,
+			this->filterDesc,
+			this->inputTensorDesc,
+			this->convDesc,
+			this->outputTensorDesc,
+			cudnnConvolutionBwdDataPreference_t::CUDNN_CONVOLUTION_BWD_DATA_PREFER_FASTEST,	// メモリの使用量無制限で最速のアルゴリズムを調べる
+			0,																				// 使用可能なメモリの上限
+			&this->useBackwardDataAlgorithm);
+		if(err_cudnn != 0)
+			return ErrorCode::ERROR_CODE_CUDA_INITIALIZE;
+
+		// 必要なメモリ量を調べる(後方伝播-データ)
+		size_t workSpaceSizeByte_backwardData;
+		err_cudnn = cudnnGetConvolutionBackwardDataWorkspaceSize(
+			this->cudnnHandle,
+			this->filterDesc,
+			this->inputTensorDesc,
+			this->convDesc,
+			this->outputTensorDesc,
+			this->useBackwardDataAlgorithm,
+			&workSpaceSizeByte_backwardData);
+		if(err_cudnn != 0)
+			return ErrorCode::ERROR_CODE_CUDA_INITIALIZE;
+
+
+		// 処理用バッファの確保
+		this->workSpace.resize(max(workSpaceSizeByte_forward, workSpaceSizeByte_backwardData));
 
 
 		// 出力バッファを作成
 		this->lpOutputBuffer.resize(this->batchSize * this->outputBufferCount);
 
+		// フィルタバッファを作成して初期化
+		filter.resize(
+			this->layerData.layerStructure.UpScale.x * this->layerData.layerStructure.UpScale.y * this->layerData.layerStructure.UpScale.z,
+			0.0f);
+		for(U32 z=0; z<this->layerData.layerStructure.UpScale.z; z++)
+		{
+			U32 zOffset = z * this->layerData.layerStructure.UpScale.y * this->layerData.layerStructure.UpScale.x;
+
+			for(U32 y=0; y<this->layerData.layerStructure.UpScale.y; y++)
+			{
+				U32 yOffset = y * this->layerData.layerStructure.UpScale.x;
+
+				for(U32 x=0; x<this->layerData.layerStructure.UpScale.x; x++)
+				{
+					U32 offset = zOffset + yOffset + x;
+
+					switch(this->layerData.layerStructure.PaddingType)
+					{
+					case UpSampling::LayerStructure::PaddingType_value:
+						{
+							filter[offset] = 1.0f;
+						}
+						break;
+					case UpSampling::LayerStructure::PaddingType_zero:
+						{
+							if(z==0 && y==0 && x==0)
+								filter[offset] = 1.0f;
+							else
+								filter[offset] = 0.0f;
+						}
+						break;
+					}
+				}
+			}
+		}
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -322,55 +447,26 @@ namespace NeuralNetwork {
 			this->lpOutputBuffer.size()*sizeof(F32));
 
 		// 入力バッファを出力にコピー
-		switch(this->layerData.layerStructure.PaddingType)
 		{
-		case UpSampling::LayerStructure::PaddingType_value:
-			{
-				F32 alpha = 1.0f;
-				F32 beta  = 1.0f;
+			F32 alpha = 1.0f;
+			F32 beta  = 0.0f;
 
-				for(S32 offsetZ=0; offsetZ<this->layerData.layerStructure.UpScale.z; offsetZ++)
-				{
-					for(S32 offsetY=0; offsetY<this->layerData.layerStructure.UpScale.y; offsetY++)
-					{
-						for(S32 offsetX=0; offsetX<this->layerData.layerStructure.UpScale.x; offsetX++)
-						{
-							S32 offset = offsetX * this->upscaleStride.x + offsetY * this->upscaleStride.y + offsetZ * this->upscaleStride.z;
-
-							err_cudnn = cudnnTransformTensor(
-								this->cudnnHandle,
-								&alpha,
-								this->inputTensorDesc,
-								this->m_lppInputBuffer_d,
-								&beta,
-								this->upscaleTensorDesc,
-								thrust::raw_pointer_cast(&this->lpOutputBuffer[offset]));
-
-							if(err_cudnn != 0)
-								return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
-						}
-					}
-				}
-			}
-			break;
-		case UpSampling::LayerStructure::PaddingType_zero:
-			{
-				F32 alpha = 1.0f;
-				F32 beta  = 0.0f;
-
-				err_cudnn = cudnnTransformTensor(
-					this->cudnnHandle,
-					&alpha,
-					this->inputTensorDesc,
-					this->m_lppInputBuffer_d,
-					&beta,
-					this->upscaleTensorDesc,
-					thrust::raw_pointer_cast(&this->lpOutputBuffer[0]));
-
-				if(err_cudnn != 0)
-					return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
-			}
-			break;
+			err_cudnn = cudnnConvolutionBackwardData(
+				this->cudnnHandle,
+				&alpha,
+				this->filterDesc,
+				thrust::raw_pointer_cast(&this->filter[0]),
+				this->inputTensorDesc,
+				this->m_lppInputBuffer_d,
+				this->convDesc,
+				this->useBackwardDataAlgorithm,
+				thrust::raw_pointer_cast(&this->workSpace[0]),
+				this->workSpace.size(),
+				&beta,
+				this->outputTensorDesc,
+				thrust::raw_pointer_cast(&this->lpOutputBuffer[0]));
+			if(err_cudnn != 0)
+				return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
 		}
 
 #ifdef _DEBUG
@@ -430,70 +526,25 @@ namespace NeuralNetwork {
 			0,
 			this->lpDInputBuffer.size()*sizeof(F32));
 
-		// 出力誤差バッファを入力誤差にコピー
-		switch(this->layerData.layerStructure.PaddingType)
 		{
-		case UpSampling::LayerStructure::PaddingType_value:
-			{
-				F32 alpha = 1.0f / (this->layerData.layerStructure.UpScale.x * this->layerData.layerStructure.UpScale.y * this->layerData.layerStructure.UpScale.z);
-				F32 beta  = 1.0f;
-
-				for(S32 offsetZ=0; offsetZ<this->layerData.layerStructure.UpScale.z; offsetZ++)
-				{
-					for(S32 offsetY=0; offsetY<this->layerData.layerStructure.UpScale.y; offsetY++)
-					{
-						for(S32 offsetX=0; offsetX<this->layerData.layerStructure.UpScale.x; offsetX++)
-						{
-							S32 offset = offsetX * this->upscaleStride.x + offsetY * this->upscaleStride.y + offsetZ * this->upscaleStride.z;
-
-//#ifdef _DEBUG
-//							std::vector<F32> lpPreDebugDInputBuffer(this->lpDInputBuffer.size());
-//							cudaMemcpy(&lpPreDebugDInputBuffer[0], thrust::raw_pointer_cast(&this->lpDInputBuffer[0]), sizeof(F32)*lpPreDebugDInputBuffer.size(), cudaMemcpyDeviceToHost);
-//#endif
-
-							err_cudnn = cudnnTransformTensor(
-								this->cudnnHandle,
-								&alpha,
-								this->upscaleTensorDesc,
-								&this->m_lppDOutputBuffer_d[offset],
-								&beta,
-								this->inputTensorDesc,
-								thrust::raw_pointer_cast(&this->lpDInputBuffer[0]));
-
-//#ifdef _DEBUG
-//							std::vector<F32> lpDebugDOutputBuffer(this->lpOutputBuffer.size());
-//							cudaMemcpy(&lpDebugDOutputBuffer[0], this->m_lppDOutputBuffer_d, sizeof(F32)*lpDebugDOutputBuffer.size(), cudaMemcpyDeviceToHost);
-//		
-//							std::vector<F32> lpDebugDInputBuffer(this->lpDInputBuffer.size());
-//							cudaMemcpy(&lpDebugDInputBuffer[0], thrust::raw_pointer_cast(&this->lpDInputBuffer[0]), sizeof(F32)*lpDebugDInputBuffer.size(), cudaMemcpyDeviceToHost);
-//#endif
-
-							if(err_cudnn != 0)
-								return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
-							
-						}
-					}
-				}
-			}
-			break;
-		case UpSampling::LayerStructure::PaddingType_zero:
-			{
-				F32 alpha = 1.0f;
-				F32 beta  = 0.0f;
-
-				err_cudnn = cudnnTransformTensor(
-					this->cudnnHandle,
-					&alpha,
-					this->upscaleTensorDesc,
-					this->m_lppDOutputBuffer_d,
-					&beta,
-					this->inputTensorDesc,
-					thrust::raw_pointer_cast(&this->lpDInputBuffer[0]));
-
-				if(err_cudnn != 0)
-					return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
-			}
-			break;
+			F32 alpha = 1.0f;
+			F32 beta  = 0.0f;
+			err_cudnn = cudnnConvolutionForward(
+				this->cudnnHandle,
+				&alpha,
+				this->outputTensorDesc,
+				this->m_lppDOutputBuffer_d,
+				this->filterDesc,
+				thrust::raw_pointer_cast(&this->filter[0]),
+				this->convDesc,
+				this->useForwardAlgorithm,
+				thrust::raw_pointer_cast(&this->workSpace[0]),
+				this->workSpace.size(),
+				&beta,
+				this->inputTensorDesc,
+				thrust::raw_pointer_cast(&this->lpDInputBuffer[0]));
+			if(err_cudnn != 0)
+				return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
 		}
 
 #ifdef _DEBUG

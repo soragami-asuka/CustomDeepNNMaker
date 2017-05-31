@@ -35,9 +35,6 @@ private:
 	thrust::device_vector<F32>			lpOutputBuffer;		/**< 出力バッファ <バッチ数><畳み込み数> */
 	thrust::device_vector<F32>			lpDInputBuffer;		/**< 入力誤差差分 <バッチ数><入力信号数> */
 
-	thrust::device_vector<F32>			lppDNeuron;	/**< ニューロンの学習量<ニューロン数><入力信号数> */
-	thrust::device_vector<F32>			lpDBias;	/**< バイアスの学習量<ニューロン数> */
-
 	// Get関数を使うと処理不可がかさむので一時保存用. PreCalculateで値を格納.
 	U32 inputBufferCount;				/**< 入力バッファ数 */
 	U32 outputBufferCount;				/**< 出力バッファ数 */
@@ -51,17 +48,14 @@ private:
 
 	// CUDNN用データ構造定義
 	cudnnTensorDescriptor_t			inputTensorDesc;			/**< 入力データ構造 */
-	cudnnTensorDescriptor_t			upscaleTensorDesc;			/**< 入力>出力変換用のデータ構造 */
 	cudnnTensorDescriptor_t			outputTensorDesc;			/**< 出力データ構造 */
+	cudnnFilterDescriptor_t			filterDesc;					/**< フィルター構造 */
+	cudnnConvolutionDescriptor_t	convDesc;					/**< 畳み込み設定 */
+	cudnnConvolutionFwdAlgo_t		useForwardAlgorithm;		/**< 前方伝播時に使用するアルゴリズム番号 */
+	cudnnConvolutionBwdDataAlgo_t	useBackwardDataAlgorithm;	/**< 後方伝播時のデータ計算に使用するアルゴリズム番号 */
+	thrust::device_vector<BYTE>		workSpace;					/**< 処理用のメモリ.前方伝播、後方伝播全てで共用する. */
 
-	Gravisbell::Vector3D<S32>		upscaleStride;				/**< 入力>出力変換に使用する移動量 */
-
-	// 出力差分 > 入力差分用
-	thrust::device_vector<F32>		filter;					/**< フィルタバッファ */
-	cudnnFilterDescriptor_t			filterDesc;				/**< フィルター構造 */
-	cudnnConvolutionDescriptor_t	backprobConvDesc;		/**< 畳み込み設定 */
-	cudnnConvolutionFwdAlgo_t		backprobAlgorithm;		/**< 後方伝播時に使用するアルゴリズム番号 */
-	thrust::device_vector<BYTE>		backprobWorkSpace;		/**< 処理用のメモリ.前方伝播、後方伝播全てで共用する. */
+	thrust::device_vector<F32>		filter;						/**< フィルタ */
 
 public:
 	/** コンストラクタ */

@@ -20,7 +20,7 @@
 
 using namespace Gravisbell;
 
-#define USE_GPU	0
+#define USE_GPU	1
 #define USE_HOST_MEMORY 1
 
 
