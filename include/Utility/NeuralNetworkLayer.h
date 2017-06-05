@@ -6,8 +6,8 @@
 #ifndef __GRAVISBELL_UTILITY_NEURALNETWORKLAYER_H__
 #define __GRAVISBELL_UTILITY_NEURALNETWORKLAYER_H__
 
-#include"Library/NeuralNetwork/LayerDLLManager/LayerDLLManager.h"
-#include"Layer/Connect/ILayerConnectData.h"
+#include"../Layer/NeuralNetwork/ILayerDLLManager.h"
+#include"../Layer/Connect/ILayerConnectData.h"
 
 #include<boost/filesystem.hpp>
 
@@ -16,21 +16,66 @@ namespace Utility {
 namespace NeuralNetworkLayer {
 
 	
-	/** レイヤーDLL管理クラスの作成 */
+	/** レイヤーDLL管理クラスの作成(CPU用) */
 	Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManagerCPU(const boost::filesystem::wpath& libraryDirPath);
+	/** レイヤーDLL管理クラスの作成(GPU用) */
 	Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManagerGPU(const boost::filesystem::wpath& libraryDirPath);
 
-	/** レイヤーデータを作成 */
+	//====================================
+	// レイヤーデータを作成
+	//====================================
+	/** 複合ニューラルネットワーク.
+		@param layerDLLManager	レイヤーDLL管理クラス.
+		@param	inputDataStruct	入力データ構造. */
 	Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct);
+	/** 畳込みニューラルネットワークレイヤー.
+		@param	layerDLLManager		レイヤーDLL管理クラス.
+		@param	inputDataStruct		入力データ構造.
+		@param	filterSize			フィルタサイズ.
+		@param	outputChannelCount	フィルタの個数.
+		@param	stride				フィルタの移動量.
+		@param	paddingSize			パディングサイズ. */
 	Layer::ILayerData* CreateConvolutionLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, Vector3D<S32> filterSize, U32 outputChannelCount, Vector3D<S32> stride, Vector3D<S32> paddingSize);
+	/** 全結合ニューラルネットワークレイヤー.
+		@param	layerDLLManager		レイヤーDLL管理クラス.
+		@param	inputDataStruct		入力データ構造.
+		@param	neuronCount			ニューロン数. */
 	Layer::ILayerData* CreateFullyConnectLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, U32 neuronCount);
+	/** 活性化レイヤー.
+		@param	layerDLLManager		レイヤーDLL管理クラス.
+		@param	inputDataStruct		入力データ構造.
+		@param	activationType		活性化種別. */
 	Layer::ILayerData* CreateActivationLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, const std::wstring activationType);
+	/** ドロップアウトレイヤー.
+		@param	layerDLLManager		レイヤーDLL管理クラス.
+		@param	inputDataStruct		入力データ構造.
+		@param	rate				ドロップアウト率.(0.0～1.0).(0.0＝ドロップアウトなし,1.0=全入力無視) */
 	Layer::ILayerData* CreateDropoutLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, F32 rate);
+	/** プーリングレイヤー.
+		@param	layerDLLManager		レイヤーDLL管理クラス.
+		@param	inputDataStruct		入力データ構造.
+		@param	filterSize			プーリング幅.
+		@param	stride				フィルタ移動量. */
 	Layer::ILayerData* CreatePoolingLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, Vector3D<S32> filterSize, Vector3D<S32> stride);
+	/** バッチ正規化レイヤー
+		@param	layerDLLManager		レイヤーDLL管理クラス.
+		@param	inputDataStruct		入力データ構造. */
 	Layer::ILayerData* CreateBatchNormalizationLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct);
+	/** 広域平均プーリングレイヤー
+		@param	layerDLLManager		レイヤーDLL管理クラス.
+		@param	inputDataStruct		入力データ構造. */
 	Layer::ILayerData* CreateGlobalAveragePoolingLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct);
+	/** アップサンプリングレイヤー
+		@param	layerDLLManager		レイヤーDLL管理クラス.
+		@param	inputDataStruct		入力データ構造.
+		@param	upScale				拡張率.
+		@param	paddingUseValue		拡張部分の穴埋めに隣接する値を使用するフラグ. (true=UpConvolution, false=TransposeConvolution) */
 	Layer::ILayerData* CreateUpSamplingLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct& inputDataStruct, Vector3D<S32> upScale, bool paddingUseValue);
 
+	/** 入力結合レイヤー. 入力されたレイヤーのCHを結合する. 入力データ構造はX,Y,Zで同じサイズである必要がある.
+		@param	layerDLLManager		レイヤーDLL管理クラス.
+		@param	inputDataStruct		入力データ構造.
+		@param	inputDataCount		入力されるレイヤーの個数. */
 	Layer::ILayerData* CreateMergeInputLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct lpInputDataStruct[], U32 inputDataCount);
 	Layer::ILayerData* CreateMergeInputLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const std::vector<IODataStruct>& lpInputDataStruct);
 	template<typename... Rest>
@@ -49,6 +94,11 @@ namespace NeuralNetworkLayer {
 		return CreateMergeInputLayer(layerDLLManager, lpInputDataStruct, lpInputDataStruct_rest...);
 	}
 
+
+	/** 入力結合レイヤー. 入力されたレイヤーの値を合算する. 出力されるレイヤーのサイズは全サイズのうちの最大値になる.
+		@param	layerDLLManager		レイヤーDLL管理クラス.
+		@param	inputDataStruct		入力データ構造.
+		@param	inputDataCount		入力されるレイヤーの個数. */
 	Layer::ILayerData* CreateResidualLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const IODataStruct lpInputDataStruct[], U32 inputDataCount);
 	Layer::ILayerData* CreateResidualLayer(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, const std::vector<IODataStruct>& lpInputDataStruct);
 	template<typename... Rest>

@@ -4,8 +4,8 @@
 #ifndef __GRAVISBELL_I_BATCH_DATA_NO_LIST_GENERATOR_H__
 #define __GRAVISBELL_I_BATCH_DATA_NO_LIST_GENERATOR_H__
 
-#include"Common/ErrorCode.h"
-#include"Common/IODataStruct.h"
+#include"./ErrorCode.h"
+#include"./IODataStruct.h"
 
 namespace Gravisbell {
 namespace Common {

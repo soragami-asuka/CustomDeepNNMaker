@@ -1,8 +1,8 @@
 //=======================================
-// 入出力信号データレイヤー
+// 入出力信号データレイヤー(逐次処理)
 //=======================================
-#ifndef __GRAVISBELL_I_IO_DATA_LAYER_H__
-#define __GRAVISBELL_I_IO_DATA_LAYER_H__
+#ifndef __GRAVISBELL_I_IO_DATA_SEQUENTIAL_LAYER_H__
+#define __GRAVISBELL_I_IO_DATA_SEQUENTIAL_LAYER_H__
 
 #include"../../Common/Common.h"
 #include"../../Common/ErrorCode.h"
@@ -17,33 +17,18 @@ namespace Layer {
 namespace IOData {
 
 	/** 入出力データレイヤー */
-	class IIODataLayer : public IO::ISingleOutputLayer, public IO::ISingleInputLayer, public IDataLayer
+	class IIODataSequentialLayer : public IO::ISingleOutputLayer, public IO::ISingleInputLayer, public IDataLayer
 	{
 	public:
 		/** コンストラクタ */
-		IIODataLayer(){}
+		IIODataSequentialLayer(){}
 		/** デストラクタ */
-		virtual ~IIODataLayer(){}
+		virtual ~IIODataSequentialLayer(){}
 
 	public:
 		/** データを追加する.
 			@param	lpData	データ一組の配列. [GetBufferSize()の戻り値]の要素数が必要. */
-		virtual ErrorCode AddData(const float lpData[]) = 0;
-		/** データを番号指定で取得する.
-			@param num		取得する番号
-			@param o_LpData データの格納先配列. [GetBufferSize()の戻り値]の要素数が必要. */
-		virtual ErrorCode GetDataByNum(unsigned int num, float o_lpData[])const = 0;
-		/** データを番号指定で消去する */
-		virtual ErrorCode EraseDataByNum(unsigned int num) = 0;
-
-		/** データを全消去する.
-			@return	成功した場合0 */
-		virtual ErrorCode ClearData() = 0;
-
-		/** バッチ処理データ番号リストを設定する.
-			設定された値を元にGetDInputBuffer(),GetOutputBuffer()の戻り値が決定する.
-			@param i_lpBatchDataNoList	設定するデータ番号リスト. [GetBatchSize()の戻り値]の要素数が必要 */
-		virtual ErrorCode SetBatchDataNoList(const unsigned int i_lpBatchDataNoList[]) = 0;
+		virtual ErrorCode SetData(U32 dataNo, const float lpData[]) = 0;
 
 		/** 学習誤差を計算する.
 			@param i_lppInputBuffer	入力データバッファ. [GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要 */

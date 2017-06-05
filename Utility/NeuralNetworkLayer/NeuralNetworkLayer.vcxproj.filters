@@ -24,7 +24,7 @@
     <ClInclude Include="targetver.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="NeuralNetworkLayer.h">
+    <ClInclude Include="..\..\include\Utility\NeuralNetworkLayer.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

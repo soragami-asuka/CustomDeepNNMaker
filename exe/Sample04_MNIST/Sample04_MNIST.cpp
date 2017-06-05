@@ -16,7 +16,7 @@
 #include"Layer/IOData/IODataLayer/IODataLayer.h"
 #include"Layer/Connect/ILayerConnectData.h"
 #include"Layer/NeuralNetwork/INeuralNetwork.h"
-#include"Utility/NeuralNetworkLayer/NeuralNetworkLayer.h"
+#include"Utility/NeuralNetworkLayer.h"
 
 using namespace Gravisbell;
 

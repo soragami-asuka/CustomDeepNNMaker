@@ -4,8 +4,8 @@
 #ifndef __GRAVISBELL_I_OUTPUT_LAYER_H__
 #define __GRAVISBELL_I_OUTPUT_LAYER_H__
 
-#include"Common/ErrorCode.h"
-#include"Common/IODataStruct.h"
+#include"../../Common/ErrorCode.h"
+#include"../../Common/IODataStruct.h"
 
 #include"../ILayerBase.h"
 

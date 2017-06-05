@@ -5,12 +5,14 @@
 //==================================
 #include"stdafx.h"
 
-#include"NeuralNetworkLayer.h"
+#include"Utility/NeuralNetworkLayer.h"
 #include"Layer/IO/ISingleInputLayerData.h"
 #include"Layer/IO/ISingleOutputLayerData.h"
+#include"Library/NeuralNetwork/LayerDLLManager/LayerDLLManager.h"
 
 #include<boost/uuid/uuid_generators.hpp>
 #include<boost/foreach.hpp>
+
 
 namespace Gravisbell {
 namespace Utility {
