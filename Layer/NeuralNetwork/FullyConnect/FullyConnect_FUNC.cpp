@@ -10,7 +10,7 @@
 #include<string>
 #include<map>
 
-#include<Library/SettingData/Standard/SettingData.h>
+#include<Library/SettingData/Standard.h>
 
 #include"FullyConnect_FUNC.hpp"
 

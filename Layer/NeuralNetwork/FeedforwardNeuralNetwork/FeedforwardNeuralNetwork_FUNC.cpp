@@ -11,7 +11,7 @@
 #include<string>
 #include<map>
 
-#include<Library/SettingData/Standard/SettingData.h>
+#include<Library/SettingData/Standard.h>
 
 #include"FeedforwardNeuralNetwork_FUNC.hpp"
 

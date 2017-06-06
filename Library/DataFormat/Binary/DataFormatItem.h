@@ -11,7 +11,7 @@
 #include<set>
 #include<map>
 
-#include"DataFormat.h"
+#include"Library/DataFormat/Binary.h"
 
 
 namespace Gravisbell {

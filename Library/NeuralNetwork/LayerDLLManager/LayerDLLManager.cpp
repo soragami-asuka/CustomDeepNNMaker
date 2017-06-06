@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "Layer/NeuralNetwork/NNlayerFunction.h"
-#include "LayerDLLManager.h"
+#include "Library/NeuralNetwork/LayerDLLManager.h"
 
 #include<string>
 #include<vector>

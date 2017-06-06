@@ -13,7 +13,7 @@
 #include"../../Common/StringUtility/StringUtility.h"
 #include<Layer/Connect/ILayerConnectData.h>
 
-#include"XMLParser.h"
+#include"Library/NeuralNetwork/NetworkParserXML.h"
 
 using namespace StringUtility;
 

@@ -3,8 +3,8 @@
 //==================================
 #include "stdafx.h"
 
-#include"SettingData.h"
-#include"IItemEx_Enum.h"
+#include"Library/SettingData/Standard.h"
+#include"SettingData/Standard/IDataEx.h"
 #include"ItemBase.h"
 
 #include<string>

@@ -12,7 +12,7 @@
 #include"Common/VersionCode.h"
 #include"Common/Guiddef.h"
 
-#include"Library/SettingData/Standard/SettingData.h"
+#include"Library/SettingData/Standard.h"
 
 namespace Gravisbell {
 namespace NeuralNetwork {

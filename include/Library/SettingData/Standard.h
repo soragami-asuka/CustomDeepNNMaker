@@ -13,8 +13,8 @@
 #include"Common/VersionCode.h"
 #include"SettingData/Standard/IData.h"
 
-#include"IDataEx.h"
-#include"IItemEx_Enum.h"
+#include"../../SettingData/Standard/IDataEx.h"
+#include"../../SettingData/Standard/IItemEx_Enum.h"
 
 namespace Gravisbell {
 namespace SettingData {

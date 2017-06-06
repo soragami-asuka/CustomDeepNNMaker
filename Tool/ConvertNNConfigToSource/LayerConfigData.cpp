@@ -1233,7 +1233,7 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"#include<string>\n");
 		fwprintf(fp, L"#include<map>\n");
 		fwprintf(fp, L"\n");
-		fwprintf(fp, L"#include<Library/SettingData/Standard/SettingData.h>\n");
+		fwprintf(fp, L"#include<Library/SettingData/Standard.h>\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"#include\"%ls\"\n", funcHeaderFilePath.filename().wstring().c_str());
 		fwprintf(fp, L"\n");

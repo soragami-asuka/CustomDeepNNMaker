@@ -3,7 +3,7 @@
 //==================================
 #include "stdafx.h"
 
-#include"SettingData.h"
+#include"Library/SettingData/Standard.h"
 #include"ItemBase.h"
 
 #include<string>

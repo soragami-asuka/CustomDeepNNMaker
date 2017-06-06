@@ -20,9 +20,9 @@
 #include<boost/uuid/uuid_generators.hpp>
 
 
-#include"Library/DataFormat/DataFormatStringArray/DataFormat.h"
-#include"Library/NeuralNetwork/LayerDLLManager/LayerDLLManager.h"
-#include"Library/Common/BatchDataNoListGenerator/BatchDataNoListGenerator.h"
+#include"Library/DataFormat/StringArray.h"
+#include"Library/NeuralNetwork/LayerDLLManager.h"
+#include"Library/Common/BatchDataNoListGenerator.h"
 #include"Layer/IOData/IODataLayer/IODataLayer.h"
 #include"Layer/Connect/ILayerConnectData.h"
 #include"Layer/NeuralNetwork/INeuralNetwork.h"

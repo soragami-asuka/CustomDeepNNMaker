@@ -5,7 +5,7 @@
 
 #include<map>
 
-#include"LayerDataManager.h"
+#include"Library/NeuralNetwork/LayerDataManager.h"
 
 
 namespace Gravisbell {

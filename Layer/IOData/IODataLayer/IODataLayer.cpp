@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "IODataLayer.h"
 #include "Common/VersionCode.h"
-#include "Library/SettingData/Standard/SettingData.h"
+#include "Library/SettingData/Standard.h"
 
 #include<vector>
 #include<list>

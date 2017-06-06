@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "BatchDataNoListGenerator.h"
+#include "Library/Common/BatchDataNoListGenerator.h"
 
 #include<vector>
 #include<algorithm>

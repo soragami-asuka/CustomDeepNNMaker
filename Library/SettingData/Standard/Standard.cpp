@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 
-#include"SettingData.h"
+#include"Library/SettingData/Standard.h"
 
 #include"Common/VersionCode.h"
 #include"Common/Guiddef.h"
