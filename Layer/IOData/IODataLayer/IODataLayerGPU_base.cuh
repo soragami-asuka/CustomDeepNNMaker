@@ -2,7 +2,7 @@
 // 入出力データを管理するクラス
 // GPU制御
 //===================================
-#include "IODataLayer.h"
+#include "Library/Layer/IOData/IODataLayer.h"
 
 
 #include<vector>

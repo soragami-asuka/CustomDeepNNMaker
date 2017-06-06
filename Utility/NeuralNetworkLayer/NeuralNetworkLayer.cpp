@@ -20,12 +20,12 @@ namespace NeuralNetworkLayer {
 
 
 /** レイヤーDLL管理クラスの作成 */
-Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManagerCPU(const boost::filesystem::wpath& libraryDirPath)
+Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManagerCPU(const wchar_t i_libraryDirPath[])
 {
 	// DLL管理クラスを作成
 	Layer::NeuralNetwork::ILayerDLLManager* pDLLManager = Layer::NeuralNetwork::CreateLayerDLLManagerCPU();
 
-	BOOST_FOREACH(const boost::filesystem::wpath& path, std::make_pair(boost::filesystem::directory_iterator(libraryDirPath),
+	BOOST_FOREACH(const boost::filesystem::wpath& path, std::make_pair(boost::filesystem::directory_iterator(i_libraryDirPath),
                                                     boost::filesystem::directory_iterator()))
 	{
 		if(path.stem().wstring().find(L"Gravisbell.Layer.NeuralNetwork.") == 0 && path.extension().wstring()==L".dll")
@@ -35,12 +35,12 @@ Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManagerCPU(const boost::fi
     }
 	return pDLLManager;
 }
-Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManagerGPU(const boost::filesystem::wpath& libraryDirPath)
+Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManagerGPU(const wchar_t i_libraryDirPath[])
 {
 	// DLL管理クラスを作成
 	Layer::NeuralNetwork::ILayerDLLManager* pDLLManager = Layer::NeuralNetwork::CreateLayerDLLManagerGPU();
 
-	BOOST_FOREACH(const boost::filesystem::wpath& path, std::make_pair(boost::filesystem::directory_iterator(libraryDirPath),
+	BOOST_FOREACH(const boost::filesystem::wpath& path, std::make_pair(boost::filesystem::directory_iterator(i_libraryDirPath),
                                                     boost::filesystem::directory_iterator()))
 	{
 		if(path.stem().wstring().find(L"Gravisbell.Layer.NeuralNetwork.") == 0 && path.extension().wstring()==L".dll")
@@ -446,8 +446,10 @@ Gravisbell::ErrorCode AddLayerToNetworkLast(
 
 
 /** ニューラルネットワークをバイナリファイルに保存する */
-Gravisbell::ErrorCode WriteNetworkToBinaryFile(const Layer::ILayerData& neuralNetwork, const boost::filesystem::path& filePath)
+Gravisbell::ErrorCode WriteNetworkToBinaryFile(const Layer::ILayerData& neuralNetwork, const wchar_t i_filePath[])
 {
+	boost::filesystem::path filePath = i_filePath;
+
 	// バッファを用意する
 	std::vector<BYTE> lpBuffer;
 	S32 writeByteCount = 0;
@@ -480,8 +482,10 @@ Gravisbell::ErrorCode WriteNetworkToBinaryFile(const Layer::ILayerData& neuralNe
 	return ErrorCode::ERROR_CODE_NONE;
 }
 /** ニューラルネットワークをバイナリファイルから読み込むする */
-Gravisbell::ErrorCode ReadNetworkFromBinaryFile(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::ILayerData** ppNeuralNetwork, const boost::filesystem::path& filePath)
+Gravisbell::ErrorCode ReadNetworkFromBinaryFile(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::ILayerData** ppNeuralNetwork, const wchar_t i_filePath[])
 {
+	boost::filesystem::path filePath = i_filePath;
+
 	std::vector<BYTE> lpBuffer;
 	S32 readByteCount = 0;
 

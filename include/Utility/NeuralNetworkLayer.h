@@ -28,9 +28,9 @@ namespace NeuralNetworkLayer {
 
 	
 	/** レイヤーDLL管理クラスの作成(CPU用) */
-	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManagerCPU(const boost::filesystem::wpath& libraryDirPath);
+	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManagerCPU(const wchar_t i_libraryDirPath[]);
 	/** レイヤーDLL管理クラスの作成(GPU用) */
-	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManagerGPU(const boost::filesystem::wpath& libraryDirPath);
+	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManagerGPU(const wchar_t i_libraryDirPath[]);
 
 	//====================================
 	// レイヤーデータを作成
@@ -167,9 +167,9 @@ namespace NeuralNetworkLayer {
 
 
 	/** ニューラルネットワークをバイナリファイルに保存する */
-	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API Gravisbell::ErrorCode WriteNetworkToBinaryFile(const Layer::ILayerData& neuralNetwork, const boost::filesystem::path& filePath);
+	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API Gravisbell::ErrorCode WriteNetworkToBinaryFile(const Layer::ILayerData& neuralNetwork, const wchar_t i_filePath[]);
 	/** ニューラルネットワークをバイナリファイルから読み込むする */
-	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API Gravisbell::ErrorCode ReadNetworkFromBinaryFile(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::ILayerData** ppNeuralNetwork, const boost::filesystem::path& filePath);
+	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API Gravisbell::ErrorCode ReadNetworkFromBinaryFile(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::ILayerData** ppNeuralNetwork, const wchar_t i_filePath[]);
 
 
 }	// NeuralNetworkLayer

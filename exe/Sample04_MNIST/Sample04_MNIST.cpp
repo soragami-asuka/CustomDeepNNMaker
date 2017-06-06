@@ -13,7 +13,7 @@
 #include"Library/NeuralNetwork/LayerDLLManager.h"
 #include"Library/NeuralNetwork/LayerDataManager.h"
 #include"Library/NeuralNetwork/NetworkParserXML.h"
-#include"Layer/IOData/IODataLayer/IODataLayer.h"
+#include"Library/Layer/IOData/IODataLayer.h"
 #include"Layer/Connect/ILayerConnectData.h"
 #include"Layer/NeuralNetwork/INeuralNetwork.h"
 #include"Utility/NeuralNetworkLayer.h"
@@ -120,7 +120,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 	// ファイルに保存する
-	Gravisbell::Utility::NeuralNetworkLayer::WriteNetworkToBinaryFile(*pNeuralNetworkData, "../../LayerData/test.bin");
+	Gravisbell::Utility::NeuralNetworkLayer::WriteNetworkToBinaryFile(*pNeuralNetworkData, L"../../LayerData/test.bin");
 	//// ファイルから読み込む
 	//delete pNeuralNetworkData;
 	//Gravisbell::Utility::NeuralNetworkLayer::ReadNetworkFromBinaryFile(*pLayerDLLManager, &pNeuralNetworkData, "test.bin");

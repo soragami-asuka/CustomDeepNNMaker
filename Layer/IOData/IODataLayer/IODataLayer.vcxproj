@@ -195,8 +195,8 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerDLL.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
+    <ClInclude Include="..\..\..\include\Library\Layer\IOData\IODataLayer.h" />
     <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h" />
-    <ClInclude Include="IODataLayer.h" />
     <ClInclude Include="IODataLayerGPU_base.cuh">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

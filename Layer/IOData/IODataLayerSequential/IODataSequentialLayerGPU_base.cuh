@@ -2,7 +2,7 @@
 // 入出力データを管理するクラス
 // GPU制御
 //===================================
-#include "IODataSequentialLayer.h"
+#include "Library/Layer/IOData/IODataSequentialLayer.h"
 
 
 #include<vector>
