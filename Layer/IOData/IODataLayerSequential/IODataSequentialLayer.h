@@ -2,11 +2,16 @@
 #define IODataSequentialLayer_API __declspec(dllexport)
 #else
 #define IODataSequentialLayer_API __declspec(dllimport)
+#ifndef GRAVISBELL_LIBRARY
+#pragma comment(lib, "Gravisbell.Layer.IOData.IODataSequentialLayer.lib")
+#endif
 #endif
 
 #include"Layer/IOData/IIODataSequentialLayer.h"
 #include"Common/Guiddef.h"
 #include"Common/VersionCode.h"
+
+
 
 namespace Gravisbell {
 namespace Layer {

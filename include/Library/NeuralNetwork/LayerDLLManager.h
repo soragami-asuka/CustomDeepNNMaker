@@ -8,12 +8,16 @@
 #define LayerDLLManager_API __declspec(dllexport)
 #else
 #define LayerDLLManager_API __declspec(dllimport)
+#ifndef GRAVISBELL_LIBRARY
+#pragma comment(lib, "Gravisbell.NeuralNetwork.LayerDLLManager.lib")
+#endif
 #endif
 
 #include"Common/ErrorCode.h"
 #include"Common/VersionCode.h"
 
 #include"Layer/NeuralNetwork/ILayerDLLManager.h"
+
 
 namespace Gravisbell {
 namespace Layer {

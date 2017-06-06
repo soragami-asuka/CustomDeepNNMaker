@@ -12,9 +12,13 @@
 #define GRAVISBELL_LIBRAY_API __declspec(dllexport)
 #else
 #define GRAVISBELL_LIBRAY_API __declspec(dllimport)
+#ifndef GRAVISBELL_LIBRARY
+#pragma comment(lib, "Gravisbell.DataFormat.Binary.lib")
+#endif
 #endif
 
 #include"DataFormat/Binary/IDataFormat.h"
+
 
 
 namespace Gravisbell {

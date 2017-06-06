@@ -5,6 +5,9 @@
 #define NetworkParserXML_API __declspec(dllexport)
 #else
 #define NetworkParserXML_API __declspec(dllimport)
+#ifndef GRAVISBELL_LIBRARY
+#pragma comment(lib, "Gravisbell.NeuralNetwork.NetworkParserXML.lib")
+#endif
 #endif
 
 #include"Common/ErrorCode.h"
@@ -14,6 +17,7 @@
 #include"Layer/NeuralNetwork/ILayerDataManager.h"
 #include<Layer/IO/ISingleInputLayerData.h>
 #include<Layer/IO/ISingleOutputLayerData.h>
+
 
 namespace Gravisbell {
 namespace Layer {

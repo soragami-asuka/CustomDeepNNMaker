@@ -5,6 +5,9 @@
 #define LayerDataManager_API __declspec(dllexport)
 #else
 #define LayerDataManager_API __declspec(dllimport)
+#ifndef GRAVISBELL_LIBRARY
+#pragma comment(lib, "Gravisbell.NeuralNetwork.LayerDataManager.lib")
+#endif
 #endif
 
 #include"Common/ErrorCode.h"

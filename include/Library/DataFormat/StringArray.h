@@ -12,9 +12,13 @@
 #define GRAVISBELL_LIBRAY_API __declspec(dllexport)
 #else
 #define GRAVISBELL_LIBRAY_API __declspec(dllimport)
+#ifndef GRAVISBELL_LIBRARY
+#pragma comment(lib, "Gravisbell.DataFormat.StringArray.lib")
+#endif
 #endif
 
 #include"DataFormat/StringArray/IDataFormat.h"
+
 
 
 namespace Gravisbell {

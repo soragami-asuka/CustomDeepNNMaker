@@ -8,6 +8,9 @@
 #define GRAVISBELL_SETTINGDATA_API __declspec(dllexport)
 #else
 #define GRAVISBELL_SETTINGDATA_API __declspec(dllimport)
+#ifndef GRAVISBELL_LIBRARY
+#pragma comment(lib, "Gravisbell.SettingData.Standard.lib")
+#endif
 #endif
 
 #include"Common/VersionCode.h"
@@ -15,6 +18,7 @@
 
 #include"../../SettingData/Standard/IDataEx.h"
 #include"../../SettingData/Standard/IItemEx_Enum.h"
+
 
 namespace Gravisbell {
 namespace SettingData {
