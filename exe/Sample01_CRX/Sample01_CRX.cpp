@@ -256,7 +256,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 
 		// äwèK
-		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkSample, pTeachInputLayer, pTeachOutputLayer, pSampleInputLayer, pSampleOutputLayer, 32, 100) != ErrorCode::ERROR_CODE_NONE)
+		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkSample, pTeachInputLayer, pTeachOutputLayer, pSampleInputLayer, pSampleOutputLayer, 32, 1) != ErrorCode::ERROR_CODE_NONE)
 		{
 			delete pNeuralNetworkSample;
 			delete pNeuralNetworkLearn;

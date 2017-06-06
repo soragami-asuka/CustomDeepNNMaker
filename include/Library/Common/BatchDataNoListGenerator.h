@@ -3,11 +3,11 @@
 #else
 #define BatchDataNoListGenerator_API __declspec(dllimport)
 #ifndef GRAVISBELL_LIBRARY
-#pragma comment(lib, "Gravisbell.Layer.NeuralNetwork.BatchNormalization.lib")
+#pragma comment(lib, "Gravisbell.Common.BatchDataNoListGenerator.lib")
 #endif
 #endif
 
-#include"Common/IBatchDataNoListGenerator.h"
+#include"../../Common/IBatchDataNoListGenerator.h"
 
 
 
