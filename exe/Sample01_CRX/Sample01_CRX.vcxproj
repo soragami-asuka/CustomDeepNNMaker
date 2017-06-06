@@ -199,6 +199,9 @@
     <ProjectReference Include="..\..\Library\DataFormat\StringArray\StringArray.vcxproj">
       <Project>{a08b9691-cb48-4671-a5cb-c70b3fbb175d}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\Library\NeuralNetwork\LayerDataManager\LayerDataManager.vcxproj">
+      <Project>{0d56f731-5409-4b4c-8a69-d74e3ac68cda}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\Library\NeuralNetwork\LayerDLLManager\LayerDLLManager.vcxproj">
       <Project>{ac9b4528-ab0b-4549-a844-cfdc8837a7c6}</Project>
     </ProjectReference>
