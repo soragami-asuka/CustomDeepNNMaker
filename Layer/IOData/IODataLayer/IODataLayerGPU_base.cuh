@@ -42,7 +42,6 @@ namespace IOData {
 		thrust::device_vector<F32>	lpDInputBuffer;	/**< 入力誤差バッファ */
 
 		U32 calcErrorCount;	/**< 誤差計算を実行した回数 */
-		thrust::device_vector<F32>	lpErrorValue_min;	/**< 最小誤差 */
 		thrust::device_vector<F32>	lpErrorValue_max;	/**< 最大誤差 */
 		thrust::device_vector<F32>	lpErrorValue_ave;	/**< 平均誤差 */
 		thrust::device_vector<F32>	lpErrorValue_ave2;	/**< 平均二乗誤差 */
@@ -166,7 +165,7 @@ namespace IOData {
 			@param	o_max	最大誤差.
 			@param	o_ave	平均誤差.
 			@param	o_ave2	平均二乗誤差. */
-		Gravisbell::ErrorCode GetCalculateErrorValue(F32& o_min, F32& o_max, F32& o_ave, F32& o_ave2, F32& o_crossEntropy);
+		Gravisbell::ErrorCode GetCalculateErrorValue(F32& o_max, F32& o_ave, F32& o_ave2, F32& o_crossEntropy);
 
 		/** 詳細な誤差の値を取得する.
 			各入出力の値毎に誤差を取る.
@@ -176,7 +175,7 @@ namespace IOData {
 			@param	o_lpMax		最大誤差.
 			@param	o_lpAve		平均誤差.
 			@param	o_lpAve2	平均二乗誤差. */
-		Gravisbell::ErrorCode GetCalculateErrorValueDetail(F32 o_lpMin[], F32 o_lpMax[], F32 o_lpAve[], F32 o_lpAve2[]);
+		Gravisbell::ErrorCode GetCalculateErrorValueDetail(F32 o_lpMax[], F32 o_lpAve[], F32 o_lpAve2[]);
 
 
 	public:

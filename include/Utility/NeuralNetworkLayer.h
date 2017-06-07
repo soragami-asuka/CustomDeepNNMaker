@@ -74,7 +74,7 @@ namespace NeuralNetworkLayer {
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 	Layer::ILayerData* CreateActivationLayer(
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		const IODataStruct& inputDataStruct, const std::wstring activationType);
+		const IODataStruct& inputDataStruct, const wchar_t activationType[]);
 
 	/** ドロップアウトレイヤー.
 		@param	layerDLLManager		レイヤーDLL管理クラス.

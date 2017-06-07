@@ -172,7 +172,7 @@ Layer::ILayerData* CreateFullyConnectLayer(
 }
 Layer::ILayerData* CreateActivationLayer(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-	const IODataStruct& inputDataStruct, const std::wstring activationType)
+	const IODataStruct& inputDataStruct, const wchar_t activationType[])
 {
 	const Gravisbell::GUID TYPE_CODE(0x99904134, 0x83b7, 0x4502, 0xa0, 0xca, 0x72, 0x8a, 0x2c, 0x9d, 0x80, 0xc7);
 
@@ -189,7 +189,7 @@ Layer::ILayerData* CreateActivationLayer(
 	// Šˆ«‰»ŠÖ”í•Ê
 	{
 		SettingData::Standard::IItem_Enum* pItem = dynamic_cast<SettingData::Standard::IItem_Enum*>(pConfig->GetItemByID(L"ActivationType"));
-		pItem->SetValue(activationType.c_str());
+		pItem->SetValue(activationType);
 	}
 
 	// ƒŒƒCƒ„[‚Ìì¬

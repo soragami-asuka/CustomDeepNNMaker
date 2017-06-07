@@ -480,10 +480,10 @@ Gravisbell::ErrorCode LearnNeuralNetwork(
 
 		// 誤差表示
 		{
-			F32 errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy;
-			pTeachLayer->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy);
+			F32 errorMax, errorAve, errorAve2, errorCrossEntoropy;
+			pTeachLayer->GetCalculateErrorValue(errorMax, errorAve, errorAve2, errorCrossEntoropy);
 //			printf("min=%.3f, max=%.3f, ave=%.3f, ave2=%.3f\n", errorMin, errorMax, errorAve, errorAve2);
-			printf("%.3f,%.3f,%.3f,%.3f,%.3f\n", errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy); 
+			printf("%.3f,%.3f,%.3f,%.3f\n", errorMax, errorAve, errorAve2, errorCrossEntoropy); 
 		}
 	}
 
@@ -535,9 +535,9 @@ Gravisbell::ErrorCode CalculateSampleError(
 	// 誤差表示
 	printf("\nサンプル誤差\n");
 	{
-		F32 errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy;
-		pTeachLayer->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy);
-		printf("min=%.3f, max=%.3f, ave=%.3f, ave2=%.3f\n", errorMin, errorMax, errorAve, errorAve2);
+		F32 errorMax, errorAve, errorAve2, errorCrossEntoropy;
+		pTeachLayer->GetCalculateErrorValue(errorMax, errorAve, errorAve2, errorCrossEntoropy);
+		printf("max=%.3f, ave=%.3f, ave2=%.3f\n", errorMax, errorAve, errorAve2);
 	}
 
 	return ErrorCode::ERROR_CODE_NONE;
@@ -745,15 +745,15 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 
 		// 誤差表示
 		{
-			F32 errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy;
-			pTeachOutputLayer->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy);
+			F32 errorMax, errorAve, errorAve2, errorCrossEntoropy;
+			pTeachOutputLayer->GetCalculateErrorValue(errorMax, errorAve, errorAve2, errorCrossEntoropy);
 //			printf("学習：max=%.3f, ave=%.3f, ave2=%.3f, entropy=%.3f", errorMax, errorAve, errorAve2, errorCrossEntoropy);
 			printf("%.3f,%.3f,%.3f,%.3f,",  errorMax, errorAve2, errorCrossEntoropy, (F32)correctCount_learn / (pBatchDataNoListGenerator->GetBatchDataNoListCount() * BATCH_SIZE)); 
 		}
 //		printf(" : ");
 		{
-			F32 errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy;
-			pSampleOutputLayer->GetCalculateErrorValue(errorMin, errorMax, errorAve, errorAve2, errorCrossEntoropy);
+			F32 errorMax, errorAve, errorAve2, errorCrossEntoropy;
+			pSampleOutputLayer->GetCalculateErrorValue(errorMax, errorAve, errorAve2, errorCrossEntoropy);
 //			printf("実行：max=%.3f, ave=%.3f, ave2=%.3f, entropy=%.3f", errorMax, errorAve, errorAve2, errorCrossEntoropy);
 			printf("%.3f,%.3f,%.3f,%.3f", errorMax, errorAve2, errorCrossEntoropy, (F32)correctCount_sample / pSampleInputLayer->GetDataCount()); 
 		}

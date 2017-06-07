@@ -317,11 +317,8 @@ namespace NeuralNetwork {
 		this->learnCount = 0;
 
 		// ‰‰Z—p‚Ì•½‹Ï.•ªU‚ğ‰Šú‰»
-		for(U32 ch=0; ch<this->layerData.inputDataStruct.ch; ch++)
-		{
-			this->layerData.lpMean[ch] = 0.0f;
-			this->layerData.lpVariance[ch] = 0.0f;
-		}
+		cudaMemset(thrust::raw_pointer_cast(&this->layerData.lpMean[0]),	 0, sizeof(F32)*this->layerData.inputDataStruct.ch);
+		cudaMemset(thrust::raw_pointer_cast(&this->layerData.lpVariance[0]), 0, sizeof(F32)*this->layerData.inputDataStruct.ch);
 
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}

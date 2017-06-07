@@ -23,7 +23,7 @@ using namespace Gravisbell;
 namespace
 {
 	/** ベクトルの要素同士の掛け算. */
-	__global__ void cuda_func_calculateError(const F32* i_lpOutputBuffer, const F32* i_lpTeachBuffer, F32* o_lpErrorMin, F32* o_lpErrorMax, F32* o_lpErrorAve, F32* o_lpErrorAve2, F32* o_lpErrorCrossEntropy, U32 i_bachNum, U32 i_bufferSize)
+	__global__ void cuda_func_calculateError(const F32* i_lpOutputBuffer, const F32* i_lpTeachBuffer, F32* o_lpErrorMax, F32* o_lpErrorAve, F32* o_lpErrorAve2, F32* o_lpErrorCrossEntropy, U32 i_bachNum, U32 i_bufferSize)
 	{
 		const U32 inputNum = blockIdx.x * BLOCK_SIZE + threadIdx.x;
 		if(inputNum >= i_bufferSize)	// 分岐するが末尾のwarpだけなので、処理速度に影響はないはず...
@@ -43,7 +43,6 @@ namespace
 				 );
 
 		// 誤差を保存
-		o_lpErrorMin[inputNum]  = min(o_lpErrorMin[inputNum], error_abs);
 		o_lpErrorMax[inputNum]  = max(o_lpErrorMax[inputNum], error_abs);
 		o_lpErrorAve[inputNum]  += error_abs;
 		o_lpErrorAve2[inputNum] += error_abs * error_abs;
@@ -166,7 +165,6 @@ namespace IOData {
 		this->lpOutputBuffer.resize(batchSize * this->GetBufferCount());
 
 		// 誤差計算用のバッファを初期化
-		this->lpErrorValue_min.resize(this->GetBufferCount());
 		this->lpErrorValue_max.resize(this->GetBufferCount());
 		this->lpErrorValue_ave.resize(this->GetBufferCount());
 		this->lpErrorValue_ave2.resize(this->GetBufferCount());
@@ -187,11 +185,10 @@ namespace IOData {
 	Gravisbell::ErrorCode IODataLayerGPU_base::PreProcessCalculateLoop()
 	{
 		this->calcErrorCount = 0;
-		this->lpErrorValue_min.assign(this->GetBufferCount(), FLT_MAX);
-		this->lpErrorValue_max.assign(this->GetBufferCount(), 0.0f);
-		this->lpErrorValue_ave.assign(this->GetBufferCount(), 0.0f);
-		this->lpErrorValue_ave2.assign(this->GetBufferCount(), 0.0f);
-		this->lpErrorValue_crossEntropy.assign(this->GetBufferCount(), 0.0f);
+		cudaMemset(thrust::raw_pointer_cast(&this->lpErrorValue_max[0]),			0, sizeof(F32)*this->lpErrorValue_max.size());
+		cudaMemset(thrust::raw_pointer_cast(&this->lpErrorValue_ave[0]),			0, sizeof(F32)*this->lpErrorValue_max.size());
+		cudaMemset(thrust::raw_pointer_cast(&this->lpErrorValue_ave2[0]),			0, sizeof(F32)*this->lpErrorValue_max.size());
+		cudaMemset(thrust::raw_pointer_cast(&this->lpErrorValue_crossEntropy[0]),	0, sizeof(F32)*this->lpErrorValue_max.size());
 
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
@@ -244,7 +241,6 @@ namespace IOData {
 			cuda_func_calculateError<<<grid, block>>>(
 				i_lppInputBuffer,
 				thrust::raw_pointer_cast(&this->lpOutputBuffer[0]),
-				thrust::raw_pointer_cast(&this->lpErrorValue_min[0]),
 				thrust::raw_pointer_cast(&this->lpErrorValue_max[0]),
 				thrust::raw_pointer_cast(&this->lpErrorValue_ave[0]),
 				thrust::raw_pointer_cast(&this->lpErrorValue_ave2[0]),
@@ -265,9 +261,8 @@ namespace IOData {
 		@param	o_max	最大誤差.
 		@param	o_ave	平均誤差.
 		@param	o_ave2	平均二乗誤差. */
-	ErrorCode IODataLayerGPU_base::GetCalculateErrorValue(F32& o_min, F32& o_max, F32& o_ave, F32& o_ave2, F32& o_crossEntropy)
+	ErrorCode IODataLayerGPU_base::GetCalculateErrorValue(F32& o_max, F32& o_ave, F32& o_ave2, F32& o_crossEntropy)
 	{
-		o_min  = FLT_MAX;
 		o_max  = 0.0f;
 		o_ave  = 0.0f;
 		o_ave2 = 0.0f;
@@ -275,13 +270,11 @@ namespace IOData {
 
 		for(U32 inputNum=0; inputNum<this->GetBufferCount(); inputNum++)
 		{
-			F32 errorValue_min  = this->lpErrorValue_min[inputNum];
 			F32 errorValue_max  = this->lpErrorValue_max[inputNum];
 			F32 errorValue_ave  = this->lpErrorValue_ave[inputNum];
 			F32 errorValue_ave2 = this->lpErrorValue_ave2[inputNum];
 			F32 errorValue_crossEntropy = this->lpErrorValue_crossEntropy[inputNum];
 
-			o_min   = min(o_min, errorValue_min);
 			o_max   = max(o_max, errorValue_max);
 			o_ave  += errorValue_ave;
 			o_ave2 += errorValue_ave2;
@@ -303,11 +296,10 @@ namespace IOData {
 		@param	o_lpMax		最大誤差.
 		@param	o_lpAve		平均誤差.
 		@param	o_lpAve2	平均二乗誤差. */
-	ErrorCode IODataLayerGPU_base::GetCalculateErrorValueDetail(F32 o_lpMin[], F32 o_lpMax[], F32 o_lpAve[], F32 o_lpAve2[])
+	ErrorCode IODataLayerGPU_base::GetCalculateErrorValueDetail(F32 o_lpMax[], F32 o_lpAve[], F32 o_lpAve2[])
 	{
 		for(U32 inputNum=0; inputNum<this->GetBufferCount(); inputNum++)
 		{
-			o_lpMin[inputNum]   = this->lpErrorValue_min[inputNum];
 			o_lpMax[inputNum]   = this->lpErrorValue_max[inputNum];
 			o_lpAve[inputNum]  += this->lpErrorValue_ave[inputNum] / this->GetDataCount();
 			o_lpAve2[inputNum] += (F32)sqrt(this->lpErrorValue_ave2[inputNum] / this->GetDataCount());

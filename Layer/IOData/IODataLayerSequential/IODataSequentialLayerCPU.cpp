@@ -31,7 +31,6 @@ namespace IOData {
 		std::vector<F32*> lpBatchDInputBufferPointer;	/**< バッチ処理入力誤差差分の配列先導アドレスリスト */
 
 		U32 calcErrorCount;	/**< 誤差計算を実行した回数 */
-		std::vector<F32> lpErrorValue_min;	/**< 最小誤差 */
 		std::vector<F32> lpErrorValue_max;	/**< 最大誤差 */
 		std::vector<F32> lpErrorValue_ave;	/**< 平均誤差 */
 		std::vector<F32> lpErrorValue_ave2;	/**< 平均二乗誤差 */
@@ -200,7 +199,6 @@ namespace IOData {
 			}
 
 			// 誤差計算処理
-			this->lpErrorValue_min.resize(this->GetBufferCount());
 			this->lpErrorValue_max.resize(this->GetBufferCount());
 			this->lpErrorValue_ave.resize(this->GetBufferCount());
 			this->lpErrorValue_ave2.resize(this->GetBufferCount());
@@ -220,11 +218,10 @@ namespace IOData {
 		Gravisbell::ErrorCode PreProcessCalculateLoop()
 		{
 			this->calcErrorCount = 0;
-			this->lpErrorValue_min.assign(this->lpErrorValue_min.size(),  FLT_MAX);
-			this->lpErrorValue_max.assign(this->lpErrorValue_max.size(),  0.0f);
-			this->lpErrorValue_ave.assign(this->lpErrorValue_ave.size(),  0.0f);
-			this->lpErrorValue_ave2.assign(this->lpErrorValue_ave2.size(), 0.0f);
-			this->lpErrorValue_crossEntropy.assign(this->lpErrorValue_crossEntropy.size(), 0.0f);
+			memset(&this->lpErrorValue_max[0], 0, sizeof(F32)*this->lpErrorValue_max.size());
+			memset(&this->lpErrorValue_ave[0], 0, sizeof(F32)*this->lpErrorValue_ave.size());
+			memset(&this->lpErrorValue_ave2[0], 0, sizeof(F32)*this->lpErrorValue_ave2.size());
+			memset(&this->lpErrorValue_crossEntropy[0], 0, sizeof(F32)*this->lpErrorValue_crossEntropy.size());
 
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
@@ -269,7 +266,6 @@ namespace IOData {
 						 );
 
 					// 誤差を保存
-					this->lpErrorValue_min[inputNum]  = min(this->lpErrorValue_min[inputNum], error_abs);
 					this->lpErrorValue_max[inputNum]  = max(this->lpErrorValue_max[inputNum], error_abs);
 					this->lpErrorValue_ave[inputNum]  += error_abs;
 					this->lpErrorValue_ave2[inputNum] += error_abs * error_abs;
@@ -288,9 +284,8 @@ namespace IOData {
 			@param	o_max	最大誤差.
 			@param	o_ave	平均誤差.
 			@param	o_ave2	平均二乗誤差. */
-		ErrorCode GetCalculateErrorValue(F32& o_min, F32& o_max, F32& o_ave, F32& o_ave2, F32& o_crossEntropy)
+		ErrorCode GetCalculateErrorValue(F32& o_max, F32& o_ave, F32& o_ave2, F32& o_crossEntropy)
 		{
-			o_min  = FLT_MAX;
 			o_max  = 0.0f;
 			o_ave  = 0.0f;
 			o_ave2 = 0.0f;
@@ -298,7 +293,6 @@ namespace IOData {
 
 			for(U32 inputNum=0; inputNum<this->GetBufferCount(); inputNum++)
 			{
-				o_min   = min(o_min, this->lpErrorValue_min[inputNum]);
 				o_max   = max(o_max, this->lpErrorValue_max[inputNum]);
 				o_ave  += this->lpErrorValue_ave[inputNum];
 				o_ave2 += this->lpErrorValue_ave2[inputNum];
@@ -320,11 +314,10 @@ namespace IOData {
 			@param	o_lpMax		最大誤差.
 			@param	o_lpAve		平均誤差.
 			@param	o_lpAve2	平均二乗誤差. */
-		ErrorCode GetCalculateErrorValueDetail(F32 o_lpMin[], F32 o_lpMax[], F32 o_lpAve[], F32 o_lpAve2[])
+		ErrorCode GetCalculateErrorValueDetail(F32 o_lpMax[], F32 o_lpAve[], F32 o_lpAve2[])
 		{
 			for(U32 inputNum=0; inputNum<this->GetBufferCount(); inputNum++)
 			{
-				o_lpMin[inputNum]   = this->lpErrorValue_min[inputNum];
 				o_lpMax[inputNum]   = this->lpErrorValue_max[inputNum];
 				o_lpAve[inputNum]  += this->lpErrorValue_ave[inputNum] / this->GetDataCount();
 				o_lpAve2[inputNum] += (F32)sqrt(this->lpErrorValue_ave2[inputNum] / this->GetDataCount());
