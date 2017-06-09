@@ -60,6 +60,24 @@ namespace IOData {
 
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
+		/** データを追加する.
+			@param	lpData	データ一組の配列. [GetBufferSize()の戻り値]の要素数が必要. 0～255の値. 内部的には0.0～1.0に変換される. */
+		ErrorCode SetData(U32 i_dataNo, const BYTE lpData[])
+		{
+			if(lpData == NULL)
+				return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
+			if(i_dataNo > this->batchSize)
+				return ErrorCode::ERROR_CODE_COMMON_OUT_OF_ARRAYRANGE;
+
+			// コピー
+			//cudaMemcpy(
+			//	thrust::raw_pointer_cast(&this->lpOutputBuffer[i_dataNo * this->GetOutputBufferCount()]),
+			//	lpData,
+			//	sizeof(F32) * this->GetOutputBufferCount(),
+			//	cudaMemcpyHostToDevice);
+
+			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
+		}
 
 		/** データ数を取得する */
 		U32 GetDataCount()const

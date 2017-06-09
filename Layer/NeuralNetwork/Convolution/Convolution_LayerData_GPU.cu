@@ -51,9 +51,10 @@ namespace NeuralNetwork {
 
 
 		// 畳みこみ回数を計算
-		this->convolutionCount.x = (S32)ceilf((F32)((this->inputDataStruct.x + this->layerStructure.Padding.x*2 - (this->layerStructure.FilterSize.x - 1)) / this->layerStructure.Stride.x));
-		this->convolutionCount.y = (S32)ceilf((F32)((this->inputDataStruct.y + this->layerStructure.Padding.y*2 - (this->layerStructure.FilterSize.y - 1)) / this->layerStructure.Stride.y));
-		this->convolutionCount.z = (S32)ceilf((F32)((this->inputDataStruct.z + this->layerStructure.Padding.z*2 - (this->layerStructure.FilterSize.z - 1)) / this->layerStructure.Stride.z));
+		this->convolutionCountVec.x = (S32)ceilf((F32)((this->inputDataStruct.x + this->layerStructure.Padding.x*2 - (this->layerStructure.FilterSize.x - 1)) / this->layerStructure.Stride.x));
+		this->convolutionCountVec.y = (S32)ceilf((F32)((this->inputDataStruct.y + this->layerStructure.Padding.y*2 - (this->layerStructure.FilterSize.y - 1)) / this->layerStructure.Stride.y));
+		this->convolutionCountVec.z = (S32)ceilf((F32)((this->inputDataStruct.z + this->layerStructure.Padding.z*2 - (this->layerStructure.FilterSize.z - 1)) / this->layerStructure.Stride.z));
+		this->convolutionCount = this->convolutionCountVec.x * this->convolutionCountVec.y * this->convolutionCountVec.z;
 
 
 		// バッファを確保しつつ、初期値を設定
@@ -63,7 +64,8 @@ namespace NeuralNetwork {
 		thrust::host_vector<F32> lpTmpNeuron(this->lppNeuron_d.size());
 		thrust::host_vector<F32> lpTmpBias(this->lpBias_d.size());
 
-		float maxArea = sqrt(6.0f / (inputBufferCount + neuronCount));
+//		float maxArea = sqrt(6.0f / (this->GetInputBufferCount() + this->GetOutputBufferCount()));
+		float maxArea = sqrt(6.0f / (this->layerStructure.FilterSize.x*this->layerStructure.FilterSize.y*this->layerStructure.FilterSize.z  + this->layerStructure.Output_Channel));
 		for(U32 i=0; i<lpTmpNeuron.size(); i++)
 			lpTmpNeuron[i] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
 		for(U32 i=0; i<lpTmpBias.size(); i++)

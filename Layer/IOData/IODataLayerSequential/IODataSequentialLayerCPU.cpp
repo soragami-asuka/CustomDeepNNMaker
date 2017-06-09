@@ -128,6 +128,23 @@ namespace IOData {
 
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
+		/** データを追加する.
+			@param	lpData	データ一組の配列. [GetBufferSize()の戻り値]の要素数が必要. 0～255の値. 内部的には0.0～1.0に変換される. */
+		Gravisbell::ErrorCode SetData(U32 i_dataNo, const BYTE lpData[])
+		{
+			if(lpData == NULL)
+				return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
+			if(i_dataNo >= this->lpBatchDataPointer.size())
+				return ErrorCode::ERROR_CODE_COMMON_OUT_OF_ARRAYRANGE;
+
+			// コピー
+			U32 bufferCount = this->GetBufferCount();
+			for(U32 i=0; i<bufferCount; i++)
+				lpBatchDataPointer[i_dataNo][i] = (F32)lpData[i] / 0xFF;
+
+			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
+		}
+
 
 		/** データ数を取得する */
 		U32 GetDataCount()const

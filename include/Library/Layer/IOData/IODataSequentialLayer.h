@@ -58,19 +58,19 @@ extern IODataSequentialLayer_API Gravisbell::Layer::IOData::IIODataSequentialLay
 extern IODataSequentialLayer_API Gravisbell::Layer::IOData::IIODataSequentialLayer* CreateIODataSequentialLayerCPUwithGUID(Gravisbell::GUID guid, Gravisbell::IODataStruct ioDataStruct);
 
 
-//======================================
-// GPU処理
-// データをホストに確保
-//======================================
-/** 入力信号データレイヤーを作成する.GPU制御
-	@param ioDataStruct	入出力データ構造.
-	@return	入力信号データレイヤーのアドレス */
-extern IODataSequentialLayer_API Gravisbell::Layer::IOData::IIODataSequentialLayer* CreateIODataSequentialLayerGPU_host(Gravisbell::IODataStruct ioDataStruct);
-/** 入力信号データレイヤーを作成する.GPU制御
-	@param guid			レイヤーのGUID.
-	@param ioDataStruct	入出力データ構造.
-	@return	入力信号データレイヤーのアドレス */
-extern IODataSequentialLayer_API Gravisbell::Layer::IOData::IIODataSequentialLayer* CreateIODataSequentialLayerGPUwithGUID_host(Gravisbell::GUID guid, Gravisbell::IODataStruct ioDataStruct);
+////======================================
+//// GPU処理
+//// データをホストに確保
+////======================================
+///** 入力信号データレイヤーを作成する.GPU制御
+//	@param ioDataStruct	入出力データ構造.
+//	@return	入力信号データレイヤーのアドレス */
+//extern IODataSequentialLayer_API Gravisbell::Layer::IOData::IIODataSequentialLayer* CreateIODataSequentialLayerGPU_host(Gravisbell::IODataStruct ioDataStruct);
+///** 入力信号データレイヤーを作成する.GPU制御
+//	@param guid			レイヤーのGUID.
+//	@param ioDataStruct	入出力データ構造.
+//	@return	入力信号データレイヤーのアドレス */
+//extern IODataSequentialLayer_API Gravisbell::Layer::IOData::IIODataSequentialLayer* CreateIODataSequentialLayerGPUwithGUID_host(Gravisbell::GUID guid, Gravisbell::IODataStruct ioDataStruct);
 
 
 //======================================

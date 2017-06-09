@@ -142,9 +142,9 @@ namespace NeuralNetwork {
 	{
 		IODataStruct outputDataStruct;
 
-		outputDataStruct.x = this->convolutionCount.x;
-		outputDataStruct.y = this->convolutionCount.y;
-		outputDataStruct.z = this->convolutionCount.z;
+		outputDataStruct.x = this->convolutionCountVec.x;
+		outputDataStruct.y = this->convolutionCountVec.y;
+		outputDataStruct.z = this->convolutionCountVec.z;
 		outputDataStruct.ch = this->layerStructure.Output_Channel;
 
 		return outputDataStruct;

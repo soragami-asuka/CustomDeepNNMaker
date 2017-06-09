@@ -140,9 +140,9 @@ namespace NeuralNetwork {
 		}
 		
 		// パディング後の入力バッファを作成
-		this->paddingInputDataStruct.x  = this->layerData.convolutionCount.x + this->layerData.layerStructure.FilterSize.x - 1;
-		this->paddingInputDataStruct.y  = this->layerData.convolutionCount.y + this->layerData.layerStructure.FilterSize.y - 1;
-		this->paddingInputDataStruct.z  = this->layerData.convolutionCount.z + this->layerData.layerStructure.FilterSize.z - 1;
+		this->paddingInputDataStruct.x  = this->layerData.convolutionCountVec.x + this->layerData.layerStructure.FilterSize.x - 1;
+		this->paddingInputDataStruct.y  = this->layerData.convolutionCountVec.y + this->layerData.layerStructure.FilterSize.y - 1;
+		this->paddingInputDataStruct.z  = this->layerData.convolutionCountVec.z + this->layerData.layerStructure.FilterSize.z - 1;
 		this->paddingInputDataStruct.ch = this->layerData.inputDataStruct.ch;
 		this->lpPaddingInputBuffer.resize(this->batchSize);
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
@@ -238,13 +238,13 @@ namespace NeuralNetwork {
 		//{
 		//	for(U32 neuronNum=0; neuronNum<(U32)this->layerData.layerStructure.Output_Channel; neuronNum++)
 		//	{
-		//		for(S32 convZ=0; convZ<this->layerData.convolutionCount.z; convZ++)
+		//		for(S32 convZ=0; convZ<this->layerData.convolutionCountVec.z; convZ++)
 		//		{
-		//			for(S32 convY=0; convY<this->layerData.convolutionCount.y; convY++)
+		//			for(S32 convY=0; convY<this->layerData.convolutionCountVec.y; convY++)
 		//			{
-		//				for(S32 convX=0; convX<this->layerData.convolutionCount.x; convX++)
+		//				for(S32 convX=0; convX<this->layerData.convolutionCountVec.x; convX++)
 		//				{
-		//					U32 outputOffset = POSITION_TO_OFFSET_VECTOR(convX,convY,convZ,neuronNum, this->layerData.convolutionCount, this->layerData.layerStructure.Output_Channel);
+		//					U32 outputOffset = POSITION_TO_OFFSET_VECTOR(convX,convY,convZ,neuronNum, this->layerData.convolutionCountVec, this->layerData.layerStructure.Output_Channel);
 
 		//					// 一時保存用のバッファを作成
 		//					F32 tmp = 0.0f;
@@ -290,13 +290,13 @@ namespace NeuralNetwork {
 		{
 			for(U32 neuronNum=0; neuronNum<(U32)this->layerData.layerStructure.Output_Channel; neuronNum++)
 			{
-				for(S32 convZ=0; convZ<this->layerData.convolutionCount.z; convZ++)
+				for(S32 convZ=0; convZ<this->layerData.convolutionCountVec.z; convZ++)
 				{
-					for(S32 convY=0; convY<this->layerData.convolutionCount.y; convY++)
+					for(S32 convY=0; convY<this->layerData.convolutionCountVec.y; convY++)
 					{
-						for(S32 convX=0; convX<this->layerData.convolutionCount.x; convX++)
+						for(S32 convX=0; convX<this->layerData.convolutionCountVec.x; convX++)
 						{
-							U32 outputOffset = POSITION_TO_OFFSET_VECTOR(convX,convY,convZ,neuronNum, this->layerData.convolutionCount, this->layerData.layerStructure.Output_Channel);
+							U32 outputOffset = POSITION_TO_OFFSET_VECTOR(convX,convY,convZ,neuronNum, this->layerData.convolutionCountVec, this->layerData.layerStructure.Output_Channel);
 
 							// 一時保存用のバッファを作成
 							F32 tmp = 0.0f;
@@ -408,13 +408,13 @@ namespace NeuralNetwork {
 			// 入力誤差計算
 			for(S32 neuronNum=0; neuronNum<this->layerData.layerStructure.Output_Channel; neuronNum++)
 			{
-				for(S32 convZ=0; convZ<this->layerData.convolutionCount.z; convZ++)
+				for(S32 convZ=0; convZ<this->layerData.convolutionCountVec.z; convZ++)
 				{
-					for(S32 convY=0; convY<this->layerData.convolutionCount.y; convY++)
+					for(S32 convY=0; convY<this->layerData.convolutionCountVec.y; convY++)
 					{
-						for(S32 convX=0; convX<this->layerData.convolutionCount.x; convX++)
+						for(S32 convX=0; convX<this->layerData.convolutionCountVec.x; convX++)
 						{
-							U32 outputOffet = POSITION_TO_OFFSET_VECTOR(convX,convY,convZ,neuronNum, this->layerData.convolutionCount, this->layerData.layerStructure.Output_Channel);
+							U32 outputOffet = POSITION_TO_OFFSET_VECTOR(convX,convY,convZ,neuronNum, this->layerData.convolutionCountVec, this->layerData.layerStructure.Output_Channel);
 							F32 dOutput = this->m_lppDOutputBuffer[batchNum][outputOffet];
 
 							// フィルタを処理する

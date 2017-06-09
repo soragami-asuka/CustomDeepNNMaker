@@ -29,6 +29,9 @@ namespace IOData {
 		/** データを追加する.
 			@param	lpData	データ一組の配列. [GetBufferSize()の戻り値]の要素数が必要. */
 		virtual ErrorCode SetData(U32 dataNo, const float lpData[]) = 0;
+		/** データを追加する.
+			@param	lpData	データ一組の配列. [GetBufferSize()の戻り値]の要素数が必要. 0～255の値. 内部的には0.0～1.0に変換される. */
+		virtual ErrorCode SetData(U32 dataNo, const BYTE lpData[]) = 0;
 
 		/** 学習誤差を計算する.
 			@param i_lppInputBuffer	入力データバッファ. [GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要 */
