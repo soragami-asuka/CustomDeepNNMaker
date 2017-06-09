@@ -65,7 +65,7 @@ namespace NeuralNetwork {
 	{
 		if(this->lppOutputToLayer.empty())
 			return NULL;
-		return (*this->lppOutputToLayer.begin()).pLayer->GetDInputBufferByNum((*this->lppOutputToLayer.begin()).position);
+		return this->neuralNetwork.GetDInputBuffer();
 	}
 
 	/** レイヤーリストを作成する.
@@ -218,6 +218,20 @@ namespace NeuralNetwork {
 		this->ResetBypassLayer();
 
 		return ErrorCode::ERROR_CODE_NONE;
+	}
+
+	
+	/** レイヤーで使用する入力誤差バッファのIDを取得する
+		@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
+	ErrorCode LayerConnectInput::SetDInputBufferID(U32 i_inputNum, S32 i_DInputBufferID)
+	{
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+	/** レイヤーで使用する入力誤差バッファのIDを取得する
+		@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
+	S32 LayerConnectInput::GetDInputBufferID(U32 i_inputNum)const
+	{
+		return -1;
 	}
 
 

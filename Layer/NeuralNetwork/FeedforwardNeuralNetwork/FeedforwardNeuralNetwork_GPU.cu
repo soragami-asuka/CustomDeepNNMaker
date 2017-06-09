@@ -38,6 +38,46 @@ namespace NeuralNetwork {
 
 
 	//====================================
+	// 入力誤差バッファ関連
+	//====================================
+	/** 入力誤差バッファの総数を設定する */
+	ErrorCode FeedforwardNeuralNetwork_GPU::SetDInputBufferCount(U32 i_DInputBufferCount)
+	{
+		this->lpDInputBuffer.resize(i_DInputBufferCount);
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+
+	/** 入力誤差バッファのサイズを設定する */
+	ErrorCode FeedforwardNeuralNetwork_GPU::ResizeDInputBuffer(U32 i_DInputBufferNo, U32 i_bufferSize)
+	{
+		if(i_DInputBufferNo >= this->lpDInputBuffer.size())
+			ErrorCode::ERROR_CODE_COMMON_OUT_OF_ARRAYRANGE;
+
+		this->lpDInputBuffer[i_DInputBufferNo].resize(i_bufferSize);
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+
+	/** 入力誤差バッファを取得する */
+	BATCH_BUFFER_POINTER FeedforwardNeuralNetwork_GPU::GetDInputBuffer(U32 i_DInputBufferNo)
+	{
+		if(i_DInputBufferNo >= this->lpDInputBuffer.size())
+			return NULL;
+
+		return thrust::raw_pointer_cast(&this->lpDInputBuffer[i_DInputBufferNo][0]);
+	}
+	/** 入力誤差バッファを取得する */
+	CONST_BATCH_BUFFER_POINTER FeedforwardNeuralNetwork_GPU::GetDInputBuffer(U32 i_DInputBufferNo)const
+	{
+		if(i_DInputBufferNo >= this->lpDInputBuffer.size())
+			return NULL;
+
+		return thrust::raw_pointer_cast(&this->lpDInputBuffer[i_DInputBufferNo][0]);
+	}
+
+
+	//====================================
 	// 入出力バッファ関連
 	//====================================
 	/** 出力データバッファを取得する.

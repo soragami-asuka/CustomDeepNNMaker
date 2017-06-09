@@ -15,6 +15,7 @@ namespace NeuralNetwork {
 	/** コンストラクタ */
 	LayerConnectOutput::LayerConnectOutput(class FeedforwardNeuralNetwork_Base& neuralNetwork)
 		:	neuralNetwork	(neuralNetwork)
+		,	dInputBufferID	(INVALID_DINPUTBUFFER_ID)	/**< 入力誤差バッファID */
 	{
 	}
 	/** デストラクタ */
@@ -257,7 +258,6 @@ namespace NeuralNetwork {
 	//=======================================
 	// 接続関連
 	//=======================================
-
 	/** レイヤーの接続を解除 */
 	ErrorCode LayerConnectOutput::Disconnect(void)
 	{
@@ -267,6 +267,20 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
+	/** レイヤーで使用する入力誤差バッファのIDを取得する
+		@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
+	S32 LayerConnectOutput::GetDInputBufferID(U32 i_inputNum)const
+	{
+		return this->dInputBufferID;
+	}
+	/** レイヤーで使用する入力誤差バッファのIDを取得する
+		@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
+	ErrorCode LayerConnectOutput::SetDInputBufferID(U32 i_inputNum, S32 i_DInputBufferID)
+	{
+		this->dInputBufferID = i_DInputBufferID;
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
 
 
 	//=======================================

@@ -104,9 +104,6 @@ namespace NeuralNetwork {
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
-		// 入力差分バッファを作成
-		this->lpDInputBuffer_d.resize(this->batchSize * this->inputBufferCount);
-
 		// バイアス更新用のベクトルを作成
 		lpBiasUpdateVector_d.resize(this->batchSize);
 		{
@@ -260,12 +257,15 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode FullyConnect_GPU::Training(CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
+	ErrorCode FullyConnect_GPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
 	{
-		// 出力誤差バッファのアドレスを配列に格納
+		// 出力誤差バッファのアドレスを格納
 		this->m_lppDOutputBuffer_d = i_lpDOutputBufferPrev;
+		// 入力誤差バッファのアドレスを配列に格納
+		this->m_lpDInputBuffer_d = o_lppDInputBuffer;
 
 		// 入力誤差差分を計算
+		if(this->m_lpDInputBuffer_d)
 		{
 			F32 alpha = 1.0f;
 			F32 beta  = 0.0f;
@@ -283,7 +283,7 @@ namespace NeuralNetwork {
 				this->m_lppDOutputBuffer_d,									// 行列B
 				this->neuronCount,											// 行列Bの転置前の行数
 				&beta,
-				thrust::raw_pointer_cast(&this->lpDInputBuffer_d[0]),
+				this->m_lpDInputBuffer_d,
 				this->inputBufferCount);
 		}
 		
@@ -343,7 +343,7 @@ namespace NeuralNetwork {
 		@return	誤差差分配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER FullyConnect_GPU::GetDInputBuffer()const
 	{
-		return thrust::raw_pointer_cast(&this->lpDInputBuffer_d[0]);
+		return this->m_lpDInputBuffer_d;
 	}
 	/** 学習差分を取得する.
 		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */

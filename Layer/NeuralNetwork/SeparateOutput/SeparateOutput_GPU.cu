@@ -81,9 +81,6 @@ namespace NeuralNetwork {
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
-		// 入力差分バッファを作成
-		this->lpDInputBuffer.resize(this->batchSize * this->inputBufferCount);
-
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
@@ -172,23 +169,30 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode SeparateOutput_GPU::Training(CONST_BATCH_BUFFER_POINTER i_lppDOutputBufferPrev[])
+	ErrorCode SeparateOutput_GPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBufferPrev[])
 	{
-		// バッファ1つ目の出力誤差で上書き
-		cudaMemcpy(thrust::raw_pointer_cast(&this->lpDInputBuffer[0]), i_lppDOutputBufferPrev[0], sizeof(F32)*this->batchSize*this->outputBufferCount, cudaMemcpyDeviceToDevice);
+		// 入力誤差バッファのアドレスを格納
+		this->m_lpDInputBuffer_d = o_lppDInputBuffer;
 
-		// 加算
-		for(U32 outputLayerNum=1; outputLayerNum<(U32)this->layerData.layerStructure.separateCount; outputLayerNum++)
+		// 入力誤差計算
+		if(this->m_lpDInputBuffer_d)
 		{
-			F32 alpha = 1.0f;
+			// バッファ1つ目の出力誤差で上書き
+			cudaMemcpy(this->m_lpDInputBuffer_d, i_lppDOutputBufferPrev[0], sizeof(F32)*this->batchSize*this->outputBufferCount, cudaMemcpyDeviceToDevice);
 
-			cublasSaxpy_v2(
-				this->cublasHandle,
-				this->batchSize*this->outputBufferCount,
-				&alpha,
-				i_lppDOutputBufferPrev[outputLayerNum], 1,
-				thrust::raw_pointer_cast(&this->lpDInputBuffer[0]), 1);
+			// 加算
+			for(U32 outputLayerNum=1; outputLayerNum<(U32)this->layerData.layerStructure.separateCount; outputLayerNum++)
+			{
+				F32 alpha = 1.0f;
 
+				cublasSaxpy_v2(
+					this->cublasHandle,
+					this->batchSize*this->outputBufferCount,
+					&alpha,
+					i_lppDOutputBufferPrev[outputLayerNum], 1,
+					this->m_lpDInputBuffer_d, 1);
+
+			}
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
@@ -200,7 +204,7 @@ namespace NeuralNetwork {
 		@return	誤差差分配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER SeparateOutput_GPU::GetDInputBuffer()const
 	{
-		return thrust::raw_pointer_cast(&this->lpDInputBuffer[0]);
+		return this->m_lpDInputBuffer_d;
 	}
 	/** 学習差分を取得する.
 		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */

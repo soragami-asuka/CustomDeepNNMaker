@@ -84,14 +84,8 @@ namespace NeuralNetwork {
 
 		// 出力誤差バッファ受け取り用のアドレス配列を作成する
 		this->m_lppDOutputBuffer.resize(batchSize);
-
-		// 入力差分バッファを作成
-		this->lpDInputBuffer.resize(this->batchSize * this->inputBufferCount);
-		this->lppBatchDInputBuffer.resize(this->batchSize);
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
-		{
-			this->lppBatchDInputBuffer[batchNum] = &this->lpDInputBuffer[batchNum*this->inputBufferCount];
-		}
+		// 入力誤差バッファ受け取り用のアドレス配列を作成する
+		this->m_lppDInputBuffer.resize(batchSize);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -249,66 +243,75 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode UpSampling_CPU::Training(CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
+	ErrorCode UpSampling_CPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
 	{
 		// 出力誤差バッファのアドレスを配列に格納
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 			this->m_lppDOutputBuffer[batchNum] = &i_lpDOutputBufferPrev[batchNum * this->outputBufferCount];
 
-		// 入力誤差バッファを初期化
-		memset(&this->lpDInputBuffer[0], 0, sizeof(F32)*this->lpDInputBuffer.size());
+		// 入力誤差計算
+		this->m_lpDInputBuffer = o_lppDInputBuffer;
+		if(o_lppDInputBuffer)
+		{
+			// 入力誤差バッファのアドレスを配列に格納
+			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+				this->m_lppDInputBuffer[batchNum] = &o_lppDInputBuffer[batchNum * this->inputBufferCount];
+
+			// 入力誤差バッファを初期化
+			memset(this->m_lpDInputBuffer, 0, sizeof(F32)*this->inputBufferCount*this->batchSize);
 
 		
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
-		{
-			for(U32 ch=0; ch<this->layerData.inputDataStruct.ch; ch++)
+			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 			{
-				for(U32 inputZ=0; inputZ<this->layerData.inputDataStruct.z; inputZ++)
+				for(U32 ch=0; ch<this->layerData.inputDataStruct.ch; ch++)
 				{
-					for(U32 inputY=0; inputY<this->layerData.inputDataStruct.y; inputY++)
+					for(U32 inputZ=0; inputZ<this->layerData.inputDataStruct.z; inputZ++)
 					{
-						for(U32 inputX=0; inputX<this->layerData.inputDataStruct.x; inputX++)
+						for(U32 inputY=0; inputY<this->layerData.inputDataStruct.y; inputY++)
 						{
-							U32 inputOffset = POSITION_TO_OFFSET_STRUCT(inputX, inputY, inputZ, ch, this->layerData.inputDataStruct);
-
-							switch(this->layerData.layerStructure.PaddingType)
+							for(U32 inputX=0; inputX<this->layerData.inputDataStruct.x; inputX++)
 							{
-							case UpSampling::LayerStructure::PaddingType_value:
+								U32 inputOffset = POSITION_TO_OFFSET_STRUCT(inputX, inputY, inputZ, ch, this->layerData.inputDataStruct);
+
+								switch(this->layerData.layerStructure.PaddingType)
 								{
-									for(S32 offsetZ=0; offsetZ<this->layerData.layerStructure.UpScale.z; offsetZ++)
+								case UpSampling::LayerStructure::PaddingType_value:
 									{
-										for(S32 offsetY=0; offsetY<this->layerData.layerStructure.UpScale.y; offsetY++)
+										for(S32 offsetZ=0; offsetZ<this->layerData.layerStructure.UpScale.z; offsetZ++)
 										{
-											for(S32 offsetX=0; offsetX<this->layerData.layerStructure.UpScale.x; offsetX++)
+											for(S32 offsetY=0; offsetY<this->layerData.layerStructure.UpScale.y; offsetY++)
 											{
-												U32 outputOffset = POSITION_TO_OFFSET_STRUCT(
-													inputX*this->layerData.layerStructure.UpScale.x + offsetX,
-													inputY*this->layerData.layerStructure.UpScale.y + offsetY,
-													inputZ*this->layerData.layerStructure.UpScale.z + offsetZ,
-													ch,
-													this->layerData.outputDataStruct);
+												for(S32 offsetX=0; offsetX<this->layerData.layerStructure.UpScale.x; offsetX++)
+												{
+													U32 outputOffset = POSITION_TO_OFFSET_STRUCT(
+														inputX*this->layerData.layerStructure.UpScale.x + offsetX,
+														inputY*this->layerData.layerStructure.UpScale.y + offsetY,
+														inputZ*this->layerData.layerStructure.UpScale.z + offsetZ,
+														ch,
+														this->layerData.outputDataStruct);
 
 
-												this->lppBatchDInputBuffer[batchNum][inputOffset] += this->m_lppDOutputBuffer[batchNum][outputOffset];
+													this->m_lppDInputBuffer[batchNum][inputOffset] += this->m_lppDOutputBuffer[batchNum][outputOffset];
+												}
 											}
 										}
 									}
-								}
-								break;
-							case UpSampling::LayerStructure::PaddingType_zero:
-								{
-									U32 outputOffset = POSITION_TO_OFFSET_STRUCT(
-										inputX*this->layerData.layerStructure.UpScale.x + 0,
-										inputY*this->layerData.layerStructure.UpScale.y + 0,
-										inputZ*this->layerData.layerStructure.UpScale.z + 0,
-										ch,
-										this->layerData.outputDataStruct);
+									break;
+								case UpSampling::LayerStructure::PaddingType_zero:
+									{
+										U32 outputOffset = POSITION_TO_OFFSET_STRUCT(
+											inputX*this->layerData.layerStructure.UpScale.x + 0,
+											inputY*this->layerData.layerStructure.UpScale.y + 0,
+											inputZ*this->layerData.layerStructure.UpScale.z + 0,
+											ch,
+											this->layerData.outputDataStruct);
 
-									this->lppBatchDInputBuffer[batchNum][inputOffset] = this->m_lppDOutputBuffer[batchNum][outputOffset];
+										this->m_lppDInputBuffer[batchNum][inputOffset] = this->m_lppDOutputBuffer[batchNum][outputOffset];
+									}
+									break;
 								}
-								break;
+
 							}
-
 						}
 					}
 				}
@@ -324,7 +327,7 @@ namespace NeuralNetwork {
 		@return	誤差差分配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER UpSampling_CPU::GetDInputBuffer()const
 	{
-		return &this->lpDInputBuffer[0];
+		return this->m_lpDInputBuffer;
 	}
 	/** 学習差分を取得する.
 		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */

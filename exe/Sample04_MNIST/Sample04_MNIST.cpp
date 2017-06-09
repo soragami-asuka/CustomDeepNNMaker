@@ -201,7 +201,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	// äwèK, ÉeÉXÉgé¿çs
 	{
 		// äwèK
-		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkTest, pDataLayerTeach_Input, pDataLayerTeach_Output, pDataLayerTest_Input, pDataLayerTest_Output, 32, 1) != ErrorCode::ERROR_CODE_NONE)
+		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkTest, pDataLayerTeach_Input, pDataLayerTeach_Output, pDataLayerTest_Input, pDataLayerTest_Output, 32, 20) != ErrorCode::ERROR_CODE_NONE)
 		{
 			delete pNeuralNetworkLearn;
 			delete pNeuralNetworkTest;
@@ -444,23 +444,21 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 			inputDataStruct, lastLayerGUID,
 			CreatePoolingLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1)));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-		//err = AddLayerToNetworkLast(
-		//	*pNeuralNetwork,
-		//	lppLayerData,
-		//	inputDataStruct, lastLayerGUID,
-		//	CreateBatchNormalizationLayer(layerDLLManager, inputDataStruct));
-		//if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			inputDataStruct, lastLayerGUID,
+			CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, inputDataStruct));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			inputDataStruct, lastLayerGUID,
 			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"ReLU"));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-		//err = AddLayerToNetworkLast(
-		//	*pNeuralNetwork,
-		//	lppLayerData,
-		//	inputDataStruct, lastLayerGUID,
-		//	CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.2f));
-		//if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			inputDataStruct, lastLayerGUID,
+			CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct, 0.2f));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 
 #if 0	// Single
 		// 2ëwñ⁄
@@ -474,25 +472,23 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 			inputDataStruct, lastLayerGUID,
 			CreatePoolingLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1)));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-		//err = AddLayerToNetworkLast(
-		//	*pNeuralNetwork,
-		//	lppLayerData,
-		//	inputDataStruct, lastLayerGUID,
-		//	CreateBatchNormalizationLayer(layerDLLManager, inputDataStruct));
-		//if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			inputDataStruct, lastLayerGUID,
+			CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, inputDataStruct));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			inputDataStruct, lastLayerGUID,
 			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"ReLU"));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-		//err = AddLayerToNetworkLast(
-		//	*pNeuralNetwork,
-		//	lppLayerData,
-		//	inputDataStruct, lastLayerGUID,
-		//	CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.5f));
-		//if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			inputDataStruct, lastLayerGUID,
+			CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct, 0.5f));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 
-#elif 1	// MergeInput
+#elif 0	// MergeInput
 		// 1ëwñ⁄ÇÃGUIDÇãLò^
 		Gravisbell::GUID lastLayerGUID_A = lastLayerGUID;
 		Gravisbell::GUID lastLayerGUID_B = lastLayerGUID;
@@ -511,23 +507,21 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 				inputDataStruct_A, lastLayerGUID_A,
 				CreatePoolingLayer(layerDLLManager, layerDataManager, inputDataStruct_A, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1)));
 			if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-			//err = AddLayerToNetworkLast(
-			//	*pNeuralNetwork,
-			//	lppLayerData,
-			//	inputDataStruct_A, lastLayerGUID_A,
-			//	CreateBatchNormalizationLayer(layerDLLManager, inputDataStruct_A));
-			//if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+			err = AddLayerToNetworkLast(
+				*pNeuralNetwork,
+				inputDataStruct_A, lastLayerGUID_A,
+				CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, inputDataStruct_A));
+			if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 			err = AddLayerToNetworkLast(
 				*pNeuralNetwork,
 				inputDataStruct_A, lastLayerGUID_A,
 				CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct_A, L"ReLU"));
 			if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-			//err = AddLayerToNetworkLast(
-			//	*pNeuralNetwork,
-			//	lppLayerData,
-			//	inputDataStruct_A, lastLayerGUID_A,
-			//	CreateDropoutLayer(layerDLLManager, inputDataStruct_A, 0.5f));
-			//if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+			err = AddLayerToNetworkLast(
+				*pNeuralNetwork,
+				inputDataStruct_A, lastLayerGUID_A,
+				CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct_A, 0.5f));
+			if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		}
 
 		// 2ëwñ⁄B
@@ -542,23 +536,21 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 				inputDataStruct_B, lastLayerGUID_B,
 				CreatePoolingLayer(layerDLLManager, layerDataManager, inputDataStruct_B, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1)));
 			if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-			//err = AddLayerToNetworkLast(
-			//	*pNeuralNetwork,
-			//	lppLayerData,
-			//	inputDataStruct_B, lastLayerGUID_B,
-			//	CreateBatchNormalizationLayer(layerDLLManager, inputDataStruct_B));
-			//if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+			err = AddLayerToNetworkLast(
+				*pNeuralNetwork,
+				inputDataStruct_B, lastLayerGUID_B,
+				CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, inputDataStruct_B));
+			if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 			err = AddLayerToNetworkLast(
 				*pNeuralNetwork,
 				inputDataStruct_B, lastLayerGUID_B,
 				CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct_B, L"ReLU"));
 			if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-			//err = AddLayerToNetworkLast(
-			//	*pNeuralNetwork,
-			//	lppLayerData,
-			//	inputDataStruct_B, lastLayerGUID_B,
-			//	CreateDropoutLayer(layerDLLManager, inputDataStruct_B, 0.5f));
-			//if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+			err = AddLayerToNetworkLast(
+				*pNeuralNetwork,
+				inputDataStruct_B, lastLayerGUID_B,
+				CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct_B, 0.5f));
+			if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		}
 
 		// A,Båãçáëw
@@ -818,7 +810,7 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 				pTeachOutputLayer->CalculateLearnError(pNeuralNetworkLearn->GetOutputBuffer());
 
 				// äwèK
-				pNeuralNetworkLearn->Training(pTeachOutputLayer->GetDInputBuffer());
+				pNeuralNetworkLearn->Training(NULL, pTeachOutputLayer->GetDInputBuffer());
 
 
 				// ê≥âó¶ÇéZèoÇ∑ÇÈ

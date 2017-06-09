@@ -97,9 +97,6 @@ namespace NeuralNetwork {
 		this->lpTmpMean.resize(this->layerData.inputDataStruct.ch, 0.0f);
 		this->lpTmpVariance.resize(this->layerData.inputDataStruct.ch, 0.0f);
 
-		// 入力誤差用バッファを作成
-		this->lpDInputBuffer.resize(this->batchSize * this->inputBufferCount);
-
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
@@ -449,12 +446,24 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode BatchNormalization_GPU::Training(CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
+	ErrorCode BatchNormalization_GPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
 	{
 		cudnnStatus_t err_cudnn;
 
 		// 出力誤差バッファのアドレスを格納
 		this->m_lppDOutputBufferPrev = i_lpDOutputBufferPrev;
+
+		// 入力誤差バッファのアドレスを格納
+		this->m_lpDInputBuffer_d = o_lppDInputBuffer;
+		if(this->m_lpDInputBuffer_d == NULL)
+		{
+			// 入力誤差バッファが存在しない場合学習ができないため、代替バッファを確保
+			if(this->m_lpTemporaryDInputBuffer_d.size() != this->inputBufferCount * this->batchSize)
+				this->m_lpTemporaryDInputBuffer_d.resize(this->inputBufferCount * this->batchSize);
+
+			this->m_lpDInputBuffer_d = thrust::raw_pointer_cast(&this->m_lpTemporaryDInputBuffer_d[0]);
+		}
+
 
 		F32 alphaData = 1.0f;
 		F32 betaData  = 0.0f;
@@ -474,7 +483,7 @@ namespace NeuralNetwork {
 			this->outputTensorDesc,
 			this->m_lppDOutputBufferPrev,
 			this->inputTensorDesc,
-			thrust::raw_pointer_cast(&this->lpDInputBuffer[0]),
+			this->m_lpDInputBuffer_d,
 			this->paramTensorDesc,
 			thrust::raw_pointer_cast(&this->layerData.lpScale[0]),
 			thrust::raw_pointer_cast(&this->layerData.lpScale[0]),
@@ -495,7 +504,7 @@ namespace NeuralNetwork {
 		@return	誤差差分配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER BatchNormalization_GPU::GetDInputBuffer()const
 	{
-		return thrust::raw_pointer_cast(&this->lpDInputBuffer[0]);
+		return this->m_lpDInputBuffer_d;
 	}
 	/** 学習差分を取得する.
 		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */

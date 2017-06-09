@@ -34,7 +34,6 @@ private:
 
 	// 入出力バッファ
 	thrust::device_vector<F32>				lpOutputBuffer_d;		/**< 出力バッファ <バッチ数><入力信号数> */
-	thrust::device_vector<F32>				lpDInputBuffer_d;		/**< 入力誤差差分 <バッチ数><入力信号数> */
 
 	/**< バッチ処理用入力誤差差分 <バッチ数> */
 
@@ -43,8 +42,9 @@ private:
 	U32 outputBufferCount;				/**< 出力バッファ数 */
 
 	// 演算時の入力データ
-	CONST_BATCH_BUFFER_POINTER m_lpInputBuffer_d;
-	CONST_BATCH_BUFFER_POINTER m_lpDOutputBufferPrev_d;
+	CONST_BATCH_BUFFER_POINTER	m_lpInputBuffer_d;			/**< 入力バッファ */
+	CONST_BATCH_BUFFER_POINTER	m_lpDOutputBufferPrev_d;	/**< 出力誤差バッファ */
+	BATCH_BUFFER_POINTER		m_lpDInputBuffer_d;			/**< 入力誤差バッファ */
 
 
 	// 演算処理用のバッファ
@@ -131,7 +131,7 @@ public:
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Training(CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer);
+	ErrorCode Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer);
 
 	/** 学習差分を取得する.
 		配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]

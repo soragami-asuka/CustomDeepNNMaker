@@ -34,14 +34,14 @@ namespace IO {
 		/** 入力バッファ数を取得する. byte数では無くデータの数なので注意 */
 		virtual U32 GetInputBufferCount(U32 i_dataNum)const = 0;
 
-		/** 学習差分を取得する.
-			配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]
-			@return	誤差差分配列の先頭ポインタ */
-		virtual CONST_BATCH_BUFFER_POINTER GetDInputBuffer(U32 i_dataNum)const = 0;
-		/** 学習差分を取得する.
-			@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要.
-			@return 成功した場合0 */
-		virtual ErrorCode GetDInputBuffer(U32 i_dataNum, BATCH_BUFFER_POINTER o_lpDInputBuffer)const = 0;
+		///** 学習差分を取得する.
+		//	配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]
+		//	@return	誤差差分配列の先頭ポインタ */
+		//virtual CONST_BATCH_BUFFER_POINTER GetDInputBuffer(U32 i_dataNum)const = 0;
+		///** 学習差分を取得する.
+		//	@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要.
+		//	@return 成功した場合0 */
+		//virtual ErrorCode GetDInputBuffer(U32 i_dataNum, BATCH_BUFFER_POINTER o_lpDInputBuffer)const = 0;
 	};
 
 }	// IO

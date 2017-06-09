@@ -4,8 +4,7 @@
 #ifndef __SEPARATEOUTPUT_BASE_H__
 #define __SEPARATEOUTPUT_BASE_H__
 
-#include<Layer/NeuralNetwork/INNSingleInputLayer.h>
-#include<Layer/NeuralNetwork/INNMultOutputLayer.h>
+#include<Layer/NeuralNetwork/INNSingle2MultLayer.h>
 
 #include<vector>
 
@@ -19,7 +18,7 @@ namespace NeuralNetwork {
 
 	typedef float NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class SeparateOutput_Base : public INNSingleInputLayer, public INNMultOutputLayer
+	class SeparateOutput_Base : public INNSingle2MultLayer
 	{
 	protected:
 		Gravisbell::GUID guid;	/**< レイヤー識別用のGUID */

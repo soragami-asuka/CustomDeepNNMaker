@@ -4,8 +4,7 @@
 #ifndef __Residual_BASE_H__
 #define __Residual_BASE_H__
 
-#include<Layer/NeuralNetwork/INNMultInputLayer.h>
-#include<Layer/NeuralNetwork/INNSingleOutputLayer.h>
+#include<Layer/NeuralNetwork/INNMult2SingleLayer.h>
 
 #include<vector>
 
@@ -19,7 +18,7 @@ namespace NeuralNetwork {
 
 	typedef float NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class Residual_Base : public INNMultInputLayer, public INNSingleOutputLayer
+	class Residual_Base : public INNMult2SingleLayer
 	{
 	protected:
 		Gravisbell::GUID guid;	/**< レイヤー識別用のGUID */

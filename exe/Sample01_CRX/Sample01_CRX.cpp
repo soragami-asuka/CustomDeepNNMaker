@@ -30,7 +30,7 @@
 #include"Utility/NeuralNetworkLayer.h"
 
 
-#define USE_GPU	0
+#define USE_GPU	1
 #define USE_HOST_MEMORY 1
 
 
@@ -256,7 +256,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 
 		// äwèK
-		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkSample, pTeachInputLayer, pTeachOutputLayer, pSampleInputLayer, pSampleOutputLayer, 32, 1) != ErrorCode::ERROR_CODE_NONE)
+		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkSample, pTeachInputLayer, pTeachOutputLayer, pSampleInputLayer, pSampleOutputLayer, 32, 100) != ErrorCode::ERROR_CODE_NONE)
 		{
 			delete pNeuralNetworkSample;
 			delete pNeuralNetworkLearn;
@@ -354,10 +354,10 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(
 
 	Layer::Connect::ILayerConnectData* pNeuralNetwork = Gravisbell::Utility::NeuralNetworkLayer::CreateNeuralNetwork(layerDLLManager, layerDataManager, i_inputDataStruct);
 
-	if(Layer::IO::ISingleInputLayer* pNeuralNetworkInput = dynamic_cast<Layer::IO::ISingleInputLayer*>(pNeuralNetwork))
+	if(pNeuralNetwork)
 	{
 		// ì¸óÕêMçÜÇíºëOÉåÉCÉÑÅ[Ç…ê›íË
-		Gravisbell::IODataStruct inputDataStruct = pNeuralNetworkInput->GetInputDataStruct();
+		Gravisbell::IODataStruct inputDataStruct = i_inputDataStruct;
 		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID();
 
 		// 1ëwñ⁄
@@ -369,10 +369,10 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(
 			*pNeuralNetwork,
 			inputDataStruct, lastLayerGUID,
 			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"ReLU"));
-		AddLayerToNetworkLast(
-			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct, 0.2f));
+		//AddLayerToNetworkLast(
+		//	*pNeuralNetwork,
+		//	inputDataStruct, lastLayerGUID,
+		//	CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct, 0.2f));
 
 		// 2ëwñ⁄
 		AddLayerToNetworkLast(
@@ -383,10 +383,10 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(
 			*pNeuralNetwork,
 			inputDataStruct, lastLayerGUID,
 			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"ReLU"));
-		AddLayerToNetworkLast(
-			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct, 0.5f));
+		//AddLayerToNetworkLast(
+		//	*pNeuralNetwork,
+		//	inputDataStruct, lastLayerGUID,
+		//	CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct, 0.5f));
 
 		// 3ëwñ⁄(èoóÕëw)
 		AddLayerToNetworkLast(
@@ -475,7 +475,7 @@ Gravisbell::ErrorCode LearnNeuralNetwork(
 			pTeachLayer->CalculateLearnError(pNeuralNetwork->GetOutputBuffer());
 
 			// äwèK
-			pNeuralNetwork->Training(pTeachLayer->GetDInputBuffer());
+			pNeuralNetwork->Training(NULL, pTeachLayer->GetDInputBuffer());
 		}
 
 		// åÎç∑ï\é¶
@@ -636,7 +636,7 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 				pTeachOutputLayer->CalculateLearnError(pNeuralNetworkLearn->GetOutputBuffer());
 
 				// äwèK
-				pNeuralNetworkLearn->Training(pTeachOutputLayer->GetDInputBuffer());
+				pNeuralNetworkLearn->Training(NULL, pTeachOutputLayer->GetDInputBuffer());
 
 
 				// ê≥âó¶ÇéZèoÇ∑ÇÈ

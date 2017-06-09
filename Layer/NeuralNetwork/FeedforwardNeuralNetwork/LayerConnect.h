@@ -18,6 +18,8 @@ namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
+	static const S32 INVALID_DINPUTBUFFER_ID = 0xFFFF;
+
 	/** レイヤーのポインタと接続位置の情報 */
 	struct LayerPosition
 	{
@@ -112,6 +114,15 @@ namespace NeuralNetwork {
 
 		/** レイヤーの接続を解除 */
 		virtual ErrorCode Disconnect(void) = 0;
+
+
+		/** レイヤーで使用する入力誤差バッファのIDを取得する
+			@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
+		virtual ErrorCode SetDInputBufferID(U32 i_inputNum, S32 i_DInputBufferID) = 0;
+		/** レイヤーで使用する入力誤差バッファのIDを取得する
+			@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
+		virtual S32 GetDInputBufferID(U32 i_inputNum)const = 0;
+
 
 	public:
 		/** 出力先レイヤーを追加する */

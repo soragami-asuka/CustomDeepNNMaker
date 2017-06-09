@@ -4,14 +4,13 @@
 #ifndef __GRAVISBELL_I_NEURAL_NETWORK_H__
 #define __GRAVISBELL_I_NEURAL_NETWORK_H__
 
-#include"INNSingleInputLayer.h"
-#include"INNSingleOutputLayer.h"
+#include"INNSingle2SingleLayer.h"
 
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-	class INeuralNetwork : public INNSingleInputLayer, public INNSingleOutputLayer
+	class INeuralNetwork : public INNSingle2SingleLayer
 	{
 	public:
 		/** コンストラクタ */

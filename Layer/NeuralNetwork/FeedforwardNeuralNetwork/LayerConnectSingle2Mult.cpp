@@ -13,11 +13,12 @@ namespace NeuralNetwork {
 
 	
 	/** コンストラクタ */
-	LayerConnectSingle2Mult::LayerConnectSingle2Mult(ILayerBase* pLayer, Gravisbell::SettingData::Standard::IData* pLearnSettingData)
-		:	pLayer				(pLayer)
-		,	pLayer_input		(dynamic_cast<INNSingleInputLayer*>(pLayer))
-		,	pLayer_output		(dynamic_cast<INNMultOutputLayer*>(pLayer))
+	LayerConnectSingle2Mult::LayerConnectSingle2Mult(class FeedforwardNeuralNetwork_Base& neuralNetwork, ILayerBase* pLayer, Gravisbell::SettingData::Standard::IData* pLearnSettingData)
+		:	neuralNetwork		(neuralNetwork)
+		,	pLayer				(pLayer)
+		,	pLayer_io			(dynamic_cast<INNSingle2MultLayer*>(pLayer))
 		,	pLearnSettingData	(pLearnSettingData)
+		,	dInputBufferID		(INVALID_DINPUTBUFFER_ID)
 	{
 	}
 	/** デストラクタ */
@@ -52,14 +53,14 @@ namespace NeuralNetwork {
 		@return	出力データ構造 */
 	IODataStruct LayerConnectSingle2Mult::GetOutputDataStruct()const
 	{
-		return this->pLayer_output->GetOutputDataStruct();
+		return this->pLayer_io->GetOutputDataStruct();
 	}
 	/** 出力データバッファを取得する.
 		配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
 		@return 出力データ配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER LayerConnectSingle2Mult::GetOutputBuffer()const
 	{
-		return this->pLayer_output->GetOutputBuffer();
+		return this->pLayer_io->GetOutputBuffer();
 	}
 
 	/** 入力誤差バッファの位置を入力元レイヤーのGUID指定で取得する */
@@ -76,7 +77,7 @@ namespace NeuralNetwork {
 	/** 入力誤差バッファを位置指定で取得する */
 	CONST_BATCH_BUFFER_POINTER LayerConnectSingle2Mult::GetDInputBufferByNum(S32 num)const
 	{
-		return this->pLayer_input->GetDInputBuffer();
+		return neuralNetwork.GetDInputBuffer(this->GetDInputBufferID(0));
 	}
 
 	/** レイヤーリストを作成する.
@@ -301,6 +302,23 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
+
+	/** レイヤーで使用する入力誤差バッファのIDを取得する
+		@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
+	S32 LayerConnectSingle2Mult::GetDInputBufferID(U32 i_inputNum)const
+	{
+		return this->dInputBufferID;
+	}
+	/** レイヤーで使用する入力誤差バッファのIDを取得する
+		@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
+	ErrorCode LayerConnectSingle2Mult::SetDInputBufferID(U32 i_inputNum, S32 i_DInputBufferID)
+	{
+		this->dInputBufferID = i_DInputBufferID;
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+
+
 	//=======================================
 	// 演算関連
 	//=======================================
@@ -320,13 +338,13 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
 
 		// 入力元レイヤーのバッファ数を確認
-		if(this->lppInputFromLayer[0]->GetOutputDataStruct().GetDataCount() != this->pLayer_input->GetInputBufferCount())
+		if(this->lppInputFromLayer[0]->GetOutputDataStruct().GetDataCount() != this->pLayer_io->GetInputBufferCount())
 			return ErrorCode::ERROR_CODE_FRAUD_INPUT_COUNT;
 
 		// 出力先レイヤー数の確認
 		if(this->lppOutputToLayer.empty())
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-		if(this->lppOutputToLayer.size() != this->pLayer_output->GetOutputToLayerCount())
+		if(this->lppOutputToLayer.size() != this->pLayer_io->GetOutputToLayerCount())
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
 		// 出力先レイヤーの位置を登録
@@ -377,7 +395,7 @@ namespace NeuralNetwork {
 	/** 演算処理を実行する. */
 	ErrorCode LayerConnectSingle2Mult::Calculate(void)
 	{
-		return this->pLayer_input->Calculate(lppInputFromLayer[0]->GetOutputBuffer());
+		return this->pLayer_io->Calculate(lppInputFromLayer[0]->GetOutputBuffer());
 	}
 	/** 学習誤差を計算する. */
 	ErrorCode LayerConnectSingle2Mult::Training(void)
@@ -386,8 +404,19 @@ namespace NeuralNetwork {
 		{
 			this->lpDOutputBuffer[outputLayerNum] = this->lppOutputToLayer[outputLayerNum].pLayer->GetDInputBufferByNum(this->lppOutputToLayer[outputLayerNum].position);
 		}
-
-		return this->pLayer_output->Training(&this->lpDOutputBuffer[0]);
+		
+		if(this->GetDInputBufferID(0) < 0)
+		{
+			return this->pLayer_io->Training(
+				this->neuralNetwork.GetDInputBuffer(),
+				&this->lpDOutputBuffer[0] );
+		}
+		else
+		{
+			return this->pLayer_io->Training(
+				this->neuralNetwork.GetDInputBuffer(this->GetDInputBufferID(0)),
+				&this->lpDOutputBuffer[0] );
+		}
 	}
 
 

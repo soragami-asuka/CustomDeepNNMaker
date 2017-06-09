@@ -24,18 +24,21 @@ namespace NeuralNetwork {
 	class LayerConnectSingle2Single : public ILayerConnect
 	{
 	public:
+		class FeedforwardNeuralNetwork_Base& neuralNetwork;
+
 		ILayerBase* pLayer;	/**< レイヤーのアドレス */
-		INNSingleInputLayer*  pLayer_input;
-		INNSingleOutputLayer* pLayer_output;
+		INNSingle2SingleLayer* pLayer_io;
 
 		Gravisbell::SettingData::Standard::IData* pLearnSettingData;	/**< 学習設定情報のアドレス */
 
 		std::vector<LayerPosition>  lppOutputToLayer;		/**< 出力先レイヤー. SingleOutput扱いなので、必ず1個 */
 		std::vector<ILayerConnect*> lppInputFromLayer;	/**< 入力元レイヤー. SingleInput扱いなので、必ず1個 */
 
+		S32 dInputBufferID;	/**< 入力誤差バッファID */
+
 	public:
 		/** コンストラクタ */
-		LayerConnectSingle2Single(ILayerBase* pLayer, Gravisbell::SettingData::Standard::IData* pLearnSettingData);
+		LayerConnectSingle2Single(class FeedforwardNeuralNetwork_Base& neuralNetwork, ILayerBase* pLayer, Gravisbell::SettingData::Standard::IData* pLearnSettingData);
 		/** デストラクタ */
 		virtual ~LayerConnectSingle2Single();
 
@@ -106,6 +109,15 @@ namespace NeuralNetwork {
 
 		/** レイヤーの接続を解除 */
 		ErrorCode Disconnect(void);
+
+
+		/** レイヤーで使用する入力誤差バッファのIDを取得する
+			@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
+		ErrorCode SetDInputBufferID(U32 i_inputNum, S32 i_DInputBufferID);
+		/** レイヤーで使用する入力誤差バッファのIDを取得する
+			@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
+		S32 GetDInputBufferID(U32 i_inputNum)const;
+
 
 	protected:
 		//==========================================

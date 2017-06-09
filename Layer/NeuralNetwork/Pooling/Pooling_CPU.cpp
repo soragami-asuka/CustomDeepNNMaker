@@ -83,14 +83,9 @@ namespace NeuralNetwork {
 
 		// 出力誤差バッファ受け取り用のアドレス配列を作成する
 		this->m_lppDOutputBufferPrev.resize(batchSize);
+		// 入力誤差バッファ受け取り用のアドレス配列を作成する
+		this->m_lppDInputBuffer.resize(batchSize);
 
-		// 入力差分バッファを作成
-		this->lpDInputBuffer.resize(this->batchSize * this->inputBufferCount);
-		this->lppBatchDInputBuffer.resize(this->batchSize);
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
-		{
-			this->lppBatchDInputBuffer[batchNum] = &this->lpDInputBuffer[batchNum * this->inputBufferCount];
-		}
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -242,59 +237,68 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Pooling_CPU::Training(CONST_BATCH_BUFFER_POINTER i_lppDOutputBufferPrev)
+	ErrorCode Pooling_CPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBufferPrev)
 	{
 		// 出力誤差バッファのアドレスを配列に格納
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 			this->m_lppDOutputBufferPrev[batchNum] = &i_lppDOutputBufferPrev[batchNum * this->outputBufferCount];
 
-		// 入力誤差バッファを初期化
-		memset(&this->lpDInputBuffer[0], 0, sizeof(F32) * this->inputBufferCount * this->batchSize);
-
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		// 入力誤差計算
+		this->m_lpDInputBuffer = o_lppDInputBuffer;
+		if(o_lppDInputBuffer)
 		{
-			for(U32 ch=0; ch<this->layerData.outputDataStruct.ch; ch++)
+			// 入力誤差バッファのアドレスを配列に格納
+			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+				this->m_lppDInputBuffer[batchNum] = &o_lppDInputBuffer[batchNum * this->inputBufferCount];
+
+			// 入力誤差バッファを初期化
+			memset(this->m_lpDInputBuffer, 0, sizeof(F32) * this->inputBufferCount * this->batchSize);
+
+			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 			{
-				for(U32 outputZ=0; outputZ<this->layerData.outputDataStruct.z; outputZ++)
+				for(U32 ch=0; ch<this->layerData.outputDataStruct.ch; ch++)
 				{
-					for(U32 outputY=0; outputY<this->layerData.outputDataStruct.y; outputY++)
+					for(U32 outputZ=0; outputZ<this->layerData.outputDataStruct.z; outputZ++)
 					{
-						for(U32 outputX=0; outputX<this->layerData.outputDataStruct.x; outputX++)
+						for(U32 outputY=0; outputY<this->layerData.outputDataStruct.y; outputY++)
 						{
-							U32 outputOffset = POSITION_TO_OFFSET_STRUCT(outputX,outputY,outputZ,ch, this->layerData.outputDataStruct);
-
-							// 最大値を調べる
-							for(S32 filterZ=0; filterZ<this->layerData.layerStructure.FilterSize.z; filterZ++)
+							for(U32 outputX=0; outputX<this->layerData.outputDataStruct.x; outputX++)
 							{
-								U32 inputZ = outputZ * this->layerData.layerStructure.Stride.z + filterZ;
-								if(inputZ >= this->layerData.inputDataStruct.z)
-									continue;
+								U32 outputOffset = POSITION_TO_OFFSET_STRUCT(outputX,outputY,outputZ,ch, this->layerData.outputDataStruct);
 
-								for(S32 filterY=0; filterY<this->layerData.layerStructure.FilterSize.y; filterY++)
+								// 最大値を調べる
+								for(S32 filterZ=0; filterZ<this->layerData.layerStructure.FilterSize.z; filterZ++)
 								{
-									U32 inputY = outputY * this->layerData.layerStructure.Stride.y + filterY;
-									if(inputY >= this->layerData.inputDataStruct.y)
+									U32 inputZ = outputZ * this->layerData.layerStructure.Stride.z + filterZ;
+									if(inputZ >= this->layerData.inputDataStruct.z)
 										continue;
 
-									for(S32 filterX=0; filterX<this->layerData.layerStructure.FilterSize.x; filterX++)
+									for(S32 filterY=0; filterY<this->layerData.layerStructure.FilterSize.y; filterY++)
 									{
-										U32 inputX = outputX * this->layerData.layerStructure.Stride.x + filterX;
-										if(inputX >= this->layerData.inputDataStruct.x)
+										U32 inputY = outputY * this->layerData.layerStructure.Stride.y + filterY;
+										if(inputY >= this->layerData.inputDataStruct.y)
 											continue;
 
-										U32 inputOffset = POSITION_TO_OFFSET_STRUCT(
-																inputX,
-																inputY,
-																inputZ,
-																ch,
-																this->layerData.inputDataStruct);
+										for(S32 filterX=0; filterX<this->layerData.layerStructure.FilterSize.x; filterX++)
+										{
+											U32 inputX = outputX * this->layerData.layerStructure.Stride.x + filterX;
+											if(inputX >= this->layerData.inputDataStruct.x)
+												continue;
 
-										if(this->m_lppInputBuffer[batchNum][inputOffset] == this->lppBatchOutputBuffer[batchNum][outputOffset])
-											this->lppBatchDInputBuffer[batchNum][inputOffset] += this->m_lppDOutputBufferPrev[batchNum][outputOffset];
+											U32 inputOffset = POSITION_TO_OFFSET_STRUCT(
+																	inputX,
+																	inputY,
+																	inputZ,
+																	ch,
+																	this->layerData.inputDataStruct);
+
+											if(this->m_lppInputBuffer[batchNum][inputOffset] == this->lppBatchOutputBuffer[batchNum][outputOffset])
+												this->m_lppDInputBuffer[batchNum][inputOffset] += this->m_lppDOutputBufferPrev[batchNum][outputOffset];
+										}
 									}
 								}
-							}
 
+							}
 						}
 					}
 				}
@@ -310,7 +314,7 @@ namespace NeuralNetwork {
 		@return	誤差差分配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER Pooling_CPU::GetDInputBuffer()const
 	{
-		return &this->lpDInputBuffer[0];
+		return this->m_lpDInputBuffer;
 	}
 	/** 学習差分を取得する.
 		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */

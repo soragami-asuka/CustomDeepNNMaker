@@ -16,8 +16,7 @@
 #pragma warning(pop)
 
 #include<vector>
-#include<Layer/NeuralNetwork/INNSingleInputLayer.h>
-#include<Layer/NeuralNetwork/INNSingleOutputLayer.h>
+#include<Layer/NeuralNetwork/INNSingle2SingleLayer.h>
 
 #include"BatchNormalization_DATA.hpp"
 
@@ -29,7 +28,7 @@ namespace NeuralNetwork {
 
 	typedef float NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class BatchNormalization_Base : public INNSingleInputLayer, public INNSingleOutputLayer
+	class BatchNormalization_Base : public INNSingle2SingleLayer
 	{
 	protected:
 		Gravisbell::GUID guid;	/**< レイヤー識別用のGUID */

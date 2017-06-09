@@ -103,6 +103,14 @@ namespace NeuralNetwork {
 		ErrorCode Disconnect(void);
 
 
+		/** レイヤーで使用する入力誤差バッファのIDを取得する
+			@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
+		ErrorCode SetDInputBufferID(U32 i_inputNum, S32 i_DInputBufferID);
+		/** レイヤーで使用する入力誤差バッファのIDを取得する
+			@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
+		S32 GetDInputBufferID(U32 i_inputNum)const;
+
+
 		//==========================================
 		// 出力レイヤー関連
 		//==========================================

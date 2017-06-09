@@ -101,9 +101,6 @@ namespace NeuralNetwork {
 		// 学習処理中フラグを設定する
 		this->onLearning = true;
 
-		// 入力差分バッファを作成
-		this->lpDInputBuffer_d.resize(this->batchSize * this->inputBufferCount);
-		
 		// 出力バッファを作成
 		{
 			int n = this->batchSize;
@@ -299,25 +296,34 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Dropout_GPU::Training(CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
+	ErrorCode Dropout_GPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
 	{
-		// 出力誤差バッファのアドレスを配列に格納
+		// 出力誤差バッファのアドレスを格納
 		this->m_lpDOutputBufferPrev_d = i_lpDOutputBufferPrev;
+		// 出力誤差バッファのアドレスを格納
+		this->m_lpDInputBuffer_d = o_lppDInputBuffer;
 
-		if(this->onLearning)
+		if(this->m_lpDInputBuffer_d)
 		{
-			cudnnStatus_t err = cudnnDropoutBackward(
-				this->cudnnHandle,
-				this->dropoutDesc,
-				this->outputTensorDesc,
-				i_lpDOutputBufferPrev,
-				this->inputTensorDesc,
-				thrust::raw_pointer_cast(&this->lpDInputBuffer_d[0]),
-				this->m_pReserve,
-				this->reserveSize);
+			if(this->onLearning)
+			{
+				cudnnStatus_t err = cudnnDropoutBackward(
+					this->cudnnHandle,
+					this->dropoutDesc,
+					this->outputTensorDesc,
+					i_lpDOutputBufferPrev,
+					this->inputTensorDesc,
+					this->m_lpDInputBuffer_d,
+					this->m_pReserve,
+					this->reserveSize);
 
-			if(err != 0)
-				return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
+				if(err != 0)
+					return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
+			}
+			else
+			{
+				cudaMemcpy(this->m_lpDInputBuffer_d, i_lpDOutputBufferPrev, sizeof(F32)*this->inputBufferCount*this->batchSize, cudaMemcpyDeviceToDevice);
+			}
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
@@ -329,14 +335,7 @@ namespace NeuralNetwork {
 		@return	誤差差分配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER Dropout_GPU::GetDInputBuffer()const
 	{
-		if(this->onLearning)
-		{
-			return thrust::raw_pointer_cast(&this->lpDInputBuffer_d[0]);
-		}
-		else
-		{
-			return this->m_lpDOutputBufferPrev_d;
-		}
+		return this->m_lpDInputBuffer_d;
 	}
 	/** 学習差分を取得する.
 		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */

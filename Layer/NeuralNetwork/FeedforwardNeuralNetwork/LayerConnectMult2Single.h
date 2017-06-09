@@ -5,7 +5,7 @@
 #define __GRAVISBELL_LAYER_CONNECT_MULT2SINGLE_H__
 
 #include<Layer/NeuralNetwork/INeuralNetwork.h>
-#include<Layer/NeuralNetwork/INNMultInputLayer.h>
+#include<Layer/NeuralNetwork/INNMult2SingleLayer.h>
 
 #include"FeedforwardNeuralNetwork_FUNC.hpp"
 
@@ -25,9 +25,10 @@ namespace NeuralNetwork {
 	class LayerConnectMult2Single : public ILayerConnect
 	{
 	public:
+		class FeedforwardNeuralNetwork_Base& neuralNetwork;
+
 		ILayerBase* pLayer;	/**< レイヤーのアドレス */
-		INNMultInputLayer*		pLayer_input;
-		INNSingleOutputLayer*	pLayer_output;
+		INNMult2SingleLayer*	pLayer_io;
 
 		Gravisbell::SettingData::Standard::IData* pLearnSettingData;	/**< 学習設定情報のアドレス */
 
@@ -36,9 +37,12 @@ namespace NeuralNetwork {
 
 		std::vector<CONST_BATCH_BUFFER_POINTER> lppInputBuffer;	/**< 入力バッファ格納用の配列 */
 
+		std::vector<S32> lpDInputBufferID;	/**< 入力誤差バッファID */
+		std::vector<BATCH_BUFFER_POINTER> lppDInputBuffer;	/**< 入力誤差バッファ格納用の配列 */
+
 	public:
 		/** コンストラクタ */
-		LayerConnectMult2Single(ILayerBase* pLayer, Gravisbell::SettingData::Standard::IData* pLearnSettingData);
+		LayerConnectMult2Single(class FeedforwardNeuralNetwork_Base& neuralNetwork, ILayerBase* pLayer, Gravisbell::SettingData::Standard::IData* pLearnSettingData);
 		/** デストラクタ */
 		virtual ~LayerConnectMult2Single();
 
@@ -109,6 +113,15 @@ namespace NeuralNetwork {
 
 		/** レイヤーの接続を解除 */
 		ErrorCode Disconnect(void);
+
+
+		/** レイヤーで使用する入力誤差バッファのIDを取得する
+			@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
+		ErrorCode SetDInputBufferID(U32 i_inputNum, S32 i_DInputBufferID);
+		/** レイヤーで使用する入力誤差バッファのIDを取得する
+			@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
+		S32 GetDInputBufferID(U32 i_inputNum)const;
+
 
 	protected:
 		//==========================================

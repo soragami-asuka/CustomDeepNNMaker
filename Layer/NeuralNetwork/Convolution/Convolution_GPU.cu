@@ -98,13 +98,6 @@ namespace NeuralNetwork {
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
-		// 入力差分バッファを作成
-		this->lpDInputBuffer.resize(this->batchSize * this->inputBufferCount);
-
-		// ニューロン/バイアスの誤差を一時保存するバッファを作成
-		this->lpDBias.resize(this->layerData.lpBias_d.size());
-		this->lppDNeuron.resize(this->layerData.lppNeuron_d.size());
-
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
@@ -612,7 +605,7 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Convolution_GPU::Training(CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
+	ErrorCode Convolution_GPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
 	{
 		cudnnStatus_t err_cudnn;
 
@@ -620,6 +613,8 @@ namespace NeuralNetwork {
 		this->m_lppDOutputBuffer_d = i_lpDOutputBufferPrev;
 
 		// 入力誤差を計算
+		this->m_lpDInputBuffer_d = o_lppDInputBuffer;
+		if(this->m_lpDInputBuffer_d)
 		{
 			F32 alpha = 1.0f;
 			F32 beta  = 0.0f;
@@ -637,7 +632,7 @@ namespace NeuralNetwork {
 				this->workSpace.size(),
 				&beta,
 				this->inputTensorDesc,
-				thrust::raw_pointer_cast(&this->lpDInputBuffer[0]));
+				this->m_lpDInputBuffer_d);
 			if(err_cudnn != 0)
 				return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
 		}
@@ -691,7 +686,7 @@ namespace NeuralNetwork {
 		@return	誤差差分配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER Convolution_GPU::GetDInputBuffer()const
 	{
-		return thrust::raw_pointer_cast(&this->lpDInputBuffer[0]);
+		return this->m_lpDInputBuffer_d;
 	}
 	/** 学習差分を取得する.
 		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */

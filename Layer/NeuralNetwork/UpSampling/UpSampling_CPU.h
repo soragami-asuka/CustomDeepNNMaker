@@ -23,10 +23,8 @@ private:
 
 	// 入出力バッファ
 	std::vector<F32>			lpOutputBuffer;		/**< 出力バッファ <バッチ数><畳み込み数> */
-	std::vector<F32>			lpDInputBuffer;		/**< 入力誤差差分 <バッチ数><入力信号数> */
 
 	std::vector<F32*>						lppBatchOutputBuffer;		/**< バッチ処理用出力バッファ <バッチ数> */
-	std::vector<F32*>						lppBatchDInputBuffer;		/**< バッチ処理用入力誤差差分 <バッチ数> */
 
 	// Get関数を使うと処理不可がかさむので一時保存用. PreCalculateで値を格納.
 	U32 inputBufferCount;				/**< 入力バッファ数 */
@@ -35,6 +33,8 @@ private:
 	// 演算時の入力データ
 	std::vector<CONST_BATCH_BUFFER_POINTER> m_lppInputBuffer;		/**< 演算時の入力データ */
 	std::vector<CONST_BATCH_BUFFER_POINTER> m_lppDOutputBuffer;		/**< 入力誤差計算時の出力誤差データ */
+	BATCH_BUFFER_POINTER m_lpDInputBuffer;
+	std::vector<BATCH_BUFFER_POINTER> m_lppDInputBuffer;			/**< 入力誤差データ */
 
 	// 演算処理用のバッファ
 
@@ -112,7 +112,7 @@ public:
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Training(CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer);
+	ErrorCode Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer);
 
 	/** 学習差分を取得する.
 		配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]

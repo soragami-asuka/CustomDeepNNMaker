@@ -10,6 +10,7 @@
 
 #include<Layer/NeuralNetwork/ILayerDLLManager.h>
 
+#include<thrust/device_vector.h>
 
 namespace Gravisbell {
 namespace Layer {
@@ -17,6 +18,9 @@ namespace NeuralNetwork {
 
 	class FeedforwardNeuralNetwork_GPU : public FeedforwardNeuralNetwork_Base
 	{
+	private:
+		std::vector<thrust::device_vector<F32>> lpDInputBuffer;
+
 		//====================================
 		// コンストラクタ/デストラクタ
 		//====================================
@@ -30,6 +34,24 @@ namespace NeuralNetwork {
 		/** レイヤー種別の取得.
 			ELayerKind の組み合わせ. */
 		U32 GetLayerKind(void)const;
+
+
+		//====================================
+		// 入力誤差バッファ関連
+		//====================================
+	protected:
+		/** 入力誤差バッファの総数を設定する */
+		ErrorCode SetDInputBufferCount(U32 i_DInputBufferCount);
+
+		/** 入力誤差バッファのサイズを設定する */
+		ErrorCode ResizeDInputBuffer(U32 i_DInputBufferNo, U32 i_bufferSize);
+
+	public:
+		/** 入力誤差バッファを取得する */
+		BATCH_BUFFER_POINTER GetDInputBuffer(U32 i_DInputBufferNo);
+		/** 入力誤差バッファを取得する */
+		CONST_BATCH_BUFFER_POINTER GetDInputBuffer(U32 i_DInputBufferNo)const;
+
 
 	public:
 		//====================================

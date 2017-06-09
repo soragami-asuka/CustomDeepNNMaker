@@ -90,18 +90,6 @@ namespace NeuralNetwork {
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
-		// 入力差分バッファを作成
-		switch(this->layerData.layerStructure.ActivationType)
-		{
-			// lenear
-		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_lenear:
-			break;
-
-		default:
-			this->lpDInputBuffer_d.resize(this->batchSize * this->inputBufferCount);
-			break;
-		}
-
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
@@ -349,88 +337,98 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Activation_GPU::Training(CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
+	ErrorCode Activation_GPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
 	{
 		// 出力誤差バッファのアドレスを配列に格納
 		this->m_lpDOutputBufferPrev_d = i_lpDOutputBufferPrev;
 
-		switch(this->layerData.layerStructure.ActivationType)
+
+		// 入力誤差計算
+		if(o_lppDInputBuffer)
 		{
-			// lenear
-		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_lenear:
-			break;
+			// 入力誤差バッファのアドレスを格納
+			this->m_lpDInputBuffer_d = o_lppDInputBuffer;
 
-		default:
-			// Sigmoid
-		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_sigmoid:
-		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_sigmoid_crossEntropy:
-			// ReLU
-		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_ReLU:
-			// tanh
-		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_tanh:
+			switch(this->layerData.layerStructure.ActivationType)
 			{
-				F32 alpha = 1.0f;
-				F32 beta = 0.0f;
-				cudnnActivationBackward(
-					this->cudnnHandle,
-					this->activDesc,
-					&alpha,
-					this->outputTensorDesc,
-					thrust::raw_pointer_cast(&this->lpDInputBuffer_d[0]),
-					this->outputTensorDesc,
-					this->m_lpDOutputBufferPrev_d,
-					this->inputTensorDesc,
-					this->m_lpInputBuffer_d,
-					&beta,
-					this->inputTensorDesc,
-					thrust::raw_pointer_cast(&this->lpDInputBuffer_d[0])
-					);
+				// lenear
+			case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_lenear:
+				cudaMemcpy(this->m_lpDInputBuffer_d, this->m_lpDOutputBufferPrev_d, sizeof(F32)*this->inputBufferCount*this->batchSize, cudaMemcpyDeviceToDevice);
+				break;
+
+			default:
+				// Sigmoid
+			case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_sigmoid:
+				// ReLU
+			case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_ReLU:
+				// tanh
+			case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_tanh:
+				{
+					F32 alpha = 1.0f;
+					F32 beta = 0.0f;
+					cudnnActivationBackward(
+						this->cudnnHandle,
+						this->activDesc,
+						&alpha,
+						this->outputTensorDesc,	// 出力データ構造
+						thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]),	// 出力データ
+						this->outputTensorDesc,
+						this->m_lpDOutputBufferPrev_d,	// 出力誤差
+						this->inputTensorDesc,
+						this->m_lpInputBuffer_d,	// 入力
+						&beta,
+						this->inputTensorDesc,
+						this->m_lpDInputBuffer_d	// 入力誤差
+						);
+				}
+				break;
+
+				// softmax
+				case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_ALL:
+					{
+						F32 alpha = 1.0f;
+						F32 beta = 0.0f;
+						cudnnSoftmaxBackward(
+							this->cudnnHandle,
+							CUDNN_SOFTMAX_ACCURATE,
+							CUDNN_SOFTMAX_MODE_INSTANCE,
+							&alpha,
+							this->outputTensorDesc,
+							thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]),
+							this->outputTensorDesc,
+							this->m_lpDOutputBufferPrev_d,
+							&beta,
+							this->inputTensorDesc,
+							this->m_lpDInputBuffer_d
+							);
+					}
+					break;
+				case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_CH:
+					{
+						F32 alpha = 1.0f;
+						F32 beta = 0.0f;
+						cudnnSoftmaxBackward(
+							this->cudnnHandle,
+							CUDNN_SOFTMAX_ACCURATE,
+							CUDNN_SOFTMAX_MODE_CHANNEL,
+							&alpha,
+							this->outputTensorDesc,
+							thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]),
+							this->outputTensorDesc,
+							this->m_lpDOutputBufferPrev_d,
+							&beta,
+							this->inputTensorDesc,
+							this->m_lpDInputBuffer_d
+							);
+					}
+					break;
+
+				case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_sigmoid_crossEntropy:
+				case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_ALL_crossEntropy:
+				case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_CH_crossEntropy:
+					cudaMemcpy(this->m_lpDInputBuffer_d, this->m_lpDOutputBufferPrev_d, sizeof(F32)*this->inputBufferCount*this->batchSize, cudaMemcpyDeviceToDevice);
+					break;
 			}
-			break;
-
-			// softmax
-			case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_ALL:
-				{
-					F32 alpha = 1.0f;
-					F32 beta = 0.0f;
-					cudnnSoftmaxBackward(
-						this->cudnnHandle,
-						CUDNN_SOFTMAX_ACCURATE,
-						CUDNN_SOFTMAX_MODE_INSTANCE,
-						&alpha,
-						this->outputTensorDesc,
-						thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]),
-						this->outputTensorDesc,
-						this->m_lpDOutputBufferPrev_d,
-						&beta,
-						this->inputTensorDesc,
-						thrust::raw_pointer_cast(&this->lpDInputBuffer_d[0])
-						);
-				}
-				break;
-			case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_CH:
-				{
-					F32 alpha = 1.0f;
-					F32 beta = 0.0f;
-					cudnnSoftmaxBackward(
-						this->cudnnHandle,
-						CUDNN_SOFTMAX_ACCURATE,
-						CUDNN_SOFTMAX_MODE_CHANNEL,
-						&alpha,
-						this->outputTensorDesc,
-						thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]),
-						this->outputTensorDesc,
-						this->m_lpDOutputBufferPrev_d,
-						&beta,
-						this->inputTensorDesc,
-						thrust::raw_pointer_cast(&this->lpDInputBuffer_d[0])
-						);
-				}
-				break;
-
-			case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_ALL_crossEntropy:
-			case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_CH_crossEntropy:
-				break;
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
@@ -442,20 +440,7 @@ namespace NeuralNetwork {
 		@return	誤差差分配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER Activation_GPU::GetDInputBuffer()const
 	{
-		switch(this->layerData.layerStructure.ActivationType)
-		{
-			// lenear
-		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_lenear:
-		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_sigmoid_crossEntropy:
-		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_ALL_crossEntropy:
-		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_CH_crossEntropy:
-			return this->m_lpDOutputBufferPrev_d;
-			break;
-
-		default:
-			return thrust::raw_pointer_cast(&this->lpDInputBuffer_d[0]);
-			break;
-		}
+		return this->m_lpDInputBuffer_d;
 	}
 	/** 学習差分を取得する.
 		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
