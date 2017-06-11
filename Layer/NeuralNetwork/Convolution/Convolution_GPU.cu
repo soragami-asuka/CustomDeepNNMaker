@@ -201,7 +201,7 @@ namespace NeuralNetwork {
 			dimStride[1] = this->layerData.layerStructure.Stride.y;
 			dimStride[2] = this->layerData.layerStructure.Stride.x;
 		}
-		else if(this->layerData.inputDataStruct.y > 1)
+		else if(this->layerData.inputDataStruct.y > 1 || this->layerData.inputDataStruct.x > 1)
 		{
 			dataDim = 1 + 1 + 2;
 

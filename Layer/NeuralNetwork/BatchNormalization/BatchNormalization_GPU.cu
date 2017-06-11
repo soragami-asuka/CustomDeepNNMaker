@@ -244,8 +244,8 @@ namespace NeuralNetwork {
 			dimOutput[2] = this->layerData.GetOutputDataStruct().x;
 
 			dimOutputStride.resize(dataDim);
-			dimOutputStride[0] = dimOutput[2] * dimOutput[3];
-			dimOutputStride[1] = dimOutput[3];
+			dimOutputStride[0] = dimOutput[1] * dimOutput[2];
+			dimOutputStride[1] = dimOutput[2];
 			dimOutputStride[2] = 1;
 
 			dimParam.resize(dataDim);
@@ -254,8 +254,8 @@ namespace NeuralNetwork {
 			dimParam[2] = 1;
 
 			dimParamStride.resize(dataDim);
-			dimParamStride[0] = dimParam[2] * dimParam[3];
-			dimParamStride[1] = dimParam[3];
+			dimParamStride[0] = dimParam[1] * dimParam[2];
+			dimParamStride[1] = dimParam[2];
 			dimParamStride[2] = 1;
 		}
 		else

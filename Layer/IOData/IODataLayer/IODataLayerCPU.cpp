@@ -194,6 +194,7 @@ namespace IOData {
 				if(lpBufferList[i] != NULL)
 					delete lpBufferList[i];
 			}
+			this->lpBufferList.clear();
 
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}

@@ -116,6 +116,7 @@ namespace IOData {
 				if(lpBufferList[i] != NULL)
 					cudaFree(lpBufferList[i]);
 			}
+			this->lpBufferList.clear();
 
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
