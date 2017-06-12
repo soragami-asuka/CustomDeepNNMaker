@@ -215,7 +215,7 @@ namespace NeuralNetwork {
 						tmp += (value - this->lpTmpMean[ch]) * (value - this->lpTmpMean[ch]);
 					}
 				}
-				this->lpTmpVariance[ch]    = tmp / (this->batchSize * this->channeclBufferCount);
+				this->lpTmpVariance[ch]    = (F32)(tmp / (this->batchSize * this->channeclBufferCount));
 			}
 		}
 
@@ -274,18 +274,16 @@ namespace NeuralNetwork {
 	//================================
 	// 学習処理
 	//================================
-	/** 学習処理を実行する.
+	/** 入力誤差計算をを実行する.学習せずに入力誤差を取得したい場合に使用する.
 		入力信号、出力信号は直前のCalculateの値を参照する.
+		@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode BatchNormalization_CPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
+	ErrorCode BatchNormalization_CPU::CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
-		// 平均値更新用の係数を算出
-		F64 factor = 1.0 / (this->learnCount+1);
-
 		// 出力誤差バッファのアドレスを配列に格納
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
-			this->m_lppDOutputBufferPrev[batchNum] = &i_lpDOutputBufferPrev[batchNum * this->outputBufferCount];
+			this->m_lppDOutputBufferPrev[batchNum] = &i_lppDOutputBuffer[batchNum * this->outputBufferCount];
 
 		// 入力誤差バッファのアドレスを配列に格納
 		this->m_lpDInputBuffer = o_lppDInputBuffer;
@@ -341,6 +339,23 @@ namespace NeuralNetwork {
 		}
 
 
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+
+	/** 学習処理を実行する.
+		入力信号、出力信号は直前のCalculateの値を参照する.
+		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
+		直前の計算結果を使用する */
+	ErrorCode BatchNormalization_CPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	{
+		Gravisbell::ErrorCode errCode = this->CalculateDInput(o_lppDInputBuffer, i_lppDOutputBuffer);
+		if(errCode != ErrorCode::ERROR_CODE_NONE)
+			return errCode;
+
+
+		// 平均値更新用の係数を算出
+		F64 factor = 1.0 / (this->learnCount+1);
+
 		// 学習処理の実行回数をカウントアップ
 		this->learnCount++;
 
@@ -361,7 +376,7 @@ namespace NeuralNetwork {
 					F32 value = this->m_lppInputBuffer[batchNum][this->channeclBufferCount*ch + bufNum];
 
 					// 正規化
-					F32 value2 = (value - mean) * sqrtVarianceInv;
+					F32 value2 = (F32)( (value - mean) * sqrtVarianceInv );
 
 					dScale += this->m_lppDOutputBufferPrev[batchNum][this->channeclBufferCount*ch + bufNum] * value2;
 					dBias  += this->m_lppDOutputBufferPrev[batchNum][this->channeclBufferCount*ch + bufNum];
@@ -376,7 +391,6 @@ namespace NeuralNetwork {
 			this->layerData.lpMean[ch]     = (F32)((1.0 - factor) * this->layerData.lpMean[ch]     + factor * this->lpTmpMean[ch]);
 			this->layerData.lpVariance[ch] = (F32)((1.0 - factor) * this->layerData.lpVariance[ch] + factor * variance);
 		}
-
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

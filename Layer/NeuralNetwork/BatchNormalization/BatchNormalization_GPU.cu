@@ -317,6 +317,10 @@ namespace NeuralNetwork {
 		cudaMemset(thrust::raw_pointer_cast(&this->layerData.lpMean[0]),	 0, sizeof(F32)*this->layerData.inputDataStruct.ch);
 		cudaMemset(thrust::raw_pointer_cast(&this->layerData.lpVariance[0]), 0, sizeof(F32)*this->layerData.inputDataStruct.ch);
 
+		cudaMemset(thrust::raw_pointer_cast(&this->lpLearnMean[0]),		0, sizeof(F32)*this->layerData.inputDataStruct.ch);
+		cudaMemset(thrust::raw_pointer_cast(&this->lpLearnVariance[0]),	0, sizeof(F32)*this->layerData.inputDataStruct.ch);
+
+
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
 	/** 演算ループの初期化処理.データセットの演算開始前に実行する
@@ -326,6 +330,9 @@ namespace NeuralNetwork {
 		// 平均,分散を一時バッファに移す
 		this->lpTmpMean = this->layerData.lpMean;
 		this->lpTmpVariance = this->layerData.lpVariance;
+
+		this->lpLearnMean = this->layerData.lpMean;
+		this->lpLearnVariance = this->layerData.lpVariance;
 
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
@@ -352,6 +359,10 @@ namespace NeuralNetwork {
 			for(U32 i=0; i<lpVarianceLast.size(); i++)
 				lpVarianceLast[i] = this->layerData.lpVariance[i];
 
+			// 平均、分散を学習用に移す
+			this->lpLearnMean     = this->layerData.lpMean;
+			this->lpLearnVariance = this->layerData.lpVariance;
+
 			err_cudnn = cudnnBatchNormalizationForwardTraining(
 				this->cudnnHandle,
 				cudnnBatchNormMode_t::CUDNN_BATCHNORM_SPATIAL,
@@ -365,24 +376,13 @@ namespace NeuralNetwork {
 				thrust::raw_pointer_cast(&this->layerData.lpScale[0]),
 				thrust::raw_pointer_cast(&this->layerData.lpBias[0]),
 				(1.0 / (this->learnCount+1)),
-				thrust::raw_pointer_cast(&this->layerData.lpMean[0]),
-				thrust::raw_pointer_cast(&this->layerData.lpVariance[0]),
+				thrust::raw_pointer_cast(&this->lpLearnMean[0]),
+				thrust::raw_pointer_cast(&this->lpLearnVariance[0]),
 				max(CUDNN_BN_MIN_EPSILON, this->layerData.layerStructure.epsilon),
 				thrust::raw_pointer_cast(&this->lpTmpMean[0]),
 				thrust::raw_pointer_cast(&this->lpTmpVariance[0]));
 			if(err_cudnn != 0)
 				return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
-
-			std::vector<F32> lpVarianceNext(this->layerData.inputDataStruct.ch);
-			for(U32 i=0; i<lpVarianceNext.size(); i++)
-				lpVarianceNext[i] = this->layerData.lpVariance[i];
-
-			std::vector<F32> lpVarianceTmp(this->layerData.inputDataStruct.ch);
-			for(U32 i=0; i<lpVarianceTmp.size(); i++)
-				lpVarianceTmp[i] = this->lpTmpVariance[i];
-
-			// 学習処理の実行回数をカウントアップ
-			this->learnCount++;
 		}
 		else
 		{
@@ -442,16 +442,73 @@ namespace NeuralNetwork {
 	//================================
 	// 学習処理
 	//================================
-	/** 学習処理を実行する.
+	/** 入力誤差計算をを実行する.学習せずに入力誤差を取得したい場合に使用する.
 		入力信号、出力信号は直前のCalculateの値を参照する.
+		@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode BatchNormalization_GPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
+	ErrorCode BatchNormalization_GPU::CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		cudnnStatus_t err_cudnn;
 
 		// 出力誤差バッファのアドレスを格納
-		this->m_lppDOutputBufferPrev = i_lpDOutputBufferPrev;
+		this->m_lppDOutputBufferPrev = i_lppDOutputBuffer;
+
+		// 入力誤差バッファのアドレスを格納
+		this->m_lpDInputBuffer_d = o_lppDInputBuffer;
+		if(this->m_lpDInputBuffer_d == NULL)
+		{
+			// 入力誤差バッファが存在しない場合学習ができないため、代替バッファを確保
+			if(this->m_lpTemporaryDInputBuffer_d.size() != this->inputBufferCount * this->batchSize)
+				this->m_lpTemporaryDInputBuffer_d.resize(this->inputBufferCount * this->batchSize);
+
+			this->m_lpDInputBuffer_d = thrust::raw_pointer_cast(&this->m_lpTemporaryDInputBuffer_d[0]);
+		}
+
+
+		F32 alphaData = 1.0f;
+		F32 betaData  = 0.0f;
+
+		F32 alphaParam = 0.0f;
+		F32 betaParam  = 1.0f;
+
+		err_cudnn = cudnnBatchNormalizationBackward(
+			this->cudnnHandle,
+			cudnnBatchNormMode_t::CUDNN_BATCHNORM_SPATIAL,
+			&alphaData,
+			&betaData,
+			&alphaParam,
+			&betaParam,
+			this->inputTensorDesc,
+			this->m_lppInputBuffer,
+			this->outputTensorDesc,
+			this->m_lppDOutputBufferPrev,
+			this->inputTensorDesc,
+			this->m_lpDInputBuffer_d,
+			this->paramTensorDesc,
+			thrust::raw_pointer_cast(&this->layerData.lpScale[0]),
+			thrust::raw_pointer_cast(&this->layerData.lpScale[0]),
+			thrust::raw_pointer_cast(&this->layerData.lpBias[0]),
+			max(CUDNN_BN_MIN_EPSILON, this->layerData.layerStructure.epsilon),
+			thrust::raw_pointer_cast(&this->lpTmpMean[0]),
+			thrust::raw_pointer_cast(&this->lpTmpVariance[0]));
+		if(err_cudnn != 0)
+			return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
+
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+
+	/** 学習処理を実行する.
+		入力信号、出力信号は直前のCalculateの値を参照する.
+		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
+		直前の計算結果を使用する */
+	ErrorCode BatchNormalization_GPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	{
+		cudnnStatus_t err_cudnn;
+
+		// 出力誤差バッファのアドレスを格納
+		this->m_lppDOutputBufferPrev = i_lppDOutputBuffer;
 
 		// 入力誤差バッファのアドレスを格納
 		this->m_lpDInputBuffer_d = o_lppDInputBuffer;
@@ -494,6 +551,12 @@ namespace NeuralNetwork {
 		if(err_cudnn != 0)
 			return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
 
+		// 平均、分散を更新
+		this->layerData.lpMean = this->lpLearnMean;
+		this->layerData.lpVariance = this->lpLearnVariance;
+
+		// 学習処理の実行回数をカウントアップ
+		this->learnCount++;
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

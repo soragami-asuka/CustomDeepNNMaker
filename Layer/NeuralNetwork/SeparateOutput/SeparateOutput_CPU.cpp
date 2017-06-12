@@ -170,11 +170,12 @@ namespace NeuralNetwork {
 	//================================
 	// 学習処理
 	//================================
-	/** 学習処理を実行する.
+	/** 入力誤差計算をを実行する.学習せずに入力誤差を取得したい場合に使用する.
 		入力信号、出力信号は直前のCalculateの値を参照する.
-		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
+		@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
+		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要な配列の[GetOutputDataCount()]配列
 		直前の計算結果を使用する */
-	ErrorCode SeparateOutput_CPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBufferPrev[])
+	ErrorCode SeparateOutput_CPU::CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer[])
 	{
 		// 入力誤差計算
 		this->m_lpDInputBuffer = o_lppDInputBuffer;
@@ -193,13 +194,22 @@ namespace NeuralNetwork {
 			{
 				for(U32 dataNum=0; dataNum<dataCount; dataNum++)
 				{
-					this->m_lpDInputBuffer[dataNum] += i_lppDOutputBufferPrev[outputLayerNum][dataNum];
+					this->m_lpDInputBuffer[dataNum] += i_lppDOutputBuffer[outputLayerNum][dataNum];
 				}
 			}
 
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
+	}
+
+	/** 学習処理を実行する.
+		入力信号、出力信号は直前のCalculateの値を参照する.
+		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
+		直前の計算結果を使用する */
+	ErrorCode SeparateOutput_CPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer[])
+	{
+		return this->CalculateDInput(o_lppDInputBuffer, i_lppDOutputBuffer);
 	}
 
 

@@ -396,6 +396,22 @@ namespace NeuralNetwork {
 		return this->pLayer_io->Calculate(lppInputFromLayer[0]->GetOutputBuffer());
 	}
 	/** ŠwKŒë·‚ðŒvŽZ‚·‚é. */
+	ErrorCode LayerConnectSingle2Single::CalculateDInput(void)
+	{
+		if(this->GetDInputBufferID(0) < 0)
+		{
+			return this->pLayer_io->CalculateDInput(
+				this->neuralNetwork.GetDInputBuffer(),
+				this->lppOutputToLayer[0].pLayer->GetDInputBufferByNum(this->lppOutputToLayer[0].position) );
+		}
+		else
+		{
+			return this->pLayer_io->CalculateDInput(
+				this->neuralNetwork.GetDInputBuffer(this->GetDInputBufferID(0)),
+				this->lppOutputToLayer[0].pLayer->GetDInputBufferByNum(this->lppOutputToLayer[0].position) );
+		}
+	}
+	/** ŠwKŒë·‚ðŒvŽZ‚·‚é. */
 	ErrorCode LayerConnectSingle2Single::Training(void)
 	{
 		if(this->GetDInputBufferID(0) < 0)

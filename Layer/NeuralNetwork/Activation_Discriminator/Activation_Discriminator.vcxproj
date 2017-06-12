@@ -199,10 +199,9 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INeuralNetwork.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNMultInputLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNMultOutputLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingleInputLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingleOutputLayer.h" />
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNMult2SingleLayer.h" />
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingle2MultLayer.h" />
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingle2SingleLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
     <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h" />
     <ClInclude Include="Activation_Discriminator_Base.h" />

@@ -168,6 +168,8 @@ namespace NeuralNetwork {
 
 		/** 演算処理を実行する. */
 		virtual ErrorCode Calculate(void) = 0;
+		/** 入力誤差計算を実行する. */
+		virtual ErrorCode CalculateDInput(void) = 0;
 		/** 学習処理を実行する. */
 		virtual ErrorCode Training(void) = 0;
 	};

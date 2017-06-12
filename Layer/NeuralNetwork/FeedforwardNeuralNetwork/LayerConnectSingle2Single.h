@@ -166,6 +166,8 @@ namespace NeuralNetwork {
 
 		/** 演算処理を実行する. */
 		ErrorCode Calculate(void);
+		/** 入力誤差計算を実行する. */
+		ErrorCode CalculateDInput(void);
 		/** 学習処理を実行する. */
 		ErrorCode Training(void);
 	};

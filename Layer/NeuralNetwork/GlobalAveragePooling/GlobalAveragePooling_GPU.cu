@@ -212,11 +212,6 @@ namespace NeuralNetwork {
 		// 入力バッファのアドレスを格納
 		this->m_lppInputBuffer = i_lpInputBuffer;
 
-#ifdef _DEBUG
-		std::vector<F32> lpInputBuffer_host(this->inputBufferCount * this->batchSize);
-		cudaMemcpy(&lpInputBuffer_host[0], i_lpInputBuffer, sizeof(F32)*lpInputBuffer_host.size(), cudaMemcpyDeviceToHost);
-#endif
-
 		// 初回処理
 		U32 tmpInputBufferCount = this->chSize;
 		U32 tmpOutputBufferCount = (tmpInputBufferCount + (BLOCK_SIZE-1))/BLOCK_SIZE;
@@ -227,12 +222,6 @@ namespace NeuralNetwork {
 		}
 		thrust::device_vector<F32>* pTmpBufferIn  = &this->lpTmpBuffer0;
 		thrust::device_vector<F32>* pTmpBufferOut = &this->lpTmpBuffer1;
-
-
-#ifdef _DEBUG
-		std::vector<F32> lpTmpBuffer_host(tmpOutputBufferCount * this->GetInputDataStruct().ch * this->batchSize);
-		cudaMemcpy(&lpTmpBuffer_host[0], thrust::raw_pointer_cast(&(*pTmpBufferIn)[0]), sizeof(F32)*lpTmpBuffer_host.size(), cudaMemcpyDeviceToHost);
-#endif
 
 
 		while(tmpOutputBufferCount > 1)
@@ -263,12 +252,6 @@ namespace NeuralNetwork {
 			lpTmpOutputBuffer_host[outputNum] /= this->chSize;
 		}
 		this->lpOutputBuffer = lpTmpOutputBuffer_host;
-		
-#ifdef _DEBUG
-		std::vector<F32> lpOutputBuffer_host(this->lpOutputBuffer.size());
-		cudaMemcpy(&lpOutputBuffer_host[0], thrust::raw_pointer_cast(&this->lpOutputBuffer[0]), sizeof(F32)*lpOutputBuffer_host.size(), cudaMemcpyDeviceToHost);
-#endif
-
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -301,14 +284,15 @@ namespace NeuralNetwork {
 	//================================
 	// 学習処理
 	//================================
-	/** 学習処理を実行する.
+	/** 入力誤差計算をを実行する.学習せずに入力誤差を取得したい場合に使用する.
 		入力信号、出力信号は直前のCalculateの値を参照する.
+		@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode GlobalAveragePooling_GPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBufferPrev)
+	ErrorCode GlobalAveragePooling_GPU::CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		// 出力誤差バッファのアドレスを格納
-		this->m_lppDOutputBufferPrev = i_lppDOutputBufferPrev;
+		this->m_lppDOutputBufferPrev = i_lppDOutputBuffer;
 		// 出力誤差バッファのアドレスを格納
 		this->m_lpDInputBuffer_d = o_lppDInputBuffer;
 
@@ -326,16 +310,18 @@ namespace NeuralNetwork {
 					this->m_lpDInputBuffer_d,
 					this->chSize);
 			}
-		
-#ifdef _DEBUG
-			std::vector<F32> lpTmpDOutputBuffer_host(this->outputBufferCount * this->batchSize);
-			std::vector<F32> lpTmpDInputBuffer_host(this->inputBufferCount * this->batchSize);
-			cudaMemcpy(&lpTmpDOutputBuffer_host[0], this->m_lppDOutputBufferPrev, sizeof(F32)*lpTmpDOutputBuffer_host.size(), cudaMemcpyDeviceToHost);
-			cudaMemcpy(&lpTmpDInputBuffer_host[0],  this->m_lpDInputBuffer_d, sizeof(F32)*lpTmpDInputBuffer_host.size(), cudaMemcpyDeviceToHost);
-#endif
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
+	}
+
+	/** 学習処理を実行する.
+		入力信号、出力信号は直前のCalculateの値を参照する.
+		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
+		直前の計算結果を使用する */
+	ErrorCode GlobalAveragePooling_GPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	{
+		return this->CalculateDInput(o_lppDInputBuffer, i_lppDOutputBuffer);
 	}
 
 

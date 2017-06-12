@@ -304,6 +304,11 @@ namespace NeuralNetwork {
 	{
 		return ErrorCode::ERROR_CODE_NONE;
 	}
+	/** 入力誤差計算を実行する. */
+	ErrorCode LayerConnectInput::CalculateDInput(void)
+	{
+		return ErrorCode::ERROR_CODE_NONE;
+	}
 	/** 学習処理を実行する. */
 	ErrorCode LayerConnectInput::Training(void)
 	{

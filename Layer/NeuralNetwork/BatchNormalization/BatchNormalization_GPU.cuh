@@ -46,6 +46,9 @@ private:
 	thrust::device_vector<F32> lpTmpMean;			/**< 平均値格納用の一時変数 */
 	thrust::device_vector<F32> lpTmpVariance;		/**< 分散値格納用の一時変数 */
 
+	thrust::device_vector<F32> lpLearnMean;			/**< 学習用平均値格納用の一時変数 */
+	thrust::device_vector<F32> lpLearnVariance;		/**< 学習用分散値格納用の一時変数 */
+
 	// 演算時の入力データ
 	CONST_BATCH_BUFFER_POINTER	m_lppInputBuffer;		/**< 演算時の入力データ */
 	CONST_BATCH_BUFFER_POINTER	m_lppDOutputBufferPrev;	/**< 入力誤差計算時の出力誤差データ */
@@ -130,6 +133,13 @@ public:
 	//================================
 	// 学習処理
 	//================================
+	/** 入力誤差計算をを実行する.学習せずに入力誤差を取得したい場合に使用する.
+		入力信号、出力信号は直前のCalculateの値を参照する.
+		@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
+		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
+		直前の計算結果を使用する */
+	ErrorCode CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer);
+
 	/** 学習処理を実行する.
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.

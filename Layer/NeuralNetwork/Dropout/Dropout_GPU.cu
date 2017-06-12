@@ -292,14 +292,15 @@ namespace NeuralNetwork {
 	//================================
 	// 学習処理
 	//================================
-	/** 学習処理を実行する.
+	/** 入力誤差計算をを実行する.学習せずに入力誤差を取得したい場合に使用する.
 		入力信号、出力信号は直前のCalculateの値を参照する.
+		@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Dropout_GPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lpDOutputBufferPrev)
+	ErrorCode Dropout_GPU::CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		// 出力誤差バッファのアドレスを格納
-		this->m_lpDOutputBufferPrev_d = i_lpDOutputBufferPrev;
+		this->m_lpDOutputBufferPrev_d = i_lppDOutputBuffer;
 		// 出力誤差バッファのアドレスを格納
 		this->m_lpDInputBuffer_d = o_lppDInputBuffer;
 
@@ -311,7 +312,7 @@ namespace NeuralNetwork {
 					this->cudnnHandle,
 					this->dropoutDesc,
 					this->outputTensorDesc,
-					i_lpDOutputBufferPrev,
+					this->m_lpDOutputBufferPrev_d,
 					this->inputTensorDesc,
 					this->m_lpDInputBuffer_d,
 					this->m_pReserve,
@@ -322,11 +323,20 @@ namespace NeuralNetwork {
 			}
 			else
 			{
-				cudaMemcpy(this->m_lpDInputBuffer_d, i_lpDOutputBufferPrev, sizeof(F32)*this->inputBufferCount*this->batchSize, cudaMemcpyDeviceToDevice);
+				cudaMemcpy(this->m_lpDInputBuffer_d, this->m_lpDOutputBufferPrev_d, sizeof(F32)*this->inputBufferCount*this->batchSize, cudaMemcpyDeviceToDevice);
 			}
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
+	}
+
+	/** 学習処理を実行する.
+		入力信号、出力信号は直前のCalculateの値を参照する.
+		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
+		直前の計算結果を使用する */
+	ErrorCode Dropout_GPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	{
+		return this->CalculateDInput(o_lppDInputBuffer, i_lppDOutputBuffer);
 	}
 
 
