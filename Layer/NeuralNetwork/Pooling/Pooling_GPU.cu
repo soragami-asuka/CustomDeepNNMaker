@@ -164,7 +164,7 @@ namespace NeuralNetwork {
 			dimPadding[1] = 0;
 			dimPadding[2] = 0;
 		}
-		else if(this->layerData.inputDataStruct.y > 1)
+		else if(this->layerData.inputDataStruct.y > 1 || this->layerData.inputDataStruct.x)
 		{
 			dataDim = 1 + 1 + 2;
 

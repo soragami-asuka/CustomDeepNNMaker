@@ -137,6 +137,7 @@ namespace NeuralNetwork {
 		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, useBufferByte);
 		if(pLayerStructure == NULL)
 			return ErrorCode::ERROR_CODE_INITLAYER_READ_CONFIG;
+		readBufferByte += useBufferByte;
 
 		// ‰Šú‰»‚·‚é
 		ErrorCode err = this->Initialize(*pLayerStructure, &lpTmpInputDataStruct[0], (U32)lpTmpInputDataStruct.size());
