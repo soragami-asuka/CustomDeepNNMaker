@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="6694E58A-954C-4092-86C9-653D2E124E83" version="1.0.0.0" default-language="ja">
+
+  <SourceName>Activation_Discriminator</SourceName>
+  <Name>GAN-Discriminator用出力</Name>
+  <Text>GAN-Discriminator用出力.0～1の値を取る単一の出力を持つ.入力は必ず(x=1,y=1,z=1,ch=2)である必要がある.</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+  </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <Learn>
+  </Learn>
+
+</Config>

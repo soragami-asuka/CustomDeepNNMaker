@@ -398,12 +398,6 @@ Layer::ILayerData* CreateMergeInputLayer(
 
 	return pLayer;
 }
-Layer::ILayerData* CreateMergeInputLayer(
-	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-	const std::vector<IODataStruct>& lpInputDataStruct)
-{
-	return CreateMergeInputLayer(layerDLLManager, layerDataManager, &lpInputDataStruct[0], (U32)lpInputDataStruct.size());
-}
 
 
 Layer::ILayerData* CreateResidualLayer(
@@ -433,13 +427,6 @@ Layer::ILayerData* CreateResidualLayer(
 
 	return pLayer;
 }
-Layer::ILayerData* CreateResidualLayer(
-	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-	const std::vector<IODataStruct>& lpInputDataStruct)
-{
-	return CreateResidualLayer(layerDLLManager, layerDataManager, &lpInputDataStruct[0], (U32)lpInputDataStruct.size());
-}
-
 
 
 /** レイヤーをネットワークの末尾に追加する.GUIDは自動割り当て.入力データ構造、最終GUIDも更新する. */
@@ -492,14 +479,6 @@ Gravisbell::ErrorCode AddLayerToNetworkLast(
 
 	return Gravisbell::ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
 }
-Gravisbell::ErrorCode AddLayerToNetworkLast(
-	Layer::Connect::ILayerConnectData& neuralNetwork,
-	Gravisbell::IODataStruct& inputDataStruct, Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddLayer,
-	const std::vector<Gravisbell::GUID>& lpInputLayerGUID)
-{
-	return AddLayerToNetworkLast(neuralNetwork, inputDataStruct, lastLayerGUID, pAddLayer, &lpInputLayerGUID[0], (U32)lpInputLayerGUID.size());
-}
-
 
 
 /** ニューラルネットワークをバイナリファイルに保存する */
