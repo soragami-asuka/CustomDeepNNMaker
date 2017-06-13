@@ -575,6 +575,41 @@ namespace NeuralNetwork {
 				}
 			}
 		}
+		// 入力レイヤーを複数レイヤーから使用していないか確認する
+		if(this->GetOutputLayerCount(this->GetInputGUID()) > 1)
+		{
+			// 出力分割レイヤ－のDLLを取得
+			auto pDLL = this->layerDLLManager.GetLayerDLLByGUID(SEPARATE_LAYER_GUID);
+			if(pDLL == NULL)
+				return ErrorCode::ERROR_CODE_DLL_NOTFOUND;
+
+			// レイヤー構造情報を作成
+			auto pLayerStructure = pDLL->CreateLayerStructureSetting();
+			if(pLayerStructure == NULL)
+				return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+			auto pItem = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Int*>(pLayerStructure->GetItemByID(L"separateCount"));
+			if(pItem == NULL)
+				return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+
+			pItem->SetValue(this->GetOutputLayerCount(this->GetInputGUID()));
+
+			// レイヤーデータを作成
+			auto pSubstitutionLayerData = pDLL->CreateLayerData(*pLayerStructure, this->GetInputDataStruct());
+			delete pLayerStructure;
+
+			// レイヤーを追加
+			ILayerBase* pSubstitutionLayer = NULL;
+			err = neuralNetwork.AddTemporaryLayer(pSubstitutionLayerData, &pSubstitutionLayer);
+			if(err != ErrorCode::ERROR_CODE_NONE)
+				return err;
+
+			lpSubstitutionLayer[this->GetInputGUID()] = pSubstitutionLayer->GetGUID();
+
+			// 代替レイヤーの入力を代替先レイヤーに設定
+			err = neuralNetwork.AddInputLayerToLayer(pSubstitutionLayer->GetGUID(), this->GetInputGUID());
+			if(err != ErrorCode::ERROR_CODE_NONE)
+				return err;
+		}
 
 
 		// レイヤー間の接続を設定する
@@ -967,11 +1002,6 @@ namespace NeuralNetwork {
 	/** レイヤーに接続している出力レイヤーの数を取得する */
 	U32 FeedforwardNeuralNetwork_LayerData_Base::GetOutputLayerCount(const Gravisbell::GUID& i_layerGUID)
 	{
-		// レイヤーの存在を確認
-		auto pLayerConnet = this->GetLayerByGUID(i_layerGUID);
-		if(pLayerConnet == NULL)
-			return ErrorCode::ERROR_CODE_ADDLAYER_NOT_EXIST;
-
 		// 対象レイヤーを入力レイヤーに持つレイヤー数を数える
 		U32 outputCount = 0;
 		for(auto it : this->lpConnectInfo)
