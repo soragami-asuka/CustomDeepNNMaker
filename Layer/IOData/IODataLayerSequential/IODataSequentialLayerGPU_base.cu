@@ -212,7 +212,7 @@ namespace IOData {
 		if(this->lpDInputBuffer.size())
 		{
 			// データをコピー
-			cudaMemcpy(thrust::raw_pointer_cast(&this->lpDInputBuffer[0]), thrust::raw_pointer_cast(&this->lpOutputBuffer[0]), sizeof(F32)*this->GetBufferCount(), cudaMemcpyDeviceToDevice);
+			cudaMemcpy(thrust::raw_pointer_cast(&this->lpDInputBuffer[0]), thrust::raw_pointer_cast(&this->lpOutputBuffer[0]), sizeof(F32)*this->GetBufferCount()*this->batchSize, cudaMemcpyDeviceToDevice);
 
 			// データの誤差を計算
 			{
