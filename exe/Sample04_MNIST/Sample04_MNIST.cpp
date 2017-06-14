@@ -133,12 +133,17 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 	// ファイルに保存する
+	printf("バイナリファイル保存\n");
 	Gravisbell::Utility::NeuralNetworkLayer::WriteNetworkToBinaryFile(*pNeuralNetworkData, L"../../LayerData/test.bin");
-	//// ファイルから読み込む
-	//delete pNeuralNetworkData;
-	//Gravisbell::Utility::NeuralNetworkLayer::ReadNetworkFromBinaryFile(*pLayerDLLManager, &pNeuralNetworkData, "test.bin");
-	//// 別ファイルに保存する
-	//Gravisbell::Utility::NeuralNetworkLayer::WriteNetworkToBinaryFile(*pNeuralNetworkData, "test2.bin");
+	// ファイルから読み込む
+	printf("バイナリファイル読み込み\n");
+	Gravisbell::Layer::ILayerData* pNeuralNetworkData2 = NULL;
+	Gravisbell::Utility::NeuralNetworkLayer::ReadNetworkFromBinaryFile(*pLayerDLLManager, &pNeuralNetworkData2,  L"../../LayerData/test.bin");
+	// 別ファイルに保存する
+	printf("バイナリファイル保存2\n");
+	Gravisbell::Utility::NeuralNetworkLayer::WriteNetworkToBinaryFile(*pNeuralNetworkData2,  L"../../LayerData/test2.bin");
+	printf("終了\n");
+	delete pNeuralNetworkData2;
 
 	//// XMLファイルに保存する
 	//Gravisbell::Layer::NeuralNetwork::Parser::SaveLayerToXML(*pNeuralNetworkData, L"../../LayerData/", L"test.xml");
@@ -628,7 +633,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		//	inputDataStruct, lastLayerGUID,
 		//	CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.5f));
 		//if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-#else	// UpSampling
+#elif 1// UpSampling
 
 		// 2層目
 		err = AddLayerToNetworkLast(
@@ -664,7 +669,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		//	inputDataStruct, lastLayerGUID,
 		//	CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.5f));
 		//if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-
+#else
 #endif
 
 
@@ -680,7 +685,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 			inputDataStruct, lastLayerGUID,
 			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"softmax_ALL_crossEntropy"));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-#else	// GlobalAveragePooling
+#elif 0	// GlobalAveragePooling
 		// 畳み込み(出力：2ch)
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
@@ -699,6 +704,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 			inputDataStruct, lastLayerGUID,
 			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"softmax_ALL_crossEntropy"));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+#else
 #endif
 
 		// 出力レイヤー設定

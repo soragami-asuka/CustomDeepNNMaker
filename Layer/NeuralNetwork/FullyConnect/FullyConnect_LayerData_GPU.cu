@@ -128,7 +128,7 @@ namespace NeuralNetwork {
 			thrust::raw_pointer_cast(&this->lppNeuron_d[0]),
 			&i_lpBuffer[readBufferByte],
 			sizeof(F32) * this->lppNeuron_d.size(),
-			cudaMemcpyDeviceToHost);
+			cudaMemcpyHostToDevice);
 		readBufferByte += sizeof(F32) * (S32)this->lppNeuron_d.size();
 
 		// バイアス
@@ -136,7 +136,7 @@ namespace NeuralNetwork {
 			thrust::raw_pointer_cast(&this->lpBias_d[0]),
 			&i_lpBuffer[readBufferByte],
 			sizeof(F32) * this->lpBias_d.size(),
-			cudaMemcpyDeviceToHost);
+			cudaMemcpyHostToDevice);
 		readBufferByte += sizeof(F32) * (S32)this->lpBias_d.size();
 
 		o_useBufferSize = readBufferByte;
