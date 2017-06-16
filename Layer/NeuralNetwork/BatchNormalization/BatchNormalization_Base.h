@@ -22,6 +22,8 @@
 
 #include"BatchNormalization_LayerData_Base.h"
 
+#include"Layer/NeuralNetwork/IOptimizer.h"
+
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
@@ -36,6 +38,9 @@ namespace NeuralNetwork {
 		SettingData::Standard::IData* pLearnData;	/**< 学習設定を定義したコンフィグクラス */
 
 		unsigned int batchSize;	/**< バッチサイズ */
+
+		IOptimizer* m_pOptimizer_scale;		/**< スケール更新用オプティマイザ */
+		IOptimizer* m_pOptimizer_bias;		/**< バイアス更新用オプティマイザ */
 
 	public:
 		/** コンストラクタ */

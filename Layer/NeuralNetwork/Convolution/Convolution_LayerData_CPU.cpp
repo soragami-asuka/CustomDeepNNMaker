@@ -37,7 +37,7 @@ namespace NeuralNetwork {
 	ErrorCode Convolution_LayerData_CPU::Initialize(void)
 	{
 		// 乱数固定化
-//		Utility::Random::Initialize(0);
+		Utility::Random::Initialize(0);
 
 		// 入力バッファ数を確認
 		U32 inputBufferCount = this->inputDataStruct.ch * this->layerStructure.FilterSize.z * this->layerStructure.FilterSize.y * this->layerStructure.FilterSize.x;
@@ -58,13 +58,14 @@ namespace NeuralNetwork {
 		// バッファを確保しつつ、初期値を設定
 //		float maxArea = sqrt(6.0f / (this->GetInputBufferCount() + this->GetOutputBufferCount()));
 		float maxArea = sqrt(6.0f / (this->layerStructure.FilterSize.x*this->layerStructure.FilterSize.y*this->layerStructure.FilterSize.z  + this->layerStructure.Output_Channel));
+		this->lpNeuron.resize(neuronCount * inputBufferCount);
 		this->lppNeuron.resize(neuronCount);
 		this->lpBias.resize(neuronCount);
 		// ニューロン
-		for(unsigned int neuronNum=0; neuronNum<lppNeuron.size(); neuronNum++)
+		for(unsigned int neuronNum=0; neuronNum<neuronCount; neuronNum++)
 		{
-			lppNeuron[neuronNum].resize(inputBufferCount);
-			for(unsigned int inputNum=0; inputNum<lppNeuron[neuronNum].size(); inputNum++)
+			lppNeuron[neuronNum] = &this->lpNeuron[inputBufferCount * neuronNum];
+			for(unsigned int inputNum=0; inputNum<inputBufferCount; inputNum++)
 			{
 				lppNeuron[neuronNum][inputNum] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
 			}
@@ -120,11 +121,8 @@ namespace NeuralNetwork {
 		this->Initialize();
 
 		// ニューロン係数
-		for(unsigned int neuronNum=0; neuronNum<this->lppNeuron.size(); neuronNum++)
-		{
-			memcpy(&this->lppNeuron[neuronNum][0], &i_lpBuffer[readBufferByte], this->lppNeuron[neuronNum].size() * sizeof(NEURON_TYPE));
-			readBufferByte += (int)this->lppNeuron[neuronNum].size() * sizeof(NEURON_TYPE);
-		}
+		memcpy(&this->lpNeuron[0], &i_lpBuffer[readBufferByte], this->lpNeuron.size() * sizeof(NEURON_TYPE));
+		readBufferByte += (int)this->lpNeuron.size() * sizeof(NEURON_TYPE);
 
 		// バイアス
 		memcpy(&this->lpBias[0], &i_lpBuffer[readBufferByte], this->lpBias.size() * sizeof(NEURON_TYPE));
@@ -157,11 +155,8 @@ namespace NeuralNetwork {
 		writeBufferByte += this->pLayerStructure->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
 
 		// ニューロン係数
-		for(unsigned int neuronNum=0; neuronNum<this->lppNeuron.size(); neuronNum++)
-		{
-			memcpy(&o_lpBuffer[writeBufferByte], &this->lppNeuron[neuronNum][0], this->lppNeuron[neuronNum].size() * sizeof(NEURON_TYPE));
-			writeBufferByte += (int)this->lppNeuron[neuronNum].size() * sizeof(NEURON_TYPE);
-		}
+		memcpy(&o_lpBuffer[writeBufferByte], &this->lpNeuron[0], this->lpNeuron.size() * sizeof(NEURON_TYPE));
+		writeBufferByte += (int)this->lpNeuron.size() * sizeof(NEURON_TYPE);
 
 		// バイアス
 		memcpy(&o_lpBuffer[writeBufferByte], &this->lpBias[0], this->lpBias.size() * sizeof(NEURON_TYPE));

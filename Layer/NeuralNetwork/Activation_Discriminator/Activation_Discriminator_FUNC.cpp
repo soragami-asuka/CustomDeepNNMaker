@@ -3,7 +3,7 @@
  * LayerName : GAN-Discriminator用出力
  * guid      : 6694E58A-954C-4092-86C9-653D2E124E83
  * 
- * Text      : GAN-Discriminator用出力
+ * Text      : GAN-Discriminator用出力.0～1の値を取る単一の出力を持つ.入力は必ず(x=1,y=1,z=1,ch=2)である必要がある.
 --------------------------------------------*/
 #include"stdafx.h"
 
@@ -38,7 +38,7 @@ namespace DefaultLanguage
     static const StringData g_baseData = 
     {
         L"GAN-Discriminator用出力",
-        L"GAN-Discriminator用出力"
+        L"GAN-Discriminator用出力.0～1の値を取る単一の出力を持つ.入力は必ず(x=1,y=1,z=1,ch=2)である必要がある."
     };
 
 

@@ -227,13 +227,13 @@
     <Xml Include="Config.xml" />
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="GlobalAveragePooling_GPU.cu" />
+    <CudaCompile Include="GlobalAveragePooling_LayerData_GPU.cu" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\..\Library\SettingData\Standard\Standard.vcxproj">
       <Project>{79fd5f13-1407-43ab-834c-04c1aeccdbb5}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <CudaCompile Include="GlobalAveragePooling_GPU.cu" />
-    <CudaCompile Include="GlobalAveragePooling_LayerData_GPU.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

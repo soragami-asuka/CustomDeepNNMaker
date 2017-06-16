@@ -267,6 +267,9 @@
     </Xml>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Library\NeuralNetwork\Optimizer\Optimizer.vcxproj">
+      <Project>{698bec32-f247-4642-a71d-3db317fc945c}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Library\SettingData\Standard\Standard.vcxproj">
       <Project>{79fd5f13-1407-43ab-834c-04c1aeccdbb5}</Project>
     </ProjectReference>

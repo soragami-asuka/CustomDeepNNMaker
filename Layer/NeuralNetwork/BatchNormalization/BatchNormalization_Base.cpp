@@ -15,6 +15,8 @@ using namespace Gravisbell::Layer::NeuralNetwork;
 BatchNormalization_Base::BatchNormalization_Base(Gravisbell::GUID guid)
 	:	guid				(guid)
 	,	pLearnData			(NULL)
+	,	m_pOptimizer_scale	(NULL)		/**< スケール更新用オプティマイザ */
+	,	m_pOptimizer_bias	(NULL)		/**< バイアス更新用オプティマイザ */
 {
 }
 
@@ -23,6 +25,11 @@ BatchNormalization_Base::~BatchNormalization_Base()
 {
 	if(pLearnData != NULL)
 		delete pLearnData;
+	
+	if(this->m_pOptimizer_scale)
+		delete this->m_pOptimizer_scale;
+	if(this->m_pOptimizer_bias)
+		delete this->m_pOptimizer_bias;
 }
 
 

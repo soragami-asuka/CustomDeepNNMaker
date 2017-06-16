@@ -9,6 +9,7 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4267)
+#pragma warning(disable : 4819)
 #include <cuda.h> // need CUDA_VERSION
 #include <cudnn.h>
 #include <cublas_v2.h>
@@ -47,6 +48,9 @@ private:
 
 	// 演算処理用のバッファ
 	thrust::device_vector<F32>	lpBiasUpdateVector_d;		/**< バイアス更新のためのベクトル(全て1が入る) */
+
+	thrust::device_vector<F32> lpDBias;		/**< バイアスの変化量 */
+	thrust::device_vector<F32> lpDNeuron;	/**< ニューロンの変化量 */
 
 	cublasHandle_t cublasHandle;
 

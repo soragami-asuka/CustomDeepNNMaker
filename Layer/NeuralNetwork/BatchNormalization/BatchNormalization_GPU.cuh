@@ -64,6 +64,10 @@ private:
 	cudnnTensorDescriptor_t			outputTensorDesc;			/**< 出力データ構造 */
 	cudnnTensorDescriptor_t			paramTensorDesc;			/**< スケール,バイアス,平均の各値のデータ構造 */
 
+	thrust::device_vector<F32> lpDBias;		/**< バイアスの変化量 */
+	thrust::device_vector<F32> lpDScale;		/**< スケールの変化量 */
+
+
 public:
 	/** コンストラクタ */
 	BatchNormalization_GPU(Gravisbell::GUID guid, class BatchNormalization_LayerData_GPU& i_layerData);

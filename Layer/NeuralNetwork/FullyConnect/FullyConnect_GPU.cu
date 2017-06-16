@@ -11,6 +11,8 @@
 #include"FullyConnect_GPU.cuh"
 #include"FullyConnect_LayerData_GPU.cuh"
 
+#include"Library/NeuralNetwork/Optimizer.h"
+
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
 
@@ -111,6 +113,10 @@ namespace NeuralNetwork {
 			this->lpBiasUpdateVector_d = lpBuf;
 		}
 
+		// パラメータ変化量
+		this->lpDBias.resize(this->neuronCount);
+		this->lpDNeuron.resize(this->neuronCount * this->inputBufferCount);
+
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
@@ -156,14 +162,18 @@ namespace NeuralNetwork {
 		if(this->pLearnData != NULL)
 			delete this->pLearnData;
 		this->pLearnData = data.Clone();
+		this->pLearnData->WriteToStruct((BYTE*)&this->learnData);
 
-		// 学習係数
+		switch(this->learnData.Optimizer)
 		{
-			auto pItem = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Float*>(data.GetItemByID(L"LearnCoeff"));
-			if(pItem)
-				this->learnData.LearnCoeff = pItem->GetValue();
-			else
-				this->learnData.LearnCoeff = 1.0f;
+		case FullyConnect::LearnDataStructure::Optimizer_SGD:
+			UpdateOptimizer_SGD_GPU(&this->m_pOptimizer_neuron, this->neuronCount*this->inputBufferCount, this->learnData.LearnCoeff);
+			UpdateOptimizer_SGD_GPU(&this->m_pOptimizer_bias,   this->neuronCount,                        this->learnData.LearnCoeff);
+			break;
+		case FullyConnect::LearnDataStructure::Optimizer_Momentum:
+			UpdateOptimizer_Momentum_GPU(&this->m_pOptimizer_neuron, this->neuronCount*this->inputBufferCount, this->learnData.LearnCoeff, this->learnData.Momentum_alpha);
+			UpdateOptimizer_Momentum_GPU(&this->m_pOptimizer_bias,   this->neuronCount,                        this->learnData.LearnCoeff, this->learnData.Momentum_alpha);
+			break;
 		}
 
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
@@ -303,10 +313,10 @@ namespace NeuralNetwork {
 			return errCode;
 
 		
-		// バイアス更新
+		// バイアス変化量計算
 		{
-			F32 alpha = this->learnData.LearnCoeff;
-			F32 beta  = 1.0f;
+			F32 alpha = 1.0f;
+			F32 beta  = 0;
 
 			cublasSgemm(
 				this->cublasHandle,
@@ -321,16 +331,16 @@ namespace NeuralNetwork {
 				thrust::raw_pointer_cast(&this->lpBiasUpdateVector_d[0]),	// 行列B
 				this->batchSize,											// 行列Bの転置前の行数
 				&beta,
-				thrust::raw_pointer_cast(&this->layerData.lpBias_d[0]),
+				thrust::raw_pointer_cast(&this->lpDBias[0]),
 				this->neuronCount);
 		}
 
-		// ニューロン更新
+		// ニューロン変化量計算
 		{
 			// ニューロンの誤差を計算して加算する
 			{
-				F32 alpha = this->learnData.LearnCoeff;
-				F32 beta  = 1.0f;
+				F32 alpha = 1.0f;
+				F32 beta  = 0;
 
 				cublasSgemm(
 					this->cublasHandle,
@@ -345,10 +355,18 @@ namespace NeuralNetwork {
 					this->m_lppDOutputBuffer_d,	// 行列B
 					this->neuronCount,										// 行列Bの転置前の行数
 					&beta,
-					thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]),
+					thrust::raw_pointer_cast(&this->lpDNeuron[0]),
 					this->inputBufferCount);
 			}
 		}
+
+
+		// 誤差を反映
+		if(this->m_pOptimizer_bias)
+			this->m_pOptimizer_bias->UpdateParameter(thrust::raw_pointer_cast(&this->layerData.lpBias_d[0]),   thrust::raw_pointer_cast(&this->lpDBias[0]));
+		if(this->m_pOptimizer_neuron)
+			this->m_pOptimizer_neuron->UpdateParameter(thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]), thrust::raw_pointer_cast(&this->lpDNeuron[0]));
+
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

@@ -59,6 +59,8 @@ private:
 	cudnnConvolutionBwdFilterAlgo_t	useBackwardFilterAlgorithm;	/**< 後方伝播時のフィルタ計算に使用するアルゴリズム番号 */
 	thrust::device_vector<BYTE>		workSpace;					/**< 処理用のメモリ.前方伝播、後方伝播全てで共用する. */
 
+	thrust::device_vector<F32> lpDBias;		/**< バイアスの変化量 */
+	thrust::device_vector<F32> lpDNeuron;	/**< ニューロンの変化量 */
 
 public:
 	/** コンストラクタ */

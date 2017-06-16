@@ -26,8 +26,8 @@ private:
 
 	std::vector<F32*>						lppBatchOutputBuffer;		/**< バッチ処理用出力バッファ <バッチ数> */
 
-	std::vector<std::vector<F32>>			lppDNeuron;	/**< ニューロンの学習量 */
-	std::vector<F32>						lpDBias;	/**< バイアスの学習量 */
+	std::vector<F32>			lpDNeuron;	/**< ニューロンの学習量 */
+	std::vector<F32>			lpDBias;	/**< バイアスの学習量 */
 
 	// Get関数を使うと処理不可がかさむので一時保存用. PreCalculateで値を格納.
 	U32 filterSize;						/**< フィルタサイズ */

@@ -11,8 +11,12 @@
 #include"Convolution_GPU.cuh"
 #include"Convolution_LayerData_GPU.cuh"
 
+#include"Library/NeuralNetwork/Optimizer.h"
+
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
+
+#define TEMPORARY_MEMORY_MAX	(100 * 1024 * 1024)
 
 
 namespace Gravisbell {
@@ -97,6 +101,12 @@ namespace NeuralNetwork {
 		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
+
+
+		// パラメータ変化量のバッファを確保
+		this->lpDBias.resize(this->layerData.lpBias_d.size());
+		this->lpDNeuron.resize(this->layerData.lppNeuron_d.size());
+
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -401,8 +411,8 @@ namespace NeuralNetwork {
 			this->filterDesc,
 			this->convDesc,
 			this->outputTensorDesc,
-			CUDNN_CONVOLUTION_FWD_PREFER_FASTEST,	// メモリの使用量無制限で最速のアルゴリズムを調べる
-			0,										// 使用可能なメモリの上限
+			cudnnConvolutionFwdPreference_t::CUDNN_CONVOLUTION_FWD_SPECIFY_WORKSPACE_LIMIT,	// メモリの使用量無制限で最速のアルゴリズムを調べる
+			TEMPORARY_MEMORY_MAX,										// 使用可能なメモリの上限
 			&this->useForwardAlgorithm
 			);
 		if(err_cudnn != 0)
@@ -429,8 +439,8 @@ namespace NeuralNetwork {
 			this->outputTensorDesc,
 			this->convDesc,
 			this->inputTensorDesc,
-			cudnnConvolutionBwdDataPreference_t::CUDNN_CONVOLUTION_BWD_DATA_PREFER_FASTEST,	// メモリの使用量無制限で最速のアルゴリズムを調べる
-			0,																				// 使用可能なメモリの上限
+			cudnnConvolutionBwdDataPreference_t::CUDNN_CONVOLUTION_BWD_DATA_SPECIFY_WORKSPACE_LIMIT,	// メモリの使用量無制限で最速のアルゴリズムを調べる
+			TEMPORARY_MEMORY_MAX,																				// 使用可能なメモリの上限
 			&this->useBackwardDataAlgorithm);
 		if(err_cudnn != 0)
 			return ErrorCode::ERROR_CODE_CUDA_INITIALIZE;
@@ -456,8 +466,8 @@ namespace NeuralNetwork {
 			this->outputTensorDesc,
 			this->convDesc,
 			this->filterDesc,
-			cudnnConvolutionBwdFilterPreference_t::CUDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST,	// メモリの使用量無制限で最速のアルゴリズムを調べる
-			0,																					// 使用可能なメモリの上限
+			cudnnConvolutionBwdFilterPreference_t::CUDNN_CONVOLUTION_BWD_FILTER_SPECIFY_WORKSPACE_LIMIT,	// メモリの使用量無制限で最速のアルゴリズムを調べる
+			TEMPORARY_MEMORY_MAX,																					// 使用可能なメモリの上限
 			&this->useBackwardFilterAlgorithm);
 		if(err_cudnn != 0)
 			return ErrorCode::ERROR_CODE_CUDA_INITIALIZE;
@@ -501,15 +511,20 @@ namespace NeuralNetwork {
 		if(this->pLearnData != NULL)
 			delete this->pLearnData;
 		this->pLearnData = data.Clone();
+		this->pLearnData->WriteToStruct((BYTE*)&this->learnData);
 
-		// 学習係数
+		switch(this->learnData.Optimizer)
 		{
-			auto pItem = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Float*>(data.GetItemByID(L"LearnCoeff"));
-			if(pItem)
-				this->learnData.LearnCoeff = pItem->GetValue();
-			else
-				this->learnData.LearnCoeff = 1.0f;
+		case Convolution::LearnDataStructure::Optimizer_SGD:
+			UpdateOptimizer_SGD_GPU(&this->m_pOptimizer_neuron, (U32)this->lpDNeuron.size(), this->learnData.LearnCoeff);
+			UpdateOptimizer_SGD_GPU(&this->m_pOptimizer_bias,   (U32)this->lpDBias.size(),   this->learnData.LearnCoeff);
+			break;
+		case Convolution::LearnDataStructure::Optimizer_Momentum:
+			UpdateOptimizer_Momentum_GPU(&this->m_pOptimizer_neuron, (U32)this->lpDNeuron.size(), this->learnData.LearnCoeff, this->learnData.Momentum_alpha);
+			UpdateOptimizer_Momentum_GPU(&this->m_pOptimizer_bias,   (U32)this->lpDBias.size(),   this->learnData.LearnCoeff, this->learnData.Momentum_alpha);
+			break;
 		}
+
 
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
@@ -657,8 +672,8 @@ namespace NeuralNetwork {
 
 		// フィルター変化量を計算
 		{
-			F32 alpha = this->learnData.LearnCoeff;
-			F32 beta  = 1.0f;
+			F32 alpha = 1.0f;
+			F32 beta  = 0.0f;
 
 			err_cudnn = cudnnConvolutionBackwardFilter(
 				this->cudnnHandle,
@@ -673,15 +688,15 @@ namespace NeuralNetwork {
 				this->workSpace.size(),
 				&beta,
 				this->filterDesc,
-				thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]));
+				thrust::raw_pointer_cast(&this->lpDNeuron[0]));
 			if(err_cudnn != 0)
 				return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
 		}
 
 		// バイアス変化量を計算
 		{
-			F32 alpha = this->learnData.LearnCoeff;
-			F32 beta  = 1.0f;
+			F32 alpha = 1.0f;
+			F32 beta  = 0.0f;
 
 			err_cudnn = cudnnConvolutionBackwardBias(
 				this->cudnnHandle,
@@ -690,10 +705,17 @@ namespace NeuralNetwork {
 				this->m_lppDOutputBuffer_d,
 				&beta,
 				this->biasTensorDesc,
-				thrust::raw_pointer_cast(&this->layerData.lpBias_d[0]));
+				thrust::raw_pointer_cast(&this->lpDBias[0]));
 			if(err_cudnn != 0)
 				return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
 		}
+
+		// 変化量を反映
+		if(this->m_pOptimizer_bias)
+			this->m_pOptimizer_bias->UpdateParameter(thrust::raw_pointer_cast(&this->layerData.lpBias_d[0]),   thrust::raw_pointer_cast(&this->lpDBias[0]));
+		if(this->m_pOptimizer_neuron)
+			this->m_pOptimizer_neuron->UpdateParameter(thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]), thrust::raw_pointer_cast(&this->lpDNeuron[0]));
+
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

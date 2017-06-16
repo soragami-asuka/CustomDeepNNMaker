@@ -229,11 +229,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Library\SettingData\Standard\Standard.vcxproj">
-      <Project>{79fd5f13-1407-43ab-834c-04c1aeccdbb5}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <CudaCompile Include="IODataLayerGPU_base.cu">
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -253,6 +248,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Library\SettingData\Standard\Standard.vcxproj">
+      <Project>{79fd5f13-1407-43ab-834c-04c1aeccdbb5}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

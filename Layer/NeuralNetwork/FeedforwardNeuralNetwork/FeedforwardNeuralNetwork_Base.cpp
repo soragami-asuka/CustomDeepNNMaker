@@ -589,6 +589,16 @@ namespace NeuralNetwork {
 				return ErrorCode::ERROR_CODE_NONE;
 			}
 			break;
+		case Gravisbell::SettingData::Standard::ITEMTYPE_ENUM:
+			{
+				Gravisbell::SettingData::Standard::IItem_Enum* pItemString = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Enum*>(pItem);
+				if(pItemString == NULL)
+					break;
+				pItemString->SetValue(i_param);
+
+				return ErrorCode::ERROR_CODE_NONE;
+			}
+			break;
 		}
 
 		return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;

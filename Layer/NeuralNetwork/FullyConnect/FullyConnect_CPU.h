@@ -42,7 +42,8 @@ private:
 	std::vector<BATCH_BUFFER_POINTER> m_lppDInputBuffer;			/**< 入力誤差データ */
 
 	// 演算処理用のバッファ
-
+	std::vector<F32> lpDBias;	/**< バイアスの変化量 */
+	std::vector<F32> lpDNeuron;	/**< ニューロンの変化量 */
 
 public:
 	/** コンストラクタ */

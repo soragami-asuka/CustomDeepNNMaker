@@ -12,6 +12,8 @@
 #include"FullyConnect_CPU.h"
 #include"FullyConnect_LayerData_CPU.h"
 
+#include"Library/NeuralNetwork/Optimizer.h"
+
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
 
@@ -86,6 +88,10 @@ namespace NeuralNetwork {
 		// 出力誤差バッファ受け取り用のアドレス配列を作成する
 		this->m_lppDInputBuffer.resize(batchSize);
 
+		// パラメータの変化量バッファ
+		this->lpDBias.resize(this->neuronCount);
+		this->lpDNeuron.resize(this->neuronCount * this->inputBufferCount);
+
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -115,9 +121,9 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
 		// ニューロンバッファのサイズ確認
-		if(this->layerData.lppNeuron.size() != this->neuronCount)
+		if(this->layerData.lpNeuron.size() != this->neuronCount * this->inputBufferCount)
 			return ErrorCode::ERROR_CODE_FRAUD_NEURON_COUNT;
-		if(this->layerData.lppNeuron[0].size() != this->inputBufferCount)
+		if(this->layerData.lppNeuron.size() != this->neuronCount)
 			return ErrorCode::ERROR_CODE_FRAUD_NEURON_COUNT;
 
 		// 入力バッファ保存用のアドレス配列を作成
@@ -142,14 +148,18 @@ namespace NeuralNetwork {
 		if(this->pLearnData != NULL)
 			delete this->pLearnData;
 		this->pLearnData = data.Clone();
+		this->pLearnData->WriteToStruct((BYTE*)&this->learnData);
 
-		// 学習係数
+		switch(this->learnData.Optimizer)
 		{
-			auto pItem = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Float*>(data.GetItemByID(L"LearnCoeff"));
-			if(pItem)
-				this->learnData.LearnCoeff = pItem->GetValue();
-			else
-				this->learnData.LearnCoeff = 1.0f;
+		case FullyConnect::LearnDataStructure::Optimizer_SGD:
+			UpdateOptimizer_SGD_CPU(&this->m_pOptimizer_neuron, this->neuronCount*this->inputBufferCount, this->learnData.LearnCoeff);
+			UpdateOptimizer_SGD_CPU(&this->m_pOptimizer_bias,   this->neuronCount,                        this->learnData.LearnCoeff);
+			break;
+		case FullyConnect::LearnDataStructure::Optimizer_Momentum:
+			UpdateOptimizer_Momentum_CPU(&this->m_pOptimizer_neuron, this->neuronCount*this->inputBufferCount, this->learnData.LearnCoeff, this->learnData.Momentum_alpha);
+			UpdateOptimizer_Momentum_CPU(&this->m_pOptimizer_bias,   this->neuronCount,                        this->learnData.LearnCoeff, this->learnData.Momentum_alpha);
+			break;
 		}
 
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
@@ -276,8 +286,11 @@ namespace NeuralNetwork {
 		if(errCode != ErrorCode::ERROR_CODE_NONE)
 			return errCode;
 
+		// パラメータ変化量のバッファをクリア
+		memset(&this->lpDBias[0],   0, sizeof(F32)*this->lpDBias.size());
+		memset(&this->lpDNeuron[0], 0, sizeof(F32)*this->lpDNeuron.size());
 
-		// 学習誤差を反映
+		// 学習誤差を計算
 		for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
 		{
 			// バイアス更新
@@ -288,7 +301,7 @@ namespace NeuralNetwork {
 					 sumDOutput += this->m_lppDOutputBuffer[batchNum][neuronNum];
 				}
 
-				this->layerData.lpBias[neuronNum] += this->learnData.LearnCoeff * sumDOutput;
+				this->lpDBias[neuronNum] = sumDOutput;
 			}
 
 			// 入力対応ニューロン更新
@@ -300,9 +313,15 @@ namespace NeuralNetwork {
 					sumDOutput += this->m_lppInputBuffer[batchNum][inputNum] * this->m_lppDOutputBuffer[batchNum][neuronNum];
 				}
 
-				this->layerData.lppNeuron[neuronNum][inputNum] += this->learnData.LearnCoeff * sumDOutput;
+				this->lpDNeuron[neuronNum*this->inputBufferCount + inputNum] += sumDOutput;
 			}
 		}
+
+		// 誤差を反映
+		if(this->m_pOptimizer_bias)
+			this->m_pOptimizer_bias->UpdateParameter(&this->layerData.lpBias[0],   &this->lpDBias[0]);
+		if(this->m_pOptimizer_neuron)
+			this->m_pOptimizer_neuron->UpdateParameter(&this->layerData.lpNeuron[0], &this->lpDNeuron[0]);
 
 
 		return ErrorCode::ERROR_CODE_NONE;

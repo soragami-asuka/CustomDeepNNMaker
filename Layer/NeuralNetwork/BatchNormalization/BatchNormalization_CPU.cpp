@@ -11,6 +11,8 @@
 #include"BatchNormalization_CPU.h"
 #include"BatchNormalization_LayerData_CPU.h"
 
+#include"Library/NeuralNetwork/Optimizer.h"
+
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
 
@@ -93,6 +95,9 @@ namespace NeuralNetwork {
 		// 入力誤差バッファ受け取り用のアドレス配列を作成する
 		this->m_lppDInputBuffer.resize(batchSize);
 
+		// パラメータ変化量のバッファを確保
+		this->lpDBias.resize(this->layerData.lpBias.size());
+		this->lpDScale.resize(this->layerData.lpScale.size());
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -148,7 +153,6 @@ namespace NeuralNetwork {
 		if(this->pLearnData != NULL)
 			delete this->pLearnData;
 		this->pLearnData = data.Clone();
-
 		this->pLearnData->WriteToStruct((BYTE*)&learnData);
 
 
@@ -160,6 +164,18 @@ namespace NeuralNetwork {
 		{
 			this->layerData.lpMean[ch] = 0.0f;
 			this->layerData.lpVariance[ch] = 0.0f;
+		}
+
+		switch(this->learnData.Optimizer)
+		{
+		case BatchNormalization::LearnDataStructure::Optimizer_SGD:
+			UpdateOptimizer_SGD_CPU(&this->m_pOptimizer_scale,	(U32)this->lpDScale.size(),	this->learnData.LearnCoeff);
+			UpdateOptimizer_SGD_CPU(&this->m_pOptimizer_bias,   (U32)this->lpDBias.size(),	this->learnData.LearnCoeff);
+			break;
+		case BatchNormalization::LearnDataStructure::Optimizer_Momentum:
+			UpdateOptimizer_Momentum_CPU(&this->m_pOptimizer_scale,	(U32)this->lpDScale.size(), this->learnData.LearnCoeff, this->learnData.Momentum_alpha);
+			UpdateOptimizer_Momentum_CPU(&this->m_pOptimizer_bias,	(U32)this->lpDBias.size(),  this->learnData.LearnCoeff, this->learnData.Momentum_alpha);
+			break;
 		}
 
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
@@ -366,8 +382,8 @@ namespace NeuralNetwork {
 			F64 sqrtVariance = (F32)sqrt(variance);
 			F64 sqrtVarianceInv = 1.0f / sqrtVariance;
 
-			F32 dBias = 0.0f;
-			F32 dScale = 0.0f;
+			this->lpDScale[ch] = 0.0f;
+			this->lpDBias[ch] = 0.0f;
 
 			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 			{
@@ -378,19 +394,21 @@ namespace NeuralNetwork {
 					// 正規化
 					F32 value2 = (F32)( (value - mean) * sqrtVarianceInv );
 
-					dScale += this->m_lppDOutputBufferPrev[batchNum][this->channeclBufferCount*ch + bufNum] * value2;
-					dBias  += this->m_lppDOutputBufferPrev[batchNum][this->channeclBufferCount*ch + bufNum];
+					this->lpDScale[ch] += this->m_lppDOutputBufferPrev[batchNum][this->channeclBufferCount*ch + bufNum] * value2;
+					this->lpDBias[ch]  += this->m_lppDOutputBufferPrev[batchNum][this->channeclBufferCount*ch + bufNum];
 				}
 			}
-
-			// 値を更新
-			this->layerData.lpScale[ch] += this->learnData.LearnCoeff * dScale;
-			this->layerData.lpBias[ch]  += this->learnData.LearnCoeff * dBias;
 
 			// 平均と分散を更新
 			this->layerData.lpMean[ch]     = (F32)((1.0 - factor) * this->layerData.lpMean[ch]     + factor * this->lpTmpMean[ch]);
 			this->layerData.lpVariance[ch] = (F32)((1.0 - factor) * this->layerData.lpVariance[ch] + factor * variance);
 		}
+
+		// スケールとバイアスを更新
+		if(this->m_pOptimizer_scale)
+			this->m_pOptimizer_scale->UpdateParameter(&this->layerData.lpScale[0], &this->lpDScale[0]);
+		if(this->m_pOptimizer_bias)
+			this->m_pOptimizer_bias->UpdateParameter(&this->layerData.lpBias[0], &this->lpDBias[0]);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

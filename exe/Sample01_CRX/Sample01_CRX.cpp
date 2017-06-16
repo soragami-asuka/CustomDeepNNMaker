@@ -30,7 +30,7 @@
 #include"Utility/NeuralNetworkLayer.h"
 
 
-#define USE_GPU	1
+#define USE_GPU	0
 #define USE_HOST_MEMORY 1
 
 
@@ -615,7 +615,7 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 		// ŠwK
 		{
 			// ŠwKƒ‹[ƒvæ“ªˆ—
-			pBatchDataNoListGenerator->PreProcessLearnLoop();
+//			pBatchDataNoListGenerator->PreProcessLearnLoop();
 			pTeachInputLayer->PreProcessLearnLoop(*pLearnSetting);
 			pTeachOutputLayer->PreProcessLearnLoop(*pLearnSetting);
 			pNeuralNetworkLearn->PreProcessLearnLoop(*pLearnSetting);

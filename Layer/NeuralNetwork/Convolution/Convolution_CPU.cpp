@@ -11,6 +11,8 @@
 #include"Convolution_CPU.h"
 #include"Convolution_LayerData_CPU.h"
 
+#include"Library/NeuralNetwork/Optimizer.h"
+
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
 
@@ -123,9 +125,9 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_FRAUD_INPUT_COUNT;
 
 		// ニューロンバッファのサイズ確認
-		if(this->layerData.lppNeuron.size() != this->neuronCount)
+		if(this->layerData.lpNeuron.size() != this->neuronCount * this->filterSize * this->layerData.inputDataStruct.ch)
 			return ErrorCode::ERROR_CODE_FRAUD_NEURON_COUNT;
-		if(this->layerData.lppNeuron[0].size() != this->filterSize * this->layerData.inputDataStruct.ch)
+		if(this->layerData.lppNeuron.size() != this->neuronCount)
 			return ErrorCode::ERROR_CODE_FRAUD_NEURON_COUNT;
 
 		// 入力バッファ保存用のアドレス配列を作成
@@ -162,22 +164,25 @@ namespace NeuralNetwork {
 		if(this->pLearnData != NULL)
 			delete this->pLearnData;
 		this->pLearnData = data.Clone();
+		this->pLearnData->WriteToStruct((BYTE*)&this->learnData);
 
 		// ニューロン/バイアスの誤差を一時保存するバッファを作成
-		if(lpDBias.empty() || lppDNeuron.empty())
+		if(lpDBias.empty() || lpDNeuron.empty())
 		{
-			this->lpDBias.resize(this->neuronCount);
-			this->lppDNeuron.resize(this->neuronCount);
-			for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
-				this->lppDNeuron[neuronNum].resize(this->filterSize * this->layerData.inputDataStruct.ch);
+			this->lpDBias.resize(this->layerData.lpBias.size());
+			this->lpDNeuron.resize(this->layerData.lpNeuron.size());
 		}
-		// 学習係数
+
+		switch(this->learnData.Optimizer)
 		{
-			auto pItem = dynamic_cast<const Gravisbell::SettingData::Standard::IItem_Float*>(data.GetItemByID(L"LearnCoeff"));
-			if(pItem)
-				this->learnData.LearnCoeff = pItem->GetValue();
-			else
-				this->learnData.LearnCoeff = 1.0f;
+		case Convolution::LearnDataStructure::Optimizer_SGD:
+			UpdateOptimizer_SGD_CPU(&this->m_pOptimizer_neuron, this->lpDNeuron.size(), this->learnData.LearnCoeff);
+			UpdateOptimizer_SGD_CPU(&this->m_pOptimizer_bias,   this->lpDBias.size(),   this->learnData.LearnCoeff);
+			break;
+		case Convolution::LearnDataStructure::Optimizer_Momentum:
+			UpdateOptimizer_Momentum_CPU(&this->m_pOptimizer_neuron, this->lpDNeuron.size(), this->learnData.LearnCoeff, this->learnData.Momentum_alpha);
+			UpdateOptimizer_Momentum_CPU(&this->m_pOptimizer_bias,   this->lpDBias.size(),   this->learnData.LearnCoeff, this->learnData.Momentum_alpha);
+			break;
 		}
 
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
@@ -312,11 +317,8 @@ namespace NeuralNetwork {
 
 		
 		// ニューロンとバイアスの変化量を初期化
-		for(S32 neuronNum=0; neuronNum<this->layerData.layerStructure.Output_Channel; neuronNum++)
-		{
-			this->lpDBias[neuronNum] = 0.0f;
-			memset(&this->lppDNeuron[neuronNum][0], 0, this->filterSize * this->layerData.inputDataStruct.ch * sizeof(F32));
-		}
+		memset(&this->lpDBias[0], 0, sizeof(F32)*this->lpDBias.size());
+		memset(&this->lpDNeuron[0], 0, sizeof(F32)*this->lpDNeuron.size());
 
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 		{
@@ -360,7 +362,7 @@ namespace NeuralNetwork {
 												this->m_lppDInputBuffer[batchNum][inputOffset] += this->layerData.lppNeuron[neuronNum][filterOffset] * dOutput;
 
 											// ニューロンの重み変化量を追加
-											this->lppDNeuron[neuronNum][filterOffset] += this->m_lppInputBuffer[batchNum][inputOffset] * dOutput;
+											this->lpDNeuron[neuronNum*this->filterSize*this->layerData.inputDataStruct.ch + filterOffset] += this->m_lppInputBuffer[batchNum][inputOffset] * dOutput;
 										}
 									}
 								}
@@ -390,19 +392,11 @@ namespace NeuralNetwork {
 			return errCode;
 
 		// 学習差分の反映
-		U32 filterDataSize = this->layerData.layerStructure.FilterSize.x * this->layerData.layerStructure.FilterSize.y * this->layerData.layerStructure.FilterSize.z * this->layerData.inputDataStruct.ch;
+		if(this->m_pOptimizer_bias)
+			this->m_pOptimizer_bias->UpdateParameter(&this->layerData.lpBias[0], &this->lpDBias[0]);
+		if(this->m_pOptimizer_neuron)
+			this->m_pOptimizer_neuron->UpdateParameter(&this->layerData.lpNeuron[0], &this->lpDNeuron[0]);
 
-		for(S32 neuronNum=0; neuronNum<this->layerData.layerStructure.Output_Channel; neuronNum++)
-		{
-			// バイアス更新
-			this->layerData.lpBias[neuronNum] += this->lpDBias[neuronNum] * this->learnData.LearnCoeff;
-
-			// 各ニューロンを更新
-			for(U32 filterOffset=0; filterOffset<filterDataSize; filterOffset++)
-			{
-				this->layerData.lppNeuron[neuronNum][filterOffset] += this->lppDNeuron[neuronNum][filterOffset] * this->learnData.LearnCoeff;
-			}
-		}
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

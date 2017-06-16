@@ -47,6 +47,10 @@ private:
 	BATCH_BUFFER_POINTER m_lpDInputBuffer;
 	std::vector<BATCH_BUFFER_POINTER> m_lppDInputBuffer;	/**< 入力誤差計算時の出力誤差データ */
 
+	// 演算処理用のバッファ
+	std::vector<F32> lpDBias;	/**< バイアスの変化量 */
+	std::vector<F32> lpDScale;	/**< スケールの変化量 */
+
 public:
 	/** コンストラクタ */
 	BatchNormalization_CPU(Gravisbell::GUID guid, class BatchNormalization_LayerData_CPU& i_layerData);

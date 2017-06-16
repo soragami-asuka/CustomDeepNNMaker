@@ -97,6 +97,10 @@ namespace NeuralNetwork {
 		this->lpTmpMean.resize(this->layerData.inputDataStruct.ch, 0.0f);
 		this->lpTmpVariance.resize(this->layerData.inputDataStruct.ch, 0.0f);
 
+		// パラメータ変化量
+		this->lpDBias.resize(this->layerData.lpBias.size());
+		this->lpDScale.resize(this->layerData.lpScale.size());
+
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
@@ -525,8 +529,8 @@ namespace NeuralNetwork {
 		F32 alphaData = 1.0f;
 		F32 betaData  = 0.0f;
 
-		F32 alphaParam = this->learnData.LearnCoeff;
-		F32 betaParam  = 1.0f;
+		F32 alphaParam = 1.0F;
+		F32 betaParam  = 0.0F;
 
 		err_cudnn = cudnnBatchNormalizationBackward(
 			this->cudnnHandle,
@@ -543,8 +547,8 @@ namespace NeuralNetwork {
 			this->m_lpDInputBuffer_d,
 			this->paramTensorDesc,
 			thrust::raw_pointer_cast(&this->layerData.lpScale[0]),
-			thrust::raw_pointer_cast(&this->layerData.lpScale[0]),
-			thrust::raw_pointer_cast(&this->layerData.lpBias[0]),
+			thrust::raw_pointer_cast(&this->lpDScale[0]),
+			thrust::raw_pointer_cast(&this->lpDBias[0]),
 			max(CUDNN_BN_MIN_EPSILON, this->layerData.layerStructure.epsilon),
 			thrust::raw_pointer_cast(&this->lpTmpMean[0]),
 			thrust::raw_pointer_cast(&this->lpTmpVariance[0]));
@@ -554,6 +558,12 @@ namespace NeuralNetwork {
 		// 平均、分散を更新
 		this->layerData.lpMean = this->lpLearnMean;
 		this->layerData.lpVariance = this->lpLearnVariance;
+
+		// パラメータを更新
+		if(this->m_pOptimizer_scale)
+			this->m_pOptimizer_scale->UpdateParameter(thrust::raw_pointer_cast(&this->layerData.lpScale[0]), thrust::raw_pointer_cast(&this->lpDScale[0]));
+		if(this->m_pOptimizer_bias)
+			this->m_pOptimizer_bias->UpdateParameter(thrust::raw_pointer_cast(&this->layerData.lpBias[0]), thrust::raw_pointer_cast(&this->lpDBias[0]));
 
 		// 学習処理の実行回数をカウントアップ
 		this->learnCount++;

@@ -114,11 +114,87 @@
 
   <!--学習に使用するデータの構造-->
   <Learn>
+
+    <Enum id="Optimizer">
+      <Name>最適化ルーチン</Name>
+      <Text>重み誤差を反映させるためのアルゴリズム.</Text>
+      <Items>
+        <Item id="SGD">
+          <Name>SGD</Name>
+        </Item>
+        <Item id="Momentum">
+          <Name>Momentum</Name>
+          <Text>慣性付与</Text>
+        </Item>
+        <Item id="AdaDelta">
+          <Name>AdaDelta</Name>
+        </Item>
+        <Item id="Adam">
+          <Name>Adam</Name>
+        </Item>
+      </Items>
+      <Default>SGD</Default>
+    </Enum>
+
     <Float id="LearnCoeff">
       <Name>学習係数</Name>
+      <Text>SGD,Momentumで使用.</Text>
       <Min>0.0</Min>
       <Max>1000.0</Max>
       <Default>1.0</Default>
+    </Float>
+
+    <Float id="Momentum_alpha">
+      <Name>Momentum-α</Name>
+      <Text>Momentumで使用.t-1の値を反映する割合</Text>
+      <Min>0.0</Min>
+      <Max>1.0</Max>
+      <Default>0.99</Default>
+    </Float>
+
+    <Float id="AdaDelta_beta">
+      <Name>AdaDelta-β</Name>
+      <Text>AdaDeltaで使用.減衰率.高いほうが減衰しづらい.</Text>
+      <Min>0.0</Min>
+      <Max>1.0</Max>
+      <Default>0.95</Default>
+    </Float>
+    <Float id="AdaDelta_epsilon">
+      <Name>AdaDelta-ε</Name>
+      <Text>AdaDeltaで使用.補助数.高いほど初期値が大きくなる.</Text>
+      <Min>0.0</Min>
+      <Max>1.0</Max>
+      <Default>0.000001</Default>
+    </Float>
+
+    <Float id="Adam_alpha">
+      <Name>Adam-α</Name>
+      <Text>Adamで使用.加算率.高いほうが更新されやすい.</Text>
+      <Min>0.0</Min>
+      <Max>1.0</Max>
+      <Default>0.001</Default>
+    </Float>
+    <Float id="Adam_beta1">
+      <Name>Adam-β</Name>
+      <Text>Adamで使用.減衰率1.高いほうが減衰しづらい.</Text>
+      <Min>0.0</Min>
+      <Max>1.0</Max>
+      <Default>0.9</Default>
+    </Float>
+    <Float id="Adam_beta2">
+      <Name>Adam-β</Name>
+      <Text>Adamで使用.減衰率2.高いほうが減衰しづらい.</Text>
+      <Min>0.0</Min>
+      <Max>1.0</Max>
+      <Default>0.999</Default>
+
+    </Float>
+    <Float id="Adam_epsilon">
+      <Name>Adam-ε</Name>
+      <Text>AdaDeltaで使用.補助数.高いほど初期値が大きくなる.</Text>
+      <Min>0.0</Min>
+      <Max>1.0</Max>
+      <Default>0.00000001</Default>
     </Float>
   </Learn>
 

@@ -13,6 +13,8 @@
 
 #include"Convolution_LayerData_Base.h"
 
+#include"Layer/NeuralNetwork/IOptimizer.h"
+
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
@@ -28,6 +30,9 @@ namespace NeuralNetwork {
 		Convolution::LearnDataStructure learnData;	/**< 学習設定 */
 
 		U32 batchSize;	/**< バッチサイズ */
+
+		IOptimizer* m_pOptimizer_neuron;	/**< ニューロン更新用オプティマイザ */
+		IOptimizer* m_pOptimizer_bias;		/**< バイアス更新用オプティマイザ */
 
 	public:
 		/** コンストラクタ */
