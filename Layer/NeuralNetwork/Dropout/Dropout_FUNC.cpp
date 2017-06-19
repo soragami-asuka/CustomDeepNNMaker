@@ -156,7 +156,7 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			L"Rate",
 			CurrentLanguage::g_lpItemData_LayerStructure[L"Rate"].name.c_str(),
 			CurrentLanguage::g_lpItemData_LayerStructure[L"Rate"].text.c_str(),
-			0.000000f, 1.000000f, 0.000000f));
+			0.0000000000000000f, 1.0000000000000000f, 0.0000000000000000f));
 
 	return pLayerConfig;
 }

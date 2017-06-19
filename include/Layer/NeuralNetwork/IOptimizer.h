@@ -102,9 +102,9 @@ namespace NeuralNetwork {
 		// 基本情報
 		//===========================
 		/** ハイパーパラメータを更新する
-			@param	i_beta			減衰率.
+			@param	i_rho			減衰率.
 			@param	i_epsilon		補助係数. */
-		virtual ErrorCode SetHyperParameter(F32 i_beta, F32 i_epsilon) = 0;
+		virtual ErrorCode SetHyperParameter(F32 i_rho, F32 i_epsilon) = 0;
 	};
 
 	/** Adam */

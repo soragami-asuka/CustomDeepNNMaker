@@ -160,6 +160,14 @@ namespace NeuralNetwork {
 			UpdateOptimizer_Momentum_CPU(&this->m_pOptimizer_neuron, this->neuronCount*this->inputBufferCount, this->learnData.LearnCoeff, this->learnData.Momentum_alpha);
 			UpdateOptimizer_Momentum_CPU(&this->m_pOptimizer_bias,   this->neuronCount,                        this->learnData.LearnCoeff, this->learnData.Momentum_alpha);
 			break;
+		case FullyConnect::LearnDataStructure::Optimizer_AdaDelta:
+			UpdateOptimizer_AdaDelta_CPU(&this->m_pOptimizer_neuron,	this->neuronCount*this->inputBufferCount, this->learnData.AdaDelta_rho, this->learnData.AdaDelta_epsilon);
+			UpdateOptimizer_AdaDelta_CPU(&this->m_pOptimizer_bias,		this->neuronCount,                        this->learnData.AdaDelta_rho, this->learnData.AdaDelta_epsilon);
+			break;
+		case FullyConnect::LearnDataStructure::Optimizer_Adam:
+			UpdateOptimizer_Adam_CPU(&this->m_pOptimizer_neuron,	this->neuronCount*this->inputBufferCount,  this->learnData.Adam_alpha, this->learnData.Adam_beta1, this->learnData.Adam_beta2, this->learnData.Adam_epsilon);
+			UpdateOptimizer_Adam_CPU(&this->m_pOptimizer_bias,		this->neuronCount,                         this->learnData.Adam_alpha, this->learnData.Adam_beta1, this->learnData.Adam_beta2, this->learnData.Adam_epsilon);
+			break;
 		}
 
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;

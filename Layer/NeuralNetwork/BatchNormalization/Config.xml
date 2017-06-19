@@ -62,11 +62,11 @@
       <Text>Momentumで使用.t-1の値を反映する割合</Text>
       <Min>0.0</Min>
       <Max>1.0</Max>
-      <Default>0.99</Default>
+      <Default>0.9</Default>
     </Float>
 
-    <Float id="AdaDelta_beta">
-      <Name>AdaDelta-β</Name>
+    <Float id="AdaDelta_rho">
+      <Name>AdaDelta-Ρ</Name>
       <Text>AdaDeltaで使用.減衰率.高いほうが減衰しづらい.</Text>
       <Min>0.0</Min>
       <Max>1.0</Max>

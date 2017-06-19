@@ -182,12 +182,24 @@
     <ClCompile Include="Optimizer_Momentum_CPU.cpp">
       <Filter>Optimizer</Filter>
     </ClCompile>
+    <ClCompile Include="Optimizer_AdaDelta_CPU.cpp">
+      <Filter>Optimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="Optimizer_Adam_CPU.cpp">
+      <Filter>Optimizer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="Optimizer_SGD_GPU.cu">
       <Filter>Optimizer</Filter>
     </CudaCompile>
     <CudaCompile Include="Optimizer_Momentum_GPU.cu">
+      <Filter>Optimizer</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Optimizer_AdaDelta_GPU.cu">
+      <Filter>Optimizer</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Optimizer_Adam_GPU.cu">
       <Filter>Optimizer</Filter>
     </CudaCompile>
   </ItemGroup>

@@ -337,7 +337,7 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSetting(void)
 			L"LearnCoeff",
 			CurrentLanguage::g_lpItemData_Learn[L"LearnCoeff"].name.c_str(),
 			CurrentLanguage::g_lpItemData_Learn[L"LearnCoeff"].text.c_str(),
-			0.000000f, 1000.000000f, 1.000000f));
+			0.0000000000000000f, 1000.0000000000000000f, 1.0000000000000000f));
 
 	return pLayerConfig;
 }

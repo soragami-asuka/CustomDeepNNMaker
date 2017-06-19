@@ -72,11 +72,11 @@ namespace BatchNormalization {
 		  */
 		F32 Momentum_alpha;
 
-		/** Name : AdaDelta-ƒÀ
-		  * ID   : AdaDelta_beta
+		/** Name : AdaDelta-ƒ¯
+		  * ID   : AdaDelta_rho
 		  * Text : AdaDelta‚Åg—p.Œ¸Š—¦.‚‚¢‚Ù‚¤‚ªŒ¸Š‚µ‚Ã‚ç‚¢.
 		  */
-		F32 AdaDelta_beta;
+		F32 AdaDelta_rho;
 
 		/** Name : AdaDelta-ƒÃ
 		  * ID   : AdaDelta_epsilon

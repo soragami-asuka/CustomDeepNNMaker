@@ -679,7 +679,7 @@ namespace
 					fwprintf(fp, L"			L\"%ls\",\n", szID);
 					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].name.c_str(),\n", dataCode.c_str(), szID);
 					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].text.c_str(),\n", dataCode.c_str(), szID);
-					fwprintf(fp, L"			%ff, %ff, %ff));\n", pItemFloat->GetMin(), pItemFloat->GetMax(), pItemFloat->GetDefault());
+					fwprintf(fp, L"			%.16ff, %.16ff, %.16ff));\n", pItemFloat->GetMin(), pItemFloat->GetMax(), pItemFloat->GetDefault());
 				}
 				break;
 			case Gravisbell::SettingData::Standard::ITEMTYPE_INT:
@@ -793,9 +793,9 @@ namespace
 					fwprintf(fp, L"			L\"%ls\",\n", szID);
 					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].name.c_str(),\n", dataCode.c_str(), szID);
 					fwprintf(fp, L"			CurrentLanguage::g_lpItemData_%ls[L\"%ls\"].text.c_str(),\n", dataCode.c_str(), szID);
-					fwprintf(fp, L"			%ff, %ff, %ff,\n", pItemVector3D->GetMinX(), pItemVector3D->GetMinY(), pItemVector3D->GetMinZ());
-					fwprintf(fp, L"			%ff, %ff, %ff,\n", pItemVector3D->GetMaxX(), pItemVector3D->GetMaxY(), pItemVector3D->GetMaxZ());
-					fwprintf(fp, L"			%ff, %ff, %ff));\n", pItemVector3D->GetDefaultX(), pItemVector3D->GetDefaultY(), pItemVector3D->GetDefaultZ());
+					fwprintf(fp, L"			%.16ff, %.16ff, %.16ff,\n", pItemVector3D->GetMinX(), pItemVector3D->GetMinY(), pItemVector3D->GetMinZ());
+					fwprintf(fp, L"			%.16ff, %.16ff, %.16ff,\n", pItemVector3D->GetMaxX(), pItemVector3D->GetMaxY(), pItemVector3D->GetMaxZ());
+					fwprintf(fp, L"			%.16ff, %.16ff, %.16ff));\n", pItemVector3D->GetDefaultX(), pItemVector3D->GetDefaultY(), pItemVector3D->GetDefaultZ());
 				}
 				break;
 			}

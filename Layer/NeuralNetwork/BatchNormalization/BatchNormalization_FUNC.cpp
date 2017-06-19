@@ -87,9 +87,9 @@ namespace DefaultLanguage
             }
         },
         {
-            L"AdaDelta_beta",
+            L"AdaDelta_rho",
             {
-                L"AdaDelta-β",
+                L"AdaDelta-Ρ",
                 L"AdaDeltaで使用.減衰率.高いほうが減衰しづらい.",
             }
         },
@@ -251,7 +251,7 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			L"epsilon",
 			CurrentLanguage::g_lpItemData_LayerStructure[L"epsilon"].name.c_str(),
 			CurrentLanguage::g_lpItemData_LayerStructure[L"epsilon"].text.c_str(),
-			0.000010f, 1.000000f, 0.000010f));
+			0.0000099999997474f, 1.0000000000000000f, 0.0000099999997474f));
 
 	return pLayerConfig;
 }
@@ -345,7 +345,7 @@ pItemEnum->SetValue(pItemEnum->GetDefault());
 			L"LearnCoeff",
 			CurrentLanguage::g_lpItemData_Learn[L"LearnCoeff"].name.c_str(),
 			CurrentLanguage::g_lpItemData_Learn[L"LearnCoeff"].text.c_str(),
-			0.000000f, 1000.000000f, 1.000000f));
+			0.0000000000000000f, 1000.0000000000000000f, 1.0000000000000000f));
 
 	/** Name : Momentum-α
 	  * ID   : Momentum_alpha
@@ -356,18 +356,18 @@ pItemEnum->SetValue(pItemEnum->GetDefault());
 			L"Momentum_alpha",
 			CurrentLanguage::g_lpItemData_Learn[L"Momentum_alpha"].name.c_str(),
 			CurrentLanguage::g_lpItemData_Learn[L"Momentum_alpha"].text.c_str(),
-			0.000000f, 1.000000f, 0.990000f));
+			0.0000000000000000f, 1.0000000000000000f, 0.8999999761581421f));
 
-	/** Name : AdaDelta-β
-	  * ID   : AdaDelta_beta
+	/** Name : AdaDelta-Ρ
+	  * ID   : AdaDelta_rho
 	  * Text : AdaDeltaで使用.減衰率.高いほうが減衰しづらい.
 	  */
 	pLayerConfig->AddItem(
 		Gravisbell::SettingData::Standard::CreateItem_Float(
-			L"AdaDelta_beta",
-			CurrentLanguage::g_lpItemData_Learn[L"AdaDelta_beta"].name.c_str(),
-			CurrentLanguage::g_lpItemData_Learn[L"AdaDelta_beta"].text.c_str(),
-			0.000000f, 1.000000f, 0.950000f));
+			L"AdaDelta_rho",
+			CurrentLanguage::g_lpItemData_Learn[L"AdaDelta_rho"].name.c_str(),
+			CurrentLanguage::g_lpItemData_Learn[L"AdaDelta_rho"].text.c_str(),
+			0.0000000000000000f, 1.0000000000000000f, 0.9499999880790710f));
 
 	/** Name : AdaDelta-ε
 	  * ID   : AdaDelta_epsilon
@@ -378,7 +378,7 @@ pItemEnum->SetValue(pItemEnum->GetDefault());
 			L"AdaDelta_epsilon",
 			CurrentLanguage::g_lpItemData_Learn[L"AdaDelta_epsilon"].name.c_str(),
 			CurrentLanguage::g_lpItemData_Learn[L"AdaDelta_epsilon"].text.c_str(),
-			0.000000f, 1.000000f, 0.000001f));
+			0.0000000000000000f, 1.0000000000000000f, 0.0000009999999975f));
 
 	/** Name : Adam-α
 	  * ID   : Adam_alpha
@@ -389,7 +389,7 @@ pItemEnum->SetValue(pItemEnum->GetDefault());
 			L"Adam_alpha",
 			CurrentLanguage::g_lpItemData_Learn[L"Adam_alpha"].name.c_str(),
 			CurrentLanguage::g_lpItemData_Learn[L"Adam_alpha"].text.c_str(),
-			0.000000f, 1.000000f, 0.001000f));
+			0.0000000000000000f, 1.0000000000000000f, 0.0010000000474975f));
 
 	/** Name : Adam-β
 	  * ID   : Adam_beta1
@@ -400,7 +400,7 @@ pItemEnum->SetValue(pItemEnum->GetDefault());
 			L"Adam_beta1",
 			CurrentLanguage::g_lpItemData_Learn[L"Adam_beta1"].name.c_str(),
 			CurrentLanguage::g_lpItemData_Learn[L"Adam_beta1"].text.c_str(),
-			0.000000f, 1.000000f, 0.900000f));
+			0.0000000000000000f, 1.0000000000000000f, 0.8999999761581421f));
 
 	/** Name : Adam-β
 	  * ID   : Adam_beta2
@@ -411,7 +411,7 @@ pItemEnum->SetValue(pItemEnum->GetDefault());
 			L"Adam_beta2",
 			CurrentLanguage::g_lpItemData_Learn[L"Adam_beta2"].name.c_str(),
 			CurrentLanguage::g_lpItemData_Learn[L"Adam_beta2"].text.c_str(),
-			0.000000f, 1.000000f, 0.999000f));
+			0.0000000000000000f, 1.0000000000000000f, 0.9990000128746033f));
 
 	/** Name : Adam-ε
 	  * ID   : Adam_epsilon
@@ -422,7 +422,7 @@ pItemEnum->SetValue(pItemEnum->GetDefault());
 			L"Adam_epsilon",
 			CurrentLanguage::g_lpItemData_Learn[L"Adam_epsilon"].name.c_str(),
 			CurrentLanguage::g_lpItemData_Learn[L"Adam_epsilon"].text.c_str(),
-			0.000000f, 1.000000f, 0.000000f));
+			0.0000000000000000f, 1.0000000000000000f, 0.0000000099999999f));
 
 	return pLayerConfig;
 }

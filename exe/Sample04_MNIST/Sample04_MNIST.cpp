@@ -23,6 +23,9 @@ using namespace Gravisbell;
 #define USE_GPU	1
 #define USE_HOST_MEMORY 1
 
+#define USE_BATCHNORM	1
+#define USE_DROPOUT		0
+
 
 /** データファイルをを読み込む
 	@param	o_ppDataLayerTeach	教師データを格納したデータクラスの格納先ポインタアドレス
@@ -454,16 +457,20 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 			inputDataStruct, lastLayerGUID,
 			CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, inputDataStruct));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+#if USE_BATCHNORM
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			inputDataStruct, lastLayerGUID,
 			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"ReLU"));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-		//err = AddLayerToNetworkLast(
-		//	*pNeuralNetwork,
-		//	inputDataStruct, lastLayerGUID,
-		//	CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct, 0.2f));
-		//if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+#endif
+#if USE_DROPOUT
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			inputDataStruct, lastLayerGUID,
+			CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct, 0.2f));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+#endif
 
 #if 1	// Single
 		// 2層目
@@ -482,16 +489,20 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 			inputDataStruct, lastLayerGUID,
 			CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, inputDataStruct));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+#if USE_BATCHNORM
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			inputDataStruct, lastLayerGUID,
 			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"ReLU"));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-		//err = AddLayerToNetworkLast(
-		//	*pNeuralNetwork,
-		//	inputDataStruct, lastLayerGUID,
-		//	CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct, 0.5f));
-		//if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+#endif
+#if USE_DROPOUT
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			inputDataStruct, lastLayerGUID,
+			CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct, 0.5f));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+#endif
 
 #elif 0	// MergeInput
 		// 1層目のGUIDを記録
@@ -730,9 +741,17 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 	Gravisbell::ErrorCode err;
 
 	// 学習係数を設定
-//	pNeuralNetworkLearn->SetLearnSettingData(L"LearnCoeff", 0.001f);
+#if USE_BATCHNORM
 	pNeuralNetworkLearn->SetLearnSettingData(L"LearnCoeff", 0.005f);
-	pNeuralNetworkLearn->SetLearnSettingData(L"Optimizer", L"Momentum");
+#else
+	pNeuralNetworkLearn->SetLearnSettingData(L"LearnCoeff", 0.001f);
+#endif
+//	pNeuralNetworkLearn->SetLearnSettingData(L"Optimizer", L"Momentum");
+//	pNeuralNetworkLearn->SetLearnSettingData(L"Optimizer", L"AdaDelta");
+	pNeuralNetworkLearn->SetLearnSettingData(L"Optimizer", L"Adam");
+	pNeuralNetworkLearn->SetLearnSettingData(L"Momentum_alpha", 0.5f);
+	pNeuralNetworkLearn->SetLearnSettingData(L"AdaDelta_rho", (F32)0.95f);
+	pNeuralNetworkLearn->SetLearnSettingData(L"AdaDelta_epsilon", (F32)1e-8);
 
 	// 事前処理を実行
 	err = pNeuralNetworkLearn->PreProcessLearn(BATCH_SIZE);
