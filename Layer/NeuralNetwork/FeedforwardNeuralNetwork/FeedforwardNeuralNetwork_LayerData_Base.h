@@ -273,6 +273,17 @@ namespace NeuralNetwork {
 			@param	o_postLayerGUID	レイヤーに接続しているレイヤーのGUID格納先. */
 		ErrorCode GetOutputLayerGUIDbyNum(const Gravisbell::GUID& i_layerGUID, U32 i_outputNum, Gravisbell::GUID& o_postLayerGUID);
 
+
+		//===========================
+		// オプティマイザー設定
+		//===========================
+	public:
+		/** オプティマイザーを変更する */
+		ErrorCode ChangeOptimizer(const wchar_t i_optimizerID[]);
+		/** オプティマイザーのハイパーパラメータを変更する */
+		ErrorCode SetOptimizerHyperParameter(const wchar_t i_parameterID[], F32 i_value);
+		ErrorCode SetOptimizerHyperParameter(const wchar_t i_parameterID[], S32 i_value);
+		ErrorCode SetOptimizerHyperParameter(const wchar_t i_parameterID[], const wchar_t i_value[]);
 	};
 
 }	// NeuralNetwork

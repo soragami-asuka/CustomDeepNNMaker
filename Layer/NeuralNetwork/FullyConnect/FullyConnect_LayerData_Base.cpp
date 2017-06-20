@@ -19,6 +19,8 @@ namespace NeuralNetwork {
 		,	inputDataStruct	()	/**< 入力データ構造 */
 		,	pLayerStructure	(NULL)	/**< レイヤー構造を定義したコンフィグクラス */
 		,	layerStructure	()		/**< レイヤー構造 */
+		,	m_pOptimizer_neuron	(NULL)		/**< ニューロン更新用オプティマイザ */
+		,	m_pOptimizer_bias	(NULL)		/**< バイアス更新用オプティマイザ */
 	{
 	}
 	/** デストラクタ */
@@ -26,6 +28,11 @@ namespace NeuralNetwork {
 	{
 		if(pLayerStructure != NULL)
 			delete pLayerStructure;
+
+		if(this->m_pOptimizer_neuron)
+			delete this->m_pOptimizer_neuron;
+		if(this->m_pOptimizer_bias)
+			delete this->m_pOptimizer_bias;
 	}
 
 
@@ -112,6 +119,10 @@ namespace NeuralNetwork {
 		bufferSize += (this->GetNeuronCount() * this->GetInputBufferCount()) * sizeof(NEURON_TYPE);	// ニューロン係数
 		bufferSize += this->GetNeuronCount() * sizeof(NEURON_TYPE);	// バイアス係数
 
+		// オプティマイザーのバイト数
+		bufferSize += this->m_pOptimizer_bias->GetUseBufferByteCount();
+		bufferSize += this->m_pOptimizer_neuron->GetUseBufferByteCount();
+
 
 		return bufferSize;
 	}
@@ -166,6 +177,39 @@ namespace NeuralNetwork {
 	U32 FullyConnect_LayerData_Base::GetNeuronCount()const
 	{
 		return this->layerStructure.NeuronCount;
+	}
+
+
+	//===========================
+	// オプティマイザー設定
+	//===========================
+	/** オプティマイザーのハイパーパラメータを変更する */
+	ErrorCode FullyConnect_LayerData_Base::SetOptimizerHyperParameter(const wchar_t i_parameterID[], F32 i_value)
+	{
+		if(this->m_pOptimizer_bias)
+			this->m_pOptimizer_bias->SetHyperParameter(i_parameterID, i_value);
+		if(this->m_pOptimizer_neuron)
+			this->m_pOptimizer_neuron->SetHyperParameter(i_parameterID, i_value);
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+	ErrorCode FullyConnect_LayerData_Base::SetOptimizerHyperParameter(const wchar_t i_parameterID[], S32 i_value)
+	{
+		if(this->m_pOptimizer_bias)
+			this->m_pOptimizer_bias->SetHyperParameter(i_parameterID, i_value);
+		if(this->m_pOptimizer_neuron)
+			this->m_pOptimizer_neuron->SetHyperParameter(i_parameterID, i_value);
+		
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+	ErrorCode FullyConnect_LayerData_Base::SetOptimizerHyperParameter(const wchar_t i_parameterID[], const wchar_t i_value[])
+	{
+		if(this->m_pOptimizer_bias)
+			this->m_pOptimizer_bias->SetHyperParameter(i_parameterID, i_value);
+		if(this->m_pOptimizer_neuron)
+			this->m_pOptimizer_neuron->SetHyperParameter(i_parameterID, i_value);
+
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 
 } // Gravisbell;

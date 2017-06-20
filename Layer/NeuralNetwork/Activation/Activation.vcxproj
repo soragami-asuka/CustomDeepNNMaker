@@ -203,6 +203,7 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingle2MultLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingle2SingleLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
+    <ClInclude Include="..\..\..\include\Layer\Optimizer\IOptimizer.h" />
     <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h" />
     <ClInclude Include="Activation_Base.h" />
     <ClInclude Include="Activation_CPU.h" />

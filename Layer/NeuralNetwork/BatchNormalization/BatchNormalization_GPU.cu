@@ -11,7 +11,6 @@
 #include"BatchNormalization_GPU.cuh"
 #include"BatchNormalization_LayerData_GPU.cuh"
 
-#include"Library/NeuralNetwork/Optimizer.h"
 
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
@@ -326,27 +325,6 @@ namespace NeuralNetwork {
 		cudaMemset(thrust::raw_pointer_cast(&this->lpLearnMean[0]),		0, sizeof(F32)*this->layerData.inputDataStruct.ch);
 		cudaMemset(thrust::raw_pointer_cast(&this->lpLearnVariance[0]),	0, sizeof(F32)*this->layerData.inputDataStruct.ch);
 
-		// Optimizerの設定
-		switch(this->learnData.Optimizer)
-		{
-		case BatchNormalization::LearnDataStructure::Optimizer_SGD:
-			UpdateOptimizer_SGD_GPU(&this->m_pOptimizer_scale,	(U32)this->lpDScale.size(),	this->learnData.LearnCoeff);
-			UpdateOptimizer_SGD_GPU(&this->m_pOptimizer_bias,   (U32)this->lpDBias.size(),	this->learnData.LearnCoeff);
-			break;
-		case BatchNormalization::LearnDataStructure::Optimizer_Momentum:
-			UpdateOptimizer_Momentum_GPU(&this->m_pOptimizer_scale,	(U32)this->lpDScale.size(), this->learnData.LearnCoeff, this->learnData.Momentum_alpha);
-			UpdateOptimizer_Momentum_GPU(&this->m_pOptimizer_bias,	(U32)this->lpDBias.size(),  this->learnData.LearnCoeff, this->learnData.Momentum_alpha);
-			break;
-		case BatchNormalization::LearnDataStructure::Optimizer_AdaDelta:
-			UpdateOptimizer_AdaDelta_GPU(&this->m_pOptimizer_scale, (U32)this->lpDScale.size(), this->learnData.AdaDelta_rho, this->learnData.AdaDelta_epsilon);
-			UpdateOptimizer_AdaDelta_GPU(&this->m_pOptimizer_bias,  (U32)this->lpDBias.size(),  this->learnData.AdaDelta_rho, this->learnData.AdaDelta_epsilon);
-			break;
-		case BatchNormalization::LearnDataStructure::Optimizer_Adam:
-			UpdateOptimizer_Adam_GPU(&this->m_pOptimizer_scale,	(U32)this->lpDScale.size(), this->learnData.Adam_alpha, this->learnData.Adam_beta1, this->learnData.Adam_beta2, this->learnData.Adam_epsilon);
-			UpdateOptimizer_Adam_GPU(&this->m_pOptimizer_bias,	(U32)this->lpDBias.size(),  this->learnData.Adam_alpha, this->learnData.Adam_beta1, this->learnData.Adam_beta2, this->learnData.Adam_epsilon);
-			break;
-		}
-
 
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
@@ -583,10 +561,10 @@ namespace NeuralNetwork {
 		this->layerData.lpVariance = this->lpLearnVariance;
 
 		// パラメータを更新
-		if(this->m_pOptimizer_scale)
-			this->m_pOptimizer_scale->UpdateParameter(thrust::raw_pointer_cast(&this->layerData.lpScale[0]), thrust::raw_pointer_cast(&this->lpDScale[0]));
-		if(this->m_pOptimizer_bias)
-			this->m_pOptimizer_bias->UpdateParameter(thrust::raw_pointer_cast(&this->layerData.lpBias[0]), thrust::raw_pointer_cast(&this->lpDBias[0]));
+		if(this->layerData.m_pOptimizer_scale)
+			this->layerData.m_pOptimizer_scale->UpdateParameter(thrust::raw_pointer_cast(&this->layerData.lpScale[0]), thrust::raw_pointer_cast(&this->lpDScale[0]));
+		if(this->layerData.m_pOptimizer_bias)
+			this->layerData.m_pOptimizer_bias->UpdateParameter(thrust::raw_pointer_cast(&this->layerData.lpBias[0]), thrust::raw_pointer_cast(&this->lpDBias[0]));
 
 		// 学習処理の実行回数をカウントアップ
 		this->learnCount++;

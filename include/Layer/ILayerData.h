@@ -69,6 +69,17 @@ namespace Layer {
 		/** レイヤーを作成する.
 			@param guid	新規生成するレイヤーのGUID. */
 		virtual ILayerBase* CreateLayer(const Gravisbell::GUID& guid) = 0;
+
+	public:
+		//===========================
+		// オプティマイザー設定
+		//===========================
+		/** オプティマイザーを変更する */
+		virtual ErrorCode ChangeOptimizer(const wchar_t i_optimizerID[]) = 0;
+		/** オプティマイザーのハイパーパラメータを変更する */
+		virtual ErrorCode SetOptimizerHyperParameter(const wchar_t i_parameterID[], F32 i_value) = 0;
+		virtual ErrorCode SetOptimizerHyperParameter(const wchar_t i_parameterID[], S32 i_value) = 0;
+		virtual ErrorCode SetOptimizerHyperParameter(const wchar_t i_parameterID[], const wchar_t i_value[]) = 0;
 	};
 
 }	// Layer

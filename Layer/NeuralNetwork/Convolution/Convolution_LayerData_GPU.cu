@@ -8,6 +8,8 @@
 #include"Convolution_FUNC.hpp"
 #include"Convolution_GPU.cuh"
 
+#include"Library/NeuralNetwork/Optimizer.h"
+
 #include"RandomUtility.h"
 
 namespace Gravisbell {
@@ -92,7 +94,17 @@ namespace NeuralNetwork {
 		// 入力データ構造の設定
 		this->inputDataStruct = i_inputDataStruct;
 
-		return this->Initialize();
+		// 初期化
+		err = this->Initialize();
+		if(err != ErrorCode::ERROR_CODE_NONE)
+			return err;
+
+		// オプティマイザーの設定
+		err = this->ChangeOptimizer(L"SGD");
+		if(err != ErrorCode::ERROR_CODE_NONE)
+			return err;
+
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 	/** 初期化. バッファからデータを読み込む
 		@param i_lpBuffer	読み込みバッファの先頭アドレス.
@@ -134,6 +146,21 @@ namespace NeuralNetwork {
 			sizeof(F32) * this->lpBias_d.size(),
 			cudaMemcpyHostToDevice);
 		readBufferByte += sizeof(F32) * (S32)this->lpBias_d.size();
+
+
+		// オプティマイザ
+		S32 useBufferSize = 0;
+		// bias
+		if(this->m_pOptimizer_bias)
+			delete this->m_pOptimizer_bias;
+		this->m_pOptimizer_bias = CreateOptimizerFromBuffer_CPU(&i_lpBuffer[readBufferByte], i_bufferSize-readBufferByte, useBufferSize);
+		readBufferByte += useBufferSize;
+		// neuron
+		if(this->m_pOptimizer_neuron)
+			delete this->m_pOptimizer_neuron;
+		this->m_pOptimizer_neuron = CreateOptimizerFromBuffer_CPU(&i_lpBuffer[readBufferByte], i_bufferSize-readBufferByte, useBufferSize);
+		readBufferByte += useBufferSize;
+
 
 		o_useBufferSize = readBufferByte;
 
@@ -178,6 +205,13 @@ namespace NeuralNetwork {
 		writeBufferByte += sizeof(F32) * (S32)this->lpBias_d.size();
 
 
+		// オプティマイザ
+		// bias
+		writeBufferByte += this->m_pOptimizer_bias->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
+		// neuron
+		writeBufferByte += this->m_pOptimizer_neuron->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
+
+
 		return writeBufferByte;
 	}
 
@@ -191,6 +225,20 @@ namespace NeuralNetwork {
 	{
 		return new Convolution_GPU(guid, *this);
 	}
+
+
+	//===========================
+	// オプティマイザー設定
+	//===========================
+	/** オプティマイザーを変更する */
+	ErrorCode Convolution_LayerData_GPU::ChangeOptimizer(const wchar_t i_optimizerID[])
+	{
+		ChangeOptimizer_GPU(&this->m_pOptimizer_bias,   i_optimizerID, (U32)this->lpBias_d.size());
+		ChangeOptimizer_GPU(&this->m_pOptimizer_neuron, i_optimizerID, (U32)this->lppNeuron_d.size());
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+
 
 } // Gravisbell;
 } // Layer;

@@ -123,6 +123,18 @@ namespace NeuralNetwork {
 		// 固有関数
 		//===========================
 	public:
+
+
+		//===========================
+		// オプティマイザー設定
+		//===========================		
+	public:
+		/** オプティマイザーを変更する */
+		ErrorCode ChangeOptimizer(const wchar_t i_optimizerID[]){return ErrorCode::ERROR_CODE_NONE;}
+		/** オプティマイザーのハイパーパラメータを変更する */
+		ErrorCode SetOptimizerHyperParameter(const wchar_t i_parameterID[], F32 i_value){return ErrorCode::ERROR_CODE_NONE;}
+		ErrorCode SetOptimizerHyperParameter(const wchar_t i_parameterID[], S32 i_value){return ErrorCode::ERROR_CODE_NONE;}
+		ErrorCode SetOptimizerHyperParameter(const wchar_t i_parameterID[], const wchar_t i_value[]){return ErrorCode::ERROR_CODE_NONE;}
 	};
 
 } // Gravisbell;

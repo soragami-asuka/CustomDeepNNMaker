@@ -8,6 +8,8 @@
 #include"BatchNormalization_FUNC.hpp"
 #include"BatchNormalization_GPU.cuh"
 
+#include"Library/NeuralNetwork/Optimizer.h"
+
 using namespace Gravisbell;
 
 namespace Gravisbell {
@@ -67,7 +69,17 @@ namespace NeuralNetwork {
 		// 入力データ構造の設定
 		this->inputDataStruct = i_inputDataStruct;
 
-		return this->Initialize();
+		// 初期化
+		err = this->Initialize();
+		if(err != ErrorCode::ERROR_CODE_NONE)
+			return err;
+
+		// オプティマイザーの設定
+		err = this->ChangeOptimizer(L"SGD");
+		if(err != ErrorCode::ERROR_CODE_NONE)
+			return err;
+
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 	/** 初期化. バッファからデータを読み込む
 		@param i_lpBuffer	読み込みバッファの先頭アドレス.
@@ -105,6 +117,20 @@ namespace NeuralNetwork {
 		// バイアス値
 		cudaMemcpy(thrust::raw_pointer_cast(&this->lpBias[0]), &i_lpBuffer[readBufferByte], sizeof(F32)*this->lpMean.size(), cudaMemcpyHostToDevice);
 		readBufferByte += sizeof(F32)*(U32)this->lpMean.size();
+
+
+		// オプティマイザ
+		S32 useBufferSize = 0;
+		// bias
+		if(this->m_pOptimizer_bias)
+			delete this->m_pOptimizer_bias;
+		this->m_pOptimizer_bias = CreateOptimizerFromBuffer_CPU(&i_lpBuffer[readBufferByte], i_bufferSize-readBufferByte, useBufferSize);
+		readBufferByte += useBufferSize;
+		// neuron
+		if(this->m_pOptimizer_scale)
+			delete this->m_pOptimizer_scale;
+		this->m_pOptimizer_scale = CreateOptimizerFromBuffer_CPU(&i_lpBuffer[readBufferByte], i_bufferSize-readBufferByte, useBufferSize);
+		readBufferByte += useBufferSize;
 
 
 		o_useBufferSize = readBufferByte;
@@ -146,6 +172,14 @@ namespace NeuralNetwork {
 		cudaMemcpy(&o_lpBuffer[writeBufferByte], thrust::raw_pointer_cast(&this->lpBias[0]), sizeof(F32)*this->lpBias.size(), cudaMemcpyDeviceToHost);
 		writeBufferByte += sizeof(F32)*(U32)this->lpBias.size();
 
+
+		// オプティマイザ
+		// bias
+		writeBufferByte += this->m_pOptimizer_bias->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
+		// neuron
+		writeBufferByte += this->m_pOptimizer_scale->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
+
+
 		return writeBufferByte;
 	}
 
@@ -158,6 +192,19 @@ namespace NeuralNetwork {
 	ILayerBase* BatchNormalization_LayerData_GPU::CreateLayer(const Gravisbell::GUID& guid)
 	{
 		return new BatchNormalization_GPU(guid, *this);
+	}
+	
+
+	//===========================
+	// オプティマイザー設定
+	//===========================		
+	/** オプティマイザーを変更する */
+	ErrorCode BatchNormalization_LayerData_GPU::ChangeOptimizer(const wchar_t i_optimizerID[])
+	{
+		ChangeOptimizer_GPU(&this->m_pOptimizer_bias,  i_optimizerID, (U32)this->lpBias.size());
+		ChangeOptimizer_GPU(&this->m_pOptimizer_scale, i_optimizerID, (U32)this->lpScale.size());
+
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 
 } // Gravisbell;

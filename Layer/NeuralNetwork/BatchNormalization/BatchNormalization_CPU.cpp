@@ -11,7 +11,6 @@
 #include"BatchNormalization_CPU.h"
 #include"BatchNormalization_LayerData_CPU.h"
 
-#include"Library/NeuralNetwork/Optimizer.h"
 
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
@@ -164,26 +163,6 @@ namespace NeuralNetwork {
 		{
 			this->layerData.lpMean[ch] = 0.0f;
 			this->layerData.lpVariance[ch] = 0.0f;
-		}
-
-		switch(this->learnData.Optimizer)
-		{
-		case BatchNormalization::LearnDataStructure::Optimizer_SGD:
-			UpdateOptimizer_SGD_CPU(&this->m_pOptimizer_scale,	(U32)this->lpDScale.size(),	this->learnData.LearnCoeff);
-			UpdateOptimizer_SGD_CPU(&this->m_pOptimizer_bias,   (U32)this->lpDBias.size(),	this->learnData.LearnCoeff);
-			break;
-		case BatchNormalization::LearnDataStructure::Optimizer_Momentum:
-			UpdateOptimizer_Momentum_CPU(&this->m_pOptimizer_scale,	(U32)this->lpDScale.size(), this->learnData.LearnCoeff, this->learnData.Momentum_alpha);
-			UpdateOptimizer_Momentum_CPU(&this->m_pOptimizer_bias,	(U32)this->lpDBias.size(),  this->learnData.LearnCoeff, this->learnData.Momentum_alpha);
-			break;
-		case BatchNormalization::LearnDataStructure::Optimizer_AdaDelta:
-			UpdateOptimizer_AdaDelta_CPU(&this->m_pOptimizer_scale, (U32)this->lpDScale.size(), this->learnData.AdaDelta_rho, this->learnData.AdaDelta_epsilon);
-			UpdateOptimizer_AdaDelta_CPU(&this->m_pOptimizer_bias,  (U32)this->lpDBias.size(),  this->learnData.AdaDelta_rho, this->learnData.AdaDelta_epsilon);
-			break;
-		case BatchNormalization::LearnDataStructure::Optimizer_Adam:
-			UpdateOptimizer_Adam_CPU(&this->m_pOptimizer_scale,	(U32)this->lpDScale.size(), this->learnData.Adam_alpha, this->learnData.Adam_beta1, this->learnData.Adam_beta2, this->learnData.Adam_epsilon);
-			UpdateOptimizer_Adam_CPU(&this->m_pOptimizer_bias,	(U32)this->lpDBias.size(),  this->learnData.Adam_alpha, this->learnData.Adam_beta1, this->learnData.Adam_beta2, this->learnData.Adam_epsilon);
-			break;
 		}
 
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
@@ -413,10 +392,10 @@ namespace NeuralNetwork {
 		}
 
 		// スケールとバイアスを更新
-		if(this->m_pOptimizer_scale)
-			this->m_pOptimizer_scale->UpdateParameter(&this->layerData.lpScale[0], &this->lpDScale[0]);
-		if(this->m_pOptimizer_bias)
-			this->m_pOptimizer_bias->UpdateParameter(&this->layerData.lpBias[0], &this->lpDBias[0]);
+		if(this->layerData.m_pOptimizer_scale)
+			this->layerData.m_pOptimizer_scale->UpdateParameter(&this->layerData.lpScale[0], &this->lpDScale[0]);
+		if(this->layerData.m_pOptimizer_bias)
+			this->layerData.m_pOptimizer_bias->UpdateParameter(&this->layerData.lpBias[0], &this->lpDBias[0]);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

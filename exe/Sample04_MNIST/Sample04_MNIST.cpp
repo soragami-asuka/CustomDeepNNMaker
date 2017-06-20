@@ -209,7 +209,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	// äwèK, ÉeÉXÉgé¿çs
 	{
 		// äwèK
-		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkTest, pDataLayerTeach_Input, pDataLayerTeach_Output, pDataLayerTest_Input, pDataLayerTest_Output, 8, 20) != ErrorCode::ERROR_CODE_NONE)
+		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkTest, pDataLayerTeach_Input, pDataLayerTeach_Output, pDataLayerTest_Input, pDataLayerTest_Output, 32, 20) != ErrorCode::ERROR_CODE_NONE)
 		{
 			delete pNeuralNetworkLearn;
 			delete pNeuralNetworkTest;
@@ -445,7 +445,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			inputDataStruct, lastLayerGUID,
-			CreateConvolutionLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(4,4,1), 4, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
+			CreateConvolutionLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(5,5,1), 4, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
@@ -472,12 +472,13 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #endif
 
+
 #if 1	// Single
 		// 2ëwñ⁄
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			inputDataStruct, lastLayerGUID,
-			CreateConvolutionLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(5,5,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
+			CreateConvolutionLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(5,5,1), 16, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
@@ -503,6 +504,91 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 			CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct, 0.5f));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #endif
+
+#if 1	// Expand
+		// 3ëwñ⁄
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			inputDataStruct, lastLayerGUID,
+			CreateConvolutionLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(5,5,1), 16, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			inputDataStruct, lastLayerGUID,
+			CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, inputDataStruct));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+#if USE_BATCHNORM
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			inputDataStruct, lastLayerGUID,
+			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"ReLU"));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+#endif
+#if USE_DROPOUT
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			inputDataStruct, lastLayerGUID,
+			CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct, 0.5f));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+#endif
+
+		// 4ëwñ⁄
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			inputDataStruct, lastLayerGUID,
+			CreateConvolutionLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(5,5,1), 32, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			inputDataStruct, lastLayerGUID,
+			CreatePoolingLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1)));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			inputDataStruct, lastLayerGUID,
+			CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, inputDataStruct));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+#if USE_BATCHNORM
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			inputDataStruct, lastLayerGUID,
+			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"ReLU"));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+#endif
+#if USE_DROPOUT
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			inputDataStruct, lastLayerGUID,
+			CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct, 0.5f));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+#endif
+
+		// 5ëwñ⁄
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			inputDataStruct, lastLayerGUID,
+			CreateConvolutionLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(5,5,1), 32, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			inputDataStruct, lastLayerGUID,
+			CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, inputDataStruct));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+#if USE_BATCHNORM
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			inputDataStruct, lastLayerGUID,
+			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"ReLU"));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+#endif
+#if USE_DROPOUT
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			inputDataStruct, lastLayerGUID,
+			CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct, 0.5f));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+#endif
+#endif	// Expand
 
 #elif 0	// MergeInput
 		// 1ëwñ⁄ÇÃGUIDÇãLò^
@@ -722,6 +808,11 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		pNeuralNetwork->SetOutputLayerGUID(lastLayerGUID);
 	}
 
+	// ÉIÉvÉeÉBÉ}ÉCÉUÅ[ÇÃê›íË
+	pNeuralNetwork->ChangeOptimizer(L"SGD");
+	pNeuralNetwork->SetOptimizerHyperParameter(L"LearnCoeff", 0.005f);
+//	pNeuralNetwork->ChangeOptimizer(L"Adam");
+
 	return pNeuralNetwork;
 }
 
@@ -746,10 +837,11 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 #else
 	pNeuralNetworkLearn->SetLearnSettingData(L"LearnCoeff", 0.001f);
 #endif
+//	pNeuralNetworkLearn->SetLearnSettingData(L"Optimizer", L"SGD");
 //	pNeuralNetworkLearn->SetLearnSettingData(L"Optimizer", L"Momentum");
 //	pNeuralNetworkLearn->SetLearnSettingData(L"Optimizer", L"AdaDelta");
 	pNeuralNetworkLearn->SetLearnSettingData(L"Optimizer", L"Adam");
-	pNeuralNetworkLearn->SetLearnSettingData(L"Momentum_alpha", 0.5f);
+	pNeuralNetworkLearn->SetLearnSettingData(L"Momentum_alpha", 0.9f);
 	pNeuralNetworkLearn->SetLearnSettingData(L"AdaDelta_rho", (F32)0.95f);
 	pNeuralNetworkLearn->SetLearnSettingData(L"AdaDelta_epsilon", (F32)1e-8);
 

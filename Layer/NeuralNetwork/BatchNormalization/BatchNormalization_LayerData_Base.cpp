@@ -19,6 +19,8 @@ namespace NeuralNetwork {
 		,	inputDataStruct	()	/**< 入力データ構造 */
 		,	pLayerStructure	(NULL)	/**< レイヤー構造を定義したコンフィグクラス */
 		,	layerStructure	()		/**< レイヤー構造 */
+		,	m_pOptimizer_scale	(NULL)		/**< スケール更新用オプティマイザ */
+		,	m_pOptimizer_bias	(NULL)		/**< バイアス更新用オプティマイザ */
 	{
 	}
 	/** デストラクタ */
@@ -26,6 +28,11 @@ namespace NeuralNetwork {
 	{
 		if(pLayerStructure != NULL)
 			delete pLayerStructure;
+
+		if(this->m_pOptimizer_scale)
+			delete this->m_pOptimizer_scale;
+		if(this->m_pOptimizer_bias)
+			delete this->m_pOptimizer_bias;
 	}
 
 
@@ -115,6 +122,10 @@ namespace NeuralNetwork {
 		bufferSize += sizeof(F32) * this->inputDataStruct.ch;	// スケーリング値
 		bufferSize += sizeof(F32) * this->inputDataStruct.ch;	// バイアス値
 
+		// オプティマイザーのバイト数
+		bufferSize += this->m_pOptimizer_bias->GetUseBufferByteCount();
+		bufferSize += this->m_pOptimizer_scale->GetUseBufferByteCount();
+
 		return bufferSize;
 	}
 
@@ -158,6 +169,40 @@ namespace NeuralNetwork {
 	//===========================
 	// 固有関数
 	//===========================
+
+
+	//===========================
+	// オプティマイザー設定
+	//===========================
+	/** オプティマイザーのハイパーパラメータを変更する */
+	ErrorCode BatchNormalization_LayerData_Base::SetOptimizerHyperParameter(const wchar_t i_parameterID[], F32 i_value)
+	{
+		if(this->m_pOptimizer_bias)
+			this->m_pOptimizer_bias->SetHyperParameter(i_parameterID, i_value);
+		if(this->m_pOptimizer_scale)
+			this->m_pOptimizer_scale->SetHyperParameter(i_parameterID, i_value);
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+	ErrorCode BatchNormalization_LayerData_Base::SetOptimizerHyperParameter(const wchar_t i_parameterID[], S32 i_value)
+	{
+		if(this->m_pOptimizer_bias)
+			this->m_pOptimizer_bias->SetHyperParameter(i_parameterID, i_value);
+		if(this->m_pOptimizer_scale)
+			this->m_pOptimizer_scale->SetHyperParameter(i_parameterID, i_value);
+		
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+	ErrorCode BatchNormalization_LayerData_Base::SetOptimizerHyperParameter(const wchar_t i_parameterID[], const wchar_t i_value[])
+	{
+		if(this->m_pOptimizer_bias)
+			this->m_pOptimizer_bias->SetHyperParameter(i_parameterID, i_value);
+		if(this->m_pOptimizer_scale)
+			this->m_pOptimizer_scale->SetHyperParameter(i_parameterID, i_value);
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+
 
 } // Gravisbell;
 } // Layer;

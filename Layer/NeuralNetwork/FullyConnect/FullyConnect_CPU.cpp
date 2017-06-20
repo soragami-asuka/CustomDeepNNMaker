@@ -12,7 +12,6 @@
 #include"FullyConnect_CPU.h"
 #include"FullyConnect_LayerData_CPU.h"
 
-#include"Library/NeuralNetwork/Optimizer.h"
 
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
@@ -149,26 +148,6 @@ namespace NeuralNetwork {
 			delete this->pLearnData;
 		this->pLearnData = data.Clone();
 		this->pLearnData->WriteToStruct((BYTE*)&this->learnData);
-
-		switch(this->learnData.Optimizer)
-		{
-		case FullyConnect::LearnDataStructure::Optimizer_SGD:
-			UpdateOptimizer_SGD_CPU(&this->m_pOptimizer_neuron, this->neuronCount*this->inputBufferCount, this->learnData.LearnCoeff);
-			UpdateOptimizer_SGD_CPU(&this->m_pOptimizer_bias,   this->neuronCount,                        this->learnData.LearnCoeff);
-			break;
-		case FullyConnect::LearnDataStructure::Optimizer_Momentum:
-			UpdateOptimizer_Momentum_CPU(&this->m_pOptimizer_neuron, this->neuronCount*this->inputBufferCount, this->learnData.LearnCoeff, this->learnData.Momentum_alpha);
-			UpdateOptimizer_Momentum_CPU(&this->m_pOptimizer_bias,   this->neuronCount,                        this->learnData.LearnCoeff, this->learnData.Momentum_alpha);
-			break;
-		case FullyConnect::LearnDataStructure::Optimizer_AdaDelta:
-			UpdateOptimizer_AdaDelta_CPU(&this->m_pOptimizer_neuron,	this->neuronCount*this->inputBufferCount, this->learnData.AdaDelta_rho, this->learnData.AdaDelta_epsilon);
-			UpdateOptimizer_AdaDelta_CPU(&this->m_pOptimizer_bias,		this->neuronCount,                        this->learnData.AdaDelta_rho, this->learnData.AdaDelta_epsilon);
-			break;
-		case FullyConnect::LearnDataStructure::Optimizer_Adam:
-			UpdateOptimizer_Adam_CPU(&this->m_pOptimizer_neuron,	this->neuronCount*this->inputBufferCount,  this->learnData.Adam_alpha, this->learnData.Adam_beta1, this->learnData.Adam_beta2, this->learnData.Adam_epsilon);
-			UpdateOptimizer_Adam_CPU(&this->m_pOptimizer_bias,		this->neuronCount,                         this->learnData.Adam_alpha, this->learnData.Adam_beta1, this->learnData.Adam_beta2, this->learnData.Adam_epsilon);
-			break;
-		}
 
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
@@ -326,10 +305,10 @@ namespace NeuralNetwork {
 		}
 
 		// Œë·‚ð”½‰f
-		if(this->m_pOptimizer_bias)
-			this->m_pOptimizer_bias->UpdateParameter(&this->layerData.lpBias[0],   &this->lpDBias[0]);
-		if(this->m_pOptimizer_neuron)
-			this->m_pOptimizer_neuron->UpdateParameter(&this->layerData.lpNeuron[0], &this->lpDNeuron[0]);
+		if(this->layerData.m_pOptimizer_bias)
+			this->layerData.m_pOptimizer_bias->UpdateParameter(&this->layerData.lpBias[0],   &this->lpDBias[0]);
+		if(this->layerData.m_pOptimizer_neuron)
+			this->layerData.m_pOptimizer_neuron->UpdateParameter(&this->layerData.lpNeuron[0], &this->lpDNeuron[0]);
 
 
 		return ErrorCode::ERROR_CODE_NONE;

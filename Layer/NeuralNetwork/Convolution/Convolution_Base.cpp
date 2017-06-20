@@ -15,8 +15,6 @@ using namespace Gravisbell::Layer::NeuralNetwork;
 Convolution_Base::Convolution_Base(Gravisbell::GUID guid)
 	:	guid				(guid)
 	,	pLearnData			(NULL)
-	,	m_pOptimizer_neuron	(NULL)		/**< ニューロン更新用オプティマイザ */
-	,	m_pOptimizer_bias	(NULL)		/**< バイアス更新用オプティマイザ */
 {
 }
 
@@ -25,11 +23,6 @@ Convolution_Base::~Convolution_Base()
 {
 	if(pLearnData != NULL)
 		delete pLearnData;
-
-	if(this->m_pOptimizer_neuron)
-		delete this->m_pOptimizer_neuron;
-	if(this->m_pOptimizer_bias)
-		delete this->m_pOptimizer_bias;
 }
 
 

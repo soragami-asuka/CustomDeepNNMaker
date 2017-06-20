@@ -58,6 +58,9 @@
     <Filter Include="include\Layer\Connect">
       <UniqueIdentifier>{a998b8c4-bcde-4c3b-8bdc-fcd43c0eb747}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\Layer\Optimizer">
+      <UniqueIdentifier>{a2831bfe-e4c2-4770-819c-f709ca1054d1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -188,6 +191,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\Optimizer\IOptimizer.h">
+      <Filter>include\Layer\Optimizer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -31,9 +31,6 @@ namespace NeuralNetwork {
 
 		U32 batchSize;	/**< バッチサイズ */
 
-		IOptimizer* m_pOptimizer_neuron;	/**< ニューロン更新用オプティマイザ */
-		IOptimizer* m_pOptimizer_bias;		/**< バイアス更新用オプティマイザ */
-
 	public:
 		/** コンストラクタ */
 		Convolution_Base(Gravisbell::GUID guid);

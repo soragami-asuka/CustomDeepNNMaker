@@ -14,7 +14,6 @@
 
 #include"FullyConnect_LayerData_Base.h"
 
-#include"Layer/NeuralNetwork/IOptimizer.h"
 
 namespace Gravisbell {
 namespace Layer {
@@ -31,9 +30,6 @@ namespace NeuralNetwork {
 		FullyConnect::LearnDataStructure learnData;	/**< 学習設定 */
 
 		unsigned int batchSize;	/**< バッチサイズ */
-
-		IOptimizer* m_pOptimizer_neuron;	/**< ニューロン更新用オプティマイザ */
-		IOptimizer* m_pOptimizer_bias;		/**< バイアス更新用オプティマイザ */
 
 	public:
 		/** コンストラクタ */

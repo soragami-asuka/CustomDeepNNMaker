@@ -3,7 +3,7 @@
 //===============================================
 #include"stdafx.h"
 
-#include"Layer/NeuralNetwork/IOptimizer.h"
+#include"Optimizer_SGD_base.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4267)
@@ -20,19 +20,15 @@ namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-	class Optimizer_SGD_GPU : public iOptimizer_SGD
+	class Optimizer_SGD_GPU : public Optimizer_SGD_base
 	{
 	private:
-		U32 m_parameterCount;	/**< パラメータ数 */
-		F32 m_learnCoeff;	/**< 学習係数 */
-
 		cublasHandle_t cublasHandle;
 
 	public:
 		/** コンストラクタ */
 		Optimizer_SGD_GPU(U32 i_parameterCount)
-			:	m_parameterCount	(i_parameterCount)
-			,	m_learnCoeff		(0.0f)
+			:	Optimizer_SGD_base	(i_parameterCount)
 		{
 			cublasCreate(&cublasHandle);
 		}
@@ -43,25 +39,6 @@ namespace NeuralNetwork {
 		}
 
 	public:
-		//===========================
-		// 基本情報
-		//===========================
-		/** オプティマイザの種別を取得する */
-		OptimizerType GetTypeCode()const
-		{
-			return OptimizerType::OPTIMIZER_TYPE_SGD;
-		}
-		
-		/** ハイパーパラメータを更新する
-			@param	i_learnCoeff	学習係数 */
-		ErrorCode SetHyperParameter(F32 i_learnCoeff)
-		{
-			this->m_learnCoeff = i_learnCoeff;
-
-			return ErrorCode::ERROR_CODE_NONE;
-		}
-
-
 		//===========================
 		// 処理
 		//===========================
@@ -84,23 +61,26 @@ namespace NeuralNetwork {
 	};
 
 	/** オプティマイザを作成する */
-	iOptimizer_SGD* CreateOptimizer_SGD_GPU(U32 i_parameterCount)
+	IOptimizer* CreateOptimizer_SGD_GPU(U32 i_parameterCount)
 	{
 		return new Optimizer_SGD_GPU(i_parameterCount);
 	}
-	/** オプティマイザーを更新する.異なる型だった場合は強制的に指定の型に変換される. */
-	ErrorCode UpdateOptimizer_SGD_GPU(IOptimizer** io_ppOptimizer, U32 i_parameterCount, F32 i_learnCoeff)
+	/** オプティマイザをバッファから作成する */
+	IOptimizer* CreateOptimizerFromBuffer_SGD_GPU(const BYTE* i_lpBuffer, Gravisbell::S32 i_bufferSize, Gravisbell::S32& o_useBufferSize)
 	{
-		iOptimizer_SGD* pOptimizer = dynamic_cast<iOptimizer_SGD*>(*io_ppOptimizer);
+		return CreateOptimizerFromBuffer_SGD(i_lpBuffer, i_bufferSize, o_useBufferSize, CreateOptimizer_SGD_GPU);
+	}
+	/** オプティマイザーを更新する.異なる型だった場合は強制的に指定の型に変換される. */
+	ErrorCode ChangeOptimizer_SGD_GPU(IOptimizer** io_ppOptimizer, U32 i_parameterCount)
+	{
+		Optimizer_SGD_GPU* pOptimizer = dynamic_cast<Optimizer_SGD_GPU*>(*io_ppOptimizer);
 		if(pOptimizer == NULL)
 		{
 			if(*io_ppOptimizer)
 				delete *io_ppOptimizer;
 
-			*io_ppOptimizer = pOptimizer = CreateOptimizer_SGD_GPU(i_parameterCount);
+			*io_ppOptimizer = CreateOptimizer_SGD_GPU(i_parameterCount);
 		}
-
-		pOptimizer->SetHyperParameter(i_learnCoeff);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

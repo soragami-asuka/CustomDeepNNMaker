@@ -5,23 +5,18 @@
 
 #include<stdio.h>
 
-#include"Layer/NeuralNetwork/IOptimizer.h"
+#include"Optimizer_SGD_base.h"
 
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-	class Optimizer_SGD_CPU : public iOptimizer_SGD
+	class Optimizer_SGD_CPU : public Optimizer_SGD_base
 	{
-	private:
-		U32 m_parameterCount;	/**< パラメータ数 */
-		F32 m_learnCoeff;	/**< 学習係数 */
-
 	public:
 		/** コンストラクタ */
 		Optimizer_SGD_CPU(U32 i_parameterCount)
-			:	m_parameterCount	(i_parameterCount)
-			,	m_learnCoeff		(0.0f)
+			:	Optimizer_SGD_base	(i_parameterCount)
 		{
 		}
 		/** デストラクタ */
@@ -30,25 +25,6 @@ namespace NeuralNetwork {
 		}
 
 	public:
-		//===========================
-		// 基本情報
-		//===========================
-		/** オプティマイザの種別を取得する */
-		OptimizerType GetTypeCode()const
-		{
-			return OptimizerType::OPTIMIZER_TYPE_SGD;
-		}
-		
-		/** ハイパーパラメータを更新する
-			@param	i_learnCoeff	学習係数 */
-		ErrorCode SetHyperParameter(F32 i_learnCoeff)
-		{
-			this->m_learnCoeff = i_learnCoeff;
-
-			return ErrorCode::ERROR_CODE_NONE;
-		}
-
-
 		//===========================
 		// 処理
 		//===========================
@@ -67,23 +43,26 @@ namespace NeuralNetwork {
 	};
 
 	/** オプティマイザを作成する */
-	iOptimizer_SGD* CreateOptimizer_SGD_CPU(U32 i_parameterCount)
+	IOptimizer* CreateOptimizer_SGD_CPU(U32 i_parameterCount)
 	{
 		return new Optimizer_SGD_CPU(i_parameterCount);
 	}
-	/** オプティマイザーを更新する.異なる型だった場合は強制的に指定の型に変換される. */
-	ErrorCode UpdateOptimizer_SGD_CPU(IOptimizer** io_ppOptimizer, U32 i_parameterCount, F32 i_learnCoeff)
+	/** オプティマイザをバッファから作成する */
+	IOptimizer* CreateOptimizerFromBuffer_SGD_CPU(const BYTE* i_lpBuffer, Gravisbell::S32 i_bufferSize, Gravisbell::S32& o_useBufferSize)
 	{
-		iOptimizer_SGD* pOptimizer = dynamic_cast<iOptimizer_SGD*>(*io_ppOptimizer);
+		return CreateOptimizerFromBuffer_SGD(i_lpBuffer, i_bufferSize, o_useBufferSize, CreateOptimizer_SGD_CPU);
+	}
+	/** オプティマイザーを更新する.異なる型だった場合は強制的に指定の型に変換される. */
+	ErrorCode ChangeOptimizer_SGD_CPU(IOptimizer** io_ppOptimizer, U32 i_parameterCount)
+	{
+		Optimizer_SGD_CPU* pOptimizer = dynamic_cast<Optimizer_SGD_CPU*>(*io_ppOptimizer);
 		if(pOptimizer == NULL)
 		{
 			if(*io_ppOptimizer)
 				delete *io_ppOptimizer;
 
-			*io_ppOptimizer = pOptimizer = CreateOptimizer_SGD_CPU(i_parameterCount);
+			*io_ppOptimizer = CreateOptimizer_SGD_CPU(i_parameterCount);
 		}
-
-		pOptimizer->SetHyperParameter(i_learnCoeff);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

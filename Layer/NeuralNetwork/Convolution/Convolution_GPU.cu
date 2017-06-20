@@ -513,25 +513,6 @@ namespace NeuralNetwork {
 		this->pLearnData = data.Clone();
 		this->pLearnData->WriteToStruct((BYTE*)&this->learnData);
 
-		switch(this->learnData.Optimizer)
-		{
-		case Convolution::LearnDataStructure::Optimizer_SGD:
-			UpdateOptimizer_SGD_GPU(&this->m_pOptimizer_neuron, (U32)this->lpDNeuron.size(), this->learnData.LearnCoeff);
-			UpdateOptimizer_SGD_GPU(&this->m_pOptimizer_bias,   (U32)this->lpDBias.size(),   this->learnData.LearnCoeff);
-			break;
-		case Convolution::LearnDataStructure::Optimizer_Momentum:
-			UpdateOptimizer_Momentum_GPU(&this->m_pOptimizer_neuron, (U32)this->lpDNeuron.size(), this->learnData.LearnCoeff, this->learnData.Momentum_alpha);
-			UpdateOptimizer_Momentum_GPU(&this->m_pOptimizer_bias,   (U32)this->lpDBias.size(),   this->learnData.LearnCoeff, this->learnData.Momentum_alpha);
-			break;
-		case Convolution::LearnDataStructure::Optimizer_AdaDelta:
-			UpdateOptimizer_AdaDelta_GPU(&this->m_pOptimizer_neuron, (U32)this->lpDNeuron.size(), this->learnData.AdaDelta_rho, this->learnData.AdaDelta_epsilon);
-			UpdateOptimizer_AdaDelta_GPU(&this->m_pOptimizer_bias,   (U32)this->lpDBias.size(),   this->learnData.AdaDelta_rho, this->learnData.AdaDelta_epsilon);
-			break;
-		case Convolution::LearnDataStructure::Optimizer_Adam:
-			UpdateOptimizer_Adam_GPU(&this->m_pOptimizer_neuron, (U32)this->lpDNeuron.size(), this->learnData.Adam_alpha, this->learnData.Adam_beta1, this->learnData.Adam_beta2, this->learnData.Adam_epsilon);
-			UpdateOptimizer_Adam_GPU(&this->m_pOptimizer_bias,   (U32)this->lpDBias.size(),   this->learnData.Adam_alpha, this->learnData.Adam_beta1, this->learnData.Adam_beta2, this->learnData.Adam_epsilon);
-			break;
-		}
 
 
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
@@ -719,10 +700,10 @@ namespace NeuralNetwork {
 		}
 
 		// •Ï‰»—Ê‚ð”½‰f
-		if(this->m_pOptimizer_bias)
-			this->m_pOptimizer_bias->UpdateParameter(thrust::raw_pointer_cast(&this->layerData.lpBias_d[0]),   thrust::raw_pointer_cast(&this->lpDBias[0]));
-		if(this->m_pOptimizer_neuron)
-			this->m_pOptimizer_neuron->UpdateParameter(thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]), thrust::raw_pointer_cast(&this->lpDNeuron[0]));
+		if(this->layerData.m_pOptimizer_bias)
+			this->layerData.m_pOptimizer_bias->UpdateParameter(thrust::raw_pointer_cast(&this->layerData.lpBias_d[0]),   thrust::raw_pointer_cast(&this->lpDBias[0]));
+		if(this->layerData.m_pOptimizer_neuron)
+			this->layerData.m_pOptimizer_neuron->UpdateParameter(thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]), thrust::raw_pointer_cast(&this->lpDNeuron[0]));
 
 
 		return ErrorCode::ERROR_CODE_NONE;

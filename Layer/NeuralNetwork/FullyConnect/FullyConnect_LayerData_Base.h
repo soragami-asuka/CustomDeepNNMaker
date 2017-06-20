@@ -7,6 +7,7 @@
 #include<Layer/IO/ISingleInputLayerData.h>
 #include<Layer/IO/ISingleOutputLayerData.h>
 #include<Layer/NeuralNetwork/INNLayer.h>
+#include<Layer/NeuralNetwork/IOptimizer.h>
 
 #include<vector>
 
@@ -28,6 +29,9 @@ namespace NeuralNetwork {
 
 		SettingData::Standard::IData* pLayerStructure;	/**< レイヤー構造を定義したコンフィグクラス */
 		FullyConnect::LayerStructure layerStructure;	/**< レイヤー構造 */
+
+		IOptimizer* m_pOptimizer_neuron;	/**< ニューロン更新用オプティマイザ */
+		IOptimizer* m_pOptimizer_bias;		/**< バイアス更新用オプティマイザ */
 
 
 		//===========================
@@ -101,6 +105,18 @@ namespace NeuralNetwork {
 	public:
 		/** ニューロン数を取得する */
 		U32 GetNeuronCount()const;
+
+
+		//===========================
+		// オプティマイザー設定
+		//===========================
+	public:
+		/** オプティマイザーを変更する */
+		virtual ErrorCode ChangeOptimizer(const wchar_t i_optimizerID[]) = 0;
+		/** オプティマイザーのハイパーパラメータを変更する */
+		ErrorCode SetOptimizerHyperParameter(const wchar_t i_parameterID[], F32 i_value);
+		ErrorCode SetOptimizerHyperParameter(const wchar_t i_parameterID[], S32 i_value);
+		ErrorCode SetOptimizerHyperParameter(const wchar_t i_parameterID[], const wchar_t i_value[]);
 	};
 
 } // Gravisbell;

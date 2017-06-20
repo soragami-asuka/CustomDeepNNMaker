@@ -121,7 +121,7 @@ namespace NeuralNetwork {
 			if(pLayerDLL == NULL)
 				return ErrorCode::ERROR_CODE_DLL_NOTFOUND;
 			S32 useBufferSize = 0;
-			auto pLayerData = pLayerDLL->CreateLayerDataFromBuffer(guid, &i_lpBuffer[readBufferByte], readBufferByte, useBufferSize);
+			auto pLayerData = pLayerDLL->CreateLayerDataFromBuffer(guid, &i_lpBuffer[readBufferByte], i_bufferSize - readBufferByte, useBufferSize);
 			if(pLayerData == NULL)
 				return ErrorCode::ERROR_CODE_LAYER_CREATE;
 			readBufferByte += useBufferSize;
@@ -1096,6 +1096,51 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_COMMON_OUT_OF_ARRAYRANGE;
 	}
 
+
+	//===========================
+	// オプティマイザー設定
+	//===========================
+	/** オプティマイザーを変更する */
+	ErrorCode FeedforwardNeuralNetwork_LayerData_Base::ChangeOptimizer(const wchar_t i_optimizerID[])
+	{
+		for(auto& it : this->lpConnectInfo)
+		{
+			if(it.pLayerData)
+				it.pLayerData->ChangeOptimizer(i_optimizerID);
+		}
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+	/** オプティマイザーのハイパーパラメータを変更する */
+	ErrorCode FeedforwardNeuralNetwork_LayerData_Base::SetOptimizerHyperParameter(const wchar_t i_parameterID[], F32 i_value)
+	{
+		for(auto& it : this->lpConnectInfo)
+		{
+			if(it.pLayerData)
+				it.pLayerData->SetOptimizerHyperParameter(i_parameterID, i_value);
+		}
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+	ErrorCode FeedforwardNeuralNetwork_LayerData_Base::SetOptimizerHyperParameter(const wchar_t i_parameterID[], S32 i_value)
+	{
+		for(auto& it : this->lpConnectInfo)
+		{
+			if(it.pLayerData)
+				it.pLayerData->SetOptimizerHyperParameter(i_parameterID, i_value);
+		}
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+	ErrorCode FeedforwardNeuralNetwork_LayerData_Base::SetOptimizerHyperParameter(const wchar_t i_parameterID[], const wchar_t i_value[])
+	{
+		for(auto& it : lpLayerData)
+		{
+			it.second->SetOptimizerHyperParameter(i_parameterID, i_value);
+		}
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
 
 }	// NeuralNetwork
 }	// Layer

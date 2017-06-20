@@ -5,22 +5,15 @@
 
 #include<vector>
 
-#include"Layer/NeuralNetwork/IOptimizer.h"
+#include"Optimizer_Adam_base.h"
 
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-	class Optimizer_Adam_CPU : public iOptimizer_Adam
+	class Optimizer_Adam_CPU : public Optimizer_Adam_base
 	{
-	private:
-		U32 m_parameterCount;	/**< パラメータ数 */
-
-		F32	m_alpha;		/**< 慣性. */
-		F32	m_beta1;		/**< 減衰率. */
-		F32	m_beta2;		/**< 減衰率. */
-		F32	m_epsilon;		/**< 補助係数. */
-
+	public:
 		std::vector<F32> lpParameterM;
 		std::vector<F32> lpParameterV;
 
@@ -30,11 +23,7 @@ namespace NeuralNetwork {
 	public:
 		/** コンストラクタ */
 		Optimizer_Adam_CPU(U32 i_parameterCount)
-			:	m_parameterCount	(i_parameterCount)
-			,	m_alpha		(0.0f)
-			,	m_beta1		(0.0f)
-			,	m_beta2		(0.0f)
-			,	m_epsilon	(0.0f)
+			:	Optimizer_Adam_base	(i_parameterCount)
 			,	m_beta2Pows	(1.0f)	/**< β2の階乗値 */
 			,	m_beta1Pows	(1.0f)	/**< β1の階乗値 */
 		{
@@ -47,37 +36,6 @@ namespace NeuralNetwork {
 		}
 
 	public:
-		//===========================
-		// 基本情報
-		//===========================
-		/** オプティマイザの種別を取得する */
-		OptimizerType GetTypeCode()const
-		{
-			return OptimizerType::OPTIMIZER_TYPE_ADAM;
-		}
-		
-		/** ハイパーパラメータを更新する
-			@param	i_alpha			慣性.
-			@param	i_beta1			減衰率.
-			@param	i_beta2			減衰率.
-			@param	i_epsilon		補助係数. */
-		virtual ErrorCode SetHyperParameter(F32 i_alpha, F32 i_beta1, F32 i_beta2, F32 i_epsilon)
-		{
-			m_alpha   = i_alpha;
-			m_beta1   = i_beta1;
-			m_beta2	  = i_beta2;
-			m_epsilon = i_epsilon;
-
-			if(m_beta1Pows < 0.0f)
-				m_beta1Pows = m_beta1;
-			if(m_beta2Pows < 0.0f)
-				m_beta2Pows = m_beta2;
-
-
-			return ErrorCode::ERROR_CODE_NONE;
-		}
-
-
 		//===========================
 		// 処理
 		//===========================
@@ -102,26 +60,81 @@ namespace NeuralNetwork {
 
 			return ErrorCode::ERROR_CODE_NONE;
 		}
+
+	public:
+		//===========================
+		// 保存
+		//===========================
+		/** レイヤーをバッファに書き込む.
+			@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
+			@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
+		S32 WriteToBuffer(BYTE* o_lpBuffer)const
+		{
+			U32 writePos = WriteToBufferBase(o_lpBuffer);
+
+			// M
+			memcpy(&o_lpBuffer[writePos], &this->lpParameterM[0], sizeof(F32)*this->m_parameterCount);
+			writePos += sizeof(F32)*this->m_parameterCount;
+			// V
+			memcpy(&o_lpBuffer[writePos], &this->lpParameterV[0], sizeof(F32)*this->m_parameterCount);
+			writePos += sizeof(F32)*this->m_parameterCount;
+
+			// beta1^n
+			memcpy(&o_lpBuffer[writePos], &this->m_beta1Pows, sizeof(F32));
+			writePos += sizeof(F32);
+			// beta2^n
+			memcpy(&o_lpBuffer[writePos], &this->m_beta2Pows, sizeof(F32));
+			writePos += sizeof(F32);
+
+			return writePos;
+		}
 	};
 
 	/** オプティマイザを作成する */
-	iOptimizer_Adam* CreateOptimizer_Adam_CPU(U32 i_parameterCount)
+	Optimizer_Adam_base* CreateOptimizer_Adam_CPU(U32 i_parameterCount)
 	{
 		return new Optimizer_Adam_CPU(i_parameterCount);
 	}
-	/** オプティマイザーを更新する.異なる型だった場合は強制的に指定の型に変換される. */
-	ErrorCode UpdateOptimizer_Adam_CPU(IOptimizer** io_ppOptimizer, U32 i_parameterCount, F32 i_alpha, F32 i_beta1, F32 i_beta2, F32 i_epsilon)
+	/** オプティマイザをバッファから作成する */
+	IOptimizer* CreateOptimizerFromBuffer_Adam_CPU(const BYTE* i_lpBuffer, Gravisbell::S32 i_bufferSize, Gravisbell::S32& o_useBufferSize)
 	{
-		iOptimizer_Adam* pOptimizer = dynamic_cast<iOptimizer_Adam*>(*io_ppOptimizer);
+		Optimizer_Adam_base* pOptimizer = CreateOptimizerFromBuffer_Adam(i_lpBuffer, i_bufferSize, o_useBufferSize, CreateOptimizer_Adam_CPU);
+		if(pOptimizer == NULL)
+			return NULL;
+		Optimizer_Adam_CPU* pOptimizerCPU = dynamic_cast<Optimizer_Adam_CPU*>(pOptimizer);
+		if(pOptimizerCPU == NULL)
+		{
+			delete pOptimizer;
+			return NULL;
+		}
+
+		// M
+		memcpy(&pOptimizerCPU->lpParameterM[0], &i_lpBuffer[o_useBufferSize], sizeof(F32)*pOptimizerCPU->lpParameterM.size());
+		o_useBufferSize += sizeof(F32)*pOptimizerCPU->lpParameterM.size();
+		// V
+		memcpy(&pOptimizerCPU->lpParameterV[0], &i_lpBuffer[o_useBufferSize], sizeof(F32)*pOptimizerCPU->lpParameterV.size());
+		o_useBufferSize += sizeof(F32)*pOptimizerCPU->lpParameterV.size();
+
+		// beta1^n
+		memcpy(&pOptimizerCPU->m_beta1Pows, &i_lpBuffer[o_useBufferSize], sizeof(F32));
+		o_useBufferSize += sizeof(F32);
+		// beta2^n
+		memcpy(&pOptimizerCPU->m_beta2Pows, &i_lpBuffer[o_useBufferSize], sizeof(F32));
+		o_useBufferSize += sizeof(F32);
+
+		return pOptimizer;
+	}
+	/** オプティマイザーを更新する.異なる型だった場合は強制的に指定の型に変換される. */
+	ErrorCode ChangeOptimizer_Adam_CPU(IOptimizer** io_ppOptimizer, U32 i_parameterCount)
+	{
+		Optimizer_Adam_base* pOptimizer = dynamic_cast<Optimizer_Adam_base*>(*io_ppOptimizer);
 		if(pOptimizer == NULL)
 		{
 			if(*io_ppOptimizer)
 				delete *io_ppOptimizer;
 
-			*io_ppOptimizer = pOptimizer = CreateOptimizer_Adam_CPU(i_parameterCount);
+			*io_ppOptimizer = CreateOptimizer_Adam_CPU(i_parameterCount);
 		}
-
-		pOptimizer->SetHyperParameter(i_alpha, i_beta1, i_beta2, i_epsilon);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

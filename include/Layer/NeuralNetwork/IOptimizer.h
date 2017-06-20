@@ -1,5 +1,5 @@
 //========================================
-// 最適化ルーチン
+// パラメータ更新のための最適化ルーチン
 //========================================
 #ifndef __GRAVISBELL_I_NN_OPTIMIZER_H__
 #define __GRAVISBELL_I_NN_OPTIMIZER_H__
@@ -12,23 +12,13 @@ namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-	/** 最適化ルーチン種別 */
-	enum OptimizerType
-	{
-		OPTIMIZER_TYPE_SGD,			// SGD
-		OPTIMIZER_TYPE_MOMENTUM,	// Momentum
-		OPTIMIZER_TYPE_ADADGRAD,	// AdaGrad
-		OPTIMIZER_TYPE_RMSPROP,		// RMSprop
-		OPTIMIZER_TYPE_ADADELTA,	// AdaDelta
-		OPTIMIZER_TYPE_ADAM,		// Adam
-
-		OPTIMIZER_TYPE_COUNT
-	};
-
 	/** 最適化ルーチン */
 	class IOptimizer
 	{
 	public:
+		//===========================
+		// コンストラクタ/デストラクタ
+		//===========================
 		/** コンストラクタ */
 		IOptimizer(){}
 		/** デストラクタ */
@@ -38,8 +28,21 @@ namespace NeuralNetwork {
 		//===========================
 		// 基本情報
 		//===========================
-		/** オプティマイザの種別を取得する */
-		virtual OptimizerType GetTypeCode()const = 0;
+		/** 識別IDの取得 */
+		virtual const wchar_t* GetOptimizerID()const = 0;
+
+		/** ハイパーパラメータを設定する
+			@param	i_parameterID	パラメータ識別用ID
+			@param	i_value			パラメータ. */
+		virtual ErrorCode SetHyperParameter(const wchar_t i_parameterID[], F32 i_value) = 0;
+		/** ハイパーパラメータを設定する
+			@param	i_parameterID	パラメータ識別用ID
+			@param	i_value			パラメータ. */
+		virtual ErrorCode SetHyperParameter(const wchar_t i_parameterID[], S32 i_value) = 0;
+		/** ハイパーパラメータを設定する
+			@param	i_parameterID	パラメータ識別用ID
+			@param	i_value			パラメータ. */
+		virtual ErrorCode SetHyperParameter(const wchar_t i_parameterID[], const wchar_t i_value[]) = 0;
 
 	public:
 		//===========================
@@ -49,6 +52,18 @@ namespace NeuralNetwork {
 			@param io_lpParamter	更新するパラメータ.
 			@param io_lpDParameter	パラメータの変化量. */
 		virtual ErrorCode UpdateParameter(F32 io_lpParameter[], const F32 i_lpDParameter[]) = 0;
+
+	public:
+		//===========================
+		// 保存
+		//===========================
+		/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
+		virtual U32 GetUseBufferByteCount()const = 0;
+
+		/** レイヤーをバッファに書き込む.
+			@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
+			@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
+		virtual S32 WriteToBuffer(BYTE* o_lpBuffer)const = 0;
 	};
 
 	/** SGD */

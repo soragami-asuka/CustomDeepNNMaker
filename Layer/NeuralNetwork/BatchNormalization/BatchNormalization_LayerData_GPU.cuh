@@ -80,6 +80,14 @@ namespace NeuralNetwork {
 		/** レイヤーを作成する.
 			@param guid	新規生成するレイヤーのGUID. */
 		ILayerBase* CreateLayer(const Gravisbell::GUID& guid);
+
+
+		//===========================
+		// オプティマイザー設定
+		//===========================		
+	public:
+		/** オプティマイザーを変更する */
+		ErrorCode ChangeOptimizer(const wchar_t i_optimizerID[]);
 	};
 
 } // Gravisbell;
