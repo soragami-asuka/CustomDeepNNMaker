@@ -157,12 +157,12 @@ namespace NeuralNetwork {
 		// bias
 		if(this->m_pOptimizer_bias)
 			delete this->m_pOptimizer_bias;
-		this->m_pOptimizer_bias = CreateOptimizerFromBuffer_CPU(&i_lpBuffer[readBufferByte], i_bufferSize-readBufferByte, useBufferSize);
+		this->m_pOptimizer_bias = CreateOptimizerFromBuffer_GPU(&i_lpBuffer[readBufferByte], i_bufferSize-readBufferByte, useBufferSize);
 		readBufferByte += useBufferSize;
 		// neuron
 		if(this->m_pOptimizer_neuron)
 			delete this->m_pOptimizer_neuron;
-		this->m_pOptimizer_neuron = CreateOptimizerFromBuffer_CPU(&i_lpBuffer[readBufferByte], i_bufferSize-readBufferByte, useBufferSize);
+		this->m_pOptimizer_neuron = CreateOptimizerFromBuffer_GPU(&i_lpBuffer[readBufferByte], i_bufferSize-readBufferByte, useBufferSize);
 		readBufferByte += useBufferSize;
 
 
