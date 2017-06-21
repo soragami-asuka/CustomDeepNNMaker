@@ -228,7 +228,7 @@ namespace NeuralNetwork {
 		cublasStatus_t err_cublas =	cublasScopy_v2(this->cublasHandle,
 			this->batchSize,
 			thrust::raw_pointer_cast(&this->lpTmpOutputBuffer_d[0]),
-			this->outputBufferCount,
+			this->inputBufferCount,
 			thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]),
 			1);
 		if(err_cublas != 0)
@@ -288,8 +288,8 @@ namespace NeuralNetwork {
 			// “ü—ÍŒë·‚ğŒvZ
 			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 			{
-				this->lpDInputBuffer_h[batchNum*this->inputBufferCount + 0] = (       this->lpOutputBuffer_d[batchNum]) * (       this->lpDOutputBuffer_h[batchNum]);
-				this->lpDInputBuffer_h[batchNum*this->inputBufferCount + 0] = (1.0f - this->lpOutputBuffer_d[batchNum]) * (1.0f - this->lpDOutputBuffer_h[batchNum]);
+				this->lpDInputBuffer_h[batchNum*this->inputBufferCount + 0] = (       this->lpOutputBuffer_d[batchNum]) *  this->lpDOutputBuffer_h[batchNum];
+				this->lpDInputBuffer_h[batchNum*this->inputBufferCount + 1] = (1.0f - this->lpOutputBuffer_d[batchNum]) * -this->lpDOutputBuffer_h[batchNum];
 			}
 
 			cudaMemcpy(this->m_lpDInputBuffer_d, thrust::raw_pointer_cast(&this->lpDInputBuffer_h[0]), sizeof(F32)*this->inputBufferCount*this->batchSize, cudaMemcpyHostToDevice);
