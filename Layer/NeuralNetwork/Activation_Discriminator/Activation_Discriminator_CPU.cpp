@@ -239,8 +239,8 @@ namespace NeuralNetwork {
 			// “ü—ÍŒë·‚ğŒvZ
 			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 			{
-				this->m_lppDInputBuffer[batchNum][0] = this->func_dActivation(       this->lppBatchOutputBuffer[batchNum][0]) * (       this->m_lppDOutputBufferPrev[batchNum][0]);
-				this->m_lppDInputBuffer[batchNum][1] = this->func_dActivation(1.0f - this->lppBatchOutputBuffer[batchNum][0]) * (1.0f - this->m_lppDOutputBufferPrev[batchNum][0]);
+				this->m_lppDInputBuffer[batchNum][0] = this->func_dActivation(       this->lppBatchOutputBuffer[batchNum][0]) *  this->m_lppDOutputBufferPrev[batchNum][0]);
+				this->m_lppDInputBuffer[batchNum][1] = this->func_dActivation(1.0f - this->lppBatchOutputBuffer[batchNum][0]) * -this->m_lppDOutputBufferPrev[batchNum][0]);
 			}
 		}
 
