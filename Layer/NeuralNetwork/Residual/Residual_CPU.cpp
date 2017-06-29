@@ -24,8 +24,8 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	Residual_CPU::Residual_CPU(Gravisbell::GUID guid, Residual_LayerData_CPU& i_layerData)
-		:	Residual_Base	(guid)
+	Residual_CPU::Residual_CPU(Gravisbell::GUID guid, Residual_LayerData_CPU& i_layerData, const std::vector<IODataStruct>& i_lpInputDataStruct)
+		:	Residual_Base					(guid, i_lpInputDataStruct, i_layerData.GetOutputDataStruct(&i_lpInputDataStruct[0], (U32)i_lpInputDataStruct.size()))
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	outputBufferCount				(0)		/**< 出力バッファ数 */
 	{
@@ -159,7 +159,7 @@ namespace NeuralNetwork {
 	ErrorCode Residual_CPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer[])
 	{
 		// 入力バッファのアドレスを配列に格納
-		for(U32 inputNum=0; inputNum<this->layerData.GetInputDataCount(); inputNum++)
+		for(U32 inputNum=0; inputNum<this->GetInputDataCount(); inputNum++)
 		{
 			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 				this->m_lppInputBuffer[inputNum][batchNum] = &i_lpInputBuffer[inputNum][batchNum * this->lpInputBufferCount[inputNum]];

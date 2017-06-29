@@ -42,7 +42,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	Residual_CPU(Gravisbell::GUID guid, class Residual_LayerData_CPU& i_layerData);
+	Residual_CPU(Gravisbell::GUID guid, class Residual_LayerData_CPU& i_layerData, const std::vector<IODataStruct>& i_lpInputDataStruct);
 	/** デストラクタ */
 	virtual ~Residual_CPU();
 

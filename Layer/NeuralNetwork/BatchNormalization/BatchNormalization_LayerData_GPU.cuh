@@ -55,7 +55,7 @@ namespace NeuralNetwork {
 			@param	i_config			設定情報
 			@oaram	i_inputDataStruct	入力データ構造情報
 			@return	成功した場合0 */
-		ErrorCode Initialize(const SettingData::Standard::IData& i_data, const IODataStruct& i_inputDataStruct);
+		ErrorCode Initialize(const SettingData::Standard::IData& i_data);
 		/** 初期化. バッファからデータを読み込む
 			@param i_lpBuffer	読み込みバッファの先頭アドレス.
 			@param i_bufferSize	読み込み可能バッファのサイズ.
@@ -79,7 +79,7 @@ namespace NeuralNetwork {
 	public:
 		/** レイヤーを作成する.
 			@param guid	新規生成するレイヤーのGUID. */
-		ILayerBase* CreateLayer(const Gravisbell::GUID& guid);
+		ILayerBase* CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
 
 
 		//===========================

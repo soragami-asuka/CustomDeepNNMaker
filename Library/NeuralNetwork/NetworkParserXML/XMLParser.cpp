@@ -115,15 +115,6 @@ namespace Parser {
 				ptree_rootLayer.put("<xmlattr>.guid", ::GUID2String(pConnectLayerData->GetGUID()));
 				ptree_rootLayer.put("<xmlattr>.outputLayerGUID", ::GUID2String(pConnectLayerData->GetOutputLayerGUID()));
 
-				// 入力データ構造を出力
-				if(Layer::IO::ISingleInputLayerData* pSingleInputLayerData = dynamic_cast<Layer::IO::ISingleInputLayerData*>(&i_NNLayer))
-				{
-					boost::property_tree::ptree& ptree_input = ptree_rootLayer.add("input", "");
-					ptree_input.put("x", pSingleInputLayerData->GetInputDataStruct().x);
-					ptree_input.put("y", pSingleInputLayerData->GetInputDataStruct().y);
-					ptree_input.put("z", pSingleInputLayerData->GetInputDataStruct().z);
-					ptree_input.put("ch", pSingleInputLayerData->GetInputDataStruct().ch);
-				}
 
 				// レイヤーの接続情報を記載する
 				boost::property_tree::ptree& ptree_layerConnect = ptree_rootLayer.add("layerConnect", "");
@@ -283,35 +274,6 @@ namespace Parser {
 					if(pLayerDLL == NULL)
 						return NULL;
 
-					// 入力データ構造を作成する
-					IODataStruct inputDataStruct;
-					{
-						auto ptreeOpt_input = pTree_root.get_child_optional("input");
-						if(ptreeOpt_input)
-						{
-							boost::property_tree::ptree& ptree_input = ptreeOpt_input.get();
-							{
-								auto pValue = ptree_input.get_optional<int>("x");
-								if(pValue)
-									inputDataStruct.x = pValue.get();
-							}
-							{
-								auto pValue = ptree_input.get_optional<int>("y");
-								if(pValue)
-									inputDataStruct.y = pValue.get();
-							}
-							{
-								auto pValue = ptree_input.get_optional<int>("z");
-								if(pValue)
-									inputDataStruct.z = pValue.get();
-							}
-							{
-								auto pValue = ptree_input.get_optional<int>("ch");
-								if(pValue)
-									inputDataStruct.ch = pValue.get();
-							}
-						}
-					}
 
 					// レイヤー構造データを作成する
 					auto pLayerStructure = pLayerDLL->CreateLayerStructureSetting();
@@ -323,8 +285,7 @@ namespace Parser {
 						i_layerDLLManager,
 						layerCode_root,
 						layerGUID_root,
-						*pLayerStructure,
-						inputDataStruct);
+						*pLayerStructure);
 					delete pLayerStructure;
 
 					// レイヤーの接続情報を作成する

@@ -26,7 +26,7 @@ namespace NeuralNetwork {
 		//====================================
 	public:
 		/** コンストラクタ */
-		FeedforwardNeuralNetwork_CPU(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData);
+		FeedforwardNeuralNetwork_CPU(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct);
 		/** デストラクタ */
 		virtual ~FeedforwardNeuralNetwork_CPU();
 

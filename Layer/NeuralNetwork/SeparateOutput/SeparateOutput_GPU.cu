@@ -21,8 +21,8 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	SeparateOutput_GPU::SeparateOutput_GPU(Gravisbell::GUID guid, SeparateOutput_LayerData_GPU& i_layerData)
-		:	SeparateOutput_Base	(guid)
+	SeparateOutput_GPU::SeparateOutput_GPU(Gravisbell::GUID guid, SeparateOutput_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct)
+		:	SeparateOutput_Base				(guid, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount				(0)				/**< 入力バッファ数 */
 		,	outputBufferCount				(0)				/**< 出力バッファ数 */

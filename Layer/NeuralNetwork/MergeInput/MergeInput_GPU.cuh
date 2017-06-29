@@ -48,7 +48,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	MergeInput_GPU(Gravisbell::GUID guid, class MergeInput_LayerData_GPU& i_layerData);
+	MergeInput_GPU(Gravisbell::GUID guid, class MergeInput_LayerData_GPU& i_layerData, const std::vector<IODataStruct>& i_lpInputDataStruct);
 	/** デストラクタ */
 	virtual ~MergeInput_GPU();
 

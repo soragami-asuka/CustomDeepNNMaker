@@ -23,7 +23,7 @@ class BatchNormalization_CPU : public BatchNormalization_Base
 private:
 	// データ本体
 	class BatchNormalization_LayerData_CPU& layerData;
-	BatchNormalization::LearnDataStructure learnData;
+//	BatchNormalization::LearnDataStructure learnData;
 
 	// 入出力バッファ
 	std::vector<F32>			lpOutputBuffer;		/**< 出力バッファ <バッチ数><入力信号数> */
@@ -53,7 +53,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	BatchNormalization_CPU(Gravisbell::GUID guid, class BatchNormalization_LayerData_CPU& i_layerData);
+	BatchNormalization_CPU(Gravisbell::GUID guid, class BatchNormalization_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct);
 	/** デストラクタ */
 	virtual ~BatchNormalization_CPU();
 

@@ -14,9 +14,7 @@ namespace NeuralNetwork {
 	
 	/** コンストラクタ */
 	FullyConnect_LayerData_Base::FullyConnect_LayerData_Base(const Gravisbell::GUID& guid)
-		:	ISingleInputLayerData(), ISingleOutputLayerData()
-		,	guid	(guid)
-		,	inputDataStruct	()	/**< 入力データ構造 */
+		:	guid	(guid)
 		,	pLayerStructure	(NULL)	/**< レイヤー構造を定義したコンフィグクラス */
 		,	layerStructure	()		/**< レイヤー構造 */
 		,	m_pOptimizer_neuron	(NULL)		/**< ニューロン更新用オプティマイザ */
@@ -109,14 +107,12 @@ namespace NeuralNetwork {
 		if(pLayerStructure == NULL)
 			return 0;
 
-		// 入力データ構造
-		bufferSize += sizeof(this->inputDataStruct);
 
 		// 設定情報
 		bufferSize += pLayerStructure->GetUseBufferByteCount();
 
 		// 本体のバイト数
-		bufferSize += (this->GetNeuronCount() * this->GetInputBufferCount()) * sizeof(NEURON_TYPE);	// ニューロン係数
+		bufferSize += (this->GetNeuronCount() * this->layerStructure.InputBufferCount) * sizeof(NEURON_TYPE);	// ニューロン係数
 		bufferSize += this->GetNeuronCount() * sizeof(NEURON_TYPE);	// バイアス係数
 
 		// オプティマイザーのバイト数
@@ -129,50 +125,53 @@ namespace NeuralNetwork {
 
 
 	//===========================
-	// 入力レイヤー関連
+	// レイヤー構造
 	//===========================
-	/** 入力データ構造を取得する.
-		@return	入力データ構造 */
-	IODataStruct FullyConnect_LayerData_Base::GetInputDataStruct()const
+	/** 入力データ構造が使用可能か確認する.
+		@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+		@return	使用可能な入力データ構造の場合trueが返る. */
+	bool FullyConnect_LayerData_Base::CheckCanUseInputDataStruct(const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
 	{
-		return this->inputDataStruct;
+		if(i_inputLayerCount == 0)
+			return false;
+		if(i_inputLayerCount > 1)
+			return false;
+		if(i_lpInputDataStruct == NULL)
+			return false;
+
+		if(i_lpInputDataStruct[0].GetDataCount() != this->layerStructure.InputBufferCount)
+			return false;
+
+		return true;
 	}
 
-	/** 入力バッファ数を取得する. */
-	U32 FullyConnect_LayerData_Base::GetInputBufferCount()const
+	/** 出力データ構造を取得する.
+		@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+		@return	入力データ構造が不正な場合(x=0,y=0,z=0,ch=0)が返る. */
+	IODataStruct FullyConnect_LayerData_Base::GetOutputDataStruct(const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
 	{
-		return this->inputDataStruct.GetDataCount();
+		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
+			return IODataStruct(0,0,0,0);
+
+		return IODataStruct(this->layerStructure.NeuronCount, 1, 1, 1);
 	}
 
-
-	//===========================
-	// 出力レイヤー関連
-	//===========================
-	/** 出力データ構造を取得する */
-	IODataStruct FullyConnect_LayerData_Base::GetOutputDataStruct()const
+	/** 複数出力が可能かを確認する */
+	bool FullyConnect_LayerData_Base::CheckCanHaveMultOutputLayer(void)
 	{
-		IODataStruct outputDataStruct;
-
-		outputDataStruct.x = 1;
-		outputDataStruct.y = 1;
-		outputDataStruct.z = 1;
-		outputDataStruct.ch = this->GetNeuronCount();
-
-		return outputDataStruct;
+		return false;
 	}
 
-	/** 出力バッファ数を取得する */
-	unsigned int FullyConnect_LayerData_Base::GetOutputBufferCount()const
-	{
-		IODataStruct outputDataStruct = GetOutputDataStruct();
-
-		return outputDataStruct.x * outputDataStruct.y * outputDataStruct.z * outputDataStruct.ch;
-	}
 
 	
 	//===========================
 	// 固有関数
 	//===========================
+	/** 入力バッファ数を取得する */
+	U32 FullyConnect_LayerData_Base::GetInputBufferCount()const
+	{
+		return this->layerStructure.InputBufferCount;
+	}
 	/** ニューロン数を取得する */
 	U32 FullyConnect_LayerData_Base::GetNeuronCount()const
 	{

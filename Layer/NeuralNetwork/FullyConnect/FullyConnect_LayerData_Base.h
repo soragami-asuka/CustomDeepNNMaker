@@ -4,9 +4,7 @@
 #ifndef __FullyConnect_DATA_BASE_H__
 #define __FullyConnect_DATA_BASE_H__
 
-#include<Layer/IO/ISingleInputLayerData.h>
-#include<Layer/IO/ISingleOutputLayerData.h>
-#include<Layer/NeuralNetwork/INNLayer.h>
+#include<Layer/ILayerData.h>
 #include<Layer/NeuralNetwork/IOptimizer.h>
 
 #include<vector>
@@ -20,12 +18,10 @@ namespace NeuralNetwork {
 	
 	typedef F32 NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class FullyConnect_LayerData_Base : public IO::ISingleInputLayerData, public IO::ISingleOutputLayerData
+	class FullyConnect_LayerData_Base : public ILayerData
 	{
 	protected:
 		Gravisbell::GUID guid;	/**< レイヤーデータ識別用のGUID */
-
-		IODataStruct inputDataStruct;	/**< 入力データ構造 */
 
 		SettingData::Standard::IData* pLayerStructure;	/**< レイヤー構造を定義したコンフィグクラス */
 		FullyConnect::LayerStructure layerStructure;	/**< レイヤー構造 */
@@ -76,33 +72,31 @@ namespace NeuralNetwork {
 		U32 GetUseBufferByteCount()const;
 
 
-		//===========================
-		// 入力レイヤー関連
-		//===========================
 	public:
-		/** 入力データ構造を取得する.
-			@return	入力データ構造 */
-		IODataStruct GetInputDataStruct()const;
-
-		/** 入力バッファ数を取得する. */
-		U32 GetInputBufferCount()const;
-
-
 		//===========================
-		// 出力レイヤー関連
+		// レイヤー構造
 		//===========================
-	public:
-		/** 出力データ構造を取得する */
-		IODataStruct GetOutputDataStruct()const;
+		/** 入力データ構造が使用可能か確認する.
+			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+			@return	使用可能な入力データ構造の場合trueが返る. */
+		bool CheckCanUseInputDataStruct(const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
 
-		/** 出力バッファ数を取得する */
-		unsigned int GetOutputBufferCount()const;
-		
+		/** 出力データ構造を取得する.
+			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+			@return	入力データ構造が不正な場合(x=0,y=0,z=0,ch=0)が返る. */
+		IODataStruct GetOutputDataStruct(const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
+
+		/** 複数出力が可能かを確認する */
+		bool CheckCanHaveMultOutputLayer(void);
+
 
 		//===========================
 		// 固有関数
 		//===========================
 	public:
+		/** 入力バッファ数を取得する */
+		U32 GetInputBufferCount()const;
+
 		/** ニューロン数を取得する */
 		U32 GetNeuronCount()const;
 

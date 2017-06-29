@@ -24,8 +24,8 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	Pooling_CPU::Pooling_CPU(Gravisbell::GUID guid, Pooling_LayerData_CPU& i_layerData)
-		:	Pooling_Base	(guid)
+	Pooling_CPU::Pooling_CPU(Gravisbell::GUID guid, Pooling_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct)
+		:	Pooling_Base					(guid, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount				(0)		/**< 入力バッファ数 */
 		,	outputBufferCount				(0)		/**< 出力バッファ数 */
@@ -154,32 +154,32 @@ namespace NeuralNetwork {
 
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 		{
-			for(U32 ch=0; ch<this->layerData.outputDataStruct.ch; ch++)
+			for(U32 ch=0; ch<this->outputDataStruct.ch; ch++)
 			{
-				for(U32 outputZ=0; outputZ<this->layerData.outputDataStruct.z; outputZ++)
+				for(U32 outputZ=0; outputZ<this->outputDataStruct.z; outputZ++)
 				{
-					for(U32 outputY=0; outputY<this->layerData.outputDataStruct.y; outputY++)
+					for(U32 outputY=0; outputY<this->outputDataStruct.y; outputY++)
 					{
-						for(U32 outputX=0; outputX<this->layerData.outputDataStruct.x; outputX++)
+						for(U32 outputX=0; outputX<this->outputDataStruct.x; outputX++)
 						{
 							// 最大値を調べる
 							F32 maxValue = -FLT_MAX;
 							for(S32 filterZ=0; filterZ<this->layerData.layerStructure.FilterSize.z; filterZ++)
 							{
 								U32 inputZ = outputZ * this->layerData.layerStructure.Stride.z + filterZ;
-								if(inputZ >= this->layerData.inputDataStruct.z)
+								if(inputZ >= this->inputDataStruct.z)
 									continue;
 
 								for(S32 filterY=0; filterY<this->layerData.layerStructure.FilterSize.y; filterY++)
 								{
 									U32 inputY = outputY * this->layerData.layerStructure.Stride.y + filterY;
-									if(inputY >= this->layerData.inputDataStruct.y)
+									if(inputY >= this->inputDataStruct.y)
 										continue;
 
 									for(S32 filterX=0; filterX<this->layerData.layerStructure.FilterSize.x; filterX++)
 									{
 										U32 inputX = outputX * this->layerData.layerStructure.Stride.x + filterX;
-										if(inputX >= this->layerData.inputDataStruct.x)
+										if(inputX >= this->inputDataStruct.x)
 											continue;
 
 										U32 inputOffset = POSITION_TO_OFFSET_STRUCT(
@@ -187,14 +187,14 @@ namespace NeuralNetwork {
 																inputY,
 																inputZ,
 																ch,
-																this->layerData.inputDataStruct);
+																this->inputDataStruct);
 
 										maxValue = max(maxValue, this->m_lppInputBuffer[batchNum][inputOffset]);
 									}
 								}
 							}
 							
-							U32 outputOffset = POSITION_TO_OFFSET_STRUCT(outputX,outputY,outputZ,ch, this->layerData.outputDataStruct);
+							U32 outputOffset = POSITION_TO_OFFSET_STRUCT(outputX,outputY,outputZ,ch, this->outputDataStruct);
 							this->lppBatchOutputBuffer[batchNum][outputOffset] = maxValue;
 						}
 					}
@@ -257,33 +257,33 @@ namespace NeuralNetwork {
 
 			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 			{
-				for(U32 ch=0; ch<this->layerData.outputDataStruct.ch; ch++)
+				for(U32 ch=0; ch<this->outputDataStruct.ch; ch++)
 				{
-					for(U32 outputZ=0; outputZ<this->layerData.outputDataStruct.z; outputZ++)
+					for(U32 outputZ=0; outputZ<this->outputDataStruct.z; outputZ++)
 					{
-						for(U32 outputY=0; outputY<this->layerData.outputDataStruct.y; outputY++)
+						for(U32 outputY=0; outputY<this->outputDataStruct.y; outputY++)
 						{
-							for(U32 outputX=0; outputX<this->layerData.outputDataStruct.x; outputX++)
+							for(U32 outputX=0; outputX<this->outputDataStruct.x; outputX++)
 							{
-								U32 outputOffset = POSITION_TO_OFFSET_STRUCT(outputX,outputY,outputZ,ch, this->layerData.outputDataStruct);
+								U32 outputOffset = POSITION_TO_OFFSET_STRUCT(outputX,outputY,outputZ,ch, this->outputDataStruct);
 
 								// 最大値を調べる
 								for(S32 filterZ=0; filterZ<this->layerData.layerStructure.FilterSize.z; filterZ++)
 								{
 									U32 inputZ = outputZ * this->layerData.layerStructure.Stride.z + filterZ;
-									if(inputZ >= this->layerData.inputDataStruct.z)
+									if(inputZ >= this->inputDataStruct.z)
 										continue;
 
 									for(S32 filterY=0; filterY<this->layerData.layerStructure.FilterSize.y; filterY++)
 									{
 										U32 inputY = outputY * this->layerData.layerStructure.Stride.y + filterY;
-										if(inputY >= this->layerData.inputDataStruct.y)
+										if(inputY >= this->inputDataStruct.y)
 											continue;
 
 										for(S32 filterX=0; filterX<this->layerData.layerStructure.FilterSize.x; filterX++)
 										{
 											U32 inputX = outputX * this->layerData.layerStructure.Stride.x + filterX;
-											if(inputX >= this->layerData.inputDataStruct.x)
+											if(inputX >= this->inputDataStruct.x)
 												continue;
 
 											U32 inputOffset = POSITION_TO_OFFSET_STRUCT(
@@ -291,7 +291,7 @@ namespace NeuralNetwork {
 																	inputY,
 																	inputZ,
 																	ch,
-																	this->layerData.inputDataStruct);
+																	this->inputDataStruct);
 
 											if(this->m_lppInputBuffer[batchNum][inputOffset] == this->lppBatchOutputBuffer[batchNum][outputOffset])
 												this->m_lppDInputBuffer[batchNum][inputOffset] += this->m_lppDOutputBufferPrev[batchNum][outputOffset];

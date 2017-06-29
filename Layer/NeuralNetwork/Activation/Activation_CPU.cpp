@@ -83,8 +83,8 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	Activation_CPU::Activation_CPU(Gravisbell::GUID guid, Activation_LayerData_CPU& i_layerData)
-		:	Activation_Base	(guid)
+	Activation_CPU::Activation_CPU(Gravisbell::GUID guid, Activation_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct)
+		:	Activation_Base					(guid, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount				(0)		/**< 入力バッファ数 */
 		,	outputBufferCount				(0)		/**< 出力バッファ数 */
@@ -235,7 +235,7 @@ namespace NeuralNetwork {
 		{
 		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_CH:
 		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_CH_crossEntropy:
-			this->lpCalculateSum.resize(this->layerData.inputDataStruct.z * this->layerData.inputDataStruct.y * this->layerData.inputDataStruct.x);
+			this->lpCalculateSum.resize(this->inputDataStruct.z * this->inputDataStruct.y * this->inputDataStruct.x);
 			break;
 		default:
 			this->lpCalculateSum.clear();
@@ -322,7 +322,7 @@ namespace NeuralNetwork {
 		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_CH:
 		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_CH_crossEntropy:
 			{
-				U32 chSize = this->layerData.inputDataStruct.z * this->layerData.inputDataStruct.y * this->layerData.inputDataStruct.x;
+				U32 chSize = this->inputDataStruct.z * this->inputDataStruct.y * this->inputDataStruct.x;
 
 				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 				{
@@ -330,15 +330,15 @@ namespace NeuralNetwork {
 					memset(&this->lpCalculateSum[0], 0, this->lpCalculateSum.size()*sizeof(F32));
 
 					// 合計値を算出
-					for(U32 ch=0; ch<this->layerData.inputDataStruct.ch; ch++)
+					for(U32 ch=0; ch<this->inputDataStruct.ch; ch++)
 					{
-						for(U32 z=0; z<this->layerData.inputDataStruct.z; z++)
+						for(U32 z=0; z<this->inputDataStruct.z; z++)
 						{
-							for(U32 y=0; y<this->layerData.inputDataStruct.y; y++)
+							for(U32 y=0; y<this->inputDataStruct.y; y++)
 							{
-								for(U32 x=0; x<this->layerData.inputDataStruct.x; x++)
+								for(U32 x=0; x<this->inputDataStruct.x; x++)
 								{
-									U32 offset = (((((ch*this->layerData.inputDataStruct.z+z)*this->layerData.inputDataStruct.y)+y)*this->layerData.inputDataStruct.x)+x);
+									U32 offset = (((((ch*this->inputDataStruct.z+z)*this->inputDataStruct.y)+y)*this->inputDataStruct.x)+x);
 
 									this->lpCalculateSum[offset] += this->lppBatchOutputBuffer[batchNum][ch*chSize + offset];
 								}
@@ -347,15 +347,15 @@ namespace NeuralNetwork {
 					}
 
 					// 合計値で割る
-					for(U32 ch=0; ch<this->layerData.inputDataStruct.ch; ch++)
+					for(U32 ch=0; ch<this->inputDataStruct.ch; ch++)
 					{
-						for(U32 z=0; z<this->layerData.inputDataStruct.z; z++)
+						for(U32 z=0; z<this->inputDataStruct.z; z++)
 						{
-							for(U32 y=0; y<this->layerData.inputDataStruct.y; y++)
+							for(U32 y=0; y<this->inputDataStruct.y; y++)
 							{
-								for(U32 x=0; x<this->layerData.inputDataStruct.x; x++)
+								for(U32 x=0; x<this->inputDataStruct.x; x++)
 								{
-									U32 offset = (((((ch*this->layerData.inputDataStruct.z+z)*this->layerData.inputDataStruct.y)+y)*this->layerData.inputDataStruct.x)+x);
+									U32 offset = (((((ch*this->inputDataStruct.z+z)*this->inputDataStruct.y)+y)*this->inputDataStruct.x)+x);
 
 									this->lppBatchOutputBuffer[batchNum][ch*chSize + offset] /= this->lpCalculateSum[offset];
 								}

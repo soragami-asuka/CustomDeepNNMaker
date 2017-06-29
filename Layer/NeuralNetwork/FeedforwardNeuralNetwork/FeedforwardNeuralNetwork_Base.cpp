@@ -29,9 +29,11 @@ namespace NeuralNetwork {
 	// コンストラクタ/デストラクタ
 	//====================================
 	/** コンストラクタ */
-	FeedforwardNeuralNetwork_Base::FeedforwardNeuralNetwork_Base(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData)
+	FeedforwardNeuralNetwork_Base::FeedforwardNeuralNetwork_Base(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct)
 		:	layerData			(i_layerData)
 		,	guid				(i_guid)			/**< レイヤー識別用のGUID */
+		,	inputDataStruct		(i_inputDataStruct)
+		,	outputDataStruct	(i_outputDataStruct)
 		,	inputLayer			(*this)	/**< 入力信号の代替レイヤーのアドレス. */
 		,	outputLayer			(*this)	/**< 出力信号の代替レイヤーのアドレス. */
 		,	pLearnData			(NULL)
@@ -125,13 +127,13 @@ namespace NeuralNetwork {
 			追加したレイヤーデータの所有権はNeuralNetworkに移るため、メモリの開放処理などは全てINeuralNetwork内で行われる.
 			@param	i_pLayerData	追加するレイヤーデータ.
 			@param	o_player		追加されたレイヤーのアドレス. */
-	ErrorCode FeedforwardNeuralNetwork_Base::AddTemporaryLayer(ILayerData* i_pLayerData, ILayerBase** o_pLayer)
+	ErrorCode FeedforwardNeuralNetwork_Base::AddTemporaryLayer(ILayerData* i_pLayerData, ILayerBase** o_pLayer, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
 	{
 		if(i_pLayerData == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
 		lpTemporaryLayerData.push_back(i_pLayerData);
 
-		ILayerBase* pLayer = i_pLayerData->CreateLayer(boost::uuids::random_generator()().data);
+		ILayerBase* pLayer = i_pLayerData->CreateLayer(boost::uuids::random_generator()().data, i_lpInputDataStruct, i_inputLayerCount);
 		if(pLayer == NULL)
 			return ErrorCode::ERROR_CODE_LAYER_CREATE;
 
@@ -713,13 +715,13 @@ namespace NeuralNetwork {
 		@return	入力データ構造 */
 	IODataStruct FeedforwardNeuralNetwork_Base::GetInputDataStruct()const
 	{
-		return this->layerData.GetInputDataStruct();
+		return this->inputDataStruct;
 	}
 
 	/** 入力バッファ数を取得する. */
 	U32 FeedforwardNeuralNetwork_Base::GetInputBufferCount()const
 	{
-		return this->layerData.GetInputBufferCount();
+		return this->GetInputDataStruct().GetDataCount();
 	}
 
 
@@ -729,13 +731,13 @@ namespace NeuralNetwork {
 	/** 出力データ構造を取得する */
 	IODataStruct FeedforwardNeuralNetwork_Base::GetOutputDataStruct()const
 	{
-		return this->outputLayer.GetOutputDataStruct();
+		return this->outputDataStruct;
 	}
 
 	/** 出力バッファ数を取得する */
 	U32 FeedforwardNeuralNetwork_Base::GetOutputBufferCount()const
 	{
-		return this->outputLayer.GetOutputDataStruct().GetDataCount();
+		return this->GetOutputDataStruct().GetDataCount();
 	}
 
 

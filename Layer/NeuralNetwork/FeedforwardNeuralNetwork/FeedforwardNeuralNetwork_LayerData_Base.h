@@ -10,8 +10,7 @@
 #include<vector>
 
 #include<Layer/Connect/ILayerConnectData.h>
-#include<Layer/IO/ISingleInputLayerData.h>
-#include<Layer/IO/ISingleOutputLayerData.h>
+#include<Layer/ILayerData.h>
 #include<Layer/NeuralNetwork/ILayerDLLManager.h>
 
 namespace Gravisbell {
@@ -19,7 +18,7 @@ namespace Layer {
 namespace NeuralNetwork {
 
 
-	class FeedforwardNeuralNetwork_LayerData_Base : public Connect::ILayerConnectData, public IO::ISingleInputLayerData, public IO::ISingleOutputLayerData
+	class FeedforwardNeuralNetwork_LayerData_Base : public Connect::ILayerConnectData
 	{
 	protected:
 		/** レイヤーデータ間の接続情報定義 */
@@ -67,8 +66,6 @@ namespace NeuralNetwork {
 		std::map<Gravisbell::GUID, ILayerData*> lpLayerData;	/**< レイヤーデータGUID, レイヤーデータ */
 		std::vector<LayerConnect> lpConnectInfo;	/**< レイヤーGUID, レイヤー接続情報 */
 
-		IODataStruct inputDataStruct;	/**< 入力データ構造 */
-
 		SettingData::Standard::IData* pLayerStructure;	/**< レイヤー構造を定義したコンフィグクラス */
 
 
@@ -93,7 +90,7 @@ namespace NeuralNetwork {
 			@param	i_config			設定情報
 			@oaram	i_inputDataStruct	入力データ構造情報
 			@return	成功した場合0 */
-		ErrorCode Initialize(const SettingData::Standard::IData& i_data, const IODataStruct& i_inputDataStruct);
+		ErrorCode Initialize(const SettingData::Standard::IData& i_data);
 		/** 初期化. バッファからデータを読み込む
 			@param i_lpBuffer	読み込みバッファの先頭アドレス.
 			@param i_bufferSize	読み込み可能バッファのサイズ.
@@ -140,27 +137,27 @@ namespace NeuralNetwork {
 		const SettingData::Standard::IData* GetLayerStructure()const;
 
 
-		//===========================
-		// 入力レイヤー関連
-		//===========================
+
 	public:
-		/** 入力データ構造を取得する.
-			@return	入力データ構造 */
-		IODataStruct GetInputDataStruct()const;
-
-		/** 入力バッファ数を取得する. */
-		U32 GetInputBufferCount()const;
-
-
 		//===========================
-		// 出力レイヤー関連
+		// レイヤー構造
 		//===========================
-	public:
-		/** 出力データ構造を取得する */
-		IODataStruct GetOutputDataStruct()const;
+		/** 入力データ構造が使用可能か確認する.
+			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+			@return	使用可能な入力データ構造の場合trueが返る. */
+		bool CheckCanUseInputDataStruct(Gravisbell::GUID i_guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
+		bool CheckCanUseInputDataStruct(const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
 
-		/** 出力バッファ数を取得する */
-		U32 GetOutputBufferCount()const;
+
+		/** 出力データ構造を取得する.
+			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+			@return	入力データ構造が不正な場合(x=0,y=0,z=0,ch=0)が返る. */
+		IODataStruct GetOutputDataStruct(Gravisbell::GUID i_guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
+		IODataStruct GetOutputDataStruct(const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
+
+
+		/** 複数出力が可能かを確認する */
+		bool CheckCanHaveMultOutputLayer(void);
 
 
 	public:
@@ -169,10 +166,11 @@ namespace NeuralNetwork {
 		//===========================
 		/** レイヤーを作成する.
 			@param guid	新規生成するレイヤーのGUID. */
-		virtual ILayerBase* CreateLayer(const Gravisbell::GUID& guid) = 0;
+		virtual ILayerBase* CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount) = 0;
 
+	protected:
 		/** 作成された新規ニューラルネットワークに対して内部レイヤーを追加する */
-		ErrorCode AddConnectionLayersToNeuralNetwork(class FeedforwardNeuralNetwork_Base& neuralNetwork);
+		ErrorCode AddConnectionLayersToNeuralNetwork(class FeedforwardNeuralNetwork_Base& neuralNetwork, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
 
 
 		//====================================

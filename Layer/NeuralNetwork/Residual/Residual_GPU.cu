@@ -21,8 +21,8 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	Residual_GPU::Residual_GPU(Gravisbell::GUID guid, Residual_LayerData_GPU& i_layerData)
-		:	Residual_Base	(guid)
+	Residual_GPU::Residual_GPU(Gravisbell::GUID guid, Residual_LayerData_GPU& i_layerData, const std::vector<IODataStruct>& i_lpInputDataStruct)
+		:	Residual_Base					(guid, i_lpInputDataStruct, i_layerData.GetOutputDataStruct(&i_lpInputDataStruct[0], (U32)i_lpInputDataStruct.size()))
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	outputBufferCount				(0)				/**< 出力バッファ数 */
 		,	m_lppInputBuffer				(NULL)			/**< 演算時の入力データ */

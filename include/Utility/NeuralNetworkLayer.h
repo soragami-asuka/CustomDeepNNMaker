@@ -43,8 +43,7 @@ namespace NeuralNetworkLayer {
 		@param	inputDataStruct	入力データ構造. */
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 	Layer::Connect::ILayerConnectData* CreateNeuralNetwork(
-		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		const IODataStruct& inputDataStruct);
+		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager);
 
 	/** 畳込みニューラルネットワークレイヤー.
 		@param	layerDLLManager		レイヤーDLL管理クラス.
@@ -56,7 +55,7 @@ namespace NeuralNetworkLayer {
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 	Layer::ILayerData* CreateConvolutionLayer(
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		const IODataStruct& inputDataStruct, Vector3D<S32> filterSize, U32 outputChannelCount, Vector3D<S32> stride, Vector3D<S32> paddingSize);
+		U32 inputChannelCount, Vector3D<S32> filterSize, U32 outputChannelCount, Vector3D<S32> stride, Vector3D<S32> paddingSize);
 
 	/** 全結合ニューラルネットワークレイヤー.
 		@param	layerDLLManager		レイヤーDLL管理クラス.
@@ -65,7 +64,7 @@ namespace NeuralNetworkLayer {
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 	Layer::ILayerData* CreateFullyConnectLayer(
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		const IODataStruct& inputDataStruct, U32 neuronCount);
+		U32 inputBufferCount, U32 neuronCount);
 
 	/** 活性化レイヤー.
 		@param	layerDLLManager		レイヤーDLL管理クラス.
@@ -74,7 +73,7 @@ namespace NeuralNetworkLayer {
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 	Layer::ILayerData* CreateActivationLayer(
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		const IODataStruct& inputDataStruct, const wchar_t activationType[]);
+		const wchar_t activationType[]);
 
 	/** ドロップアウトレイヤー.
 		@param	layerDLLManager		レイヤーDLL管理クラス.
@@ -83,7 +82,7 @@ namespace NeuralNetworkLayer {
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 	Layer::ILayerData* CreateDropoutLayer(
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		const IODataStruct& inputDataStruct, F32 rate);
+		F32 rate);
 
 	/** プーリングレイヤー.
 		@param	layerDLLManager		レイヤーDLL管理クラス.
@@ -93,7 +92,7 @@ namespace NeuralNetworkLayer {
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 	Layer::ILayerData* CreatePoolingLayer(
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		const IODataStruct& inputDataStruct, Vector3D<S32> filterSize, Vector3D<S32> stride);
+		Vector3D<S32> filterSize, Vector3D<S32> stride);
 
 	/** バッチ正規化レイヤー
 		@param	layerDLLManager		レイヤーDLL管理クラス.
@@ -101,23 +100,21 @@ namespace NeuralNetworkLayer {
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 	Layer::ILayerData* CreateBatchNormalizationLayer(
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		const IODataStruct& inputDataStruct);
+		U32 inputChannelCount);
 
 	/** 広域平均プーリングレイヤー
 		@param	layerDLLManager		レイヤーDLL管理クラス.
 		@param	inputDataStruct		入力データ構造. */
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 	Layer::ILayerData* CreateGlobalAveragePoolingLayer(
-		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		const IODataStruct& inputDataStruct);
+		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager);
 
 	/** GANにおけるDiscriminatorの出力レイヤー
 		@param	layerDLLManager		レイヤーDLL管理クラス.
 		@param	inputDataStruct		入力データ構造. */
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 	Layer::ILayerData* CreateActivationDiscriminatorLayer(
-		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		const IODataStruct& inputDataStruct);
+		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager);
 
 
 	/** アップサンプリングレイヤー
@@ -128,7 +125,7 @@ namespace NeuralNetworkLayer {
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 	Layer::ILayerData* CreateUpSamplingLayer(
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		const IODataStruct& inputDataStruct, Vector3D<S32> upScale, bool paddingUseValue);
+		Vector3D<S32> upScale, bool paddingUseValue);
 
 	/** 入力結合レイヤー. 入力されたレイヤーのCHを結合する. 入力データ構造はX,Y,Zで同じサイズである必要がある.
 		@param	layerDLLManager		レイヤーDLL管理クラス.
@@ -136,33 +133,8 @@ namespace NeuralNetworkLayer {
 		@param	inputDataCount		入力されるレイヤーの個数. */
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 	Layer::ILayerData* CreateMergeInputLayer(
-		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		const IODataStruct lpInputDataStruct[], U32 inputDataCount);
-	
-	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
-	Layer::ILayerData* CreateMergeInputLayer(
-		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		const std::vector<IODataStruct>& lpInputDataStruct);
+		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager);
 
-	template<typename... Rest>
-	Layer::ILayerData* CreateMergeInputLayer(
-		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		std::vector<IODataStruct>& lpInputDataStruct, const IODataStruct& inputDataStruct_first, const Rest&... lpInputDataStruct_rest)
-	{
-		lpInputDataStruct.push_back(inputDataStruct_first);
-
-		return CreateMergeInputLayer(layerDLLManager, layerDataManager, lpInputDataStruct, lpInputDataStruct_rest...);
-	}
-	template<typename... Rest>
-	Layer::ILayerData* CreateMergeInputLayer(
-		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		const IODataStruct& inputDataStruct_first, const Rest&... lpInputDataStruct_rest)
-	{
-		std::vector<IODataStruct> lpInputDataStruct;
-		lpInputDataStruct.push_back(inputDataStruct_first);
-
-		return CreateMergeInputLayer(layerDLLManager, layerDataManager, lpInputDataStruct, lpInputDataStruct_rest...);
-	}
 
 
 	/** 入力結合レイヤー. 入力されたレイヤーの値を合算する. 出力されるレイヤーのサイズは全サイズのうちの最大値になる.
@@ -171,73 +143,50 @@ namespace NeuralNetworkLayer {
 		@param	inputDataCount		入力されるレイヤーの個数. */
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 	Layer::ILayerData* CreateResidualLayer(
-		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		const IODataStruct lpInputDataStruct[], U32 inputDataCount);
-	
-	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
-	Layer::ILayerData* CreateResidualLayer(
-		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		const std::vector<IODataStruct>& lpInputDataStruct);
+		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager);
 
-
-	template<typename... Rest>
-	Layer::ILayerData* CreateResidualLayer(
-		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		std::vector<IODataStruct>& lpInputDataStruct, const IODataStruct& inputDataStruct_first, const Rest&... lpInputDataStruct_rest)
-	{
-		lpInputDataStruct.push_back(inputDataStruct_first);
-
-		return CreateResidualLayer(layerDLLManager, layerDataManager, lpInputDataStruct, lpInputDataStruct_rest...);
-	}
-	template<typename... Rest>
-	Layer::ILayerData* CreateResidualLayer(
-		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		const IODataStruct& inputDataStruct_first, const Rest&... lpInputDataStruct_rest)
-	{
-		std::vector<IODataStruct> lpInputDataStruct;
-		lpInputDataStruct.push_back(inputDataStruct_first);
-
-		return CreateResidualLayer(layerDLLManager, layerDataManager, lpInputDataStruct, lpInputDataStruct_rest...);
-	}
 
 
 	/** レイヤーをネットワークの末尾に追加する.GUIDは自動割り当て.入力データ構造、最終GUIDも更新する. */
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API Gravisbell::ErrorCode AddLayerToNetworkLast(
 		Layer::Connect::ILayerConnectData& neuralNetwork,
-		Gravisbell::IODataStruct& inputDataStruct, Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddlayer);
+		Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddlayer);
 
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API Gravisbell::ErrorCode AddLayerToNetworkLast(
 		Layer::Connect::ILayerConnectData& neuralNetwork,
-		Gravisbell::IODataStruct& inputDataStruct, Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddLayer,
+		Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddLayer,
 		const Gravisbell::GUID lpInputLayerGUID[], U32 inputLayerCount);
 
-	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
-	Gravisbell::ErrorCode AddLayerToNetworkLast(
+	
+	inline Gravisbell::ErrorCode AddLayerToNetworkLast(
 		Layer::Connect::ILayerConnectData& neuralNetwork,
-		Gravisbell::IODataStruct& inputDataStruct, Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddLayer,
-		const std::vector<Gravisbell::GUID>& lpInputLayerGUID);
+		Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddLayer,
+		const std::vector<Gravisbell::GUID>& lpInputLayerGUID)
+	{
+		return AddLayerToNetworkLast(neuralNetwork, lastLayerGUID, pAddLayer, &lpInputLayerGUID[0], (U32)lpInputLayerGUID.size());
+	}
 
 	template<typename... Rest>
 	Gravisbell::ErrorCode AddLayerToNetworkLast(
 		Layer::Connect::ILayerConnectData& neuralNetwork,
-		Gravisbell::IODataStruct& inputDataStruct, Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddlayer,
+		Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddlayer,
 		std::vector<Gravisbell::GUID>& lpInputLayerGUID,
 		const Gravisbell::GUID& lastLayerGUID_first, const Rest&... lpLastLayerGUID_rest)
 	{
 		lpInputLayerGUID.push_back(lastLayerGUID_first);
 	
-		return AddLayerToNetworkLast(neuralNetwork, inputDataStruct, lastLayerGUID, pAddlayer, lpInputLayerGUID, lpLastLayerGUID_rest...);
+		return AddLayerToNetworkLast(neuralNetwork, lastLayerGUID, pAddlayer, lpInputLayerGUID, lpLastLayerGUID_rest...);
 	}
 	template<typename... Rest>
 	Gravisbell::ErrorCode AddLayerToNetworkLast(
 		Layer::Connect::ILayerConnectData& neuralNetwork,
-		Gravisbell::IODataStruct& inputDataStruct, Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddlayer,
+		Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddlayer,
 		const Gravisbell::GUID& lastLayerGUID_first, const Rest&... lpLastLayerGUID_rest)
 	{
 		std::vector<Gravisbell::GUID> lpInputLayerGUID;
 		lpInputLayerGUID.push_back(lastLayerGUID_first);
 
-		return AddLayerToNetworkLast(neuralNetwork, inputDataStruct, lastLayerGUID, pAddlayer, lpInputLayerGUID, lpLastLayerGUID_rest...);
+		return AddLayerToNetworkLast(neuralNetwork, lastLayerGUID, pAddlayer, lpInputLayerGUID, lpLastLayerGUID_rest...);
 	}
 
 

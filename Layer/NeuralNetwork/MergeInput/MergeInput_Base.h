@@ -21,7 +21,9 @@ namespace NeuralNetwork {
 	class MergeInput_Base : public INNMult2SingleLayer
 	{
 	protected:
-		Gravisbell::GUID guid;	/**< レイヤー識別用のGUID */
+		Gravisbell::GUID			guid;				/**< レイヤー識別用のGUID */
+		std::vector<IODataStruct>	lpInputDataStruct;	/**< 入力データ構造 */
+		IODataStruct				outputDataStruct;	/**< 出力データ構造 */
 
 		SettingData::Standard::IData* pLearnData;	/**< 学習設定を定義したコンフィグクラス */
 
@@ -29,7 +31,7 @@ namespace NeuralNetwork {
 
 	public:
 		/** コンストラクタ */
-		MergeInput_Base(Gravisbell::GUID guid);
+		MergeInput_Base(Gravisbell::GUID guid, const std::vector<IODataStruct>& i_lpInputDataStruct, const IODataStruct& i_outputDataStruct);
 
 		/** デストラクタ */
 		virtual ~MergeInput_Base();

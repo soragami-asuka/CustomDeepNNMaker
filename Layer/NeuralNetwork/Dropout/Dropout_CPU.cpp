@@ -22,8 +22,8 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	Dropout_CPU::Dropout_CPU(Gravisbell::GUID guid, Dropout_LayerData_CPU& i_layerData)
-		:	Dropout_Base	(guid)
+	Dropout_CPU::Dropout_CPU(Gravisbell::GUID guid, Dropout_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct)
+		:	Dropout_Base					(guid, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount				(0)				/**< 入力バッファ数 */
 		,	outputBufferCount				(0)				/**< 出力バッファ数 */

@@ -35,8 +35,6 @@ private:
 	U32 neuronCount;					/**< ニューロン数 */
 	U32 outputBufferCount;				/**< 出力バッファ数 */
 
-	IODataStruct paddingInputDataStruct;	/**< パディング後の入力バッファの入力データ構造 */
-	std::vector<std::vector<F32>> lpPaddingInputBuffer;	/**< パディング後の入力バッファ <バッチ数><入力バッファ> */
 
 	// 演算時の入力データ
 	std::vector<CONST_BATCH_BUFFER_POINTER> m_lppInputBuffer;		/**< 演算時の入力データ */
@@ -50,7 +48,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	Convolution_CPU(Gravisbell::GUID guid, class Convolution_LayerData_CPU& i_layerData);
+	Convolution_CPU(Gravisbell::GUID guid, class Convolution_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct);
 	/** デストラクタ */
 	virtual ~Convolution_CPU();
 

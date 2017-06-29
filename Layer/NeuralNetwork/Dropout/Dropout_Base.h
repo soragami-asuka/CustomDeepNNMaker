@@ -22,6 +22,8 @@ namespace NeuralNetwork {
 	{
 	protected:
 		Gravisbell::GUID guid;	/**< レイヤー識別用のGUID */
+		IODataStruct inputDataStruct;	/**< 入力データ構造 */
+		IODataStruct outputDataStruct;	/**< 出力データ構造 */
 
 		SettingData::Standard::IData* pLearnData;	/**< 学習設定を定義したコンフィグクラス */
 
@@ -29,7 +31,7 @@ namespace NeuralNetwork {
 
 	public:
 		/** コンストラクタ */
-		Dropout_Base(Gravisbell::GUID guid);
+		Dropout_Base(Gravisbell::GUID guid, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct);
 
 		/** デストラクタ */
 		virtual ~Dropout_Base();

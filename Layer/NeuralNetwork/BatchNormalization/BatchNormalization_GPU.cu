@@ -22,8 +22,8 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	BatchNormalization_GPU::BatchNormalization_GPU(Gravisbell::GUID guid, BatchNormalization_LayerData_GPU& i_layerData)
-		:	BatchNormalization_Base	(guid)
+	BatchNormalization_GPU::BatchNormalization_GPU(Gravisbell::GUID guid, BatchNormalization_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct)
+		:	BatchNormalization_Base	(guid, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
 		,	layerData				(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount		(0)				/**< 入力バッファ数 */
 		,	outputBufferCount		(0)				/**< 出力バッファ数 */
@@ -95,8 +95,8 @@ namespace NeuralNetwork {
 		// 学習用の変数を作成
 		this->onLearnMode = true;
 		this->learnCount = 0;
-		this->lpTmpMean.resize(this->layerData.inputDataStruct.ch, 0.0f);
-		this->lpTmpVariance.resize(this->layerData.inputDataStruct.ch, 0.0f);
+		this->lpTmpMean.resize(this->inputDataStruct.ch, 0.0f);
+		this->lpTmpVariance.resize(this->inputDataStruct.ch, 0.0f);
 
 		// パラメータ変化量
 		this->lpDBias.resize(this->layerData.lpBias.size());
@@ -127,7 +127,7 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
 		// チャンネルごとのバッファ数を確認
-		this->channeclBufferCount = this->layerData.inputDataStruct.z * this->layerData.inputDataStruct.y * this->layerData.inputDataStruct.x;
+		this->channeclBufferCount = this->inputDataStruct.z * this->inputDataStruct.y * this->inputDataStruct.x;
 		if(this->channeclBufferCount == 0)
 			return ErrorCode::ERROR_CODE_FRAUD_INPUT_COUNT;
 
@@ -143,16 +143,16 @@ namespace NeuralNetwork {
 		std::vector<S32> dimOutputStride;
 		std::vector<S32> dimParam;
 		std::vector<S32> dimParamStride;
-		if(this->layerData.inputDataStruct.z > 1)
+		if(this->inputDataStruct.z > 1)
 		{
 			dataDim = 1 + 1 + 3;	// バッチ + チャンネル + 次元3
 
 			dimInput.resize(dataDim);
 			dimInput[0] = this->batchSize;
-			dimInput[1] = this->layerData.inputDataStruct.ch;
-			dimInput[2] = this->layerData.inputDataStruct.z;
-			dimInput[3] = this->layerData.inputDataStruct.y;
-			dimInput[4] = this->layerData.inputDataStruct.x;
+			dimInput[1] = this->inputDataStruct.ch;
+			dimInput[2] = this->inputDataStruct.z;
+			dimInput[3] = this->inputDataStruct.y;
+			dimInput[4] = this->inputDataStruct.x;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2] * dimInput[3] * dimInput[4];
@@ -163,10 +163,10 @@ namespace NeuralNetwork {
 
 			dimOutput.resize(dataDim);
 			dimOutput[0] = this->batchSize;
-			dimOutput[1] = this->layerData.GetOutputDataStruct().ch;
-			dimOutput[2] = this->layerData.GetOutputDataStruct().z;
-			dimOutput[3] = this->layerData.GetOutputDataStruct().y;
-			dimOutput[4] = this->layerData.GetOutputDataStruct().x;
+			dimOutput[1] = this->GetOutputDataStruct().ch;
+			dimOutput[2] = this->GetOutputDataStruct().z;
+			dimOutput[3] = this->GetOutputDataStruct().y;
+			dimOutput[4] = this->GetOutputDataStruct().x;
 
 			dimOutputStride.resize(dataDim);
 			dimOutputStride[0] = dimOutput[1] * dimOutput[2] * dimOutput[3] * dimOutput[4];
@@ -177,7 +177,7 @@ namespace NeuralNetwork {
 
 			dimParam.resize(dataDim);
 			dimParam[0] = 1;
-			dimParam[1] = this->layerData.inputDataStruct.ch;
+			dimParam[1] = this->inputDataStruct.ch;
 			dimParam[2] = 1;
 			dimParam[3] = 1;
 			dimParam[4] = 1;
@@ -189,15 +189,15 @@ namespace NeuralNetwork {
 			dimParamStride[3] = dimParam[4];
 			dimParamStride[4] = 1;
 		}
-		else if(this->layerData.inputDataStruct.y > 1 || this->layerData.inputDataStruct.x)
+		else if(this->inputDataStruct.y > 1 || this->inputDataStruct.x)
 		{
 			dataDim = 1 + 1 + 2;
 
 			dimInput.resize(dataDim);
 			dimInput[0] = this->batchSize;
-			dimInput[1] = this->layerData.inputDataStruct.ch;
-			dimInput[2] = this->layerData.inputDataStruct.y;
-			dimInput[3] = this->layerData.inputDataStruct.x;
+			dimInput[1] = this->inputDataStruct.ch;
+			dimInput[2] = this->inputDataStruct.y;
+			dimInput[3] = this->inputDataStruct.x;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2] * dimInput[3];
@@ -207,9 +207,9 @@ namespace NeuralNetwork {
 			
 			dimOutput.resize(dataDim);
 			dimOutput[0] = this->batchSize;
-			dimOutput[1] = this->layerData.GetOutputDataStruct().ch;
-			dimOutput[2] = this->layerData.GetOutputDataStruct().y;
-			dimOutput[3] = this->layerData.GetOutputDataStruct().x;
+			dimOutput[1] = this->GetOutputDataStruct().ch;
+			dimOutput[2] = this->GetOutputDataStruct().y;
+			dimOutput[3] = this->GetOutputDataStruct().x;
 
 			dimOutputStride.resize(dataDim);
 			dimOutputStride[0] = dimOutput[1] * dimOutput[2] * dimOutput[3];
@@ -219,7 +219,7 @@ namespace NeuralNetwork {
 
 			dimParam.resize(dataDim);
 			dimParam[0] = 1;
-			dimParam[1] = this->layerData.inputDataStruct.ch;
+			dimParam[1] = this->inputDataStruct.ch;
 			dimParam[2] = 1;
 			dimParam[3] = 1;
 
@@ -229,14 +229,14 @@ namespace NeuralNetwork {
 			dimParamStride[2] = dimParam[3];
 			dimParamStride[3] = 1;
 		}
-		else if(this->layerData.inputDataStruct.x > 1)
+		else if(this->inputDataStruct.x > 1)
 		{
 			dataDim = 1 + 1 + 1;
 
 			dimInput.resize(dataDim);
 			dimInput[0] = this->batchSize;
-			dimInput[1] = this->layerData.inputDataStruct.ch;
-			dimInput[2] = this->layerData.inputDataStruct.x;
+			dimInput[1] = this->inputDataStruct.ch;
+			dimInput[2] = this->inputDataStruct.x;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2];
@@ -245,8 +245,8 @@ namespace NeuralNetwork {
 			
 			dimOutput.resize(dataDim);
 			dimOutput[0] = this->batchSize;
-			dimOutput[1] = this->layerData.GetOutputDataStruct().ch;
-			dimOutput[2] = this->layerData.GetOutputDataStruct().x;
+			dimOutput[1] = this->GetOutputDataStruct().ch;
+			dimOutput[2] = this->GetOutputDataStruct().x;
 
 			dimOutputStride.resize(dataDim);
 			dimOutputStride[0] = dimOutput[1] * dimOutput[2];
@@ -255,7 +255,7 @@ namespace NeuralNetwork {
 
 			dimParam.resize(dataDim);
 			dimParam[0] = 1;
-			dimParam[1] = this->layerData.inputDataStruct.ch;
+			dimParam[1] = this->inputDataStruct.ch;
 			dimParam[2] = 1;
 
 			dimParamStride.resize(dataDim);
@@ -312,18 +312,18 @@ namespace NeuralNetwork {
 			delete this->pLearnData;
 		this->pLearnData = data.Clone();
 
-		this->pLearnData->WriteToStruct((BYTE*)&learnData);
+//		this->pLearnData->WriteToStruct((BYTE*)&learnData);
 
 
 		// 学習回数を初期化
 		this->learnCount = 0;
 
 		// 演算用の平均.分散を初期化
-		cudaMemset(thrust::raw_pointer_cast(&this->layerData.lpMean[0]),	 0, sizeof(F32)*this->layerData.inputDataStruct.ch);
-		cudaMemset(thrust::raw_pointer_cast(&this->layerData.lpVariance[0]), 0, sizeof(F32)*this->layerData.inputDataStruct.ch);
+		cudaMemset(thrust::raw_pointer_cast(&this->layerData.lpMean[0]),	 0, sizeof(F32)*this->inputDataStruct.ch);
+		cudaMemset(thrust::raw_pointer_cast(&this->layerData.lpVariance[0]), 0, sizeof(F32)*this->inputDataStruct.ch);
 
-		cudaMemset(thrust::raw_pointer_cast(&this->lpLearnMean[0]),		0, sizeof(F32)*this->layerData.inputDataStruct.ch);
-		cudaMemset(thrust::raw_pointer_cast(&this->lpLearnVariance[0]),	0, sizeof(F32)*this->layerData.inputDataStruct.ch);
+		cudaMemset(thrust::raw_pointer_cast(&this->lpLearnMean[0]),		0, sizeof(F32)*this->inputDataStruct.ch);
+		cudaMemset(thrust::raw_pointer_cast(&this->lpLearnVariance[0]),	0, sizeof(F32)*this->inputDataStruct.ch);
 
 
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
@@ -360,7 +360,7 @@ namespace NeuralNetwork {
 			F32 alpha = 1.0f;
 			F32 beta = 0.0f;
 
-			std::vector<F32> lpVarianceLast(this->layerData.inputDataStruct.ch);
+			std::vector<F32> lpVarianceLast(this->inputDataStruct.ch);
 			for(U32 i=0; i<lpVarianceLast.size(); i++)
 				lpVarianceLast[i] = this->layerData.lpVariance[i];
 

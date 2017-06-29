@@ -50,7 +50,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	Activation_CPU(Gravisbell::GUID guid, class Activation_LayerData_CPU& i_layerData);
+	Activation_CPU(Gravisbell::GUID guid, class Activation_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct);
 	/** デストラクタ */
 	virtual ~Activation_CPU();
 

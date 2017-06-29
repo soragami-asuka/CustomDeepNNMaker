@@ -25,15 +25,17 @@ namespace NeuralNetwork {
 	{
 	protected:
 		Gravisbell::GUID guid;	/**< レイヤー識別用のGUID */
+		IODataStruct inputDataStruct;	/**< 入力データ構造 */
+		IODataStruct outputDataStruct;	/**< 出力データ構造 */
 
 		SettingData::Standard::IData* pLearnData;		/**< 学習設定を定義したコンフィグクラス */
-		Convolution::LearnDataStructure learnData;	/**< 学習設定 */
+//		Convolution::LearnDataStructure learnData;	/**< 学習設定 */
 
 		U32 batchSize;	/**< バッチサイズ */
 
 	public:
 		/** コンストラクタ */
-		Convolution_Base(Gravisbell::GUID guid);
+		Convolution_Base(Gravisbell::GUID guid, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct);
 
 		/** デストラクタ */
 		virtual ~Convolution_Base();

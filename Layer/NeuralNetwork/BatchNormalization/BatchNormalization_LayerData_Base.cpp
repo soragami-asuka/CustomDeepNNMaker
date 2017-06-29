@@ -14,9 +14,7 @@ namespace NeuralNetwork {
 
 	/** コンストラクタ */
 	BatchNormalization_LayerData_Base::BatchNormalization_LayerData_Base(const Gravisbell::GUID& guid)
-		:	ISingleInputLayerData(), ISingleOutputLayerData()
-		,	guid	(guid)
-		,	inputDataStruct	()	/**< 入力データ構造 */
+		:	guid	(guid)
 		,	pLayerStructure	(NULL)	/**< レイヤー構造を定義したコンフィグクラス */
 		,	layerStructure	()		/**< レイヤー構造 */
 		,	m_pOptimizer_scale	(NULL)		/**< スケール更新用オプティマイザ */
@@ -110,17 +108,14 @@ namespace NeuralNetwork {
 		if(pLayerStructure == NULL)
 			return 0;
 
-		// 入力データ構造
-		bufferSize += sizeof(this->inputDataStruct);
-
 		// 設定情報
 		bufferSize += pLayerStructure->GetUseBufferByteCount();
 
 		// 各データ数
-		bufferSize += sizeof(F32) * this->inputDataStruct.ch;	// 平均
-		bufferSize += sizeof(F32) * this->inputDataStruct.ch;	// 分散
-		bufferSize += sizeof(F32) * this->inputDataStruct.ch;	// スケーリング値
-		bufferSize += sizeof(F32) * this->inputDataStruct.ch;	// バイアス値
+		bufferSize += sizeof(F32) * this->layerStructure.InputChannelCount;	// 平均
+		bufferSize += sizeof(F32) * this->layerStructure.InputChannelCount;	// 分散
+		bufferSize += sizeof(F32) * this->layerStructure.InputChannelCount;	// スケーリング値
+		bufferSize += sizeof(F32) * this->layerStructure.InputChannelCount;	// バイアス値
 
 		// オプティマイザーのバイト数
 		bufferSize += this->m_pOptimizer_bias->GetUseBufferByteCount();
@@ -131,38 +126,50 @@ namespace NeuralNetwork {
 
 
 
+
 	//===========================
-	// 入力レイヤー関連
+	// レイヤー構造
 	//===========================
-	/** 入力データ構造を取得する.
-		@return	入力データ構造 */
-	IODataStruct BatchNormalization_LayerData_Base::GetInputDataStruct()const
+	/** 入力データ構造が使用可能か確認する.
+		@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+		@return	使用可能な入力データ構造の場合trueが返る. */
+	bool BatchNormalization_LayerData_Base::CheckCanUseInputDataStruct(const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
 	{
-		return this->inputDataStruct;
+		if(i_inputLayerCount == 0)
+			return false;
+		if(i_inputLayerCount > 1)
+			return false;
+		if(i_lpInputDataStruct == NULL)
+			return false;
+		if(i_lpInputDataStruct[0].x == 0)
+			return false;
+		if(i_lpInputDataStruct[0].y == 0)
+			return false;
+		if(i_lpInputDataStruct[0].z == 0)
+			return false;
+		if(i_lpInputDataStruct[0].ch == 0)
+			return false;
+		if(i_lpInputDataStruct[0].ch != this->layerStructure.InputChannelCount)
+			return false;
+
+		return true;
 	}
 
-	/** 入力バッファ数を取得する. */
-	U32 BatchNormalization_LayerData_Base::GetInputBufferCount()const
+	/** 出力データ構造を取得する.
+		@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+		@return	入力データ構造が不正な場合(x=0,y=0,z=0,ch=0)が返る. */
+	IODataStruct BatchNormalization_LayerData_Base::GetOutputDataStruct(const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
 	{
-		return this->inputDataStruct.GetDataCount();
+		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
+			return IODataStruct(0,0,0,0);
+
+		return i_lpInputDataStruct[0];
 	}
 
-
-	//===========================
-	// 出力レイヤー関連
-	//===========================
-	/** 出力データ構造を取得する */
-	IODataStruct BatchNormalization_LayerData_Base::GetOutputDataStruct()const
+	/** 複数出力が可能かを確認する */
+	bool BatchNormalization_LayerData_Base::CheckCanHaveMultOutputLayer(void)
 	{
-		return this->inputDataStruct;
-	}
-
-	/** 出力バッファ数を取得する */
-	unsigned int BatchNormalization_LayerData_Base::GetOutputBufferCount()const
-	{
-		IODataStruct outputDataStruct = GetOutputDataStruct();
-
-		return outputDataStruct.x * outputDataStruct.y * outputDataStruct.z * outputDataStruct.ch;
+		return false;
 	}
 
 	

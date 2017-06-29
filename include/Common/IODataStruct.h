@@ -36,6 +36,24 @@ namespace Gravisbell {
 		{
 		}
 
+		bool operator==(const IODataStruct& dataStruct)const
+		{
+			if(this->x != dataStruct.x)
+				return false;
+			if(this->y != dataStruct.y)
+				return false;
+			if(this->z != dataStruct.z)
+				return false;
+			if(this->ch != dataStruct.ch)
+				return false;
+
+			return true;
+		}
+		bool operator!=(const IODataStruct& dataStruct)const
+		{
+			return !(*this == dataStruct);
+		}
+
 		U32 GetDataCount()const
 		{
 			return this->x * this->y * this->z * this->ch;

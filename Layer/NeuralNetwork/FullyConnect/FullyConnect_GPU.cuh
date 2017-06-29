@@ -56,7 +56,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	FullyConnect_GPU(Gravisbell::GUID guid, class FullyConnect_LayerData_GPU& i_layerData);
+	FullyConnect_GPU(Gravisbell::GUID guid, class FullyConnect_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct);
 	/** デストラクタ */
 	virtual ~FullyConnect_GPU();
 

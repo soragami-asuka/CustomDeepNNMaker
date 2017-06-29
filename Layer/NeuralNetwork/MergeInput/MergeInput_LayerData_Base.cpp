@@ -14,8 +14,7 @@ namespace NeuralNetwork {
 
 	/** コンストラクタ */
 	MergeInput_LayerData_Base::MergeInput_LayerData_Base(const Gravisbell::GUID& guid)
-		:	IMultInputLayerData(), ISingleOutputLayerData()
-		,	guid	(guid)
+		:	guid	(guid)
 		,	pLayerStructure	(NULL)	/**< レイヤー構造を定義したコンフィグクラス */
 		,	layerStructure	()		/**< レイヤー構造 */
 	{
@@ -56,29 +55,13 @@ namespace NeuralNetwork {
 		@return	成功した場合0 */
 	ErrorCode MergeInput_LayerData_Base::Initialize(void)
 	{
-		// 出力データ構造を決定する
-
-		this->outputDataStruct = this->lpInputDataStruct[0];
-
-		// 結合後の結合対象軸の要素数を追加
-		for(U32 inputNum=1; inputNum<this->lpInputDataStruct.size(); inputNum++)
-		{
-			switch(this->layerStructure.mergeDirection)
-			{
-			case MergeInput::LayerStructure::mergeDirection_x:	this->outputDataStruct.x  += this->lpInputDataStruct[inputNum].x;	break;
-			case MergeInput::LayerStructure::mergeDirection_y:	this->outputDataStruct.y  += this->lpInputDataStruct[inputNum].y;	break;
-			case MergeInput::LayerStructure::mergeDirection_z:	this->outputDataStruct.z  += this->lpInputDataStruct[inputNum].z;	break;
-			case MergeInput::LayerStructure::mergeDirection_ch:	this->outputDataStruct.ch += this->lpInputDataStruct[inputNum].ch;	break;
-			}
-		}
-
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 	/** 初期化. 各ニューロンの値をランダムに初期化
 		@param	i_config			設定情報
 		@oaram	i_inputDataStruct	入力データ構造情報
 		@return	成功した場合0 */
-	ErrorCode MergeInput_LayerData_Base::Initialize(const SettingData::Standard::IData& i_data, const IODataStruct i_lpInputDataStruct[], U32 i_inputDataCount)
+	ErrorCode MergeInput_LayerData_Base::Initialize(const SettingData::Standard::IData& i_data)
 	{
 		ErrorCode err;
 
@@ -86,38 +69,6 @@ namespace NeuralNetwork {
 		err = this->SetLayerConfig(i_data);
 		if(err != ErrorCode::ERROR_CODE_NONE)
 			return err;
-
-		// 入力データが一つ以上存在することを確認
-		if(i_inputDataCount <= 0)
-			return ErrorCode::ERROR_CODE_FRAUD_INPUT_COUNT;
-
-		// 入力データ構造の各要素が同じであることを確認
-		for(U32 inputNum=1; inputNum<i_inputDataCount; inputNum++)
-		{
-			if(i_lpInputDataStruct[inputNum-1].x != i_lpInputDataStruct[inputNum].x && this->layerStructure.mergeDirection != MergeInput::LayerStructure::mergeDirection_x)
-			{
-				return ErrorCode::ERROR_CODE_IO_DISAGREE_INPUT_OUTPUT_COUNT;
-			}
-			if(i_lpInputDataStruct[inputNum-1].y != i_lpInputDataStruct[inputNum].y && this->layerStructure.mergeDirection != MergeInput::LayerStructure::mergeDirection_y)
-			{
-				return ErrorCode::ERROR_CODE_IO_DISAGREE_INPUT_OUTPUT_COUNT;
-			}
-			if(i_lpInputDataStruct[inputNum-1].z != i_lpInputDataStruct[inputNum].z && this->layerStructure.mergeDirection != MergeInput::LayerStructure::mergeDirection_z)
-			{
-				return ErrorCode::ERROR_CODE_IO_DISAGREE_INPUT_OUTPUT_COUNT;
-			}
-			if(i_lpInputDataStruct[inputNum-1].ch != i_lpInputDataStruct[inputNum].ch && this->layerStructure.mergeDirection != MergeInput::LayerStructure::mergeDirection_ch)
-			{
-				return ErrorCode::ERROR_CODE_IO_DISAGREE_INPUT_OUTPUT_COUNT;
-			}
-		}
-
-		// 入力データ構造の設定
-		this->lpInputDataStruct.resize(i_inputDataCount);
-		for(U32 inputNum=0; inputNum<i_inputDataCount; inputNum++)
-		{
-			this->lpInputDataStruct[inputNum] = i_lpInputDataStruct[inputNum];
-		}
 
 		return this->Initialize();
 	}
@@ -129,18 +80,6 @@ namespace NeuralNetwork {
 	{
 		int readBufferByte = 0;
 
-		// 入力データ数
-		U32 inputDataCount = 0;
-		memcpy(&inputDataCount, i_lpBuffer, sizeof(U32));
-		readBufferByte += sizeof(U32);
-		// 入力データ構造
-		std::vector<IODataStruct> lpTmpInputDataStruct(inputDataCount);
-		for(U32 inputNum=0; inputNum<inputDataCount; inputNum++)
-		{
-			memcpy(&lpTmpInputDataStruct[inputNum], &i_lpBuffer[readBufferByte], sizeof(IODataStruct));
-			readBufferByte += sizeof(IODataStruct);
-		}
-
 		// 設定情報
 		S32 useBufferByte = 0;
 		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, useBufferByte);
@@ -149,7 +88,7 @@ namespace NeuralNetwork {
 		readBufferByte += useBufferByte;
 
 		// 初期化する
-		ErrorCode err = this->Initialize(*pLayerStructure, &lpTmpInputDataStruct[0], (U32)lpTmpInputDataStruct.size());
+		ErrorCode err = this->Initialize(*pLayerStructure);
 		delete pLayerStructure;
 		if(err != ErrorCode::ERROR_CODE_NONE)
 			return err;
@@ -212,12 +151,6 @@ namespace NeuralNetwork {
 		if(pLayerStructure == NULL)
 			return 0;
 
-		// 入力データ数
-		bufferSize += sizeof(U32);
-
-		// 入力データ構造
-		bufferSize += sizeof(IODataStruct) * (U32)this->lpInputDataStruct.size();
-
 		// 設定情報
 		bufferSize += pLayerStructure->GetUseBufferByteCount();
 
@@ -235,18 +168,6 @@ namespace NeuralNetwork {
 
 		int writeBufferByte = 0;
 
-		// 入力データ数
-		U32 inputDataCount = (U32)this->lpInputDataStruct.size();
-		memcpy(&o_lpBuffer[writeBufferByte], &inputDataCount, sizeof(U32));
-		writeBufferByte += sizeof(U32);
-
-		// 入力データ構造
-		for(U32 inputNum=0; inputNum<this->lpInputDataStruct.size(); inputNum++)
-		{
-			memcpy(&o_lpBuffer[writeBufferByte], &this->lpInputDataStruct[inputNum], sizeof(IODataStruct));
-			writeBufferByte += sizeof(IODataStruct);
-		}
-
 		// 設定情報
 		writeBufferByte += this->pLayerStructure->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
 
@@ -256,47 +177,62 @@ namespace NeuralNetwork {
 
 
 	//===========================
-	// 入力レイヤー関連
+	// レイヤー構造
 	//===========================
-	/** 入力データの数を取得する */
-	U32 MergeInput_LayerData_Base::GetInputDataCount()const
+	/** 入力データ構造が使用可能か確認する.
+		@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+		@return	使用可能な入力データ構造の場合trueが返る. */
+	bool MergeInput_LayerData_Base::CheckCanUseInputDataStruct(const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
 	{
-		return (U32)this->lpInputDataStruct.size();
+		if(i_inputLayerCount == 0)
+			return false;
+		if(i_lpInputDataStruct == NULL)
+			return false;
+
+		IODataStruct outputDataStruct = i_lpInputDataStruct[0];
+		for(U32 inputNum=1; inputNum<i_inputLayerCount; inputNum++)
+		{
+			if(this->layerStructure.mergeDirection != MergeInput::LayerStructure::mergeDirection_x  && outputDataStruct.x  != i_lpInputDataStruct[inputNum].x)	return false;
+			if(this->layerStructure.mergeDirection != MergeInput::LayerStructure::mergeDirection_y  && outputDataStruct.y  != i_lpInputDataStruct[inputNum].y)	return false;
+			if(this->layerStructure.mergeDirection != MergeInput::LayerStructure::mergeDirection_z  && outputDataStruct.z  != i_lpInputDataStruct[inputNum].z)	return false;
+			if(this->layerStructure.mergeDirection != MergeInput::LayerStructure::mergeDirection_ch && outputDataStruct.ch != i_lpInputDataStruct[inputNum].ch)	return false;
+		}
+
+		return true;
 	}
 
-	/** 入力データ構造を取得する.
-		@return	入力データ構造 */
-	IODataStruct MergeInput_LayerData_Base::GetInputDataStruct(U32 i_dataNum)const
+	/** 出力データ構造を取得する.
+		@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+		@return	入力データ構造が不正な場合(x=0,y=0,z=0,ch=0)が返る. */
+	IODataStruct MergeInput_LayerData_Base::GetOutputDataStruct(const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
 	{
-		if(i_dataNum >= this->lpInputDataStruct.size())
-			return IODataStruct(0, 0, 0, 0);
+		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
+			return IODataStruct(0,0,0,0);
+		
+		IODataStruct outputDataStruct = i_lpInputDataStruct[0];
 
-		return this->lpInputDataStruct[i_dataNum];
+		// 結合後の結合対象軸の要素数を追加
+		for(U32 inputNum=1; inputNum<i_inputLayerCount; inputNum++)
+		{
+			switch(this->layerStructure.mergeDirection)
+			{
+			case MergeInput::LayerStructure::mergeDirection_x:	outputDataStruct.x  += i_lpInputDataStruct[inputNum].x;		break;
+			case MergeInput::LayerStructure::mergeDirection_y:	outputDataStruct.y  += i_lpInputDataStruct[inputNum].y;		break;
+			case MergeInput::LayerStructure::mergeDirection_z:	outputDataStruct.z  += i_lpInputDataStruct[inputNum].z;		break;
+			case MergeInput::LayerStructure::mergeDirection_ch:	outputDataStruct.ch += i_lpInputDataStruct[inputNum].ch;	break;
+			}
+		}
+
+		return outputDataStruct;
 	}
 
-	/** 入力バッファ数を取得する. */
-	U32 MergeInput_LayerData_Base::GetInputBufferCount(U32 i_dataNum)const
+	/** 複数出力が可能かを確認する */
+	bool MergeInput_LayerData_Base::CheckCanHaveMultOutputLayer(void)
 	{
-		return this->GetInputDataStruct(i_dataNum).GetDataCount();
+		return false;
 	}
 
 
-	//===========================
-	// 出力レイヤー関連
-	//===========================
-	/** 出力データ構造を取得する */
-	IODataStruct MergeInput_LayerData_Base::GetOutputDataStruct()const
-	{
-		return this->outputDataStruct;
-	}
-
-	/** 出力バッファ数を取得する */
-	unsigned int MergeInput_LayerData_Base::GetOutputBufferCount()const
-	{
-		return GetOutputDataStruct().GetDataCount();
-	}
-
-	
 	//===========================
 	// 固有関数
 	//===========================

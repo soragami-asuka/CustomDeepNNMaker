@@ -23,8 +23,8 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	FullyConnect_CPU::FullyConnect_CPU(Gravisbell::GUID guid, FullyConnect_LayerData_CPU& i_layerData)
-		:	FullyConnect_Base	(guid)
+	FullyConnect_CPU::FullyConnect_CPU(Gravisbell::GUID guid, FullyConnect_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct)
+		:	FullyConnect_Base				(guid, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount				(0)		/**< 入力バッファ数 */
 		,	neuronCount						(0)		/**< ニューロン数 */
@@ -147,7 +147,7 @@ namespace NeuralNetwork {
 		if(this->pLearnData != NULL)
 			delete this->pLearnData;
 		this->pLearnData = data.Clone();
-		this->pLearnData->WriteToStruct((BYTE*)&this->learnData);
+//		this->pLearnData->WriteToStruct((BYTE*)&this->learnData);
 
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}

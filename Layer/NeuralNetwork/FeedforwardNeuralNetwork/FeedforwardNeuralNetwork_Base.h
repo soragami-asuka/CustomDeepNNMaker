@@ -39,6 +39,8 @@ namespace NeuralNetwork {
 		LayerConnectOutput outputLayer;	/**< 出力信号の代替レイヤーのアドレス. */
 
 		const Gravisbell::GUID guid;			/**< レイヤー識別用のGUID */
+		IODataStruct inputDataStruct;	/**< 入力データ構造 */
+		IODataStruct outputDataStruct;	/**< 出力データ構造 */
 
 		SettingData::Standard::IData* pLearnData;		/**< 学習設定を定義したコンフィグクラス */
 
@@ -55,7 +57,7 @@ namespace NeuralNetwork {
 		// コンストラクタ/デストラクタ
 		//====================================
 		/** コンストラクタ */
-		FeedforwardNeuralNetwork_Base(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData);
+		FeedforwardNeuralNetwork_Base(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct);
 		/** デストラクタ */
 		virtual ~FeedforwardNeuralNetwork_Base();
 
@@ -72,7 +74,7 @@ namespace NeuralNetwork {
 			追加したレイヤーデータの所有権はNeuralNetworkに移るため、メモリの開放処理などは全てINeuralNetwork内で行われる.
 			@param	i_pLayerData	追加するレイヤーデータ.
 			@param	o_player		追加されたレイヤーのアドレス. */
-		ErrorCode AddTemporaryLayer(ILayerData* i_pLayerData, ILayerBase** o_pLayer);
+		ErrorCode AddTemporaryLayer(ILayerData* i_pLayerData, ILayerBase** o_pLayer, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
 		/** レイヤーを削除する.
 			@param i_guid	削除するレイヤーのGUID */
 		ErrorCode EraseLayer(const Gravisbell::GUID& i_guid);

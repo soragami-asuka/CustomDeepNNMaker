@@ -15,8 +15,6 @@
 
 #include"Layer/NeuralNetwork/ILayerDLLManager.h"
 #include"Layer/NeuralNetwork/ILayerDataManager.h"
-#include<Layer/IO/ISingleInputLayerData.h>
-#include<Layer/IO/ISingleOutputLayerData.h>
 
 
 namespace Gravisbell {

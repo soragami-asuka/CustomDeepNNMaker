@@ -43,7 +43,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	GlobalAveragePooling_CPU(Gravisbell::GUID guid, class GlobalAveragePooling_LayerData_CPU& i_layerData);
+	GlobalAveragePooling_CPU(Gravisbell::GUID guid, class GlobalAveragePooling_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct);
 	/** デストラクタ */
 	virtual ~GlobalAveragePooling_CPU();
 

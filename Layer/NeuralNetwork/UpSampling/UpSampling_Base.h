@@ -23,6 +23,8 @@ namespace NeuralNetwork {
 	{
 	protected:
 		Gravisbell::GUID guid;	/**< レイヤー識別用のGUID */
+		IODataStruct inputDataStruct;	/**< 入力データ構造 */
+		IODataStruct outputDataStruct;	/**< 出力データ構造 */
 
 		SettingData::Standard::IData* pLearnData;		/**< 学習設定を定義したコンフィグクラス */
 //		UpSampling::LearnDataStructure learnData;	/**< 学習設定 */
@@ -31,7 +33,7 @@ namespace NeuralNetwork {
 
 	public:
 		/** コンストラクタ */
-		UpSampling_Base(Gravisbell::GUID guid);
+		UpSampling_Base(Gravisbell::GUID guid, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct);
 
 		/** デストラクタ */
 		virtual ~UpSampling_Base();

@@ -22,8 +22,8 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	BatchNormalization_CPU::BatchNormalization_CPU(Gravisbell::GUID guid, BatchNormalization_LayerData_CPU& i_layerData)
-		:	BatchNormalization_Base	(guid)
+	BatchNormalization_CPU::BatchNormalization_CPU(Gravisbell::GUID guid, BatchNormalization_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct)
+		:	BatchNormalization_Base	(guid, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
 		,	layerData				(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount		(0)				/**< 入力バッファ数 */
 		,	outputBufferCount		(0)				/**< 出力バッファ数 */
@@ -85,8 +85,8 @@ namespace NeuralNetwork {
 		// 学習用の変数を作成
 		this->onLearnMode = true;
 		this->learnCount = 0;
-		this->lpTmpMean.resize(this->layerData.inputDataStruct.ch, 0.0f);
-		this->lpTmpVariance.resize(this->layerData.inputDataStruct.ch, 0.0f);
+		this->lpTmpMean.resize(this->inputDataStruct.ch, 0.0f);
+		this->lpTmpVariance.resize(this->inputDataStruct.ch, 0.0f);
 
 		// 出力誤差バッファ受け取り用のアドレス配列を作成する
 		this->m_lppDOutputBufferPrev.resize(batchSize);
@@ -121,7 +121,7 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
 		// チャンネルごとのバッファ数を確認
-		this->channeclBufferCount = this->layerData.inputDataStruct.z * this->layerData.inputDataStruct.y * this->layerData.inputDataStruct.x;
+		this->channeclBufferCount = this->inputDataStruct.z * this->inputDataStruct.y * this->inputDataStruct.x;
 		if(this->channeclBufferCount == 0)
 			return ErrorCode::ERROR_CODE_FRAUD_INPUT_COUNT;
 
@@ -152,14 +152,14 @@ namespace NeuralNetwork {
 		if(this->pLearnData != NULL)
 			delete this->pLearnData;
 		this->pLearnData = data.Clone();
-		this->pLearnData->WriteToStruct((BYTE*)&learnData);
+//		this->pLearnData->WriteToStruct((BYTE*)&learnData);
 
 
 		// 学習回数を初期化
 		this->learnCount = 0;
 
 		// 演算用の平均.分散を初期化
-		for(U32 ch=0; ch<this->layerData.inputDataStruct.ch; ch++)
+		for(U32 ch=0; ch<this->inputDataStruct.ch; ch++)
 		{
 			this->layerData.lpMean[ch] = 0.0f;
 			this->layerData.lpVariance[ch] = 0.0f;
@@ -192,7 +192,7 @@ namespace NeuralNetwork {
 		if(this->onLearnMode)
 		{
 			// 平均を求める
-			for(U32 ch=0; ch<this->layerData.inputDataStruct.ch; ch++)
+			for(U32 ch=0; ch<this->inputDataStruct.ch; ch++)
 			{
 				this->lpTmpMean[ch] = 0.0f;
 				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
@@ -206,7 +206,7 @@ namespace NeuralNetwork {
 			}
 
 			// 分散を求める
-			for(U32 ch=0; ch<this->layerData.inputDataStruct.ch; ch++)
+			for(U32 ch=0; ch<this->inputDataStruct.ch; ch++)
 			{
 				F64 tmp = 0.0f;
 				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
@@ -223,7 +223,7 @@ namespace NeuralNetwork {
 		}
 
 		// 平均,分散を利用して正規化
-		for(U32 ch=0; ch<this->layerData.inputDataStruct.ch; ch++)
+		for(U32 ch=0; ch<this->inputDataStruct.ch; ch++)
 		{
 			F32 mean = this->lpTmpMean[ch];
 			F32 variance = this->lpTmpVariance[ch] + (F32)max(this->layerData.layerStructure.epsilon, 1e-5);
@@ -297,7 +297,7 @@ namespace NeuralNetwork {
 		}
 
 
-		for(U32 ch=0; ch<this->layerData.inputDataStruct.ch; ch++)
+		for(U32 ch=0; ch<this->inputDataStruct.ch; ch++)
 		{
 			F32 mean = this->lpTmpMean[ch];
 			F32 variance = this->lpTmpVariance[ch] + (F32)max(this->layerData.layerStructure.epsilon, 1e-5);
@@ -362,7 +362,7 @@ namespace NeuralNetwork {
 		// 学習処理の実行回数をカウントアップ
 		this->learnCount++;
 
-		for(U32 ch=0; ch<this->layerData.inputDataStruct.ch; ch++)
+		for(U32 ch=0; ch<this->inputDataStruct.ch; ch++)
 		{
 			F32 mean = this->lpTmpMean[ch];
 			F32 variance = this->lpTmpVariance[ch] + (F32)max(this->layerData.layerStructure.epsilon, 1e-5);

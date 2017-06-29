@@ -55,7 +55,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	Pooling_GPU(Gravisbell::GUID guid, class Pooling_LayerData_GPU& i_layerData);
+	Pooling_GPU(Gravisbell::GUID guid, class Pooling_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct);
 	/** デストラクタ */
 	virtual ~Pooling_GPU();
 

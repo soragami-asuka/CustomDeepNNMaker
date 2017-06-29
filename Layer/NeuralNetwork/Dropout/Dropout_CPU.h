@@ -50,7 +50,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	Dropout_CPU(Gravisbell::GUID guid, class Dropout_LayerData_CPU& i_layerData);
+	Dropout_CPU(Gravisbell::GUID guid, class Dropout_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct);
 	/** デストラクタ */
 	virtual ~Dropout_CPU();
 

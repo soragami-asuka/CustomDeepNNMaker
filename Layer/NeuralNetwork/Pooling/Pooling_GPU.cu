@@ -21,8 +21,8 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	Pooling_GPU::Pooling_GPU(Gravisbell::GUID guid, Pooling_LayerData_GPU& i_layerData)
-		:	Pooling_Base	(guid)
+	Pooling_GPU::Pooling_GPU(Gravisbell::GUID guid, Pooling_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct)
+		:	Pooling_Base					(guid, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount				(0)				/**< 入力バッファ数 */
 		,	outputBufferCount				(0)				/**< 出力バッファ数 */
@@ -126,16 +126,16 @@ namespace NeuralNetwork {
 		std::vector<S32> dimFilter;
 		std::vector<S32> dimStride;
 		std::vector<S32> dimPadding;
-		if(this->layerData.inputDataStruct.z > 1)
+		if(this->inputDataStruct.z > 1)
 		{
 			dataDim = 1 + 1 + 3;	// バッチ + チャンネル + 次元3
 
 			dimInput.resize(dataDim);
 			dimInput[0] = this->batchSize;
-			dimInput[1] = this->layerData.inputDataStruct.ch;
-			dimInput[2] = this->layerData.inputDataStruct.z;
-			dimInput[3] = this->layerData.inputDataStruct.y;
-			dimInput[4] = this->layerData.inputDataStruct.x;
+			dimInput[1] = this->inputDataStruct.ch;
+			dimInput[2] = this->inputDataStruct.z;
+			dimInput[3] = this->inputDataStruct.y;
+			dimInput[4] = this->inputDataStruct.x;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2] * dimInput[3] * dimInput[4];
@@ -164,15 +164,15 @@ namespace NeuralNetwork {
 			dimPadding[1] = 0;
 			dimPadding[2] = 0;
 		}
-		else if(this->layerData.inputDataStruct.y > 1 || this->layerData.inputDataStruct.x)
+		else if(this->inputDataStruct.y > 1 || this->inputDataStruct.x)
 		{
 			dataDim = 1 + 1 + 2;
 
 			dimInput.resize(dataDim);
 			dimInput[0] = this->batchSize;
-			dimInput[1] = this->layerData.inputDataStruct.ch;
-			dimInput[2] = this->layerData.inputDataStruct.y;
-			dimInput[3] = this->layerData.inputDataStruct.x;
+			dimInput[1] = this->inputDataStruct.ch;
+			dimInput[2] = this->inputDataStruct.y;
+			dimInput[3] = this->inputDataStruct.x;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2] * dimInput[3];
@@ -197,14 +197,14 @@ namespace NeuralNetwork {
 			dimPadding[0] = 0;
 			dimPadding[1] = 0;
 		}
-		else if(this->layerData.inputDataStruct.x > 1)
+		else if(this->inputDataStruct.x > 1)
 		{
 			dataDim = 1 + 1 + 1;
 
 			dimInput.resize(dataDim);
 			dimInput[0] = this->batchSize;
-			dimInput[1] = this->layerData.inputDataStruct.ch;
-			dimInput[2] = this->layerData.inputDataStruct.x;
+			dimInput[1] = this->inputDataStruct.ch;
+			dimInput[2] = this->inputDataStruct.x;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2];

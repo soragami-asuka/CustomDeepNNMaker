@@ -164,7 +164,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	// 学習用ニューラルネットワーク作成
 	Layer::NeuralNetwork::INeuralNetwork* pNeuralNetworkLearn = NULL;
 	{
-		Layer::ILayerBase* pLayer = pNeuralNetworkData->CreateLayer(boost::uuids::random_generator()().data);
+		Layer::ILayerBase* pLayer = pNeuralNetworkData->CreateLayer(boost::uuids::random_generator()().data, &pDataLayerTeach_Input->GetOutputDataStruct(), 1);
 		pNeuralNetworkLearn = dynamic_cast<Layer::NeuralNetwork::INeuralNetwork*>(pLayer);
 		if(pNeuralNetworkLearn == NULL)
 		{
@@ -186,7 +186,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	// テスト用ニューラルネットワーク作成
 	Layer::NeuralNetwork::INeuralNetwork* pNeuralNetworkTest = NULL;
 	{
-		Layer::ILayerBase* pLayer = pNeuralNetworkData->CreateLayer(boost::uuids::random_generator()().data);
+		Layer::ILayerBase* pLayer = pNeuralNetworkData->CreateLayer(boost::uuids::random_generator()().data, &pDataLayerTeach_Input->GetOutputDataStruct(), 1);
 		pNeuralNetworkTest = dynamic_cast<Layer::NeuralNetwork::INeuralNetwork*>(pLayer);
 		if(pNeuralNetworkTest == NULL)
 		{
@@ -422,48 +422,48 @@ Gravisbell::ErrorCode LoadSampleData_label(
 
 
 /** ニューラルネットワーククラスを作成する */
-Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager, const IODataStruct& inputDataStruct, const IODataStruct& outputDataStruct)
+Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct)
 {
 	using namespace Gravisbell::Utility::NeuralNetworkLayer;
 
 	Gravisbell::ErrorCode err;
 
 	// ニューラルネットワークを作成
-	Layer::Connect::ILayerConnectData* pNeuralNetwork = CreateNeuralNetwork(layerDLLManager, layerDataManager, inputDataStruct);
+	Layer::Connect::ILayerConnectData* pNeuralNetwork = CreateNeuralNetwork(layerDLLManager, layerDataManager);
 	if(pNeuralNetwork == NULL)
 		return NULL;
 
 
 	// レイヤーを追加する
-	if(Layer::IO::ISingleInputLayerData* pNeuralNetworkInput = dynamic_cast<Layer::IO::ISingleInputLayerData*>(pNeuralNetwork))
+	if(pNeuralNetwork)
 	{
 		// 入力信号を直前レイヤーに設定
-		Gravisbell::IODataStruct inputDataStruct = pNeuralNetworkInput->GetInputDataStruct();
 		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID();
 
 		// 1層目
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateConvolutionLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(5,5,1), 4, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
+			lastLayerGUID,
+			CreateConvolutionLayer(layerDLLManager, layerDataManager,
+			pNeuralNetwork->GetOutputDataStruct(lastLayerGUID, &i_inputDataStruct, 1).ch, Vector3D<S32>(5,5,1), 4, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreatePoolingLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1)));
-		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-		err = AddLayerToNetworkLast(
-			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, inputDataStruct));
+			lastLayerGUID,
+			CreatePoolingLayer(layerDLLManager, layerDataManager, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1)));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #if USE_BATCHNORM
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"ReLU"));
+			lastLayerGUID,
+			CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, pNeuralNetwork->GetOutputDataStruct(lastLayerGUID, &i_inputDataStruct, 1).ch));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #endif
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lastLayerGUID,
+			CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #if USE_DROPOUT
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
@@ -477,26 +477,26 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		// 2層目
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateConvolutionLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(5,5,1), 16, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
+			lastLayerGUID,
+			CreateConvolutionLayer(layerDLLManager, layerDataManager, pNeuralNetwork->GetOutputDataStruct(lastLayerGUID, &i_inputDataStruct, 1).ch, Vector3D<S32>(5,5,1), 16, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreatePoolingLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1)));
-		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-		err = AddLayerToNetworkLast(
-			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, inputDataStruct));
+			lastLayerGUID,
+			CreatePoolingLayer(layerDLLManager, layerDataManager, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1)));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #if USE_BATCHNORM
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"ReLU"));
+			lastLayerGUID,
+			CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, pNeuralNetwork->GetOutputDataStruct(lastLayerGUID, &i_inputDataStruct, 1).ch));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #endif
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lastLayerGUID,
+			CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #if USE_DROPOUT
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
@@ -505,25 +505,25 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #endif
 
-#if 1	// Expand
+#if 0	// Expand
 		// 3層目
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateConvolutionLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(5,5,1), 16, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
-		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-		err = AddLayerToNetworkLast(
-			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, inputDataStruct));
+			lastLayerGUID,
+			CreateConvolutionLayer(layerDLLManager, layerDataManager, pNeuralNetwork->GetOutputDataStruct(lastLayerGUID, &i_inputDataStruct, 1).ch, Vector3D<S32>(5,5,1), 16, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #if USE_BATCHNORM
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"ReLU"));
+			lastLayerGUID,
+			CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, pNeuralNetwork->GetOutputDataStruct(lastLayerGUID, &i_inputDataStruct, 1).ch));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #endif
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lastLayerGUID,
+			CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #if USE_DROPOUT
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
@@ -535,26 +535,26 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		// 4層目
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateConvolutionLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(5,5,1), 32, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
+			lastLayerGUID,
+			CreateConvolutionLayer(layerDLLManager, layerDataManager, pNeuralNetwork->GetOutputDataStruct(lastLayerGUID, &i_inputDataStruct, 1).ch, Vector3D<S32>(5,5,1), 32, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreatePoolingLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1)));
-		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-		err = AddLayerToNetworkLast(
-			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, inputDataStruct));
+			lastLayerGUID,
+			CreatePoolingLayer(layerDLLManager, layerDataManager, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1)));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #if USE_BATCHNORM
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"ReLU"));
+			lastLayerGUID,
+			CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, pNeuralNetwork->GetOutputDataStruct(lastLayerGUID, &i_inputDataStruct, 1).ch));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #endif
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lastLayerGUID,
+			CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #if USE_DROPOUT
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
@@ -566,21 +566,21 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		// 5層目
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateConvolutionLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(5,5,1), 32, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
-		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-		err = AddLayerToNetworkLast(
-			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, inputDataStruct));
+			lastLayerGUID,
+			CreateConvolutionLayer(layerDLLManager, layerDataManager, pNeuralNetwork->GetOutputDataStruct(lastLayerGUID, &i_inputDataStruct, 1).ch, Vector3D<S32>(5,5,1), 32, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #if USE_BATCHNORM
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"ReLU"));
+			lastLayerGUID,
+			CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, pNeuralNetwork->GetOutputDataStruct(lastLayerGUID, &i_inputDataStruct, 1).ch));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #endif
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lastLayerGUID,
+			CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #if USE_DROPOUT
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
@@ -590,39 +590,37 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 #endif
 #endif	// Expand
 
-#elif 1	// MergeInput
+#elif 0	// MergeInput
 		// 1層目のGUIDを記録
 		Gravisbell::GUID lastLayerGUID_A = lastLayerGUID;
 		Gravisbell::GUID lastLayerGUID_B = lastLayerGUID;
-		Gravisbell::IODataStruct inputDataStruct_A = inputDataStruct;
-		Gravisbell::IODataStruct inputDataStruct_B = inputDataStruct;
 
 		// 2層目A
 		{
 			err = AddLayerToNetworkLast(
 				*pNeuralNetwork,
-				inputDataStruct_A, lastLayerGUID_A,
-				CreateConvolutionLayer(layerDLLManager, layerDataManager, inputDataStruct_A, Vector3D<S32>(5,5,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
+				lastLayerGUID_A,
+				CreateConvolutionLayer(layerDLLManager, layerDataManager, pNeuralNetwork->GetOutputDataStruct(lastLayerGUID_A, &i_inputDataStruct, 1).ch, Vector3D<S32>(5,5,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
 			if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 			err = AddLayerToNetworkLast(
 				*pNeuralNetwork,
-				inputDataStruct_A, lastLayerGUID_A,
-				CreatePoolingLayer(layerDLLManager, layerDataManager, inputDataStruct_A, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1)));
+				lastLayerGUID_A,
+				CreatePoolingLayer(layerDLLManager, layerDataManager, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1)));
 			if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 			err = AddLayerToNetworkLast(
 				*pNeuralNetwork,
-				inputDataStruct_A, lastLayerGUID_A,
-				CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, inputDataStruct_A));
+				lastLayerGUID_A,
+				CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, pNeuralNetwork->GetOutputDataStruct(lastLayerGUID_A, &i_inputDataStruct, 1).ch));
 			if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 			err = AddLayerToNetworkLast(
 				*pNeuralNetwork,
-				inputDataStruct_A, lastLayerGUID_A,
-				CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct_A, L"ReLU"));
+				lastLayerGUID_A,
+				CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"));
 			if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 			err = AddLayerToNetworkLast(
 				*pNeuralNetwork,
-				inputDataStruct_A, lastLayerGUID_A,
-				CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct_A, 0.5f));
+				lastLayerGUID_A,
+				CreateDropoutLayer(layerDLLManager, layerDataManager, 0.5f));
 			if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		}
 
@@ -630,72 +628,71 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		{
 			err = AddLayerToNetworkLast(
 				*pNeuralNetwork,
-				inputDataStruct_B, lastLayerGUID_B,
-				CreateConvolutionLayer(layerDLLManager, layerDataManager, inputDataStruct_B, Vector3D<S32>(7,7,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(3,3,0)));
+				lastLayerGUID_B,
+				CreateConvolutionLayer(layerDLLManager, layerDataManager, pNeuralNetwork->GetOutputDataStruct(lastLayerGUID_B, &i_inputDataStruct, 1).ch, Vector3D<S32>(7,7,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(3,3,0)));
 			if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 			err = AddLayerToNetworkLast(
 				*pNeuralNetwork,
-				inputDataStruct_B, lastLayerGUID_B,
-				CreatePoolingLayer(layerDLLManager, layerDataManager, inputDataStruct_B, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1)));
+				lastLayerGUID_B,
+				CreatePoolingLayer(layerDLLManager, layerDataManager, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1)));
 			if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 			err = AddLayerToNetworkLast(
 				*pNeuralNetwork,
-				inputDataStruct_B, lastLayerGUID_B,
-				CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, inputDataStruct_B));
+				lastLayerGUID_B,
+				CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, pNeuralNetwork->GetOutputDataStruct(lastLayerGUID_B, &i_inputDataStruct, 1).ch));
 			if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 			err = AddLayerToNetworkLast(
 				*pNeuralNetwork,
-				inputDataStruct_B, lastLayerGUID_B,
-				CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct_B, L"ReLU"));
+				lastLayerGUID_B,
+				CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"));
 			if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 			err = AddLayerToNetworkLast(
 				*pNeuralNetwork,
-				inputDataStruct_B, lastLayerGUID_B,
-				CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct_B, 0.5f));
+				lastLayerGUID_B,
+				CreateDropoutLayer(layerDLLManager, layerDataManager, 0.5f));
 			if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		}
 
 		// A,B結合層
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateMergeInputLayer(layerDLLManager, layerDataManager, inputDataStruct_A, inputDataStruct_B),
+			lastLayerGUID,
+			CreateMergeInputLayer(layerDLLManager, layerDataManager),
 			lastLayerGUID_A, lastLayerGUID_B);
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #elif 0	// ResNet
 
 		// ショートカットレイヤーを保存する
 		Gravisbell::GUID lastLayerGUID_shortCut = lastLayerGUID;
-		Gravisbell::IODataStruct inputDataStruct_shortCut = inputDataStruct;
 
 		// 2層目
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateConvolutionLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(5,5,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
+			lastLayerGUID,
+			CreateConvolutionLayer(layerDLLManager, layerDataManager, pNeuralNetwork->GetOutputDataStruct(lastLayerGUID, &i_inputDataStruct, 1).ch, Vector3D<S32>(5,5,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"ReLU"));
+			lastLayerGUID,
+			CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateConvolutionLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(5,5,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
+			lastLayerGUID,
+			CreateConvolutionLayer(layerDLLManager, layerDataManager, pNeuralNetwork->GetOutputDataStruct(lastLayerGUID, &i_inputDataStruct, 1).ch, Vector3D<S32>(5,5,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"ReLU"));
+			lastLayerGUID,
+			CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 
 		// 残差レイヤー
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateResidualLayer(layerDLLManager, layerDataManager, inputDataStruct, inputDataStruct_shortCut),
+			lastLayerGUID,
+			CreateResidualLayer(layerDLLManager, layerDataManager),
 			lastLayerGUID, lastLayerGUID_shortCut);
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 
@@ -710,8 +707,8 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreatePoolingLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1)));
+			lastLayerGUID,
+			CreatePoolingLayer(layerDLLManager, layerDataManager, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1)));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		//err = AddLayerToNetworkLast(
 		//	*pNeuralNetwork,
@@ -721,8 +718,8 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		//if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"ReLU"));
+			lastLayerGUID,
+			CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		//err = AddLayerToNetworkLast(
 		//	*pNeuralNetwork,
@@ -730,24 +727,24 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		//	inputDataStruct, lastLayerGUID,
 		//	CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.5f));
 		//if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-#elif 0// UpSampling
+#elif 1// UpSampling
 
 		// 2層目
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateUpSamplingLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(2,2,1), true));
+			lastLayerGUID,
+			CreateUpSamplingLayer(layerDLLManager, layerDataManager, Vector3D<S32>(2,2,1), true));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateConvolutionLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(5,5,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
+			lastLayerGUID,
+			CreateConvolutionLayer(layerDLLManager, layerDataManager, pNeuralNetwork->GetOutputDataStruct(lastLayerGUID, &i_inputDataStruct, 1).ch, Vector3D<S32>(5,5,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0)));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreatePoolingLayer(layerDLLManager, layerDataManager, inputDataStruct, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1)));
+			lastLayerGUID,
+			CreatePoolingLayer(layerDLLManager, layerDataManager, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1)));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		//err = AddLayerToNetworkLast(
 		//	*pNeuralNetwork,
@@ -757,8 +754,8 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		//if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"ReLU"));
+			lastLayerGUID,
+			CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		//err = AddLayerToNetworkLast(
 		//	*pNeuralNetwork,
@@ -774,13 +771,13 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 #if 1	// 全結合
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateFullyConnectLayer(layerDLLManager, layerDataManager, inputDataStruct, outputDataStruct.GetDataCount()));
+			lastLayerGUID,
+			CreateFullyConnectLayer(layerDLLManager, layerDataManager, pNeuralNetwork->GetOutputDataStruct(lastLayerGUID, &i_inputDataStruct, 1).GetDataCount(), i_outputDataStruct.GetDataCount()));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"softmax_ALL_crossEntropy"));
+			lastLayerGUID,
+			CreateActivationLayer(layerDLLManager, layerDataManager, L"softmax_ALL_crossEntropy"));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #elif 0	// GlobalAveragePooling
 		// 畳み込み(出力：2ch)
@@ -807,6 +804,14 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		// 出力レイヤー設定
 		pNeuralNetwork->SetOutputLayerGUID(lastLayerGUID);
 	}
+
+	// 出力データ構造が正しいことを確認
+	if(pNeuralNetwork->GetOutputDataStruct(&i_inputDataStruct, 1) != i_outputDataStruct)
+	{
+		layerDataManager.EraseLayerByGUID(pNeuralNetwork->GetGUID());
+		return NULL;
+	}
+
 
 	// オプティマイザーの設定
 	pNeuralNetwork->ChangeOptimizer(L"SGD");

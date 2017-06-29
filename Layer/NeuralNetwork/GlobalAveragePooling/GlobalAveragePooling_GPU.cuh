@@ -56,7 +56,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	GlobalAveragePooling_GPU(Gravisbell::GUID guid, class GlobalAveragePooling_LayerData_GPU& i_layerData);
+	GlobalAveragePooling_GPU(Gravisbell::GUID guid, class GlobalAveragePooling_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct);
 	/** デストラクタ */
 	virtual ~GlobalAveragePooling_GPU();
 

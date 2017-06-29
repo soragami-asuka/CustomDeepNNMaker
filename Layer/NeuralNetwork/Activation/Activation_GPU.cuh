@@ -55,7 +55,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	Activation_GPU(Gravisbell::GUID guid, class Activation_LayerData_GPU& i_layerData);
+	Activation_GPU(Gravisbell::GUID guid, class Activation_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct);
 	/** デストラクタ */
 	virtual ~Activation_GPU();
 

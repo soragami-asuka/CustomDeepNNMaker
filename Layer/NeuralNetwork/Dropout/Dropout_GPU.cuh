@@ -60,7 +60,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	Dropout_GPU(Gravisbell::GUID guid, class Dropout_LayerData_GPU& i_layerData);
+	Dropout_GPU(Gravisbell::GUID guid, class Dropout_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct);
 	/** デストラクタ */
 	virtual ~Dropout_GPU();
 

@@ -61,7 +61,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	Activation_Discriminator_GPU(Gravisbell::GUID guid, class Activation_Discriminator_LayerData_GPU& i_layerData);
+	Activation_Discriminator_GPU(Gravisbell::GUID guid, class Activation_Discriminator_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct);
 	/** デストラクタ */
 	virtual ~Activation_Discriminator_GPU();
 

@@ -12,8 +12,10 @@ using namespace Gravisbell::Layer::NeuralNetwork;
 
 
 /** コンストラクタ */
-Convolution_Base::Convolution_Base(Gravisbell::GUID guid)
+Convolution_Base::Convolution_Base(Gravisbell::GUID guid, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct)
 	:	guid				(guid)
+	,	inputDataStruct		(i_inputDataStruct)
+	,	outputDataStruct	(i_outputDataStruct)
 	,	pLearnData			(NULL)
 {
 }
@@ -72,13 +74,13 @@ const SettingData::Standard::IData* Convolution_Base::GetLayerStructure()const
 	@return	入力データ構造 */
 IODataStruct Convolution_Base::GetInputDataStruct()const
 {
-	return this->GetLayerData().GetInputDataStruct();
+	return this->inputDataStruct;
 }
 
 /** 入力バッファ数を取得する. */
 unsigned int Convolution_Base::GetInputBufferCount()const
 {
-	return this->GetLayerData().GetInputBufferCount();
+	return this->GetInputDataStruct().GetDataCount();
 }
 
 
@@ -88,13 +90,13 @@ unsigned int Convolution_Base::GetInputBufferCount()const
 /** 出力データ構造を取得する */
 IODataStruct Convolution_Base::GetOutputDataStruct()const
 {
-	return this->GetLayerData().GetOutputDataStruct();
+	return this->outputDataStruct;
 }
 
 /** 出力バッファ数を取得する */
 unsigned int Convolution_Base::GetOutputBufferCount()const
 {
-	return this->GetLayerData().GetOutputBufferCount();
+	return this->GetOutputDataStruct().GetDataCount();
 }
 
 

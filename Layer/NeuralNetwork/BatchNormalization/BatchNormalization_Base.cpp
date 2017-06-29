@@ -12,8 +12,10 @@ using namespace Gravisbell::Layer::NeuralNetwork;
 
 
 /** コンストラクタ */
-BatchNormalization_Base::BatchNormalization_Base(Gravisbell::GUID guid)
+BatchNormalization_Base::BatchNormalization_Base(Gravisbell::GUID guid, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct)
 	:	guid				(guid)
+	,	inputDataStruct		(i_inputDataStruct)
+	,	outputDataStruct	(i_outputDataStruct)
 	,	pLearnData			(NULL)
 {
 }
@@ -72,13 +74,13 @@ const SettingData::Standard::IData* BatchNormalization_Base::GetLayerStructure()
 	@return	入力データ構造 */
 IODataStruct BatchNormalization_Base::GetInputDataStruct()const
 {
-	return this->GetLayerData().GetInputDataStruct();
+	return this->inputDataStruct;
 }
 
 /** 入力バッファ数を取得する. */
 unsigned int BatchNormalization_Base::GetInputBufferCount()const
 {
-	return this->GetLayerData().GetInputBufferCount();
+	return this->GetInputDataStruct().GetDataCount();
 }
 
 
@@ -89,13 +91,13 @@ unsigned int BatchNormalization_Base::GetInputBufferCount()const
 /** 出力データ構造を取得する */
 IODataStruct BatchNormalization_Base::GetOutputDataStruct()const
 {
-	return this->GetLayerData().GetOutputDataStruct();
+	return this->outputDataStruct;
 }
 
 /** 出力バッファ数を取得する */
 unsigned int BatchNormalization_Base::GetOutputBufferCount()const
 {
-	return this->GetLayerData().GetOutputBufferCount();
+	return this->GetOutputDataStruct().GetDataCount();
 }
 
 

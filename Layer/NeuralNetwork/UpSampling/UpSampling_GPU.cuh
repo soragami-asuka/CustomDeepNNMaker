@@ -59,7 +59,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	UpSampling_GPU(Gravisbell::GUID guid, class UpSampling_LayerData_GPU& i_layerData);
+	UpSampling_GPU(Gravisbell::GUID guid, class UpSampling_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct);
 	/** デストラクタ */
 	virtual ~UpSampling_GPU();
 

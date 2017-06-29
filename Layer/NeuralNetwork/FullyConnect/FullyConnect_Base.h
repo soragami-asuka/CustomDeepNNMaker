@@ -5,8 +5,6 @@
 #ifndef __FullyConnect_BASE_H__
 #define __FullyConnect_BASE_H__
 
-#include<Layer/NeuralNetwork/INNLayer.h>
-
 #include<vector>
 #include<Layer/NeuralNetwork/INNSingle2SingleLayer.h>
 
@@ -25,15 +23,17 @@ namespace NeuralNetwork {
 	{
 	protected:
 		Gravisbell::GUID guid;	/**< レイヤー識別用のGUID */
+		IODataStruct inputDataStruct;	/**< 入力データ構造 */
+		IODataStruct outputDataStruct;	/**< 出力データ構造 */
 
 		SettingData::Standard::IData* pLearnData;		/**< 学習設定を定義したコンフィグクラス */
-		FullyConnect::LearnDataStructure learnData;	/**< 学習設定 */
+//		FullyConnect::LearnDataStructure learnData;	/**< 学習設定 */
 
 		unsigned int batchSize;	/**< バッチサイズ */
 
 	public:
 		/** コンストラクタ */
-		FullyConnect_Base(Gravisbell::GUID guid);
+		FullyConnect_Base(Gravisbell::GUID guid, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct);
 
 		/** デストラクタ */
 		virtual ~FullyConnect_Base();

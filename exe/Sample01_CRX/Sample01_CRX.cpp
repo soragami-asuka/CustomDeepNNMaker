@@ -30,7 +30,7 @@
 #include"Utility/NeuralNetworkLayer.h"
 
 
-#define USE_GPU	0
+#define USE_GPU	1
 #define USE_HOST_MEMORY 1
 
 
@@ -157,6 +157,20 @@ int _tmain(int argc, _TCHAR* argv[])
 		delete pSampleData;
 		return -1;
 	}
+	IODataStruct outputDataStruct = pNeuralNetworkData->GetOutputDataStruct(&pTeachInputLayer->GetOutputDataStruct(), 1);
+	if(outputDataStruct != pTeachOutputLayer->GetInputDataStruct())
+	{
+		delete pTeachInputLayer;
+		delete pTeachOutputLayer;
+		delete pSampleInputLayer;
+		delete pSampleOutputLayer;
+		delete pLayerDataManager;
+		delete pLayerDLLManager;
+		delete pSampleData;
+		return -1;
+	}
+
+
 
 	// 開始時刻を計測
 	clock_t startTime = clock();
@@ -218,7 +232,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		// ニューラルネットワークを作成
 		Layer::NeuralNetwork::INeuralNetwork* pNeuralNetworkLearn = NULL;
 		{
-			Layer::ILayerBase* pLayer = pNeuralNetworkData->CreateLayer(boost::uuids::random_generator()().data);
+			Layer::ILayerBase* pLayer = pNeuralNetworkData->CreateLayer(boost::uuids::random_generator()().data, &pTeachInputLayer->GetInputDataStruct(), 1);
 			pNeuralNetworkLearn = dynamic_cast<Layer::NeuralNetwork::INeuralNetwork*>(pLayer);
 			if(pNeuralNetworkLearn == NULL)
 				delete pLayer;
@@ -237,7 +251,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		
 		Layer::NeuralNetwork::INeuralNetwork* pNeuralNetworkSample = NULL;
 		{
-			Layer::ILayerBase* pLayer = pNeuralNetworkData->CreateLayer(boost::uuids::random_generator()().data);
+			Layer::ILayerBase* pLayer = pNeuralNetworkData->CreateLayer(boost::uuids::random_generator()().data, &pSampleInputLayer->GetInputDataStruct(), 1);
 			pNeuralNetworkSample = dynamic_cast<Layer::NeuralNetwork::INeuralNetwork*>(pLayer);
 			if(pNeuralNetworkSample == NULL)
 				delete pLayer;
@@ -352,7 +366,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(
 {
 	using namespace Gravisbell::Utility::NeuralNetworkLayer;
 
-	Layer::Connect::ILayerConnectData* pNeuralNetwork = Gravisbell::Utility::NeuralNetworkLayer::CreateNeuralNetwork(layerDLLManager, layerDataManager, i_inputDataStruct);
+	Layer::Connect::ILayerConnectData* pNeuralNetwork = Gravisbell::Utility::NeuralNetworkLayer::CreateNeuralNetwork(layerDLLManager, layerDataManager);
 
 	if(pNeuralNetwork)
 	{
@@ -363,44 +377,48 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(
 		// 1層目
 		AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateFullyConnectLayer(layerDLLManager, layerDataManager, inputDataStruct, 256));
+			lastLayerGUID,
+			CreateFullyConnectLayer(layerDLLManager, layerDataManager, inputDataStruct.GetDataCount(), 256));
 		AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"ReLU"));
-		//AddLayerToNetworkLast(
-		//	*pNeuralNetwork,
-		//	inputDataStruct, lastLayerGUID,
-		//	CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct, 0.2f));
+			lastLayerGUID,
+			CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"));
+		inputDataStruct = pNeuralNetwork->GetOutputDataStruct(lastLayerGUID, &i_inputDataStruct, 1);
+		AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lastLayerGUID,
+			CreateDropoutLayer(layerDLLManager, layerDataManager, 0.2f));
 
 		// 2層目
 		AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateFullyConnectLayer(layerDLLManager, layerDataManager, inputDataStruct, 256));
+			lastLayerGUID,
+			CreateFullyConnectLayer(layerDLLManager, layerDataManager, inputDataStruct.GetDataCount(), 256));
 		AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"ReLU"));
-		//AddLayerToNetworkLast(
-		//	*pNeuralNetwork,
-		//	inputDataStruct, lastLayerGUID,
-		//	CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct, 0.5f));
+			lastLayerGUID,
+			CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"));
+		inputDataStruct = pNeuralNetwork->GetOutputDataStruct(lastLayerGUID, &i_inputDataStruct, 1);
+		AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lastLayerGUID,
+			CreateDropoutLayer(layerDLLManager, layerDataManager, 0.5f));
 
 		// 3層目(出力層)
 		AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateFullyConnectLayer(layerDLLManager, layerDataManager, inputDataStruct, i_outputDataStruct.GetDataCount()));
+			lastLayerGUID,
+			CreateFullyConnectLayer(layerDLLManager, layerDataManager, inputDataStruct.GetDataCount(), i_outputDataStruct.GetDataCount()));
 		AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateActivationLayer(layerDLLManager, layerDataManager, inputDataStruct, L"softmax_ALL_crossEntropy"));
+			lastLayerGUID,
+			CreateActivationLayer(layerDLLManager, layerDataManager, L"softmax_ALL_crossEntropy"));
 
 		// 出力レイヤー設定
 		pNeuralNetwork->SetOutputLayerGUID(lastLayerGUID);
 	}
+
+	pNeuralNetwork->ChangeOptimizer(L"Adam");
 
 	return pNeuralNetwork;
 }

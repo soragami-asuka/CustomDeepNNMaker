@@ -14,9 +14,7 @@ namespace NeuralNetwork {
 	
 	/** コンストラクタ */
 	Convolution_LayerData_Base::Convolution_LayerData_Base(const Gravisbell::GUID& guid)
-		: ISingleInputLayerData(), ISingleOutputLayerData()
-		,	guid	(guid)
-		,	inputDataStruct	()	/**< 入力データ構造 */
+		:	guid	(guid)
 		,	pLayerStructure	(NULL)	/**< レイヤー構造を定義したコンフィグクラス */
 		,	layerStructure	()		/**< レイヤー構造 */
 		,	m_pOptimizer_neuron	(NULL)		/**< ニューロン更新用オプティマイザ */
@@ -109,14 +107,11 @@ namespace NeuralNetwork {
 		if(pLayerStructure == NULL)
 			return 0;
 
-		// 入力データ構造
-		bufferSize += sizeof(this->inputDataStruct);
-
 		// 設定情報
 		bufferSize += pLayerStructure->GetUseBufferByteCount();
 
 		// 本体のバイト数
-		bufferSize += (this->layerStructure.Output_Channel * this->layerStructure.FilterSize.x * this->layerStructure.FilterSize.y * this->layerStructure.FilterSize.z * this->inputDataStruct.ch) * sizeof(NEURON_TYPE);	// ニューロン係数
+		bufferSize += (this->layerStructure.Output_Channel * this->layerStructure.FilterSize.x * this->layerStructure.FilterSize.y * this->layerStructure.FilterSize.z * this->layerStructure.Input_Channel) * sizeof(NEURON_TYPE);	// ニューロン係数
 		bufferSize += this->layerStructure.Output_Channel * sizeof(NEURON_TYPE);	// バイアス係数
 
 		// オプティマイザーのバイト数
@@ -128,42 +123,55 @@ namespace NeuralNetwork {
 
 
 	//===========================
-	// 入力レイヤー関連
+	// レイヤー構造
 	//===========================
-	/** 入力データ構造を取得する.
-		@return	入力データ構造 */
-	IODataStruct Convolution_LayerData_Base::GetInputDataStruct()const
+	/** 入力データ構造が使用可能か確認する.
+		@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+		@return	使用可能な入力データ構造の場合trueが返る. */
+	bool Convolution_LayerData_Base::CheckCanUseInputDataStruct(const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
 	{
-		return this->inputDataStruct;
+		if(i_inputLayerCount == 0)
+			return false;
+		if(i_inputLayerCount > 1)
+			return false;
+		if(i_lpInputDataStruct == NULL)
+			return false;
+		if(i_lpInputDataStruct[0].x == 0)
+			return false;
+		if(i_lpInputDataStruct[0].y == 0)
+			return false;
+		if(i_lpInputDataStruct[0].z == 0)
+			return false;
+		if(i_lpInputDataStruct[0].ch == 0)
+			return false;
+		if(i_lpInputDataStruct[0].ch != this->layerStructure.Input_Channel)
+			return false;
+
+		return true;
 	}
 
-	/** 入力バッファ数を取得する. */
-	U32 Convolution_LayerData_Base::GetInputBufferCount()const
+	/** 出力データ構造を取得する.
+		@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+		@return	入力データ構造が不正な場合(x=0,y=0,z=0,ch=0)が返る. */
+	IODataStruct Convolution_LayerData_Base::GetOutputDataStruct(const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
 	{
-		return this->inputDataStruct.GetDataCount();
-	}
+		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
+			return IODataStruct(0,0,0,0);
 
-
-	//===========================
-	// 出力レイヤー関連
-	//===========================
-	/** 出力データ構造を取得する */
-	IODataStruct Convolution_LayerData_Base::GetOutputDataStruct()const
-	{
 		IODataStruct outputDataStruct;
 
-		outputDataStruct.x = this->convolutionCountVec.x;
-		outputDataStruct.y = this->convolutionCountVec.y;
-		outputDataStruct.z = this->convolutionCountVec.z;
+		outputDataStruct.x  = (S32)ceilf((F32)((i_lpInputDataStruct[0].x + this->layerStructure.Padding.x*2 - (this->layerStructure.FilterSize.x - 1)) / this->layerStructure.Stride.x));
+		outputDataStruct.y  = (S32)ceilf((F32)((i_lpInputDataStruct[0].y + this->layerStructure.Padding.y*2 - (this->layerStructure.FilterSize.y - 1)) / this->layerStructure.Stride.y));
+		outputDataStruct.z  = (S32)ceilf((F32)((i_lpInputDataStruct[0].z + this->layerStructure.Padding.z*2 - (this->layerStructure.FilterSize.z - 1)) / this->layerStructure.Stride.z));
 		outputDataStruct.ch = this->layerStructure.Output_Channel;
 
 		return outputDataStruct;
 	}
 
-	/** 出力バッファ数を取得する */
-	unsigned int Convolution_LayerData_Base::GetOutputBufferCount()const
+	/** 複数出力が可能かを確認する */
+	bool Convolution_LayerData_Base::CheckCanHaveMultOutputLayer(void)
 	{
-		return this->GetOutputDataStruct().GetDataCount();
+		return false;
 	}
 
 	

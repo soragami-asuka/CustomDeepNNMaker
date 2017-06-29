@@ -34,9 +34,18 @@ namespace NeuralNetwork {
 	//===========================
 	/** レイヤーを作成する.
 		@param guid	新規生成するレイヤーのGUID. */
-	ILayerBase* MergeInput_LayerData_CPU::CreateLayer(const Gravisbell::GUID& guid)
+	ILayerBase* MergeInput_LayerData_CPU::CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
 	{
-		return new MergeInput_CPU(guid, *this);
+		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
+			return NULL;
+
+		std::vector<IODataStruct> lpInputDataStruct;
+		for(U32 i=0; i<i_inputLayerCount; i++)
+		{
+			lpInputDataStruct.push_back(i_lpInputDataStruct[i]);
+		}
+
+		return new MergeInput_CPU(guid, *this, lpInputDataStruct);
 	}
 
 } // Gravisbell;
@@ -47,7 +56,7 @@ namespace NeuralNetwork {
 /** Create a layer for CPU processing.
   * @param GUID of layer to create.
   */
-EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPU_MultInput(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const Gravisbell::SettingData::Standard::IData& i_data, const Gravisbell::IODataStruct i_inputDataStruct[], U32 i_inputDataCount)
+EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPU(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const Gravisbell::SettingData::Standard::IData& i_data)
 {
 	// 作成
 	Gravisbell::Layer::NeuralNetwork::MergeInput_LayerData_CPU* pLayerData = new Gravisbell::Layer::NeuralNetwork::MergeInput_LayerData_CPU(guid);
@@ -55,7 +64,7 @@ EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPU_MultInput(const Gra
 		return NULL;
 
 	// 初期化
-	Gravisbell::ErrorCode errCode = pLayerData->Initialize(i_data, i_inputDataStruct, i_inputDataCount);
+	Gravisbell::ErrorCode errCode = pLayerData->Initialize(i_data);
 	if(errCode != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 	{
 		delete pLayerData;

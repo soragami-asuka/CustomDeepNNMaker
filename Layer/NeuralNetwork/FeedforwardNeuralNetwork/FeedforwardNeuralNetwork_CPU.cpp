@@ -8,14 +8,15 @@
 #include"FeedforwardNeuralNetwork_Base.h"
 #include"FeedforwardNeuralNetwork_CPU.h"
 
+#include"FeedforwardNeuralNetwork_LayerData_Base.h"
 
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
 	/** コンストラクタ */
-	FeedforwardNeuralNetwork_CPU::FeedforwardNeuralNetwork_CPU(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData)
-		:	FeedforwardNeuralNetwork_Base(i_guid, i_layerData)
+	FeedforwardNeuralNetwork_CPU::FeedforwardNeuralNetwork_CPU(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct)
+		:	FeedforwardNeuralNetwork_Base	(i_guid, i_layerData, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
 	{
 	}
 	/** デストラクタ */

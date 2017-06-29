@@ -33,10 +33,14 @@ namespace NeuralNetwork {
 	// レイヤー作成
 	//===========================
 	/** レイヤーを作成する.
-		@param guid	新規生成するレイヤーのGUID. */
-	ILayerBase* Activation_LayerData_CPU::CreateLayer(const Gravisbell::GUID& guid)
+		@param	guid	新規生成するレイヤーのGUID.
+		@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要 */
+	ILayerBase* Activation_LayerData_CPU::CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
 	{
-		return new Activation_CPU(guid, *this);
+		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
+			return NULL;
+
+		return new Activation_CPU(guid, *this, i_lpInputDataStruct[0]);
 	}
 
 } // Gravisbell;
@@ -47,7 +51,7 @@ namespace NeuralNetwork {
 /** Create a layer for CPU processing.
   * @param GUID of layer to create.
   */
-EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPU(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const Gravisbell::SettingData::Standard::IData& i_data, const Gravisbell::IODataStruct& i_inputDataStruct)
+EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPU(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const Gravisbell::SettingData::Standard::IData& i_data)
 {
 	// 作成
 	Gravisbell::Layer::NeuralNetwork::Activation_LayerData_CPU* pLayerData = new Gravisbell::Layer::NeuralNetwork::Activation_LayerData_CPU(guid);
@@ -55,7 +59,7 @@ EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPU(const Gravisbell::L
 		return NULL;
 
 	// 初期化
-	Gravisbell::ErrorCode errCode = pLayerData->Initialize(i_data, i_inputDataStruct);
+	Gravisbell::ErrorCode errCode = pLayerData->Initialize(i_data);
 	if(errCode != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 	{
 		delete pLayerData;

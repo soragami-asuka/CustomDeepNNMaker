@@ -22,6 +22,8 @@ namespace NeuralNetwork {
 	{
 	protected:
 		Gravisbell::GUID guid;	/**< レイヤー識別用のGUID */
+		std::vector<IODataStruct>	lpInputDataStruct;	/**< 入力データ構造 */
+		IODataStruct				outputDataStruct;	/**< 出力データ構造 */
 
 		SettingData::Standard::IData* pLearnData;	/**< 学習設定を定義したコンフィグクラス */
 
@@ -29,7 +31,7 @@ namespace NeuralNetwork {
 
 	public:
 		/** コンストラクタ */
-		Residual_Base(Gravisbell::GUID guid);
+		Residual_Base(Gravisbell::GUID guid, const std::vector<IODataStruct>& i_lpInputDataStruct, const IODataStruct& i_outputDataStruct);
 
 		/** デストラクタ */
 		virtual ~Residual_Base();

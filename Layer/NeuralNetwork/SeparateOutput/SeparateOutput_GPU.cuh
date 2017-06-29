@@ -48,7 +48,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	SeparateOutput_GPU(Gravisbell::GUID guid, class SeparateOutput_LayerData_GPU& i_layerData);
+	SeparateOutput_GPU(Gravisbell::GUID guid, class SeparateOutput_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct);
 	/** デストラクタ */
 	virtual ~SeparateOutput_GPU();
 

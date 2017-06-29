@@ -78,7 +78,7 @@ namespace NeuralNetwork {
 		@param	i_config			設定情報
 		@oaram	i_inputDataStruct	入力データ構造情報
 		@return	成功した場合0 */
-	ErrorCode FullyConnect_LayerData_CPU::Initialize(const SettingData::Standard::IData& i_data, const IODataStruct& i_inputDataStruct)
+	ErrorCode FullyConnect_LayerData_CPU::Initialize(const SettingData::Standard::IData& i_data)
 	{
 		ErrorCode err;
 
@@ -86,9 +86,6 @@ namespace NeuralNetwork {
 		err = this->SetLayerConfig(i_data);
 		if(err != ErrorCode::ERROR_CODE_NONE)
 			return err;
-
-		// 入力データ構造の設定
-		this->inputDataStruct = i_inputDataStruct;
 
 		// 初期化
 		err = this->Initialize();
@@ -109,10 +106,6 @@ namespace NeuralNetwork {
 	ErrorCode FullyConnect_LayerData_CPU::InitializeFromBuffer(const BYTE* i_lpBuffer, U32 i_bufferSize, S32& o_useBufferSize)
 	{
 		int readBufferByte = 0;
-
-		// 入力データ構造
-		memcpy(&this->inputDataStruct, &i_lpBuffer[readBufferByte], sizeof(this->inputDataStruct));
-		readBufferByte += sizeof(this->inputDataStruct);
 
 		// 設定情報
 		S32 useBufferByte = 0;
@@ -168,10 +161,6 @@ namespace NeuralNetwork {
 
 		int writeBufferByte = 0;
 
-		// 入力データ構造
-		memcpy(&o_lpBuffer[writeBufferByte], &this->inputDataStruct, sizeof(this->inputDataStruct));
-		writeBufferByte += sizeof(this->inputDataStruct);
-
 		// 設定情報
 		writeBufferByte += this->pLayerStructure->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
 
@@ -199,9 +188,12 @@ namespace NeuralNetwork {
 	//===========================
 	/** レイヤーを作成する.
 		@param guid	新規生成するレイヤーのGUID. */
-	ILayerBase* FullyConnect_LayerData_CPU::CreateLayer(const Gravisbell::GUID& guid)
+	ILayerBase* FullyConnect_LayerData_CPU::CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
 	{
-		return new FullyConnect_CPU(guid, *this);
+		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
+			return NULL;
+
+		return new FullyConnect_CPU(guid, *this, i_lpInputDataStruct[0]);
 	}
 	
 
@@ -225,7 +217,7 @@ namespace NeuralNetwork {
 /** Create a layer for CPU processing.
   * @param GUID of layer to create.
   */
-EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPU(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const Gravisbell::SettingData::Standard::IData& i_data, const Gravisbell::IODataStruct& i_inputDataStruct)
+EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPU(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const Gravisbell::SettingData::Standard::IData& i_data)
 {
 	// 作成
 	Gravisbell::Layer::NeuralNetwork::FullyConnect_LayerData_CPU* pLayerData = new Gravisbell::Layer::NeuralNetwork::FullyConnect_LayerData_CPU(guid);
@@ -233,7 +225,7 @@ EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPU(const Gravisbell::L
 		return NULL;
 
 	// 初期化
-	Gravisbell::ErrorCode errCode = pLayerData->Initialize(i_data, i_inputDataStruct);
+	Gravisbell::ErrorCode errCode = pLayerData->Initialize(i_data);
 	if(errCode != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 	{
 		delete pLayerData;

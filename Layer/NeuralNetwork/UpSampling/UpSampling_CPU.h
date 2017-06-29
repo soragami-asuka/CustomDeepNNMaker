@@ -40,7 +40,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	UpSampling_CPU(Gravisbell::GUID guid, class UpSampling_LayerData_CPU& i_layerData);
+	UpSampling_CPU(Gravisbell::GUID guid, class UpSampling_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct);
 	/** デストラクタ */
 	virtual ~UpSampling_CPU();
 

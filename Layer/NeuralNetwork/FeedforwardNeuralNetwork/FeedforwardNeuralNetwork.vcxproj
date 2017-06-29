@@ -191,6 +191,7 @@
     <ClInclude Include="..\..\..\include\DataFormat\Binary\IDataFormat.h" />
     <ClInclude Include="..\..\..\include\DataFormat\IDataFormatBase.h" />
     <ClInclude Include="..\..\..\include\DataFormat\StringArray\IDataFormat.h" />
+    <ClInclude Include="..\..\..\include\Layer\Connect\ILayerConnectData.h" />
     <ClInclude Include="..\..\..\include\Layer\ILayerBase.h" />
     <ClInclude Include="..\..\..\include\Layer\ILayerData.h" />
     <ClInclude Include="..\..\..\include\Layer\IOData\IDataLayer.h" />

@@ -13,8 +13,10 @@ using namespace Gravisbell::Layer::NeuralNetwork;
 
 
 /** コンストラクタ */
-FullyConnect_Base::FullyConnect_Base(Gravisbell::GUID guid)
+FullyConnect_Base::FullyConnect_Base(Gravisbell::GUID guid, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct)
 	:	guid				(guid)
+	,	inputDataStruct		(i_inputDataStruct)
+	,	outputDataStruct	(i_outputDataStruct)
 	,	pLearnData			(NULL)
 {
 }
@@ -73,13 +75,13 @@ const SettingData::Standard::IData* FullyConnect_Base::GetLayerStructure()const
 	@return	入力データ構造 */
 IODataStruct FullyConnect_Base::GetInputDataStruct()const
 {
-	return this->GetLayerData().GetInputDataStruct();
+	return this->inputDataStruct;
 }
 
 /** 入力バッファ数を取得する. */
 unsigned int FullyConnect_Base::GetInputBufferCount()const
 {
-	return this->GetLayerData().GetInputBufferCount();
+	return this->GetInputDataStruct().GetDataCount();
 }
 
 
@@ -89,13 +91,13 @@ unsigned int FullyConnect_Base::GetInputBufferCount()const
 /** 出力データ構造を取得する */
 IODataStruct FullyConnect_Base::GetOutputDataStruct()const
 {
-	return this->GetLayerData().GetOutputDataStruct();
+	return this->outputDataStruct;
 }
 
 /** 出力バッファ数を取得する */
 unsigned int FullyConnect_Base::GetOutputBufferCount()const
 {
-	return this->GetLayerData().GetOutputBufferCount();
+	return this->GetOutputDataStruct().GetDataCount();
 }
 
 

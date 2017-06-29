@@ -25,8 +25,8 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	Convolution_GPU::Convolution_GPU(Gravisbell::GUID guid, Convolution_LayerData_GPU& i_layerData)
-		:	Convolution_Base	(guid)
+	Convolution_GPU::Convolution_GPU(Gravisbell::GUID guid, Convolution_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct)
+		:	Convolution_Base	(guid, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
 		,	layerData			(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount	(0)		/**< 入力バッファ数 */
 		,	neuronCount			(0)		/**< ニューロン数 */
@@ -151,16 +151,16 @@ namespace NeuralNetwork {
 		std::vector<S32> dimStride;
 		std::vector<S32> dimUpscale;
 		std::vector<S32> dimPadding;
-		if(this->layerData.inputDataStruct.z > 1)
+		if(this->inputDataStruct.z > 1)
 		{
 			dataDim = 1 + 1 + 3;
 
 			dimInput.resize(dataDim);
 			dimInput[0] = this->batchSize;
-			dimInput[1] = this->layerData.inputDataStruct.ch;
-			dimInput[2] = this->layerData.inputDataStruct.z;
-			dimInput[3] = this->layerData.inputDataStruct.y;
-			dimInput[4] = this->layerData.inputDataStruct.x;
+			dimInput[1] = this->inputDataStruct.ch;
+			dimInput[2] = this->inputDataStruct.z;
+			dimInput[3] = this->inputDataStruct.y;
+			dimInput[4] = this->inputDataStruct.x;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2] * dimInput[3] * dimInput[4];
@@ -171,7 +171,7 @@ namespace NeuralNetwork {
 
 			dimBias.resize(dataDim);
 			dimBias[0] = 1;
-			dimBias[1] = this->layerData.GetOutputDataStruct().ch;
+			dimBias[1] = this->GetOutputDataStruct().ch;
 			dimBias[2] = 1;
 			dimBias[3] = 1;
 			dimBias[4] = 1;
@@ -188,8 +188,8 @@ namespace NeuralNetwork {
 			filterDim = 1 + 1 + 3;	// 入力チャンネル + 出力チャンネル + 次元3
 
 			dimFilter.resize(filterDim);
-			dimFilter[0] = this->layerData.GetOutputDataStruct().ch;
-			dimFilter[1] = this->layerData.inputDataStruct.ch;
+			dimFilter[0] = this->GetOutputDataStruct().ch;
+			dimFilter[1] = this->inputDataStruct.ch;
 			dimFilter[2] = this->layerData.layerStructure.FilterSize.z;
 			dimFilter[3] = this->layerData.layerStructure.FilterSize.y;
 			dimFilter[4] = this->layerData.layerStructure.FilterSize.x;
@@ -211,15 +211,15 @@ namespace NeuralNetwork {
 			dimStride[1] = this->layerData.layerStructure.Stride.y;
 			dimStride[2] = this->layerData.layerStructure.Stride.x;
 		}
-		else if(this->layerData.inputDataStruct.y > 1 || this->layerData.inputDataStruct.x > 1)
+		else if(this->inputDataStruct.y > 1 || this->inputDataStruct.x > 1)
 		{
 			dataDim = 1 + 1 + 2;
 
 			dimInput.resize(dataDim);
 			dimInput[0] = this->batchSize;
-			dimInput[1] = this->layerData.inputDataStruct.ch;
-			dimInput[2] = this->layerData.inputDataStruct.y;
-			dimInput[3] = this->layerData.inputDataStruct.x;
+			dimInput[1] = this->inputDataStruct.ch;
+			dimInput[2] = this->inputDataStruct.y;
+			dimInput[3] = this->inputDataStruct.x;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2] * dimInput[3];
@@ -229,7 +229,7 @@ namespace NeuralNetwork {
 
 			dimBias.resize(dataDim);
 			dimBias[0] = 1;
-			dimBias[1] = this->layerData.GetOutputDataStruct().ch;
+			dimBias[1] = this->GetOutputDataStruct().ch;
 			dimBias[2] = 1;
 			dimBias[3] = 1;
 
@@ -244,8 +244,8 @@ namespace NeuralNetwork {
 			filterDim = 1 + 1 + 2;	// 入力チャンネル + 出力チャンネル + 次元3
 
 			dimFilter.resize(filterDim);
-			dimFilter[0] = this->layerData.GetOutputDataStruct().ch;
-			dimFilter[1] = this->layerData.inputDataStruct.ch;
+			dimFilter[0] = this->GetOutputDataStruct().ch;
+			dimFilter[1] = this->inputDataStruct.ch;
 			dimFilter[2] = this->layerData.layerStructure.FilterSize.y;
 			dimFilter[3] = this->layerData.layerStructure.FilterSize.x;
 
@@ -263,14 +263,14 @@ namespace NeuralNetwork {
 			dimStride[0] = this->layerData.layerStructure.Stride.y;
 			dimStride[1] = this->layerData.layerStructure.Stride.x;
 		}
-		else if(this->layerData.inputDataStruct.x > 1)
+		else if(this->inputDataStruct.x > 1)
 		{
 			dataDim = 1 + 1 + 1;
 
 			dimInput.resize(dataDim);
 			dimInput[0] = this->batchSize;
-			dimInput[1] = this->layerData.inputDataStruct.ch;
-			dimInput[2] = this->layerData.inputDataStruct.x;
+			dimInput[1] = this->inputDataStruct.ch;
+			dimInput[2] = this->inputDataStruct.x;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2];
@@ -279,7 +279,7 @@ namespace NeuralNetwork {
 
 			dimBias.resize(dataDim);
 			dimBias[0] = 1;
-			dimBias[1] = this->layerData.GetOutputDataStruct().ch;
+			dimBias[1] = this->GetOutputDataStruct().ch;
 			dimBias[2] = 1;
 
 			dimBiasStride.resize(dataDim);
@@ -292,8 +292,8 @@ namespace NeuralNetwork {
 			filterDim = 1 + 1 + 1;	// 入力チャンネル + 出力チャンネル + 次元3
 
 			dimFilter.resize(filterDim);
-			dimFilter[0] = this->layerData.GetOutputDataStruct().ch;
-			dimFilter[1] = this->layerData.inputDataStruct.ch;
+			dimFilter[0] = this->GetOutputDataStruct().ch;
+			dimFilter[1] = this->inputDataStruct.ch;
 			dimFilter[2] = this->layerData.layerStructure.FilterSize.x;
 
 			convDim = 1;	// 次元3
@@ -511,7 +511,7 @@ namespace NeuralNetwork {
 		if(this->pLearnData != NULL)
 			delete this->pLearnData;
 		this->pLearnData = data.Clone();
-		this->pLearnData->WriteToStruct((BYTE*)&this->learnData);
+//		this->pLearnData->WriteToStruct((BYTE*)&this->learnData);
 
 
 

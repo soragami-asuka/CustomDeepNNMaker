@@ -42,7 +42,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	MergeInput_CPU(Gravisbell::GUID guid, class MergeInput_LayerData_CPU& i_layerData);
+	MergeInput_CPU(Gravisbell::GUID guid, class MergeInput_LayerData_CPU& i_layerData, const std::vector<IODataStruct>& i_lpInputDataStruct);
 	/** デストラクタ */
 	virtual ~MergeInput_CPU();
 

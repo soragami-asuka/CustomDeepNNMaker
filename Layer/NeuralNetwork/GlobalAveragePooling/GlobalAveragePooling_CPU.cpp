@@ -22,8 +22,8 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	GlobalAveragePooling_CPU::GlobalAveragePooling_CPU(Gravisbell::GUID guid, GlobalAveragePooling_LayerData_CPU& i_layerData)
-		:	GlobalAveragePooling_Base		(guid)
+	GlobalAveragePooling_CPU::GlobalAveragePooling_CPU(Gravisbell::GUID guid, GlobalAveragePooling_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct)
+		:	GlobalAveragePooling_Base		(guid, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount				(0)		/**< 入力バッファ数 */
 		,	outputBufferCount				(0)		/**< 出力バッファ数 */
@@ -154,7 +154,7 @@ namespace NeuralNetwork {
 
 		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 		{
-			for(U32 ch=0; ch<this->layerData.outputDataStruct.ch; ch++)
+			for(U32 ch=0; ch<this->outputDataStruct.ch; ch++)
 			{
 				F64 tmp = 0.0;
 				for(U32 bufNum=0; bufNum<this->chSize; bufNum++)
@@ -220,7 +220,7 @@ namespace NeuralNetwork {
 
 			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
 			{
-				for(U32 ch=0; ch<this->layerData.outputDataStruct.ch; ch++)
+				for(U32 ch=0; ch<this->outputDataStruct.ch; ch++)
 				{
 					for(U32 bufNum=0; bufNum<this->chSize; bufNum++)
 					{

@@ -47,7 +47,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	FullyConnect_CPU(Gravisbell::GUID guid, class FullyConnect_LayerData_CPU& i_layerData);
+	FullyConnect_CPU(Gravisbell::GUID guid, class FullyConnect_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct);
 	/** デストラクタ */
 	virtual ~FullyConnect_CPU();
 

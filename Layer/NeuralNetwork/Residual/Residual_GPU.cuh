@@ -50,7 +50,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	Residual_GPU(Gravisbell::GUID guid, class Residual_LayerData_GPU& i_layerData);
+	Residual_GPU(Gravisbell::GUID guid, class Residual_LayerData_GPU& i_layerData, const std::vector<IODataStruct>& i_lpInputDataStruct);
 	/** デストラクタ */
 	virtual ~Residual_GPU();
 

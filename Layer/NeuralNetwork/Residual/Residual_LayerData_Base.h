@@ -4,9 +4,7 @@
 #ifndef __Residual_DATA_BASE_H__
 #define __Residual_DATA_BASE_H__
 
-#include<Layer/IO/IMultInputLayerData.h>
-#include<Layer/IO/ISingleOutputLayerData.h>
-#include<Layer/NeuralNetwork/INNLayer.h>
+#include<Layer/ILayerData.h>
 
 #include<vector>
 
@@ -19,13 +17,10 @@ namespace NeuralNetwork {
 	
 	typedef F32 NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class Residual_LayerData_Base : public IO::IMultInputLayerData, public IO::ISingleOutputLayerData
+	class Residual_LayerData_Base : public ILayerData
 	{
 	protected:
 		Gravisbell::GUID guid;	/**< レイヤーデータ識別用のGUID */
-
-		std::vector<IODataStruct> lpInputDataStruct;	/**< 入力データ構造 */
-		IODataStruct outputDataStruct;	/**< 出力データ構造 */
 
 		SettingData::Standard::IData* pLayerStructure;	/**< レイヤー構造を定義したコンフィグクラス */
 //		Residual::LayerStructure layerStructure;	/**< レイヤー構造 */
@@ -64,7 +59,7 @@ namespace NeuralNetwork {
 			@param	i_config			設定情報
 			@oaram	i_inputDataStruct	入力データ構造情報
 			@return	成功した場合0 */
-		ErrorCode Initialize(const SettingData::Standard::IData& i_data, const IODataStruct i_lpInputDataStruct[], U32 i_inputDataCount);
+		ErrorCode Initialize(const SettingData::Standard::IData& i_data);
 		/** 初期化. バッファからデータを読み込む
 			@param i_lpBuffer	読み込みバッファの先頭アドレス.
 			@param i_bufferSize	読み込み可能バッファのサイズ.
@@ -95,30 +90,24 @@ namespace NeuralNetwork {
 			@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
 		S32 WriteToBuffer(BYTE* o_lpBuffer)const;
 
-		//===========================
-		// 入力レイヤー関連
-		//===========================
+
 	public:
-		/** 入力データの数を取得する */
-		U32 GetInputDataCount()const;
-
-		/** 入力データ構造を取得する.
-			@return	入力データ構造 */
-		IODataStruct GetInputDataStruct(U32 i_dataNum)const;
-
-		/** 入力バッファ数を取得する. */
-		U32 GetInputBufferCount(U32 i_dataNum)const;
-
-
 		//===========================
-		// 出力レイヤー関連
+		// レイヤー構造
 		//===========================
-	public:
-		/** 出力データ構造を取得する */
-		IODataStruct GetOutputDataStruct()const;
+		/** 入力データ構造が使用可能か確認する.
+			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+			@return	使用可能な入力データ構造の場合trueが返る. */
+		bool CheckCanUseInputDataStruct(const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
 
-		/** 出力バッファ数を取得する */
-		unsigned int GetOutputBufferCount()const;
+		/** 出力データ構造を取得する.
+			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+			@return	入力データ構造が不正な場合(x=0,y=0,z=0,ch=0)が返る. */
+		IODataStruct GetOutputDataStruct(const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
+
+		/** 複数出力が可能かを確認する */
+		bool CheckCanHaveMultOutputLayer(void);
+
 		
 
 		//===========================

@@ -14,9 +14,7 @@ namespace NeuralNetwork {
 
 	/** コンストラクタ */
 	Pooling_LayerData_Base::Pooling_LayerData_Base(const Gravisbell::GUID& guid)
-		:	ISingleInputLayerData(), ISingleOutputLayerData()
-		,	guid	(guid)
-		,	inputDataStruct	()	/**< 入力データ構造 */
+		:	guid	(guid)
 		,	pLayerStructure	(NULL)	/**< レイヤー構造を定義したコンフィグクラス */
 		,	layerStructure	()		/**< レイヤー構造 */
 	{
@@ -57,19 +55,13 @@ namespace NeuralNetwork {
 		@return	成功した場合0 */
 	ErrorCode Pooling_LayerData_Base::Initialize(void)
 	{
-		// 出力データ構造を決定する
-		this->outputDataStruct.ch =  this->inputDataStruct.ch;
-		this->outputDataStruct.z  = 1 + (this->inputDataStruct.z - this->layerStructure.FilterSize.z) / this->layerStructure.Stride.z;
-		this->outputDataStruct.y  = 1 + (this->inputDataStruct.y - this->layerStructure.FilterSize.y) / this->layerStructure.Stride.y;
-		this->outputDataStruct.x  = 1 + (this->inputDataStruct.x - this->layerStructure.FilterSize.x) / this->layerStructure.Stride.x;
-
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 	/** 初期化. 各ニューロンの値をランダムに初期化
 		@param	i_config			設定情報
 		@oaram	i_inputDataStruct	入力データ構造情報
 		@return	成功した場合0 */
-	ErrorCode Pooling_LayerData_Base::Initialize(const SettingData::Standard::IData& i_data, const IODataStruct& i_inputDataStruct)
+	ErrorCode Pooling_LayerData_Base::Initialize(const SettingData::Standard::IData& i_data)
 	{
 		ErrorCode err;
 
@@ -77,9 +69,6 @@ namespace NeuralNetwork {
 		err = this->SetLayerConfig(i_data);
 		if(err != ErrorCode::ERROR_CODE_NONE)
 			return err;
-
-		// 入力データ構造の設定
-		this->inputDataStruct = i_inputDataStruct;
 
 		return this->Initialize();
 	}
@@ -90,10 +79,6 @@ namespace NeuralNetwork {
 	ErrorCode Pooling_LayerData_Base::InitializeFromBuffer(const BYTE* i_lpBuffer, U32 i_bufferSize, S32& o_useBufferSize)
 	{
 		int readBufferByte = 0;
-
-		// 入力データ構造
-		memcpy(&this->inputDataStruct, &i_lpBuffer[readBufferByte], sizeof(this->inputDataStruct));
-		readBufferByte += sizeof(this->inputDataStruct);
 
 		// 設定情報
 		S32 useBufferByte = 0;
@@ -165,9 +150,6 @@ namespace NeuralNetwork {
 		if(pLayerStructure == NULL)
 			return 0;
 
-		// 入力データ構造
-		bufferSize += sizeof(this->inputDataStruct);
-
 		// 設定情報
 		bufferSize += pLayerStructure->GetUseBufferByteCount();
 
@@ -185,10 +167,6 @@ namespace NeuralNetwork {
 
 		int writeBufferByte = 0;
 
-		// 入力データ構造
-		memcpy(&o_lpBuffer[writeBufferByte], &this->inputDataStruct, sizeof(this->inputDataStruct));
-		writeBufferByte += sizeof(this->inputDataStruct);
-
 		// 設定情報
 		writeBufferByte += this->pLayerStructure->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
 
@@ -198,38 +176,56 @@ namespace NeuralNetwork {
 
 
 	//===========================
-	// 入力レイヤー関連
+	// レイヤー構造
 	//===========================
-	/** 入力データ構造を取得する.
-		@return	入力データ構造 */
-	IODataStruct Pooling_LayerData_Base::GetInputDataStruct()const
+	/** 入力データ構造が使用可能か確認する.
+		@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+		@return	使用可能な入力データ構造の場合trueが返る. */
+	bool Pooling_LayerData_Base::CheckCanUseInputDataStruct(const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
 	{
-		return this->inputDataStruct;
+		if(i_inputLayerCount == 0)
+			return false;
+		if(i_inputLayerCount > 1)
+			return false;
+		if(i_lpInputDataStruct == NULL)
+			return false;
+		if(i_lpInputDataStruct[0].x == 0)
+			return false;
+		if(i_lpInputDataStruct[0].y == 0)
+			return false;
+		if(i_lpInputDataStruct[0].z == 0)
+			return false;
+		if(i_lpInputDataStruct[0].ch == 0)
+			return false;
+
+		return true;
 	}
 
-	/** 入力バッファ数を取得する. */
-	U32 Pooling_LayerData_Base::GetInputBufferCount()const
+	/** 出力データ構造を取得する.
+		@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+		@return	入力データ構造が不正な場合(x=0,y=0,z=0,ch=0)が返る. */
+	IODataStruct Pooling_LayerData_Base::GetOutputDataStruct(const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
 	{
-		return this->inputDataStruct.GetDataCount();
+		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
+			return IODataStruct(0,0,0,0);
+
+		// 出力データ構造を決定する
+		IODataStruct outputDataStruct;
+		outputDataStruct.ch = i_lpInputDataStruct[0].ch;
+		outputDataStruct.z  = 1 + (i_lpInputDataStruct[0].z - this->layerStructure.FilterSize.z) / this->layerStructure.Stride.z;
+		outputDataStruct.y  = 1 + (i_lpInputDataStruct[0].y - this->layerStructure.FilterSize.y) / this->layerStructure.Stride.y;
+		outputDataStruct.x  = 1 + (i_lpInputDataStruct[0].x - this->layerStructure.FilterSize.x) / this->layerStructure.Stride.x;
+
+		return outputDataStruct;
+	}
+
+	/** 複数出力が可能かを確認する */
+	bool Pooling_LayerData_Base::CheckCanHaveMultOutputLayer(void)
+	{
+		return false;
 	}
 
 
-	//===========================
-	// 出力レイヤー関連
-	//===========================
-	/** 出力データ構造を取得する */
-	IODataStruct Pooling_LayerData_Base::GetOutputDataStruct()const
-	{
-		return this->outputDataStruct;
-	}
-
-	/** 出力バッファ数を取得する */
-	unsigned int Pooling_LayerData_Base::GetOutputBufferCount()const
-	{
-		return GetOutputDataStruct().GetDataCount();
-	}
-
-	
 	//===========================
 	// 固有関数
 	//===========================

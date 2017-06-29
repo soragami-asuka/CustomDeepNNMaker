@@ -64,7 +64,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	Convolution_GPU(Gravisbell::GUID guid, class Convolution_LayerData_GPU& i_layerData);
+	Convolution_GPU(Gravisbell::GUID guid, class Convolution_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct);
 	/** デストラクタ */
 	virtual ~Convolution_GPU();
 

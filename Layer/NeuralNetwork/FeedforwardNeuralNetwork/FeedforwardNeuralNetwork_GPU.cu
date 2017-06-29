@@ -8,6 +8,8 @@
 #include"FeedforwardNeuralNetwork_Base.h"
 #include"FeedforwardNeuralNetwork_GPU.cuh"
 
+#include"FeedforwardNeuralNetwork_LayerData_Base.h"
+
 // CUDA用
 #pragma warning(push)
 #pragma warning(disable : 4267)
@@ -20,8 +22,8 @@ namespace Layer {
 namespace NeuralNetwork {
 
 	/** コンストラクタ */
-	FeedforwardNeuralNetwork_GPU::FeedforwardNeuralNetwork_GPU(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData)
-		:	FeedforwardNeuralNetwork_Base(i_guid, i_layerData)
+	FeedforwardNeuralNetwork_GPU::FeedforwardNeuralNetwork_GPU(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct)
+		:	FeedforwardNeuralNetwork_Base	(i_guid, i_layerData, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
 	{
 	}
 	/** デストラクタ */

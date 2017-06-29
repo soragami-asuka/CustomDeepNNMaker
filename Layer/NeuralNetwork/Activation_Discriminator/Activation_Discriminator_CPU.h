@@ -49,7 +49,7 @@ private:
 
 public:
 	/** コンストラクタ */
-	Activation_Discriminator_CPU(Gravisbell::GUID guid, class Activation_Discriminator_LayerData_CPU& i_layerData);
+	Activation_Discriminator_CPU(Gravisbell::GUID guid, class Activation_Discriminator_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct);
 	/** デストラクタ */
 	virtual ~Activation_Discriminator_CPU();
 

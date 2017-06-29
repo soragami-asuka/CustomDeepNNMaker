@@ -42,7 +42,7 @@ namespace NeuralNetwork {
 		Utility::Random::Initialize(0);
 
 		// 入力バッファ数を確認
-		U32 inputBufferCount = this->inputDataStruct.ch * this->layerStructure.FilterSize.z * this->layerStructure.FilterSize.y * this->layerStructure.FilterSize.x;
+		U32 inputBufferCount = this->layerStructure.Input_Channel * this->layerStructure.FilterSize.z * this->layerStructure.FilterSize.y * this->layerStructure.FilterSize.x;
 		if(inputBufferCount == 0)
 			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_VALUERANGE;
 
@@ -50,12 +50,6 @@ namespace NeuralNetwork {
 		U32 neuronCount = this->layerStructure.Output_Channel;
 		if(neuronCount == 0)
 			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_VALUERANGE;
-
-		// 畳みこみ回数を計算
-		this->convolutionCountVec.x = (S32)ceilf((F32)((this->inputDataStruct.x + this->layerStructure.Padding.x*2 - (this->layerStructure.FilterSize.x - 1)) / this->layerStructure.Stride.x));
-		this->convolutionCountVec.y = (S32)ceilf((F32)((this->inputDataStruct.y + this->layerStructure.Padding.y*2 - (this->layerStructure.FilterSize.y - 1)) / this->layerStructure.Stride.y));
-		this->convolutionCountVec.z = (S32)ceilf((F32)((this->inputDataStruct.z + this->layerStructure.Padding.z*2 - (this->layerStructure.FilterSize.z - 1)) / this->layerStructure.Stride.z));
-		this->convolutionCount = this->convolutionCountVec.x * this->convolutionCountVec.y * this->convolutionCountVec.z;
 
 		// バッファを確保しつつ、初期値を設定
 //		float maxArea = sqrt(6.0f / (this->GetInputBufferCount() + this->GetOutputBufferCount()));
@@ -84,7 +78,7 @@ namespace NeuralNetwork {
 		@param	i_config			設定情報
 		@oaram	i_inputDataStruct	入力データ構造情報
 		@return	成功した場合0 */
-	ErrorCode Convolution_LayerData_CPU::Initialize(const SettingData::Standard::IData& i_data, const IODataStruct& i_inputDataStruct)
+	ErrorCode Convolution_LayerData_CPU::Initialize(const SettingData::Standard::IData& i_data)
 	{
 		ErrorCode err;
 
@@ -92,9 +86,6 @@ namespace NeuralNetwork {
 		err = this->SetLayerConfig(i_data);
 		if(err != ErrorCode::ERROR_CODE_NONE)
 			return err;
-
-		// 入力データ構造の設定
-		this->inputDataStruct = i_inputDataStruct;
 
 		// 初期化
 		err = this->Initialize();
@@ -115,10 +106,6 @@ namespace NeuralNetwork {
 	ErrorCode Convolution_LayerData_CPU::InitializeFromBuffer(const BYTE* i_lpBuffer, U32 i_bufferSize, S32& o_useBufferSize )
 	{
 		int readBufferByte = 0;
-
-		// 入力データ構造
-		memcpy(&this->inputDataStruct, &i_lpBuffer[readBufferByte], sizeof(this->inputDataStruct));
-		readBufferByte += sizeof(this->inputDataStruct);
 
 		// 設定情報
 		S32 useBufferByte = 0;
@@ -173,10 +160,6 @@ namespace NeuralNetwork {
 
 		int writeBufferByte = 0;
 
-		// 入力データ構造
-		memcpy(&o_lpBuffer[writeBufferByte], &this->inputDataStruct, sizeof(this->inputDataStruct));
-		writeBufferByte += sizeof(this->inputDataStruct);
-
 		// 設定情報
 		writeBufferByte += this->pLayerStructure->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
 
@@ -204,9 +187,12 @@ namespace NeuralNetwork {
 	//===========================
 	/** レイヤーを作成する.
 		@param guid	新規生成するレイヤーのGUID. */
-	ILayerBase* Convolution_LayerData_CPU::CreateLayer(const Gravisbell::GUID& guid)
+	ILayerBase* Convolution_LayerData_CPU::CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
 	{
-		return new Convolution_CPU(guid, *this);
+		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
+			return NULL;
+
+		return new Convolution_CPU(guid, *this, i_lpInputDataStruct[0]);
 	}
 
 
@@ -231,7 +217,7 @@ using namespace Gravisbell;
 /** Create a layer for CPU processing.
   * @param GUID of layer to create.
   */
-EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPU(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const Gravisbell::SettingData::Standard::IData& i_data, const Gravisbell::IODataStruct& i_inputDataStruct)
+EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPU(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const Gravisbell::SettingData::Standard::IData& i_data)
 {
 	// 作成
 	Gravisbell::Layer::NeuralNetwork::Convolution_LayerData_CPU* pLayerData = new Gravisbell::Layer::NeuralNetwork::Convolution_LayerData_CPU(guid);
@@ -239,7 +225,7 @@ EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPU(const Gravisbell::L
 		return NULL;
 
 	// 初期化
-	Gravisbell::ErrorCode errCode = pLayerData->Initialize(i_data, i_inputDataStruct);
+	Gravisbell::ErrorCode errCode = pLayerData->Initialize(i_data);
 	if(errCode != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 	{
 		delete pLayerData;

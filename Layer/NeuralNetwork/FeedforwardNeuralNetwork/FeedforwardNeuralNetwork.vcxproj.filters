@@ -58,6 +58,9 @@
     <Filter Include="Layer">
       <UniqueIdentifier>{872aa6db-3874-4e32-8b55-b6e49838430d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\Layer\Connect">
+      <UniqueIdentifier>{e979b000-9d2b-4852-a297-475409d963eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -200,6 +203,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingle2SingleLayer.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\Connect\ILayerConnectData.h">
+      <Filter>include\Layer\Connect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

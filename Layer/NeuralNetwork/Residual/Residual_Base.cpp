@@ -12,8 +12,10 @@ using namespace Gravisbell::Layer::NeuralNetwork;
 
 
 /** コンストラクタ */
-Residual_Base::Residual_Base(Gravisbell::GUID guid)
+Residual_Base::Residual_Base(Gravisbell::GUID guid, const std::vector<IODataStruct>& i_lpInputDataStruct, const IODataStruct& i_outputDataStruct)
 	:	guid				(guid)
+	,	lpInputDataStruct	(i_lpInputDataStruct)
+	,	outputDataStruct	(i_outputDataStruct)
 	,	pLearnData			(NULL)
 {
 }
@@ -71,20 +73,23 @@ const SettingData::Standard::IData* Residual_Base::GetLayerStructure()const
 /** 入力データの数を取得する */
 U32 Residual_Base::GetInputDataCount()const
 {
-	return this->GetLayerData().GetInputDataCount();
+	return (U32)this->lpInputDataStruct.size();
 }
 
 /** 入力データ構造を取得する.
 	@return	入力データ構造 */
 IODataStruct Residual_Base::GetInputDataStruct(U32 i_dataNum)const
 {
-	return this->GetLayerData().GetInputDataStruct(i_dataNum);
+	if(i_dataNum >= this->GetInputDataCount())
+		return IODataStruct(0,0,0,0);
+
+	return this->lpInputDataStruct[i_dataNum];
 }
 
 /** 入力バッファ数を取得する. */
 unsigned int Residual_Base::GetInputBufferCount(U32 i_dataNum)const
 {
-	return this->GetLayerData().GetInputBufferCount(i_dataNum);
+	return this->GetInputDataStruct(i_dataNum).GetDataCount();
 }
 
 
@@ -94,13 +99,13 @@ unsigned int Residual_Base::GetInputBufferCount(U32 i_dataNum)const
 /** 出力データ構造を取得する */
 IODataStruct Residual_Base::GetOutputDataStruct()const
 {
-	return this->GetLayerData().GetOutputDataStruct();
+	return this->outputDataStruct;
 }
 
 /** 出力バッファ数を取得する */
 unsigned int Residual_Base::GetOutputBufferCount()const
 {
-	return this->GetLayerData().GetOutputBufferCount();
+	return this->GetOutputDataStruct().GetDataCount();
 }
 
 
