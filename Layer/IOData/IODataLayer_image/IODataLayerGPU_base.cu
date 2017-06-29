@@ -16,7 +16,7 @@
 #include<boost/uuid/uuid_generators.hpp>
 
 
-#define BLOCK_SIZE	(16)
+#define BLOCK_SIZE	(128)
 
 using namespace Gravisbell;
 
@@ -214,7 +214,7 @@ namespace IOData {
 		if(this->lpDInputBuffer.size())
 		{
 			// データをコピー
-			this->lpDInputBuffer = this->lpOutputBuffer;
+			cudaMemcpy(thrust::raw_pointer_cast(&this->lpDInputBuffer[0]), thrust::raw_pointer_cast(&this->lpOutputBuffer[0]), sizeof(F32)*this->GetBufferCount()*this->batchSize, cudaMemcpyDeviceToDevice);
 
 			// データの誤差を計算
 			{
@@ -269,22 +269,30 @@ namespace IOData {
 		o_ave2 = 0.0f;
 		o_crossEntropy = 0.0f;
 
-		for(U32 inputNum=0; inputNum<this->GetBufferCount(); inputNum++)
-		{
-			F32 errorValue_max  = this->lpErrorValue_max[inputNum];
-			F32 errorValue_ave  = this->lpErrorValue_ave[inputNum];
-			F32 errorValue_ave2 = this->lpErrorValue_ave2[inputNum];
-			F32 errorValue_crossEntropy = this->lpErrorValue_crossEntropy[inputNum];
+		std::vector<F32> lpTmporaryBufer(this->GetBufferCount());
 
-			o_max   = max(o_max, errorValue_max);
-			o_ave  += errorValue_ave;
-			o_ave2 += errorValue_ave2;
-			o_crossEntropy += errorValue_crossEntropy;
-		}
+		// max
+		cudaMemcpy(&lpTmporaryBufer[0], thrust::raw_pointer_cast(&this->lpErrorValue_max[0]), sizeof(F32)*lpTmporaryBufer.size(), cudaMemcpyDeviceToHost);
+		for(U32 inputNum=0; inputNum<lpTmporaryBufer.size(); inputNum++)
+			o_max   = max(o_max, lpTmporaryBufer[inputNum]);
 
-		o_ave  = o_ave / this->calcErrorCount / this->GetBufferCount();
-		o_ave2 = (F32)sqrt(o_ave2 / this->calcErrorCount / this->GetBufferCount());
-		o_crossEntropy = o_crossEntropy / this->calcErrorCount / this->GetBufferCount();
+		// ave
+		cudaMemcpy(&lpTmporaryBufer[0], thrust::raw_pointer_cast(&this->lpErrorValue_ave[0]), sizeof(F32)*lpTmporaryBufer.size(), cudaMemcpyDeviceToHost);
+		for(U32 inputNum=0; inputNum<lpTmporaryBufer.size(); inputNum++)
+			o_ave   += lpTmporaryBufer[inputNum];
+		o_ave  = o_ave / this->calcErrorCount / lpTmporaryBufer.size();
+
+		// ave2
+		cudaMemcpy(&lpTmporaryBufer[0], thrust::raw_pointer_cast(&this->lpErrorValue_ave2[0]), sizeof(F32)*lpTmporaryBufer.size(), cudaMemcpyDeviceToHost);
+		for(U32 inputNum=0; inputNum<lpTmporaryBufer.size(); inputNum++)
+			o_ave2   += lpTmporaryBufer[inputNum];
+		o_ave2 = (F32)sqrt(o_ave2 / this->calcErrorCount / lpTmporaryBufer.size());
+
+		// crossEntropy
+		cudaMemcpy(&lpTmporaryBufer[0], thrust::raw_pointer_cast(&this->lpErrorValue_crossEntropy[0]), sizeof(F32)*lpTmporaryBufer.size(), cudaMemcpyDeviceToHost);
+		for(U32 inputNum=0; inputNum<lpTmporaryBufer.size(); inputNum++)
+			o_crossEntropy   += lpTmporaryBufer[inputNum];
+		o_crossEntropy = o_crossEntropy / this->calcErrorCount / lpTmporaryBufer.size();
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

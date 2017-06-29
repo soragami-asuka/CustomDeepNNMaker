@@ -473,7 +473,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 #endif
 
 
-#if 1	// Single
+#if 0	// Single
 		// 2‘w–Ú
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
@@ -590,7 +590,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 #endif
 #endif	// Expand
 
-#elif 0	// MergeInput
+#elif 1	// MergeInput
 		// 1‘w–Ú‚ÌGUID‚ð‹L˜^
 		Gravisbell::GUID lastLayerGUID_A = lastLayerGUID;
 		Gravisbell::GUID lastLayerGUID_B = lastLayerGUID;

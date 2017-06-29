@@ -14,7 +14,7 @@
 // UUID関連用
 #include<boost/uuid/uuid_generators.hpp>
 
-#define BLOCK_SIZE	(16)
+#define BLOCK_SIZE	(128)
 
 using namespace Gravisbell;
 
@@ -34,7 +34,7 @@ namespace
 			U32 inputPos  = batchPos +  inputNum * i_ch + ch;
 			U32 outputPos = batchPos +  ch * i_width * i_height + inputNum;
 
-			o_lpOutputBuffer[outputPos] = i_lpInputBuffer[inputPos] / 0xFF;
+			o_lpOutputBuffer[outputPos] = (F32)i_lpInputBuffer[inputPos] / 0xFF;
 		}
 	}
 }
@@ -168,7 +168,7 @@ namespace IOData {
 				cudaMemcpyAsync(
 					thrust::raw_pointer_cast(&this->lpTmpImageBuffer[batchNum * outputBufferCount]),
 					this->lpBufferList[dataNo],
-					sizeof(U32) * outputBufferCount,
+					sizeof(U08) * outputBufferCount,
 					cudaMemcpyHostToDevice);
 			}
 			cudaThreadSynchronize();
@@ -176,7 +176,7 @@ namespace IOData {
 			// 計算用一時バッファに格納したデータをBYTE > F32, y,x,ch > ch,y,x変換する
 			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
-				U32 bufferCount = this->ioDataStruct.x * this->ioDataStruct.ch;
+				U32 bufferCount = this->ioDataStruct.x * this->ioDataStruct.y * this->ioDataStruct.ch;
 				dim3 grid((bufferCount +(BLOCK_SIZE - 1))/BLOCK_SIZE , 1, 1);
 				dim3 block(BLOCK_SIZE, 1, 1);
 
@@ -185,6 +185,12 @@ namespace IOData {
 					thrust::raw_pointer_cast(&this->lpOutputBuffer[0]),
 					ioDataStruct.x, ioDataStruct.y, ioDataStruct.ch,
 					batchNum);
+
+#if _DEBUG
+				std::vector<F32> lpBuffer(outputBufferCount);
+				cudaMemcpy(&lpBuffer[0], thrust::raw_pointer_cast(&this->lpOutputBuffer[outputBufferCount*batchNum]), sizeof(F32)*outputBufferCount, cudaMemcpyDeviceToHost);
+				lpBuffer.clear();
+#endif
 			}
 
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
