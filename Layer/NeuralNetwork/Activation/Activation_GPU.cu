@@ -15,6 +15,32 @@
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
 
+#define BLOCK_SIZE	(32)
+
+namespace
+{
+	//===========================
+	// Leaky-ReLU
+	//===========================
+	__global__ void cuda_func_activation_LeakyReLU(const F32* i_lpInputBuffer, F32* o_lpOutputBuffer, F32 i_alpha, U32 i_bufferSize)
+	{
+		const U32 inputNum = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+		if(inputNum >= i_bufferSize)	// •ªŠò‚·‚é‚ª––”ö‚Ìwarp‚¾‚¯‚È‚Ì‚ÅAˆ—‘¬“x‚É‰e‹¿‚Í‚È‚¢‚Í‚¸...
+			return;
+
+		o_lpOutputBuffer[inputNum] = i_lpInputBuffer[inputNum] * ((i_lpInputBuffer[inputNum]>0) + i_alpha * (i_lpInputBuffer[inputNum]<=0));
+	}
+	__global__ void cuda_func_dactivation_LeakyReLU(const F32* i_lpOutputBuffer, const F32* i_lpDOutputBuffer, F32* o_lpOutputBuffer, F32 i_alpha, U32 i_bufferSize)
+	{
+		const U32 inputNum = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+		if(inputNum >= i_bufferSize)	// •ªŠò‚·‚é‚ª––”ö‚Ìwarp‚¾‚¯‚È‚Ì‚ÅAˆ—‘¬“x‚É‰e‹¿‚Í‚È‚¢‚Í‚¸...
+			return;
+
+		o_lpOutputBuffer[inputNum] = ((i_lpOutputBuffer[inputNum]>0) + i_alpha * (i_lpOutputBuffer[inputNum]<=0)) * i_lpDOutputBuffer[inputNum];
+	}
+}
+
+
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
@@ -178,6 +204,10 @@ namespace NeuralNetwork {
 										0.0);
 			break;
 
+			// Leaky-ReLU
+		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_LeakyReLU:
+			break;
+
 			// tanh
 		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_tanh:
 			cudnnSetActivationDescriptor(activDesc,
@@ -255,41 +285,66 @@ namespace NeuralNetwork {
 			}
 			break;
 
+			// Leaky-ReLU
+		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_LeakyReLU:
+			{
+				U32 MAX_BUFFER_SIZE = 32768;
+				U32 bufferSize = this->inputBufferCount * this->batchSize;
+				U32 remainingSize = bufferSize;
+				while(remainingSize > 0)
+				{
+					U32 bufferCount = min(remainingSize, MAX_BUFFER_SIZE);
+					dim3 grid((bufferCount +(BLOCK_SIZE - 1))/BLOCK_SIZE , 1, 1);
+					dim3 block(BLOCK_SIZE, 1, 1);
+
+					U32 offset = bufferSize - remainingSize;
+					
+					cuda_func_activation_LeakyReLU<<<grid, block>>>(
+						&i_lpInputBuffer[offset],
+						thrust::raw_pointer_cast(&this->lpOutputBuffer_d[offset]),
+						this->layerData.layerStructure.LeakyReLU_alpha,
+						bufferCount);
+
+					remainingSize = max(0, (S32)remainingSize-(S32)MAX_BUFFER_SIZE);
+				}
+			}	
+			break;
+
 			// softmax
-			case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_ALL:
-			case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_ALL_crossEntropy:
-				{
-					F32 alpha = 1.0f;
-					F32 beta = 0.0f;
-					cudnnStatus_t err =	cudnnSoftmaxForward(
-						this->cudnnHandle,
-						CUDNN_SOFTMAX_ACCURATE,
-						CUDNN_SOFTMAX_MODE_INSTANCE,
-						&alpha,
-						this->inputTensorDesc,
-						this->m_lpInputBuffer_d,
-						&beta,
-						this->outputTensorDesc,
-						thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]));
-				}
-				break;
-			case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_CH:
-			case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_CH_crossEntropy:
-				{
-					F32 alpha = 1.0f;
-					F32 beta = 0.0f;
-					cudnnSoftmaxForward(
-						this->cudnnHandle,
-						CUDNN_SOFTMAX_ACCURATE,
-						CUDNN_SOFTMAX_MODE_CHANNEL,
-						&alpha,
-						this->inputTensorDesc,
-						this->m_lpInputBuffer_d,
-						&beta,
-						this->outputTensorDesc,
-						thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]));
-				}
-				break;
+		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_ALL:
+		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_ALL_crossEntropy:
+			{
+				F32 alpha = 1.0f;
+				F32 beta = 0.0f;
+				cudnnStatus_t err =	cudnnSoftmaxForward(
+					this->cudnnHandle,
+					CUDNN_SOFTMAX_ACCURATE,
+					CUDNN_SOFTMAX_MODE_INSTANCE,
+					&alpha,
+					this->inputTensorDesc,
+					this->m_lpInputBuffer_d,
+					&beta,
+					this->outputTensorDesc,
+					thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]));
+			}
+			break;
+		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_CH:
+		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_CH_crossEntropy:
+			{
+				F32 alpha = 1.0f;
+				F32 beta = 0.0f;
+				cudnnSoftmaxForward(
+					this->cudnnHandle,
+					CUDNN_SOFTMAX_ACCURATE,
+					CUDNN_SOFTMAX_MODE_CHANNEL,
+					&alpha,
+					this->inputTensorDesc,
+					this->m_lpInputBuffer_d,
+					&beta,
+					this->outputTensorDesc,
+					thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]));
+			}
+			break;
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
@@ -383,6 +438,32 @@ namespace NeuralNetwork {
 						);
 				}
 				break;
+
+					// Leaky-ReLU
+				case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_LeakyReLU:
+					{
+						U32 MAX_BUFFER_SIZE = 32768;
+						U32 bufferSize = this->inputBufferCount * this->batchSize;
+						U32 remainingSize = bufferSize;
+						while(remainingSize > 0)
+						{
+							U32 bufferCount = min(remainingSize, MAX_BUFFER_SIZE);
+							dim3 grid((bufferCount +(BLOCK_SIZE - 1))/BLOCK_SIZE , 1, 1);
+							dim3 block(BLOCK_SIZE, 1, 1);
+
+							U32 offset = bufferSize - remainingSize;
+
+							cuda_func_dactivation_LeakyReLU<<<grid, block>>>(
+								thrust::raw_pointer_cast(&this->lpOutputBuffer_d[offset]),
+								&i_lppDOutputBuffer[offset],
+								&o_lppDInputBuffer[offset],
+								this->layerData.layerStructure.LeakyReLU_alpha,
+								bufferCount);
+
+							remainingSize = max(0, (S32)remainingSize-(S32)MAX_BUFFER_SIZE);
+						}
+					}
+					break;
 
 				// softmax
 				case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_ALL:

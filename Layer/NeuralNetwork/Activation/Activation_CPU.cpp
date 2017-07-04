@@ -15,66 +15,6 @@
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
 
-namespace
-{
-	//================================
-	// äàê´âªä÷êî
-	//================================
-	// lenearån
-	F32 func_activation_lenear(F32 x)
-	{
-		return x;
-	}
-	F32 func_dactivation_lenear(F32 x)
-	{
-		return 1;
-	}
-
-	// sigmoidån
-	F32 func_activation_sigmoid(F32 x)
-	{
-		return 1.0f / (1.0f + (F32)exp(-x));
-	}
-	F32 func_dactivation_sigmoid(F32 x)
-	{
-		return x * (1.0f - x);
-	}
-
-	F32 func_activation_sigmoid_crossEntropy(F32 x)
-	{
-		return 1.0f / (1.0f + (F32)exp(-x));
-	}
-	F32 func_dactivation_sigmoid_crossEntropy(F32 x)
-	{
-		return 1.0f;
-	}
-
-	// ReLUån
-	F32 func_activation_ReLU(F32 x)
-	{
-		return x * (x > 0.0f);
-	}
-	F32 func_dactivation_ReLU(F32 x)
-	{
-		return 1.0f * (x > 0.0f);
-	}
-
-	// tanhån
-	F32 func_activation_tanh(F32 x)
-	{
-		return tanh(x);
-	}
-	F32 func_dactivation_tanh(F32 x)
-	{
-		return 1.0f - x*x;
-	}
-
-	// SoftMaxån
-	F32 func_activation_SoftMax(F32 x)
-	{
-		return (F32)exp(x);	// ïΩãœÇÕï Ç…çsÇ§
-	}
-}
 
 
 namespace Gravisbell {
@@ -88,8 +28,8 @@ namespace NeuralNetwork {
 		,	layerData						(i_layerData)	/**< ÉåÉCÉÑÅ[ÉfÅ[É^ */
 		,	inputBufferCount				(0)		/**< ì¸óÕÉoÉbÉtÉ@êî */
 		,	outputBufferCount				(0)		/**< èoóÕÉoÉbÉtÉ@êî */
-		,	func_activation					(func_activation_sigmoid)
-		,	func_dactivation				(func_dactivation_sigmoid)
+		,	func_activation					(&Activation_CPU::func_activation_sigmoid)
+		,	func_dactivation				(&Activation_CPU::func_dactivation_sigmoid)
 	{
 	}
 	/** ÉfÉXÉgÉâÉNÉ^ */
@@ -196,37 +136,43 @@ namespace NeuralNetwork {
 		{
 			// lenear
 		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_lenear:
-			this->func_activation  = ::func_activation_lenear;
-			this->func_dactivation = ::func_dactivation_lenear;
+			this->func_activation  = &Activation_CPU::func_activation_lenear;
+			this->func_dactivation = &Activation_CPU::func_dactivation_lenear;
 			break;
 
 			// Sigmoid
 		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_sigmoid:
 		default:
-			this->func_activation  = ::func_activation_sigmoid;
-			this->func_dactivation = ::func_dactivation_sigmoid;
+			this->func_activation  = &Activation_CPU::func_activation_sigmoid;
+			this->func_dactivation = &Activation_CPU::func_dactivation_sigmoid;
 			break;
 		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_sigmoid_crossEntropy:
-			this->func_activation  = ::func_activation_sigmoid_crossEntropy;
-			this->func_dactivation = ::func_dactivation_sigmoid_crossEntropy;
+			this->func_activation  = &Activation_CPU::func_activation_sigmoid_crossEntropy;
+			this->func_dactivation = &Activation_CPU::func_dactivation_sigmoid_crossEntropy;
 			break;
 
 			// ReLU
 		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_ReLU:
-			this->func_activation  = ::func_activation_ReLU;
-			this->func_dactivation = ::func_dactivation_ReLU;
+			this->func_activation  = &Activation_CPU::func_activation_ReLU;
+			this->func_dactivation = &Activation_CPU::func_dactivation_ReLU;
+			break;
+
+			// Leakey-ReLU
+		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_LeakyReLU:
+			this->func_activation  = &Activation_CPU::func_activation_LeakyReLU;
+			this->func_dactivation = &Activation_CPU::func_dactivation_LeakyReLU;
 			break;
 
 			// SoftMaxån
 		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_ALL:
 		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_CH:
-			this->func_activation  = ::func_activation_SoftMax;
-			this->func_dactivation = ::func_dactivation_sigmoid;
+			this->func_activation  = &Activation_CPU::func_activation_SoftMax;
+			this->func_dactivation = &Activation_CPU::func_dactivation_sigmoid;
 			break;
 		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_ALL_crossEntropy:
 		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_CH_crossEntropy:
-			this->func_activation  = ::func_activation_SoftMax;
-			this->func_dactivation = ::func_dactivation_sigmoid_crossEntropy;
+			this->func_activation  = &Activation_CPU::func_activation_SoftMax;
+			this->func_dactivation = &Activation_CPU::func_dactivation_sigmoid_crossEntropy;
 			break;
 		}
 
@@ -287,7 +233,7 @@ namespace NeuralNetwork {
 				for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
 				{
 					// äàê´âª
-					this->lppBatchOutputBuffer[batchNum][inputNum] = this->func_activation(this->m_lppInputBuffer[batchNum][inputNum]);
+					this->lppBatchOutputBuffer[batchNum][inputNum] = (this->*func_activation)(this->m_lppInputBuffer[batchNum][inputNum]);
 				}
 			}
 			break;
@@ -432,7 +378,7 @@ namespace NeuralNetwork {
 			{
 				for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
 				{
-					this->m_lppDInputBuffer[batchNum][inputNum] = this->func_dactivation(this->lppBatchOutputBuffer[batchNum][inputNum]) * this->m_lppDOutputBufferPrev[batchNum][inputNum];
+					this->m_lppDInputBuffer[batchNum][inputNum] = (this->*func_dactivation)(this->lppBatchOutputBuffer[batchNum][inputNum]) * this->m_lppDOutputBufferPrev[batchNum][inputNum];
 				}
 			}
 		}
@@ -472,6 +418,75 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
+
+
+	//================================
+	// äàê´âªä÷êî
+	//================================
+	// lenearån
+	F32 Activation_CPU::func_activation_lenear(F32 x)
+	{
+		return x;
+	}
+	F32 Activation_CPU::func_dactivation_lenear(F32 x)
+	{
+		return 1;
+	}
+
+	// sigmoidån
+	F32 Activation_CPU::func_activation_sigmoid(F32 x)
+	{
+		return 1.0f / (1.0f + (F32)exp(-x));
+	}
+	F32 Activation_CPU::func_dactivation_sigmoid(F32 x)
+	{
+		return x * (1.0f - x);
+	}
+
+	F32 Activation_CPU::func_activation_sigmoid_crossEntropy(F32 x)
+	{
+		return 1.0f / (1.0f + (F32)exp(-x));
+	}
+	F32 Activation_CPU::func_dactivation_sigmoid_crossEntropy(F32 x)
+	{
+		return 1.0f;
+	}
+
+	// ReLUån
+	F32 Activation_CPU::func_activation_ReLU(F32 x)
+	{
+		return x * (x > 0.0f);
+	}
+	F32 Activation_CPU::func_dactivation_ReLU(F32 x)
+	{
+		return 1.0f * (x > 0.0f);
+	}
+
+	// Leakey-ReLUån
+	F32 Activation_CPU::func_activation_LeakyReLU(F32 x)
+	{
+		return x * ( (x>0.0f) + this->layerData.layerStructure.LeakyReLU_alpha * (x<=0.0f) );
+	}
+	F32 Activation_CPU::func_dactivation_LeakyReLU(F32 x)
+	{
+		return (x>0.0f) + this->layerData.layerStructure.LeakyReLU_alpha * (x<=0.0f);
+	}
+
+	// tanhån
+	F32 Activation_CPU::func_activation_tanh(F32 x)
+	{
+		return tanh(x);
+	}
+	F32 Activation_CPU::func_dactivation_tanh(F32 x)
+	{
+		return 1.0f - x*x;
+	}
+
+	// SoftMaxån
+	F32 Activation_CPU::func_activation_SoftMax(F32 x)
+	{
+		return (F32)exp(x);	// ïΩãœÇÕï Ç…çsÇ§
+	}
 
 } // Gravisbell;
 } // Layer;

@@ -57,11 +57,13 @@ namespace Layer {
 namespace IOData {
 
 	/** コンストラクタ */
-	IODataLayerGPU_base::IODataLayerGPU_base(Gravisbell::GUID guid, Gravisbell::IODataStruct ioDataStruct)
+	IODataLayerGPU_base::IODataLayerGPU_base(Gravisbell::GUID guid, Gravisbell::IODataStruct ioDataStruct, Gravisbell::F32 i_outputMin, Gravisbell::F32 i_outputMax)
 		:	guid				(guid)
 		,	ioDataStruct		(ioDataStruct)
 		,	lpBatchDataNoList	(NULL)
 		,	calcErrorCount		(0)
+		,	outputMin			(i_outputMin)
+		,	outputMax			(i_outputMax)
 	{
 		cublasCreate(&cublasHandle);
 	}

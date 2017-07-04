@@ -56,6 +56,13 @@ namespace Activation {
 			  */
 			ActivationType_ReLU,
 
+			/** Name : Leaky-ReLU
+			  * ID   : LeakyReLU
+			  * Text : y = max(alpha*x, x);
+			  *      : (x=0, y=0)Çí ÇÈ
+			  */
+			ActivationType_LeakyReLU,
+
 			/** Name : tanh(ëoã»ê¸ä÷êî)
 			  * ID   : tanh
 			  * Text : y = sin(x)/cos(x);
@@ -91,6 +98,12 @@ namespace Activation {
 			ActivationType_softmax_CH_crossEntropy,
 
 		}ActivationType;
+
+		/** Name : Leaky-ReLU-Alpha
+		  * ID   : LeakyReLU_alpha
+		  * Text : Leaky-ReLUÇ≈égópÇ∑ÇÈÉøÇÃíl
+		  */
+		S32 LeakyReLU_alpha;
 
 	};
 

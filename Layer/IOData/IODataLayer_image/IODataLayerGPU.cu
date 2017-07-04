@@ -21,7 +21,7 @@ using namespace Gravisbell;
 namespace
 {
 	/** ベクトルの要素同士の掛け算. */
-	__global__ void cuda_func_ConvertImage2Binaryr(const U08* i_lpInputBuffer, F32* o_lpOutputBuffer, U32 i_width, U32 i_height, U32 i_ch, U32 i_bachNum)
+	__global__ void cuda_func_ConvertImage2Binaryr(const U08* i_lpInputBuffer, F32* o_lpOutputBuffer, U32 i_width, U32 i_height, U32 i_ch, U32 i_bachNum, F32 i_outputMin, F32 i_outputMax)
 	{
 		const U32 inputNum = blockIdx.x * BLOCK_SIZE + threadIdx.x;
 		if(inputNum >= i_width*i_height)	// 分岐するが末尾のwarpだけなので、処理速度に影響はないはず...
@@ -34,7 +34,7 @@ namespace
 			U32 inputPos  = batchPos +  inputNum * i_ch + ch;
 			U32 outputPos = batchPos +  ch * i_width * i_height + inputNum;
 
-			o_lpOutputBuffer[outputPos] = (F32)i_lpInputBuffer[inputPos] / 0xFF;
+			o_lpOutputBuffer[outputPos] = (F32)i_lpInputBuffer[inputPos] * (i_outputMax - i_outputMin) / 0xFF + i_outputMin;
 		}
 	}
 }
@@ -52,8 +52,8 @@ namespace IOData {
 
 	public:
 		/** コンストラクタ */
-		IODataLayerGPU(Gravisbell::GUID guid, U32 i_dataCount, Gravisbell::IODataStruct ioDataStruct)
-			:	IODataLayerGPU_base	(guid, ioDataStruct)
+		IODataLayerGPU(Gravisbell::GUID guid, U32 i_dataCount, Gravisbell::IODataStruct ioDataStruct, Gravisbell::F32 i_outputMin, Gravisbell::F32 i_outputMax)
+			:	IODataLayerGPU_base	(guid, ioDataStruct, i_outputMin, i_outputMax)
 		{
 			this->lpBufferList.resize(i_dataCount);
 		}
@@ -184,7 +184,8 @@ namespace IOData {
 					thrust::raw_pointer_cast(&this->lpTmpImageBuffer[0]),
 					thrust::raw_pointer_cast(&this->lpOutputBuffer[0]),
 					ioDataStruct.x, ioDataStruct.y, ioDataStruct.ch,
-					batchNum);
+					batchNum,
+					this->outputMin, this->outputMax);
 
 #if _DEBUG
 				std::vector<F32> lpBuffer(outputBufferCount);
@@ -200,19 +201,19 @@ namespace IOData {
 	/** 入力信号データレイヤーを作成する.GUIDは自動割り当て.CPU制御
 		@param bufferSize	バッファのサイズ.※F32型配列の要素数.
 		@return	入力信号データレイヤーのアドレス */
-	extern IODataLayer_image_API Gravisbell::Layer::IOData::IIODataLayer_image* CreateIODataLayerGPU(Gravisbell::U32 i_dataCount, Gravisbell::U32 i_width, Gravisbell::U32 i_height, Gravisbell::U32 i_ch)
+	extern IODataLayer_image_API Gravisbell::Layer::IOData::IIODataLayer_image* CreateIODataLayerGPU(Gravisbell::U32 i_dataCount, Gravisbell::U32 i_width, Gravisbell::U32 i_height, Gravisbell::U32 i_ch, Gravisbell::F32 i_outputMin, Gravisbell::F32 i_outputMax)
 	{
 		boost::uuids::uuid uuid = boost::uuids::random_generator()();
 
-		return CreateIODataLayerGPUwithGUID(uuid.data, i_dataCount, i_width, i_height, i_ch);
+		return CreateIODataLayerGPUwithGUID(uuid.data, i_dataCount, i_width, i_height, i_ch, i_outputMin, i_outputMax);
 	}
 	/** 入力信号データレイヤーを作成する.CPU制御
 		@param guid			レイヤーのGUID.
 		@param bufferSize	バッファのサイズ.※F32型配列の要素数.
 		@return	入力信号データレイヤーのアドレス */
-	extern IODataLayer_image_API Gravisbell::Layer::IOData::IIODataLayer_image* CreateIODataLayerGPUwithGUID(Gravisbell::GUID guid, Gravisbell::U32 i_dataCount, Gravisbell::U32 i_width, Gravisbell::U32 i_height, Gravisbell::U32 i_ch)
+	extern IODataLayer_image_API Gravisbell::Layer::IOData::IIODataLayer_image* CreateIODataLayerGPUwithGUID(Gravisbell::GUID guid, Gravisbell::U32 i_dataCount, Gravisbell::U32 i_width, Gravisbell::U32 i_height, Gravisbell::U32 i_ch, Gravisbell::F32 i_outputMin, Gravisbell::F32 i_outputMax)
 	{
-		return new Gravisbell::Layer::IOData::IODataLayerGPU(guid, i_dataCount, IODataStruct(i_ch, i_width, i_height, 1));
+		return new Gravisbell::Layer::IOData::IODataLayerGPU(guid, i_dataCount, IODataStruct(i_ch, i_width, i_height, 1), i_outputMin, i_outputMax);
 	}
 
 }	// IOData

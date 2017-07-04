@@ -23,6 +23,30 @@
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
+	
+	struct DInputBufferInfo
+	{
+		U32							maxBufferSize;	/**< 最大バッファサイズ */
+		std::set<Gravisbell::GUID>	lpUseLayerID;	/**< 使用中のレイヤーID */
+
+		DInputBufferInfo()
+			:	maxBufferSize	(0)
+			,	lpUseLayerID	()
+		{
+		}
+		DInputBufferInfo(const DInputBufferInfo& info)
+			:	maxBufferSize	(info.maxBufferSize)
+			,	lpUseLayerID	(lpUseLayerID)
+		{
+		}
+		const DInputBufferInfo& operator=(const DInputBufferInfo& info)
+		{
+			this->maxBufferSize = info.maxBufferSize;
+			this->lpUseLayerID  = info.lpUseLayerID;
+
+			return *this;
+		}
+	};
 
 	
 	//====================================
@@ -842,18 +866,6 @@ namespace NeuralNetwork {
 
 		// レイヤーが使用する入力誤差バッファを割り当てる
 		{
-			struct DInputBufferInfo
-			{
-				U32							maxBufferSize;	/**< 最大バッファサイズ */
-				std::set<Gravisbell::GUID>	lpUseLayerID;	/**< 使用中のレイヤーID */
-
-				DInputBufferInfo()
-					:	maxBufferSize	(0)
-					,	lpUseLayerID	()
-				{
-				}
-			};
-
 			std::map<U32, DInputBufferInfo> lpDInputBufferInfo;	/**< 入力誤差バッファの使用状況<入力誤差バッファのID, 使用中のレイヤーのGUID>  */
 
 			auto it_layer = this->lpCalculateLayerList.rbegin();
@@ -896,15 +908,15 @@ namespace NeuralNetwork {
 
 						// 入力誤差バッファのIDを登録
 						(*it_layer)->SetDInputBufferID(inputNum, useDInputBufferID);
+					}
+				}
 
-						// 自分が使用している入力誤差バッファを開放
-						for(auto& it_DInputBuffer : lpDInputBufferInfo)
-						{
-							if(it_DInputBuffer.second.lpUseLayerID.count((*it_layer)->GetGUID()) > 0)
-							{
-								it_DInputBuffer.second.lpUseLayerID.erase((*it_layer)->GetGUID());
-							}
-						}
+				// 自分が使用している入力誤差バッファを開放
+				for(auto& it_DInputBuffer : lpDInputBufferInfo)
+				{
+					if(it_DInputBuffer.second.lpUseLayerID.count((*it_layer)->GetGUID()) > 0)
+					{
+						it_DInputBuffer.second.lpUseLayerID.erase((*it_layer)->GetGUID());
 					}
 				}
 

@@ -45,8 +45,8 @@ private:
 
 
 	// 活性化関数
-	F32 (*func_activation)(F32);
-	F32 (*func_dactivation)(F32);
+	F32 (Activation_CPU::*func_activation)(F32);
+	F32 (Activation_CPU::*func_dactivation)(F32);
 
 public:
 	/** コンストラクタ */
@@ -137,6 +137,37 @@ public:
 	/** 学習差分を取得する.
 		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
 	ErrorCode GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const;
+
+
+protected:
+	//================================
+	// 活性化関数
+	//================================
+	// lenear系
+	F32 func_activation_lenear(F32 x);
+	F32 func_dactivation_lenear(F32 x);
+
+	// sigmoid系
+	F32 func_activation_sigmoid(F32 x);
+	F32 func_dactivation_sigmoid(F32 x);
+
+	F32 func_activation_sigmoid_crossEntropy(F32 x);
+	F32 func_dactivation_sigmoid_crossEntropy(F32 x);
+
+	// ReLU系
+	F32 func_activation_ReLU(F32 x);
+	F32 func_dactivation_ReLU(F32 x);
+
+	// Leaky-ReLU系
+	F32 func_activation_LeakyReLU(F32 x);
+	F32 func_dactivation_LeakyReLU(F32 x);
+
+	// tanh系
+	F32 func_activation_tanh(F32 x);
+	F32 func_dactivation_tanh(F32 x);
+
+	// SoftMax系
+	F32 func_activation_SoftMax(F32 x);
 
 };
 

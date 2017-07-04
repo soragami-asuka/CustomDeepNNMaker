@@ -50,9 +50,13 @@ namespace IOData {
 
 		cublasHandle_t cublasHandle;
 
+		F32 outputMin;	/**< 出力される最小値 */
+		F32 outputMax;	/**< 出力される最大値 */
+
+
 	public:
 		/** コンストラクタ */
-		IODataLayerGPU_base(Gravisbell::GUID guid, Gravisbell::IODataStruct ioDataStruct);
+		IODataLayerGPU_base(Gravisbell::GUID guid, Gravisbell::IODataStruct ioDataStruct, Gravisbell::F32 i_outputMin, Gravisbell::F32 i_outputMax);
 		/** デストラクタ */
 		virtual ~IODataLayerGPU_base();
 

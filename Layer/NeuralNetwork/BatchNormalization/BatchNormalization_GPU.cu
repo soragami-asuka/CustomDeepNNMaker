@@ -500,6 +500,19 @@ namespace NeuralNetwork {
 		if(err_cudnn != 0)
 			return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
 
+#ifdef _DEBUG
+		std::vector<float> lpTmpInputBuffer(this->batchSize * this->inputBufferCount);
+		cudaMemcpy(&lpTmpInputBuffer[0], this->m_lppInputBuffer, sizeof(float)*lpTmpInputBuffer.size(), cudaMemcpyDeviceToHost);
+
+		std::vector<float> lpTmpOutputBuffer(this->batchSize * this->outputBufferCount);
+		cudaMemcpy(&lpTmpInputBuffer[0], thrust::raw_pointer_cast(&this->lpOutputBuffer[0]), sizeof(float)*lpTmpInputBuffer.size(), cudaMemcpyDeviceToHost);
+
+		std::vector<float> lpTmpDOutputBuffer(this->batchSize * this->outputBufferCount);
+		cudaMemcpy(&lpTmpDOutputBuffer[0], i_lppDOutputBuffer, sizeof(float)*lpTmpDOutputBuffer.size(), cudaMemcpyDeviceToHost);
+
+		std::vector<float> lpTmpDInputBuffer(this->batchSize * this->inputBufferCount);
+		cudaMemcpy(&lpTmpDInputBuffer[0], o_lppDInputBuffer, sizeof(float)*lpTmpDInputBuffer.size(), cudaMemcpyDeviceToHost);
+#endif
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -568,6 +581,42 @@ namespace NeuralNetwork {
 
 		// 学習処理の実行回数をカウントアップ
 		this->learnCount++;
+
+
+#ifdef _DEBUG
+		std::vector<float> lpMean_h(this->layerData.lpMean.size());
+		cudaMemcpy(&lpMean_h[0], thrust::raw_pointer_cast(&this->layerData.lpMean[0]), sizeof(float)*this->layerData.lpMean.size(), cudaMemcpyDeviceToHost);
+
+		std::vector<float> lpVariance_h(this->layerData.lpVariance.size());
+		cudaMemcpy(&lpVariance_h[0], thrust::raw_pointer_cast(&this->layerData.lpVariance[0]), sizeof(float)*this->layerData.lpVariance.size(), cudaMemcpyDeviceToHost);
+
+		std::vector<float> lpDScale_h(this->lpDBias.size());
+		cudaMemcpy(&lpDScale_h[0], thrust::raw_pointer_cast(&this->lpDScale[0]), sizeof(float)*lpDScale_h.size(), cudaMemcpyDeviceToHost);
+
+		std::vector<float> lpDBias_h(this->lpDBias.size());
+		cudaMemcpy(&lpDBias_h[0], thrust::raw_pointer_cast(&this->lpDBias[0]), sizeof(float)*lpDBias_h.size(), cudaMemcpyDeviceToHost);
+
+		std::vector<float> lpScale_h(this->layerData.lpScale.size());
+		cudaMemcpy(&lpScale_h[0], thrust::raw_pointer_cast(&this->layerData.lpScale[0]), sizeof(float)*lpScale_h.size(), cudaMemcpyDeviceToHost);
+
+		std::vector<float> lpBias_h(this->layerData.lpBias.size());
+		cudaMemcpy(&lpBias_h[0], thrust::raw_pointer_cast(&this->layerData.lpBias[0]), sizeof(float)*lpBias_h.size(), cudaMemcpyDeviceToHost);
+
+#endif
+
+#ifdef _DEBUG
+		std::vector<float> lpTmpInputBuffer(this->batchSize * this->inputBufferCount);
+		cudaMemcpy(&lpTmpInputBuffer[0], this->m_lppInputBuffer, sizeof(float)*lpTmpInputBuffer.size(), cudaMemcpyDeviceToHost);
+
+		std::vector<float> lpTmpOutputBuffer(this->batchSize * this->outputBufferCount);
+		cudaMemcpy(&lpTmpOutputBuffer[0], thrust::raw_pointer_cast(&this->lpOutputBuffer[0]), sizeof(float)*lpTmpInputBuffer.size(), cudaMemcpyDeviceToHost);
+
+		std::vector<float> lpTmpDOutputBuffer(this->batchSize * this->outputBufferCount);
+		cudaMemcpy(&lpTmpDOutputBuffer[0], i_lppDOutputBuffer, sizeof(float)*lpTmpDOutputBuffer.size(), cudaMemcpyDeviceToHost);
+
+		std::vector<float> lpTmpDInputBuffer(this->batchSize * this->inputBufferCount);
+		cudaMemcpy(&lpTmpDInputBuffer[0], o_lppDInputBuffer, sizeof(float)*lpTmpDInputBuffer.size(), cudaMemcpyDeviceToHost);
+#endif
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

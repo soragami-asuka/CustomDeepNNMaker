@@ -248,6 +248,24 @@ namespace NeuralNetwork {
 			}
 		}
 
+#ifdef _DEBUG
+		std::vector<float> lpTmpInputBuffer0(this->batchSize * this->lpInputBufferCount[0]);
+		memcpy(&lpTmpInputBuffer0[0], this->m_lppInputBuffer[0][0], sizeof(float)*lpTmpInputBuffer0.size());
+		std::vector<float> lpTmpInputBuffer1(this->batchSize * this->lpInputBufferCount[1]);
+		memcpy(&lpTmpInputBuffer1[0], this->m_lppInputBuffer[1][0], sizeof(float)*lpTmpInputBuffer1.size());
+
+		std::vector<float> lpTmpOutputBuffer(this->batchSize * this->outputBufferCount);
+		memcpy(&lpTmpOutputBuffer[0], &this->lpOutputBuffer[0], sizeof(float)*lpTmpOutputBuffer.size());
+
+		std::vector<float> lpTmpDOutputBuffer(this->batchSize * this->outputBufferCount);
+		memcpy(&lpTmpDOutputBuffer[0], i_lppDOutputBuffer, sizeof(float)*lpTmpDOutputBuffer.size());
+
+		std::vector<float> lpTmpDInputBuffer0(this->batchSize * this->lpInputBufferCount[0]);
+		memcpy(&lpTmpDInputBuffer0[0], o_lppDInputBuffer[0], sizeof(float)*lpTmpDInputBuffer0.size());
+		std::vector<float> lpTmpDInputBuffer1(this->batchSize * this->lpInputBufferCount[1]);
+		memcpy(&lpTmpDInputBuffer1[0], o_lppDInputBuffer[1], sizeof(float)*lpTmpDInputBuffer1.size());
+#endif
+
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

@@ -342,6 +342,21 @@ namespace NeuralNetwork {
 		}
 
 
+#ifdef _DEBUG
+		std::vector<float> lpTmpInputBuffer(this->batchSize * this->inputBufferCount);
+		memcpy(&lpTmpInputBuffer[0], this->m_lppInputBuffer[0], sizeof(float)*lpTmpInputBuffer.size());
+
+		std::vector<float> lpTmpOutputBuffer(this->batchSize * this->outputBufferCount);
+		memcpy(&lpTmpOutputBuffer[0], &this->lpOutputBuffer[0], sizeof(float)*lpTmpOutputBuffer.size());
+
+		std::vector<float> lpTmpDOutputBuffer(this->batchSize * this->outputBufferCount);
+		memcpy(&lpTmpDOutputBuffer[0], i_lppDOutputBuffer, sizeof(float)*lpTmpDOutputBuffer.size());
+
+		std::vector<float> lpTmpDInputBuffer(this->batchSize * this->inputBufferCount);
+		memcpy(&lpTmpDInputBuffer[0], o_lppDInputBuffer, sizeof(float)*lpTmpDInputBuffer.size());
+#endif
+
+
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 

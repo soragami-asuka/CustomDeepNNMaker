@@ -462,7 +462,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lastLayerGUID,
-			CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"));
+			CreateActivationLayer(layerDLLManager, layerDataManager, L"LeakyReLU"));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #if USE_DROPOUT
 		err = AddLayerToNetworkLast(
@@ -473,7 +473,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 #endif
 
 
-#if 0	// Single
+#if 1	// Single
 		// 2‘w–Ú
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
@@ -495,7 +495,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lastLayerGUID,
-			CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"));
+			CreateActivationLayer(layerDLLManager, layerDataManager, L"LeakyReLU"));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #if USE_DROPOUT
 		err = AddLayerToNetworkLast(
@@ -727,7 +727,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		//	inputDataStruct, lastLayerGUID,
 		//	CreateDropoutLayer(layerDLLManager, inputDataStruct, 0.5f));
 		//if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-#elif 1// UpSampling
+#elif 0// UpSampling
 
 		// 2‘w–Ú
 		err = AddLayerToNetworkLast(

@@ -50,12 +50,12 @@ extern IODataLayer_image_API SettingData::Standard::IData* CreateLearningSetting
 /** 入力信号データレイヤーを作成する.GUIDは自動割り当て.CPU制御
 	@param ioDataStruct	入出力データ構造.
 	@return	入力信号データレイヤーのアドレス */
-extern IODataLayer_image_API Gravisbell::Layer::IOData::IIODataLayer_image* CreateIODataLayerCPU(Gravisbell::U32 i_dataCount, U32 i_width, Gravisbell::U32 i_height, Gravisbell::U32 i_ch);
+extern IODataLayer_image_API Gravisbell::Layer::IOData::IIODataLayer_image* CreateIODataLayerCPU(Gravisbell::U32 i_dataCount, U32 i_width, Gravisbell::U32 i_height, Gravisbell::U32 i_ch, Gravisbell::F32 i_outputMin=0.0f, Gravisbell::F32 i_outputMax=1.0f);
 /** 入力信号データレイヤーを作成する.CPU制御
 	@param guid			レイヤーのGUID.
 	@param ioDataStruct	入出力データ構造.
 	@return	入力信号データレイヤーのアドレス */
-extern IODataLayer_image_API Gravisbell::Layer::IOData::IIODataLayer_image* CreateIODataLayerCPUwithGUID(Gravisbell::GUID guid, Gravisbell::U32 i_dataCount, Gravisbell::U32 i_width, Gravisbell::U32 i_height, Gravisbell::U32 i_ch);
+extern IODataLayer_image_API Gravisbell::Layer::IOData::IIODataLayer_image* CreateIODataLayerCPUwithGUID(Gravisbell::GUID guid, Gravisbell::U32 i_dataCount, Gravisbell::U32 i_width, Gravisbell::U32 i_height, Gravisbell::U32 i_ch, Gravisbell::F32 i_outputMin=0.0f, Gravisbell::F32 i_outputMax=1.0f);
 
 
 //======================================
@@ -64,12 +64,12 @@ extern IODataLayer_image_API Gravisbell::Layer::IOData::IIODataLayer_image* Crea
 /** 入力信号データレイヤーを作成する.GPU制御
 	@param ioDataStruct	入出力データ構造.
 	@return	入力信号データレイヤーのアドレス */
-extern IODataLayer_image_API Gravisbell::Layer::IOData::IIODataLayer_image* CreateIODataLayerGPU(Gravisbell::U32 i_dataCount, Gravisbell::U32 i_width, Gravisbell::U32 i_height, Gravisbell::U32 i_ch);
+extern IODataLayer_image_API Gravisbell::Layer::IOData::IIODataLayer_image* CreateIODataLayerGPU(Gravisbell::U32 i_dataCount, Gravisbell::U32 i_width, Gravisbell::U32 i_height, Gravisbell::U32 i_ch, Gravisbell::F32 i_outputMin=0.0f, Gravisbell::F32 i_outputMax=1.0f);
 /** 入力信号データレイヤーを作成する.GPU制御
 	@param guid			レイヤーのGUID.
 	@param ioDataStruct	入出力データ構造.
 	@return	入力信号データレイヤーのアドレス */
-extern IODataLayer_image_API Gravisbell::Layer::IOData::IIODataLayer_image* CreateIODataLayerGPUwithGUID(Gravisbell::GUID guid, Gravisbell::U32 i_dataCount, Gravisbell::U32 i_width, Gravisbell::U32 i_height, Gravisbell::U32 i_ch);
+extern IODataLayer_image_API Gravisbell::Layer::IOData::IIODataLayer_image* CreateIODataLayerGPUwithGUID(Gravisbell::GUID guid, Gravisbell::U32 i_dataCount, Gravisbell::U32 i_width, Gravisbell::U32 i_height, Gravisbell::U32 i_ch, Gravisbell::F32 i_outputMin=0.0f, Gravisbell::F32 i_outputMax=1.0f);
 
 
 

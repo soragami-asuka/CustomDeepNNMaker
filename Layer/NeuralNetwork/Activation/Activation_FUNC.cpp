@@ -52,6 +52,13 @@ namespace DefaultLanguage
                 L"使用する活性化関数の種類を定義する",
             }
         },
+        {
+            L"LeakyReLU_alpha",
+            {
+                L"Leaky-ReLU-Alpha",
+                L"Leaky-ReLUで使用するαの値",
+            }
+        },
     };
 
 
@@ -87,6 +94,13 @@ namespace DefaultLanguage
                     {
                         L"ReLU（ランプ関数）",
                         L"y = max(0, x);\n範囲 0 <= y\n(x=0, y=0)を通る",
+                    },
+                },
+                {
+                    L"LeakyReLU",
+                    {
+                        L"Leaky-ReLU",
+                        L"y = max(alpha*x, x);\n(x=0, y=0)を通る",
                     },
                 },
                 {
@@ -246,25 +260,30 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			L"y = max(0, x);\n範囲 0 <= y\n(x=0, y=0)を通る");
 		// 4
 		pItemEnum->AddEnumItem(
+			L"LeakyReLU",
+			L"Leaky-ReLU",
+			L"y = max(alpha*x, x);\n(x=0, y=0)を通る");
+		// 5
+		pItemEnum->AddEnumItem(
 			L"tanh",
 			L"tanh(双曲線関数)",
 			L"y = sin(x)/cos(x);");
-		// 5
+		// 6
 		pItemEnum->AddEnumItem(
 			L"softmax_ALL",
 			L"SoftMax関数",
 			L"全体における自身の割合を返す関数.\ny = e^x / Σe^x;\n");
-		// 6
+		// 7
 		pItemEnum->AddEnumItem(
 			L"softmax_ALL_crossEntropy",
 			L"SoftMax関数(出力レイヤー用)",
 			L"全体における自身の割合を返す関数.\ny = e^x / Σe^x;\n");
-		// 7
+		// 8
 		pItemEnum->AddEnumItem(
 			L"softmax_CH",
 			L"SoftMax関数(CH内のみ)",
 			L"同一のX,Y,Zにおける各CHの自身の割合を返す関数.\ny = e^x / Σe^x;\n");
-		// 8
+		// 9
 		pItemEnum->AddEnumItem(
 			L"softmax_CH_crossEntropy",
 			L"SoftMax関数(CH内のみ)(出力レイヤー用)",
@@ -275,6 +294,17 @@ pItemEnum->SetValue(pItemEnum->GetDefault());
 
 		pLayerConfig->AddItem(pItemEnum);
 	}
+
+	/** Name : Leaky-ReLU-Alpha
+	  * ID   : LeakyReLU_alpha
+	  * Text : Leaky-ReLUで使用するαの値
+	  */
+	pLayerConfig->AddItem(
+		Gravisbell::SettingData::Standard::CreateItem_Int(
+			L"LeakyReLU_alpha",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"LeakyReLU_alpha"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"LeakyReLU_alpha"].text.c_str(),
+			0, 0, 0));
 
 	return pLayerConfig;
 }
