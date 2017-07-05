@@ -294,11 +294,14 @@ namespace NeuralNetwork {
 																	this->inputDataStruct);
 
 											if(this->m_lppInputBuffer[batchNum][inputOffset] == this->lppBatchOutputBuffer[batchNum][outputOffset])
-												this->m_lppDInputBuffer[batchNum][inputOffset] += this->m_lppDOutputBufferPrev[batchNum][outputOffset];
+											{
+												this->m_lppDInputBuffer[batchNum][inputOffset] = this->m_lppDOutputBufferPrev[batchNum][outputOffset];
+												goto END_FILTER;
+											}
 										}
 									}
 								}
-
+								END_FILTER:;
 							}
 						}
 					}

@@ -239,6 +239,26 @@ namespace NeuralNetwork {
 			cudaThreadSynchronize();
 		}
 
+
+#ifdef _DEBUG
+		std::vector<float> lpTmpInputBuffer0(this->batchSize * this->lpInputBufferCount[0]);
+		cudaMemcpy(&lpTmpInputBuffer0[0], this->m_lppInputBuffer[0], sizeof(float)*lpTmpInputBuffer0.size(), cudaMemcpyDeviceToHost);
+		std::vector<float> lpTmpInputBuffer1(this->batchSize * this->lpInputBufferCount[1]);
+		cudaMemcpy(&lpTmpInputBuffer1[0], this->m_lppInputBuffer[1], sizeof(float)*lpTmpInputBuffer1.size(), cudaMemcpyDeviceToHost);
+
+		std::vector<float> lpTmpOutputBuffer(this->batchSize * this->outputBufferCount);
+		cudaMemcpy(&lpTmpOutputBuffer[0], thrust::raw_pointer_cast(&this->lpOutputBuffer[0]), sizeof(float)*lpTmpOutputBuffer.size(), cudaMemcpyDeviceToHost);
+
+		std::vector<float> lpTmpDOutputBuffer(this->batchSize * this->outputBufferCount);
+		cudaMemcpy(&lpTmpDOutputBuffer[0], i_lppDOutputBuffer, sizeof(float)*lpTmpDOutputBuffer.size(), cudaMemcpyDeviceToHost);
+
+		std::vector<float> lpTmpDInputBuffer0(this->batchSize * this->lpInputBufferCount[0]);
+		cudaMemcpy(&lpTmpDInputBuffer0[0], o_lppDInputBuffer[0], sizeof(float)*lpTmpDInputBuffer0.size(), cudaMemcpyDeviceToHost);
+		std::vector<float> lpTmpDInputBuffer1(this->batchSize * this->lpInputBufferCount[1]);
+		cudaMemcpy(&lpTmpDInputBuffer1[0], o_lppDInputBuffer[1], sizeof(float)*lpTmpDInputBuffer1.size(), cudaMemcpyDeviceToHost);
+#endif
+
+
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 

@@ -462,7 +462,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lastLayerGUID,
-			CreateActivationLayer(layerDLLManager, layerDataManager, L"LeakyReLU"));
+			CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #if USE_DROPOUT
 		err = AddLayerToNetworkLast(
@@ -473,7 +473,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 #endif
 
 
-#if 1	// Single
+#if 0	// Single
 		// 2層目
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
@@ -660,7 +660,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 			CreateMergeInputLayer(layerDLLManager, layerDataManager),
 			lastLayerGUID_A, lastLayerGUID_B);
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
-#elif 0	// ResNet
+#elif 1	// ResNet
 
 		// ショートカットレイヤーを保存する
 		Gravisbell::GUID lastLayerGUID_shortCut = lastLayerGUID;
