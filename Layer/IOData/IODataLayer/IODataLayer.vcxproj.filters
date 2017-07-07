@@ -126,6 +126,15 @@
     <ClInclude Include="..\..\..\include\Library\Layer\IOData\IODataLayer.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IOData\IIODataSequentialLayer.h">
+      <Filter>include\Layer\IOData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer_image.h">
+      <Filter>include\Layer\IOData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer_base.h">
+      <Filter>include\Layer\IOData</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

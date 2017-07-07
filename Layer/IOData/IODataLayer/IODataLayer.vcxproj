@@ -185,6 +185,9 @@
     <ClInclude Include="..\..\..\include\Layer\ILayerBase.h" />
     <ClInclude Include="..\..\..\include\Layer\IOData\IDataLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer.h" />
+    <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer_base.h" />
+    <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer_image.h" />
+    <ClInclude Include="..\..\..\include\Layer\IOData\IIODataSequentialLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\IO\IInputLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\IO\IMultInputLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\IO\IOutputLayer.h" />
