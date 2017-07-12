@@ -204,6 +204,7 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingle2SingleLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
     <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h" />
+    <ClInclude Include="..\_LayerBase\CLayerBase.h" />
     <ClInclude Include="Activation_Discriminator_Base.h" />
     <ClInclude Include="Activation_Discriminator_CPU.h" />
     <ClInclude Include="Activation_Discriminator_DATA.hpp" />

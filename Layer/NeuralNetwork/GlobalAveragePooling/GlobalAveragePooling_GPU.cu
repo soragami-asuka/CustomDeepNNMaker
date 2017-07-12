@@ -143,9 +143,9 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode GlobalAveragePooling_GPU::PreProcessLearn(unsigned int batchSize)
+	ErrorCode GlobalAveragePooling_GPU::PreProcessLearn()
 	{
-		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
+		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
@@ -157,10 +157,8 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode GlobalAveragePooling_GPU::PreProcessCalculate(unsigned int batchSize)
+	ErrorCode GlobalAveragePooling_GPU::PreProcessCalculate()
 	{
-		this->batchSize = batchSize;
-
 		// 入力バッファ数を確認
 		this->inputBufferCount = this->GetInputBufferCount();
 		if(this->inputBufferCount == 0)
@@ -172,33 +170,23 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
 		// 出力バッファを作成
-		this->lpOutputBuffer.resize(this->batchSize * this->outputBufferCount);
+		this->lpOutputBuffer.resize(this->GetBatchSize() * this->outputBufferCount);
 
 		// 1CHあたりのサイズを計算
 		this->chSize = this->GetInputDataStruct().x * this->GetInputDataStruct().y * this->GetInputDataStruct().z;
 
 		// 一時バッファの確保
-		this->lpTmpBuffer0.resize((this->chSize + 31)/32*32 * this->GetInputDataStruct().ch * this->batchSize, 0.0f);
-		this->lpTmpBuffer1.resize((this->chSize + 31)/32*32 * this->GetInputDataStruct().ch * this->batchSize, 0.0f);
-		this->lpTmpOutputBuffer_host.resize(this->outputBufferCount * this->batchSize);
+		this->lpTmpBuffer0.resize((this->chSize + 31)/32*32 * this->GetInputDataStruct().ch * this->GetBatchSize(), 0.0f);
+		this->lpTmpBuffer1.resize((this->chSize + 31)/32*32 * this->GetInputDataStruct().ch * this->GetBatchSize(), 0.0f);
+		this->lpTmpOutputBuffer_host.resize(this->outputBufferCount * this->GetBatchSize());
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
-
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
+	
+	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode GlobalAveragePooling_GPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
-	{
-		if(this->pLearnData != NULL)
-			delete this->pLearnData;
-		this->pLearnData = data.Clone();
-
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode GlobalAveragePooling_GPU::PreProcessCalculateLoop()
+	ErrorCode GlobalAveragePooling_GPU::PreProcessLoop()
 	{
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
@@ -216,7 +204,7 @@ namespace NeuralNetwork {
 		U32 tmpInputBufferCount = this->chSize;
 		U32 tmpOutputBufferCount = (tmpInputBufferCount + (BLOCK_SIZE-1))/BLOCK_SIZE;
 		{
-			dim3 grid(tmpOutputBufferCount, this->GetInputDataStruct().ch, this->batchSize);
+			dim3 grid(tmpOutputBufferCount, this->GetInputDataStruct().ch, this->GetBatchSize());
 
 			cuda_func_average<<<grid, BLOCK_SIZE>>>(i_lpInputBuffer, thrust::raw_pointer_cast(&this->lpTmpBuffer0[0]), tmpInputBufferCount, tmpOutputBufferCount);
 		}
@@ -229,7 +217,7 @@ namespace NeuralNetwork {
 			tmpInputBufferCount = tmpOutputBufferCount;
 			tmpOutputBufferCount = (tmpInputBufferCount + (BLOCK_SIZE-1))/BLOCK_SIZE;
 
-			dim3 grid(tmpOutputBufferCount, this->GetInputDataStruct().ch, this->batchSize);
+			dim3 grid(tmpOutputBufferCount, this->GetInputDataStruct().ch, this->GetBatchSize());
 
 			cuda_func_average<<<grid, BLOCK_SIZE>>>(
 				thrust::raw_pointer_cast(&(*pTmpBufferIn)[0]),
@@ -245,7 +233,7 @@ namespace NeuralNetwork {
 		cudaMemcpy(
 			thrust::raw_pointer_cast(&this->lpTmpOutputBuffer_host[0]),
 			thrust::raw_pointer_cast(&(*pTmpBufferIn)[0]),
-			sizeof(F32)*this->outputBufferCount*this->batchSize,
+			sizeof(F32)*this->outputBufferCount*this->GetBatchSize(),
 			cudaMemcpyDeviceToHost);
 		for(U32 outputNum=0; outputNum<this->lpOutputBuffer.size(); outputNum++)
 		{
@@ -299,11 +287,11 @@ namespace NeuralNetwork {
 		if(this->m_lpDInputBuffer_d)
 		{
 			// 入力誤差バッファを0クリア
-			cudaMemset(thrust::raw_pointer_cast(&this->m_lpDInputBuffer_d), 0, sizeof(F32)*this->inputBufferCount*this->batchSize);
+			cudaMemset(thrust::raw_pointer_cast(&this->m_lpDInputBuffer_d), 0, sizeof(F32)*this->inputBufferCount*this->GetBatchSize());
 
 			// ch数で割った値を代入
 			{
-				dim3 grid((this->chSize + (BLOCK_SIZE-1))/BLOCK_SIZE, this->GetInputDataStruct().ch, this->batchSize);
+				dim3 grid((this->chSize + (BLOCK_SIZE-1))/BLOCK_SIZE, this->GetInputDataStruct().ch, this->GetBatchSize());
 
 				cuda_func_DOutput_to_DInput<<<grid, BLOCK_SIZE>>>(
 					this->m_lppDOutputBufferPrev,

@@ -97,12 +97,39 @@ namespace Layer {
 		//=======================================
 		// 演算ループ前処理
 		//=======================================
-		/** 学習ループの初期化処理.データセットの学習開始前に実行する
+		/** ループの初期化処理.データセットの実行開始前に実行する
 			失敗した場合はCalculate以降の処理は実行不可. */
-		virtual ErrorCode PreProcessLearnLoop(const SettingData::Standard::IData& data) = 0;
-		/** 演算ループの初期化処理.データセットの演算開始前に実行する
-			失敗した場合はCalculate以降の処理は実行不可. */
-		virtual ErrorCode PreProcessCalculateLoop() = 0;
+		virtual ErrorCode PreProcessLoop() = 0;
+
+
+
+		//====================================
+		// 実行時設定
+		//====================================
+		/** 実行時設定を取得する. */
+		virtual const SettingData::Standard::IData* GetRuntimeParameter()const = 0;
+		virtual SettingData::Standard::IData* GetRuntimeParameter() = 0;
+
+		/** 実行時設定を設定する.
+			int型、float型、enum型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		virtual ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, S32 i_param) = 0;
+		/** 実行時設定を設定する.
+			int型、float型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		virtual ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, F32 i_param) = 0;
+		/** 実行時設定を設定する.
+			bool型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		virtual ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, bool i_param) = 0;
+		/** 実行時設定を設定する.
+			string型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		virtual ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, const wchar_t* i_param) = 0;
 	};
 
 }	// Layer

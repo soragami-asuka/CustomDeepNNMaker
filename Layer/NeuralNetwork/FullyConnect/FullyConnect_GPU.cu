@@ -99,16 +99,16 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode FullyConnect_GPU::PreProcessLearn(U32 batchSize)
+	ErrorCode FullyConnect_GPU::PreProcessLearn()
 	{
-		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
+		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
 		// バイアス更新用のベクトルを作成
-		lpBiasUpdateVector_d.resize(this->batchSize);
+		lpBiasUpdateVector_d.resize(this->GetBatchSize());
 		{
-			thrust::host_vector<F32> lpBuf(this->batchSize, 1.0f);
+			thrust::host_vector<F32> lpBuf(this->GetBatchSize(), 1.0f);
 			this->lpBiasUpdateVector_d = lpBuf;
 		}
 
@@ -124,10 +124,8 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode FullyConnect_GPU::PreProcessCalculate(U32 batchSize)
+	ErrorCode FullyConnect_GPU::PreProcessCalculate()
 	{
-		this->batchSize = batchSize;
-
 		// 入力バッファ数を確認
 		this->inputBufferCount = this->GetInputBufferCount();
 		if(this->inputBufferCount == 0)
@@ -148,29 +146,19 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_FRAUD_NEURON_COUNT;
 
 		// 出力バッファを作成
-		this->lpOutputBuffer_d.resize(this->batchSize * this->outputBufferCount);
+		this->lpOutputBuffer_d.resize(this->GetBatchSize() * this->outputBufferCount);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
-
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
+	
+	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode FullyConnect_GPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
+	ErrorCode FullyConnect_GPU::PreProcessLoop()
 	{
-		if(this->pLearnData != NULL)
-			delete this->pLearnData;
-		this->pLearnData = data.Clone();
-//		this->pLearnData->WriteToStruct((BYTE*)&this->learnData);
+		return ErrorCode::ERROR_CODE_NONE;
+	}
 
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode FullyConnect_GPU::PreProcessCalculateLoop()
-	{
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
 
 
 	/** 演算処理を実行する.
@@ -183,7 +171,7 @@ namespace NeuralNetwork {
 
 		// バイアスを出力信号にコピーする
 		{
-			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
 				cudaError_t err = cudaMemcpy(
 					thrust::raw_pointer_cast(&lpOutputBuffer_d[batchNum * this->outputBufferCount]),
@@ -207,7 +195,7 @@ namespace NeuralNetwork {
 				CUBLAS_OP_T,
 				CUBLAS_OP_N,
 				this->neuronCount,	// 行列Aの行数
-				this->batchSize,	// 行列Bの列数
+				this->GetBatchSize(),	// 行列Bの列数
 				this->inputBufferCount,	// 行列Aの列数,行列Bの行数
 				&alpha,
 				thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]),	// 行列A
@@ -241,7 +229,7 @@ namespace NeuralNetwork {
 		const U32 batchSize = this->GetBatchSize();
 		const U32 outputBufferCount = this->GetOutputBufferCount();
 
-		cudaMemcpy(o_lpOutputBuffer, this->GetOutputBuffer(), sizeof(F32) * outputBufferCount * this->batchSize, cudaMemcpyDeviceToHost);
+		cudaMemcpy(o_lpOutputBuffer, this->GetOutputBuffer(), sizeof(F32) * outputBufferCount * this->GetBatchSize(), cudaMemcpyDeviceToHost);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -273,7 +261,7 @@ namespace NeuralNetwork {
 				CUBLAS_OP_N,
 				CUBLAS_OP_N,
 				this->inputBufferCount,	// 行列Aの行数
-				this->batchSize,		// 行列Bの列数
+				this->GetBatchSize(),		// 行列Bの列数
 				this->neuronCount,		// 行列Aの列数,行列Bの行数
 				&alpha,
 				thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]),	// 行列A
@@ -311,12 +299,12 @@ namespace NeuralNetwork {
 				CUBLAS_OP_N,
 				this->neuronCount,		// 行列Aの行数
 				1,						// 行列Bの列数
-				this->batchSize,		// 行列Aの列数,行列Bの行数
+				this->GetBatchSize(),		// 行列Aの列数,行列Bの行数
 				&alpha,
 				this->m_lppDOutputBuffer_d,	// 行列A
 				this->neuronCount,											// 行列Aの転置前の行数
 				thrust::raw_pointer_cast(&this->lpBiasUpdateVector_d[0]),	// 行列B
-				this->batchSize,											// 行列Bの転置前の行数
+				this->GetBatchSize(),											// 行列Bの転置前の行数
 				&beta,
 				thrust::raw_pointer_cast(&this->lpDBias[0]),
 				this->neuronCount);
@@ -335,7 +323,7 @@ namespace NeuralNetwork {
 					CUBLAS_OP_T,
 					this->inputBufferCount,	// 行列Aの行数
 					this->neuronCount,		// 行列Bの列数
-					this->batchSize,		// 行列Aの列数,行列Bの行数
+					this->GetBatchSize(),		// 行列Aの列数,行列Bの行数
 					&alpha,
 					this->m_lppInputBuffer_d,		// 行列A
 					this->inputBufferCount,										// 行列Aの転置前の行数

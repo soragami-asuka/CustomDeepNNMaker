@@ -58,6 +58,9 @@
     <Filter Include="include\Layer\Connect">
       <UniqueIdentifier>{a998b8c4-bcde-4c3b-8bdc-fcd43c0eb747}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LayerBase">
+      <UniqueIdentifier>{cd6f28c7-9cd7-4867-96c7-e41843567e5d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -188,6 +191,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDataManager.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase.h">
+      <Filter>LayerBase</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

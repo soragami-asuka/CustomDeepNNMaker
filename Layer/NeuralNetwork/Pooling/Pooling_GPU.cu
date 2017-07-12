@@ -82,9 +82,9 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode Pooling_GPU::PreProcessLearn(unsigned int batchSize)
+	ErrorCode Pooling_GPU::PreProcessLearn()
 	{
-		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
+		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
@@ -96,11 +96,9 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Pooling_GPU::PreProcessCalculate(unsigned int batchSize)
+	ErrorCode Pooling_GPU::PreProcessCalculate()
 	{
 		cudnnStatus_t err_cudnn;
-
-		this->batchSize = batchSize;
 
 		// 入力バッファ数を確認
 		this->inputBufferCount = this->GetInputBufferCount();
@@ -113,7 +111,7 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
 		// 出力バッファを作成
-		this->lpOutputBuffer.resize(this->batchSize * this->outputBufferCount);
+		this->lpOutputBuffer.resize(this->GetBatchSize() * this->outputBufferCount);
 
 
 		// 次元数を調べる
@@ -126,16 +124,16 @@ namespace NeuralNetwork {
 		std::vector<S32> dimFilter;
 		std::vector<S32> dimStride;
 		std::vector<S32> dimPadding;
-		if(this->inputDataStruct.z > 1)
+		if(this->GetInputDataStruct().z > 1)
 		{
 			dataDim = 1 + 1 + 3;	// バッチ + チャンネル + 次元3
 
 			dimInput.resize(dataDim);
-			dimInput[0] = this->batchSize;
-			dimInput[1] = this->inputDataStruct.ch;
-			dimInput[2] = this->inputDataStruct.z;
-			dimInput[3] = this->inputDataStruct.y;
-			dimInput[4] = this->inputDataStruct.x;
+			dimInput[0] = this->GetBatchSize();
+			dimInput[1] = this->GetInputDataStruct().ch;
+			dimInput[2] = this->GetInputDataStruct().z;
+			dimInput[3] = this->GetInputDataStruct().y;
+			dimInput[4] = this->GetInputDataStruct().x;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2] * dimInput[3] * dimInput[4];
@@ -164,15 +162,15 @@ namespace NeuralNetwork {
 			dimPadding[1] = 0;
 			dimPadding[2] = 0;
 		}
-		else if(this->inputDataStruct.y > 1 || this->inputDataStruct.x)
+		else if(this->GetInputDataStruct().y > 1 || this->GetInputDataStruct().x)
 		{
 			dataDim = 1 + 1 + 2;
 
 			dimInput.resize(dataDim);
-			dimInput[0] = this->batchSize;
-			dimInput[1] = this->inputDataStruct.ch;
-			dimInput[2] = this->inputDataStruct.y;
-			dimInput[3] = this->inputDataStruct.x;
+			dimInput[0] = this->GetBatchSize();
+			dimInput[1] = this->GetInputDataStruct().ch;
+			dimInput[2] = this->GetInputDataStruct().y;
+			dimInput[3] = this->GetInputDataStruct().x;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2] * dimInput[3];
@@ -197,14 +195,14 @@ namespace NeuralNetwork {
 			dimPadding[0] = 0;
 			dimPadding[1] = 0;
 		}
-		else if(this->inputDataStruct.x > 1)
+		else if(this->GetInputDataStruct().x > 1)
 		{
 			dataDim = 1 + 1 + 1;
 
 			dimInput.resize(dataDim);
-			dimInput[0] = this->batchSize;
-			dimInput[1] = this->inputDataStruct.ch;
-			dimInput[2] = this->inputDataStruct.x;
+			dimInput[0] = this->GetBatchSize();
+			dimInput[1] = this->GetInputDataStruct().ch;
+			dimInput[2] = this->GetInputDataStruct().x;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2];
@@ -285,7 +283,7 @@ namespace NeuralNetwork {
 			outputVector.y = 1;
 			outputVector.x = dimOutput[2];
 		}
-		if(outputBatchSize != this->batchSize)
+		if(outputBatchSize != this->GetBatchSize())
 			return ErrorCode::ERROR_CODE_CUDA_INITIALIZE;
 		if(outputCh != this->GetOutputDataStruct().ch)
 			return ErrorCode::ERROR_CODE_CUDA_INITIALIZE;
@@ -316,21 +314,12 @@ namespace NeuralNetwork {
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
+	
 
 
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
+	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Pooling_GPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
-	{
-		if(this->pLearnData != NULL)
-			delete this->pLearnData;
-		this->pLearnData = data.Clone();
-
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Pooling_GPU::PreProcessCalculateLoop()
+	ErrorCode Pooling_GPU::PreProcessLoop()
 	{
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}

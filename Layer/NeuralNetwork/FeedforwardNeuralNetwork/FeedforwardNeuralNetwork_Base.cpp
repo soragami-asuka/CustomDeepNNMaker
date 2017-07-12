@@ -414,35 +414,45 @@ namespace NeuralNetwork {
 	//====================================
 	// 学習設定
 	//====================================
+	/** 実行時設定を取得する. */
+	const SettingData::Standard::IData* FeedforwardNeuralNetwork_Base::GetRuntimeParameter()const
+	{
+		return NULL;
+	}
+	SettingData::Standard::IData* FeedforwardNeuralNetwork_Base::GetRuntimeParameter()
+	{
+		return NULL;
+	}
+
 	/** 学習設定を取得する.
 		設定した値はPreProcessLearnLoopを呼び出した際に適用される.
 		@param	guid	取得対象レイヤーのGUID. */
-	const SettingData::Standard::IData* FeedforwardNeuralNetwork_Base::GetLearnSettingData(const Gravisbell::GUID& guid)const
+	const SettingData::Standard::IData* FeedforwardNeuralNetwork_Base::GetRuntimeParameter(const Gravisbell::GUID& guid)const
 	{
 		// 指定レイヤーが存在することを確認する
 		auto it_layer = this->lpLayerInfo.find(guid);
 		if(it_layer == this->lpLayerInfo.end())
 			return NULL;
 
-		return it_layer->second->GetLearnSettingData();
+		return it_layer->second->GetRuntimeParameter();
 	}
-	SettingData::Standard::IData* FeedforwardNeuralNetwork_Base::GetLearnSettingData(const Gravisbell::GUID& guid)
+	SettingData::Standard::IData* FeedforwardNeuralNetwork_Base::GetRuntimeParameter(const Gravisbell::GUID& guid)
 	{
-		return const_cast<SettingData::Standard::IData*>( ((const FeedforwardNeuralNetwork_Base*)this)->GetLearnSettingData(guid) );
+		return const_cast<SettingData::Standard::IData*>( ((const FeedforwardNeuralNetwork_Base*)this)->GetRuntimeParameter(guid) );
 	}
 	
 	/** 学習設定のアイテムを取得する.
 		@param	guid		取得対象レイヤーのGUID.	指定が無い場合は全てのレイヤーに対して実行する.
 		@param	i_dataID	設定する値のID. */
-	SettingData::Standard::IItemBase* FeedforwardNeuralNetwork_Base::GetLearnSettingDataItem(const Gravisbell::GUID& guid, const wchar_t* i_dataID)
+	SettingData::Standard::IItemBase* FeedforwardNeuralNetwork_Base::GetRuntimeParameterItem(const Gravisbell::GUID& guid, const wchar_t* i_dataID)
 	{
 		// 学習設定データを取得
-		Gravisbell::SettingData::Standard::IData* pLearnSettingData = this->GetLearnSettingData(guid);
-		if(pLearnSettingData == NULL)
+		Gravisbell::SettingData::Standard::IData* pRuntimeParameter = this->GetRuntimeParameter(guid);
+		if(pRuntimeParameter == NULL)
 			return NULL;
 
 		// 該当IDの設定アイテムを取得
-		Gravisbell::SettingData::Standard::IItemBase* pItem = pLearnSettingData->GetItemByID(i_dataID);
+		Gravisbell::SettingData::Standard::IItemBase* pItem = pRuntimeParameter->GetItemByID(i_dataID);
 		if(pItem == NULL)
 			return NULL;
 
@@ -455,16 +465,16 @@ namespace NeuralNetwork {
 		@param	guid		取得対象レイヤーのGUID.	指定が無い場合は全てのレイヤーに対して実行する.
 		@param	i_dataID	設定する値のID.
 		@param	i_param		設定する値. */
-	ErrorCode FeedforwardNeuralNetwork_Base::SetLearnSettingData(const wchar_t* i_dataID, S32 i_param)
+	ErrorCode FeedforwardNeuralNetwork_Base::SetRuntimeParameter(const wchar_t* i_dataID, S32 i_param)
 	{
 		for(auto& it : this->lpLayerInfo)
-			this->SetLearnSettingData(it.first, i_dataID, i_param);
+			this->SetRuntimeParameter(it.first, i_dataID, i_param);
 		return ErrorCode::ERROR_CODE_NONE;
 	}
-	ErrorCode FeedforwardNeuralNetwork_Base::SetLearnSettingData(const Gravisbell::GUID& guid, const wchar_t* i_dataID, S32 i_param)
+	ErrorCode FeedforwardNeuralNetwork_Base::SetRuntimeParameter(const Gravisbell::GUID& guid, const wchar_t* i_dataID, S32 i_param)
 	{
 		// 該当IDの設定アイテムを取得
-		Gravisbell::SettingData::Standard::IItemBase* pItem = this->GetLearnSettingDataItem(guid, i_dataID);
+		Gravisbell::SettingData::Standard::IItemBase* pItem = this->GetRuntimeParameterItem(guid, i_dataID);
 		if(pItem == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
 
@@ -510,16 +520,16 @@ namespace NeuralNetwork {
 		@param	guid		取得対象レイヤーのGUID.	指定が無い場合は全てのレイヤーに対して実行する.
 		@param	i_dataID	設定する値のID.
 		@param	i_param		設定する値. */
-	ErrorCode FeedforwardNeuralNetwork_Base::SetLearnSettingData(const wchar_t* i_dataID, F32 i_param)
+	ErrorCode FeedforwardNeuralNetwork_Base::SetRuntimeParameter(const wchar_t* i_dataID, F32 i_param)
 	{
 		for(auto& it : this->lpLayerInfo)
-			this->SetLearnSettingData(it.first, i_dataID, i_param);
+			this->SetRuntimeParameter(it.first, i_dataID, i_param);
 		return ErrorCode::ERROR_CODE_NONE;
 	}
-	ErrorCode FeedforwardNeuralNetwork_Base::SetLearnSettingData(const Gravisbell::GUID& guid, const wchar_t* i_dataID, F32 i_param)
+	ErrorCode FeedforwardNeuralNetwork_Base::SetRuntimeParameter(const Gravisbell::GUID& guid, const wchar_t* i_dataID, F32 i_param)
 	{
 		// 該当IDの設定アイテムを取得
-		Gravisbell::SettingData::Standard::IItemBase* pItem = this->GetLearnSettingDataItem(guid, i_dataID);
+		Gravisbell::SettingData::Standard::IItemBase* pItem = this->GetRuntimeParameterItem(guid, i_dataID);
 		if(pItem == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
 
@@ -555,16 +565,16 @@ namespace NeuralNetwork {
 		@param	guid		取得対象レイヤーのGUID.	指定が無い場合は全てのレイヤーに対して実行する.
 		@param	i_dataID	設定する値のID.
 		@param	i_param		設定する値. */
-	ErrorCode FeedforwardNeuralNetwork_Base::SetLearnSettingData(const wchar_t* i_dataID, bool i_param)
+	ErrorCode FeedforwardNeuralNetwork_Base::SetRuntimeParameter(const wchar_t* i_dataID, bool i_param)
 	{
 		for(auto& it : this->lpLayerInfo)
-			this->SetLearnSettingData(it.first, i_dataID, i_param);
+			this->SetRuntimeParameter(it.first, i_dataID, i_param);
 		return ErrorCode::ERROR_CODE_NONE;
 	}
-	ErrorCode FeedforwardNeuralNetwork_Base::SetLearnSettingData(const Gravisbell::GUID& guid, const wchar_t* i_dataID, bool i_param)
+	ErrorCode FeedforwardNeuralNetwork_Base::SetRuntimeParameter(const Gravisbell::GUID& guid, const wchar_t* i_dataID, bool i_param)
 	{
 		// 該当IDの設定アイテムを取得
-		Gravisbell::SettingData::Standard::IItemBase* pItem = this->GetLearnSettingDataItem(guid, i_dataID);
+		Gravisbell::SettingData::Standard::IItemBase* pItem = this->GetRuntimeParameterItem(guid, i_dataID);
 		if(pItem == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
 
@@ -590,16 +600,16 @@ namespace NeuralNetwork {
 		@param	guid		取得対象レイヤーのGUID.	指定が無い場合は全てのレイヤーに対して実行する.
 		@param	i_dataID	設定する値のID.
 		@param	i_param		設定する値. */
-	ErrorCode FeedforwardNeuralNetwork_Base::SetLearnSettingData(const wchar_t* i_dataID, const wchar_t* i_param)
+	ErrorCode FeedforwardNeuralNetwork_Base::SetRuntimeParameter(const wchar_t* i_dataID, const wchar_t* i_param)
 	{
 		for(auto& it : this->lpLayerInfo)
-			this->SetLearnSettingData(it.first, i_dataID, i_param);
+			this->SetRuntimeParameter(it.first, i_dataID, i_param);
 		return ErrorCode::ERROR_CODE_NONE;
 	}
-	ErrorCode FeedforwardNeuralNetwork_Base::SetLearnSettingData(const Gravisbell::GUID& guid, const wchar_t* i_dataID, const wchar_t* i_param)
+	ErrorCode FeedforwardNeuralNetwork_Base::SetRuntimeParameter(const Gravisbell::GUID& guid, const wchar_t* i_dataID, const wchar_t* i_param)
 	{
 		// 該当IDの設定アイテムを取得
-		Gravisbell::SettingData::Standard::IItemBase* pItem = this->GetLearnSettingDataItem(guid, i_dataID);
+		Gravisbell::SettingData::Standard::IItemBase* pItem = this->GetRuntimeParameterItem(guid, i_dataID);
 		if(pItem == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
 
@@ -975,30 +985,14 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 		
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
+	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode FeedforwardNeuralNetwork_Base::PreProcessLearnLoop(const SettingData::Standard::IData& data)
+	ErrorCode FeedforwardNeuralNetwork_Base::PreProcessLoop()
 	{
 		auto it = this->lpCalculateLayerList.begin();
 		while(it != this->lpCalculateLayerList.end())
 		{
-			ErrorCode err = (*it)->PreProcessLearnLoop();
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return err;
-
-			it++;
-		}
-
-		return ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode FeedforwardNeuralNetwork_Base::PreProcessCalculateLoop()
-	{
-		auto it = this->lpCalculateLayerList.begin();
-		while(it != this->lpCalculateLayerList.end())
-		{
-			ErrorCode err = (*it)->PreProcessCalculateLoop();
+			ErrorCode err = (*it)->PreProcessLoop();
 			if(err != ErrorCode::ERROR_CODE_NONE)
 				return err;
 

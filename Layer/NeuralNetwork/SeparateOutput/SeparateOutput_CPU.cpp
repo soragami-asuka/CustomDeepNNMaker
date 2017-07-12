@@ -74,14 +74,14 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode SeparateOutput_CPU::PreProcessLearn(unsigned int batchSize)
+	ErrorCode SeparateOutput_CPU::PreProcessLearn()
 	{
-		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
+		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
 		// 入力誤差バッファ受け取り用のアドレス配列を作成する
-		this->m_lppDInputBuffer.resize(batchSize);
+		this->m_lppDInputBuffer.resize(this->GetBatchSize());
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -91,10 +91,8 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode SeparateOutput_CPU::PreProcessCalculate(unsigned int batchSize)
+	ErrorCode SeparateOutput_CPU::PreProcessCalculate()
 	{
-		this->batchSize = batchSize;
-
 		// 入力バッファ数を確認
 		this->inputBufferCount = this->GetInputBufferCount();
 		if(this->inputBufferCount == 0)
@@ -106,25 +104,15 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
 		// 入力バッファ保存用のアドレス配列を作成
-		this->m_lppInputBuffer.resize(batchSize, NULL);
+		this->m_lppInputBuffer.resize(this->GetBatchSize(), NULL);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
-
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
+	
+	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode SeparateOutput_CPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
-	{
-		if(this->pLearnData != NULL)
-			delete this->pLearnData;
-		this->pLearnData = data.Clone();
-
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode SeparateOutput_CPU::PreProcessCalculateLoop()
+	ErrorCode SeparateOutput_CPU::PreProcessLoop()
 	{
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
@@ -136,7 +124,7 @@ namespace NeuralNetwork {
 	ErrorCode SeparateOutput_CPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
 	{
 		// 入力バッファのアドレスを配列に格納
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			this->m_lppInputBuffer[batchNum] = &i_lpInputBuffer[batchNum * this->inputBufferCount];
 
 		return ErrorCode::ERROR_CODE_NONE;
@@ -182,14 +170,14 @@ namespace NeuralNetwork {
 		if(o_lppDInputBuffer)
 		{
 			// 入力誤差バッファのアドレスを配列に格納
-			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 				this->m_lppDInputBuffer[batchNum] = &o_lppDInputBuffer[batchNum * this->inputBufferCount];
 
 			// 入力誤差バッファをクリア
-			memset(this->m_lpDInputBuffer, 0, sizeof(F32)*this->inputBufferCount*this->batchSize);
+			memset(this->m_lpDInputBuffer, 0, sizeof(F32)*this->inputBufferCount*this->GetBatchSize());
 
 			// 出力誤差の各要素を加算して格納する
-			U32 dataCount = this->batchSize * this->outputBufferCount;
+			U32 dataCount = this->GetBatchSize() * this->outputBufferCount;
 			for(U32 outputLayerNum=0; outputLayerNum<this->layerData.layerStructure.separateCount; outputLayerNum++)
 			{
 				for(U32 dataNum=0; dataNum<dataCount; dataNum++)

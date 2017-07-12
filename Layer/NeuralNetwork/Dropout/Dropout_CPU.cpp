@@ -28,7 +28,6 @@ namespace NeuralNetwork {
 		,	inputBufferCount				(0)				/**< 入力バッファ数 */
 		,	outputBufferCount				(0)				/**< 出力バッファ数 */
 		,	dropoutRate						(0)				/**< ドロップアウト率 */
-		,	onLearning						(false)			/**< 学習処理中フラグ */
 	{
 	}
 	/** デストラクタ */
@@ -75,25 +74,22 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode Dropout_CPU::PreProcessLearn(unsigned int batchSize)
+	ErrorCode Dropout_CPU::PreProcessLearn()
 	{
-		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
+		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
 		// 出力誤差バッファ受け取り用のアドレス配列を作成する
-		this->m_lppDOutputBufferPrev.resize(batchSize);
+		this->m_lppDOutputBufferPrev.resize(this->GetBatchSize());
 		// 入力誤差バッファ受け取り用のアドレス配列を作成する
-		this->m_lppDInputBuffer.resize(batchSize);
+		this->m_lppDInputBuffer.resize(this->GetBatchSize());
 
 		if(this->dropoutRate > 0)
 		{
 			// ドロップアウトバッファを作成
 			this->lpDropoutBuffer.resize(this->inputBufferCount);
 		}
-
-		// 学習状態に設定
-		this->onLearning = true;
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -103,10 +99,8 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Dropout_CPU::PreProcessCalculate(unsigned int batchSize)
+	ErrorCode Dropout_CPU::PreProcessCalculate()
 	{
-		this->batchSize = batchSize;
-
 		// 入力バッファ数を確認
 		this->inputBufferCount = this->GetInputBufferCount();
 		if(this->inputBufferCount == 0)
@@ -121,43 +115,29 @@ namespace NeuralNetwork {
 		this->dropoutRate = (S32)(this->layerData.layerStructure.Rate * RAND_MAX);
 
 		// 入力バッファ保存用のアドレス配列を作成
-		this->m_lppInputBuffer.resize(batchSize, NULL);
+		this->m_lppInputBuffer.resize(this->GetBatchSize(), NULL);
 
 		if(this->dropoutRate > 0)
 		{
 			// 出力バッファを作成
-			this->lpOutputBuffer.resize(this->batchSize * this->outputBufferCount);
-			this->lppBatchOutputBuffer.resize(this->batchSize);
-			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			this->lpOutputBuffer.resize(this->GetBatchSize() * this->outputBufferCount);
+			this->lppBatchOutputBuffer.resize(this->GetBatchSize());
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
 				this->lppBatchOutputBuffer[batchNum] = &this->lpOutputBuffer[batchNum * this->outputBufferCount];
 			}
 		}
 
-		// 学習状態に設定
-		this->onLearning = false;
-
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
 
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
+	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Dropout_CPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
+	ErrorCode Dropout_CPU::PreProcessLoop()
 	{
-		if(this->pLearnData != NULL)
-			delete this->pLearnData;
-		this->pLearnData = data.Clone();
-
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
+		return ErrorCode::ERROR_CODE_NONE;
 	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Dropout_CPU::PreProcessCalculateLoop()
-	{
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
-
 
 	/** 演算処理を実行する.
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
@@ -166,10 +146,10 @@ namespace NeuralNetwork {
 	{
 		// 入力バッファのアドレスを配列に格納
 		this->m_lpInputBuffer = i_lpInputBuffer;
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			this->m_lppInputBuffer[batchNum] = &i_lpInputBuffer[batchNum * this->inputBufferCount];
 
-		if(this->dropoutRate>0 && this->onLearning)
+		if(this->dropoutRate>0 && this->GetProcessType() == ProcessType::PROCESSTYPE_LEARN)
 		{
 			F32 scale = 1.0f / (1.0f - this->layerData.layerStructure.Rate);
 
@@ -183,7 +163,7 @@ namespace NeuralNetwork {
 			}
 
 			// 出力を計算
-			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
 				for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
 				{
@@ -201,7 +181,7 @@ namespace NeuralNetwork {
 		@return 出力データ配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER Dropout_CPU::GetOutputBuffer()const
 	{
-		if(this->dropoutRate>0 && this->onLearning)
+		if(this->dropoutRate>0 && this->GetProcessType() == ProcessType::PROCESSTYPE_LEARN)
 		{
 			return &this->lpOutputBuffer[0];
 		}
@@ -239,7 +219,7 @@ namespace NeuralNetwork {
 	{
 		// 出力誤差バッファのアドレスを配列に格納
 		this->m_lpDOutputBufferPrev = i_lppDOutputBuffer;
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			this->m_lppDOutputBufferPrev[batchNum] = &this->m_lpDOutputBufferPrev[batchNum * this->outputBufferCount];
 
 		// 入力誤差を計算
@@ -247,12 +227,12 @@ namespace NeuralNetwork {
 		if(this->m_lpDInputBuffer)
 		{
 			// 入力誤差バッファのアドレスを配列に格納
-			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 				this->m_lppDInputBuffer[batchNum] = &o_lppDInputBuffer[batchNum * this->inputBufferCount];
 
-			if(this->dropoutRate>0 && this->onLearning)
+			if(this->dropoutRate>0 && this->GetProcessType() == ProcessType::PROCESSTYPE_LEARN)
 			{
-				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+				for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 				{
 					for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
 					{
@@ -262,7 +242,7 @@ namespace NeuralNetwork {
 			}
 			else
 			{
-				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+				for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 				{
 					for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
 					{

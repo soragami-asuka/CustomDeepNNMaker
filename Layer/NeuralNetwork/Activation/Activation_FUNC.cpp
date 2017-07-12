@@ -300,11 +300,11 @@ pItemEnum->SetValue(pItemEnum->GetDefault());
 	  * Text : Leaky-ReLU‚ÅŽg—p‚·‚éƒ¿‚Ì’l
 	  */
 	pLayerConfig->AddItem(
-		Gravisbell::SettingData::Standard::CreateItem_Int(
+		Gravisbell::SettingData::Standard::CreateItem_Float(
 			L"LeakyReLU_alpha",
 			CurrentLanguage::g_lpItemData_LayerStructure[L"LeakyReLU_alpha"].name.c_str(),
 			CurrentLanguage::g_lpItemData_LayerStructure[L"LeakyReLU_alpha"].text.c_str(),
-			0, 0, 0));
+			0.0000000000000000f, 0.0000000000000000f, 0.2000000029802322f));
 
 	return pLayerConfig;
 }

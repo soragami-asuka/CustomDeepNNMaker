@@ -73,9 +73,9 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode MergeInput_GPU::PreProcessLearn(unsigned int batchSize)
+	ErrorCode MergeInput_GPU::PreProcessLearn()
 	{
-		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
+		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
@@ -91,10 +91,8 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode MergeInput_GPU::PreProcessCalculate(unsigned int batchSize)
+	ErrorCode MergeInput_GPU::PreProcessCalculate()
 	{
-		this->batchSize = batchSize;
-
 		// 入力バッファ数を確認
 		this->lpInputBufferCount.resize(this->GetInputDataCount());
 		for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
@@ -113,7 +111,7 @@ namespace NeuralNetwork {
 		this->m_lppInputBuffer.resize(this->GetInputDataCount());
 
 		// 出力バッファを作成
-		this->lpOutputBuffer.resize(this->batchSize * this->outputBufferCount);
+		this->lpOutputBuffer.resize(this->GetBatchSize() * this->outputBufferCount);
 
 
 
@@ -121,21 +119,11 @@ namespace NeuralNetwork {
 	}
 
 
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
+	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode MergeInput_GPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
+	ErrorCode MergeInput_GPU::PreProcessLoop()
 	{
-		if(this->pLearnData != NULL)
-			delete this->pLearnData;
-		this->pLearnData = data.Clone();
-
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode MergeInput_GPU::PreProcessCalculateLoop()
-	{
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 
 
@@ -152,7 +140,7 @@ namespace NeuralNetwork {
 		{
 		case MergeInput::LayerStructure::mergeDirection_ch:
 			{
-				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+				for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 				{
 					U32 offset = 0;
 					for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
@@ -232,7 +220,7 @@ namespace NeuralNetwork {
 			{
 			case MergeInput::LayerStructure::mergeDirection_ch:
 				{
-					for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+					for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 					{
 						U32 offset = 0;
 						for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)

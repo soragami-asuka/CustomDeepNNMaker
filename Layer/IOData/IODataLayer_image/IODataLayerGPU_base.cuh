@@ -137,12 +137,9 @@ namespace IOData {
 			失敗した場合はCalculate以降の処理は実行不可. */
 		Gravisbell::ErrorCode PreProcessCalculate(U32 batchSize);
 
-		/** 学習ループの初期化処理.データセットの学習開始前に実行する
+		/** ループの初期化処理.データセットの実行開始前に実行する
 			失敗した場合はCalculate以降の処理は実行不可. */
-		Gravisbell::ErrorCode PreProcessLearnLoop(const SettingData::Standard::IData& config);
-		/** 演算ループの初期化処理.データセットの演算開始前に実行する
-			失敗した場合はCalculate以降の処理は実行不可. */
-		Gravisbell::ErrorCode PreProcessCalculateLoop();
+		ErrorCode PreProcessLoop();
 
 		/** バッチサイズを取得する.
 			@return 同時に演算を行うバッチのサイズ */
@@ -212,6 +209,36 @@ namespace IOData {
 			@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
 			@return 成功した場合0 */
 		Gravisbell::ErrorCode GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const;
+
+
+	public:
+		//====================================
+		// 実行時設定
+		//====================================
+		/** 実行時設定を取得する. */
+		const SettingData::Standard::IData* GetRuntimeParameter()const{return NULL;}
+		SettingData::Standard::IData* GetRuntimeParameter(){return NULL;}
+
+		/** 実行時設定を設定する.
+			int型、float型、enum型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, S32 i_param){return ErrorCode::ERROR_CODE_NONE;}
+		/** 実行時設定を設定する.
+			int型、float型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, F32 i_param){return ErrorCode::ERROR_CODE_NONE;}
+		/** 実行時設定を設定する.
+			bool型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, bool i_param){return ErrorCode::ERROR_CODE_NONE;}
+		/** 実行時設定を設定する.
+			string型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, const wchar_t* i_param){return ErrorCode::ERROR_CODE_NONE;}
 	};
 
 

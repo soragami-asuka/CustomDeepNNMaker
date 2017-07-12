@@ -223,16 +223,10 @@ namespace IOData {
 
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
-
-		/** 学習ループの初期化処理.データセットの学習開始前に実行する
+		
+		/** ループの初期化処理.データセットの実行開始前に実行する
 			失敗した場合はCalculate以降の処理は実行不可. */
-		Gravisbell::ErrorCode PreProcessLearnLoop(const SettingData::Standard::IData& config)
-		{
-			return this->PreProcessCalculateLoop();
-		}
-		/** 演算ループの初期化処理.データセットの演算開始前に実行する
-			失敗した場合はCalculate以降の処理は実行不可. */
-		Gravisbell::ErrorCode PreProcessCalculateLoop()
+		ErrorCode PreProcessLoop()
 		{
 			this->calcErrorCount = 0;
 			memset(&this->lpErrorValue_max[0], 0, sizeof(F32)*this->lpErrorValue_max.size());
@@ -424,6 +418,35 @@ namespace IOData {
 
 			return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 		}
+		
+	public:
+		//====================================
+		// 実行時設定
+		//====================================
+		/** 実行時設定を取得する. */
+		const SettingData::Standard::IData* GetRuntimeParameter()const{return NULL;}
+		SettingData::Standard::IData* GetRuntimeParameter(){return NULL;}
+
+		/** 実行時設定を設定する.
+			int型、float型、enum型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, S32 i_param){return ErrorCode::ERROR_CODE_NONE;}
+		/** 実行時設定を設定する.
+			int型、float型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, F32 i_param){return ErrorCode::ERROR_CODE_NONE;}
+		/** 実行時設定を設定する.
+			bool型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, bool i_param){return ErrorCode::ERROR_CODE_NONE;}
+		/** 実行時設定を設定する.
+			string型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, const wchar_t* i_param){return ErrorCode::ERROR_CODE_NONE;}
 	};
 
 	/** 入力信号データレイヤーを作成する.GUIDは自動割り当て.CPU制御

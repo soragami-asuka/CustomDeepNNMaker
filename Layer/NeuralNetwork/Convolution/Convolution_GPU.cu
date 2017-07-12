@@ -96,9 +96,9 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode Convolution_GPU::PreProcessLearn(unsigned int batchSize)
+	ErrorCode Convolution_GPU::PreProcessLearn()
 	{
-		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
+		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
@@ -116,10 +116,8 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Convolution_GPU::PreProcessCalculate(unsigned int batchSize)
+	ErrorCode Convolution_GPU::PreProcessCalculate()
 	{
-		this->batchSize = batchSize;
-
 		// 入力バッファ数を確認
 		this->inputBufferCount = this->GetInputBufferCount();
 		if(this->inputBufferCount == 0)
@@ -151,16 +149,16 @@ namespace NeuralNetwork {
 		std::vector<S32> dimStride;
 		std::vector<S32> dimUpscale;
 		std::vector<S32> dimPadding;
-		if(this->inputDataStruct.z > 1)
+		if(this->GetInputDataStruct().z > 1)
 		{
 			dataDim = 1 + 1 + 3;
 
 			dimInput.resize(dataDim);
-			dimInput[0] = this->batchSize;
-			dimInput[1] = this->inputDataStruct.ch;
-			dimInput[2] = this->inputDataStruct.z;
-			dimInput[3] = this->inputDataStruct.y;
-			dimInput[4] = this->inputDataStruct.x;
+			dimInput[0] = this->GetBatchSize();
+			dimInput[1] = this->GetInputDataStruct().ch;
+			dimInput[2] = this->GetInputDataStruct().z;
+			dimInput[3] = this->GetInputDataStruct().y;
+			dimInput[4] = this->GetInputDataStruct().x;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2] * dimInput[3] * dimInput[4];
@@ -189,7 +187,7 @@ namespace NeuralNetwork {
 
 			dimFilter.resize(filterDim);
 			dimFilter[0] = this->GetOutputDataStruct().ch;
-			dimFilter[1] = this->inputDataStruct.ch;
+			dimFilter[1] = this->GetInputDataStruct().ch;
 			dimFilter[2] = this->layerData.layerStructure.FilterSize.z;
 			dimFilter[3] = this->layerData.layerStructure.FilterSize.y;
 			dimFilter[4] = this->layerData.layerStructure.FilterSize.x;
@@ -211,15 +209,15 @@ namespace NeuralNetwork {
 			dimStride[1] = this->layerData.layerStructure.Stride.y;
 			dimStride[2] = this->layerData.layerStructure.Stride.x;
 		}
-		else if(this->inputDataStruct.y > 1 || this->inputDataStruct.x > 1)
+		else if(this->GetInputDataStruct().y > 1 || this->GetInputDataStruct().x > 1)
 		{
 			dataDim = 1 + 1 + 2;
 
 			dimInput.resize(dataDim);
-			dimInput[0] = this->batchSize;
-			dimInput[1] = this->inputDataStruct.ch;
-			dimInput[2] = this->inputDataStruct.y;
-			dimInput[3] = this->inputDataStruct.x;
+			dimInput[0] = this->GetBatchSize();
+			dimInput[1] = this->GetInputDataStruct().ch;
+			dimInput[2] = this->GetInputDataStruct().y;
+			dimInput[3] = this->GetInputDataStruct().x;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2] * dimInput[3];
@@ -245,7 +243,7 @@ namespace NeuralNetwork {
 
 			dimFilter.resize(filterDim);
 			dimFilter[0] = this->GetOutputDataStruct().ch;
-			dimFilter[1] = this->inputDataStruct.ch;
+			dimFilter[1] = this->GetInputDataStruct().ch;
 			dimFilter[2] = this->layerData.layerStructure.FilterSize.y;
 			dimFilter[3] = this->layerData.layerStructure.FilterSize.x;
 
@@ -263,14 +261,14 @@ namespace NeuralNetwork {
 			dimStride[0] = this->layerData.layerStructure.Stride.y;
 			dimStride[1] = this->layerData.layerStructure.Stride.x;
 		}
-		else if(this->inputDataStruct.x > 1)
+		else if(this->GetInputDataStruct().x > 1)
 		{
 			dataDim = 1 + 1 + 1;
 
 			dimInput.resize(dataDim);
-			dimInput[0] = this->batchSize;
-			dimInput[1] = this->inputDataStruct.ch;
-			dimInput[2] = this->inputDataStruct.x;
+			dimInput[0] = this->GetBatchSize();
+			dimInput[1] = this->GetInputDataStruct().ch;
+			dimInput[2] = this->GetInputDataStruct().x;
 
 			dimInputStride.resize(dataDim);
 			dimInputStride[0] = dimInput[1] * dimInput[2];
@@ -293,7 +291,7 @@ namespace NeuralNetwork {
 
 			dimFilter.resize(filterDim);
 			dimFilter[0] = this->GetOutputDataStruct().ch;
-			dimFilter[1] = this->inputDataStruct.ch;
+			dimFilter[1] = this->GetInputDataStruct().ch;
 			dimFilter[2] = this->layerData.layerStructure.FilterSize.x;
 
 			convDim = 1;	// 次元3
@@ -376,7 +374,7 @@ namespace NeuralNetwork {
 			outputVector.y = 1;
 			outputVector.x = dimOutput[2];
 		}
-		if(outputBatchSize != this->batchSize)
+		if(outputBatchSize != this->GetBatchSize())
 			return ErrorCode::ERROR_CODE_CUDA_INITIALIZE;
 		if(outputCh != this->GetOutputDataStruct().ch)
 			return ErrorCode::ERROR_CODE_CUDA_INITIALIZE;
@@ -490,7 +488,7 @@ namespace NeuralNetwork {
 		this->workSpace.resize(max(workSpaceSizeByte_forward, max(workSpaceSizeByte_backwardData, workSpaceSizeByte_backwardFilter)));
 
 		// 出力バッファを作成
-		this->lpOutputBuffer.resize(this->batchSize * this->outputBufferCount);
+		this->lpOutputBuffer.resize(this->GetBatchSize() * this->outputBufferCount);
 
 		// バイアスのデータ構造を設定
 		err_cudnn = cudnnSetTensorNdDescriptor(
@@ -504,25 +502,13 @@ namespace NeuralNetwork {
 	}
 
 
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
+	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Convolution_GPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
-	{
-		if(this->pLearnData != NULL)
-			delete this->pLearnData;
-		this->pLearnData = data.Clone();
-//		this->pLearnData->WriteToStruct((BYTE*)&this->learnData);
-
-
-
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Convolution_GPU::PreProcessCalculateLoop()
+	ErrorCode Convolution_GPU::PreProcessLoop()
 	{
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
+
 
 
 	/** 演算処理を実行する.
@@ -727,7 +713,7 @@ namespace NeuralNetwork {
 		const U32 batchSize = this->GetBatchSize();
 		const U32 inputBufferCount = this->GetInputBufferCount();
 
-		cudaMemcpy(o_lpDInputBuffer, this->GetDInputBuffer(), sizeof(F32)*inputBufferCount*this->batchSize, cudaMemcpyDeviceToHost);
+		cudaMemcpy(o_lpDInputBuffer, this->GetDInputBuffer(), sizeof(F32)*inputBufferCount*this->GetBatchSize(), cudaMemcpyDeviceToHost);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

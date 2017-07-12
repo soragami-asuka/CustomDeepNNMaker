@@ -76,16 +76,16 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode UpSampling_CPU::PreProcessLearn(unsigned int batchSize)
+	ErrorCode UpSampling_CPU::PreProcessLearn()
 	{
-		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
+		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
 		// 出力誤差バッファ受け取り用のアドレス配列を作成する
-		this->m_lppDOutputBuffer.resize(batchSize);
+		this->m_lppDOutputBuffer.resize(this->GetBatchSize());
 		// 入力誤差バッファ受け取り用のアドレス配列を作成する
-		this->m_lppDInputBuffer.resize(batchSize);
+		this->m_lppDInputBuffer.resize(this->GetBatchSize());
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -95,10 +95,8 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode UpSampling_CPU::PreProcessCalculate(unsigned int batchSize)
+	ErrorCode UpSampling_CPU::PreProcessCalculate()
 	{
-		this->batchSize = batchSize;
-
 		// 入力バッファ数を確認
 		this->inputBufferCount = this->GetInputBufferCount();
 		if(this->inputBufferCount == 0)
@@ -110,12 +108,12 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
 		// 入力バッファ保存用のアドレス配列を作成
-		this->m_lppInputBuffer.resize(batchSize, NULL);
+		this->m_lppInputBuffer.resize(this->GetBatchSize(), NULL);
 
 		// 出力バッファを作成
-		this->lpOutputBuffer.resize(this->batchSize * this->outputBufferCount);
-		this->lppBatchOutputBuffer.resize(this->batchSize);
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		this->lpOutputBuffer.resize(this->GetBatchSize() * this->outputBufferCount);
+		this->lppBatchOutputBuffer.resize(this->GetBatchSize());
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
 			this->lppBatchOutputBuffer[batchNum] = &this->lpOutputBuffer[batchNum * this->outputBufferCount];
 		}
@@ -123,23 +121,15 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
+	
 
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
+	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode UpSampling_CPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
+	ErrorCode UpSampling_CPU::PreProcessLoop()
 	{
-		if(this->pLearnData != NULL)
-			delete this->pLearnData;
-		this->pLearnData = data.Clone();
+		return ErrorCode::ERROR_CODE_NONE;
+	}
 
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode UpSampling_CPU::PreProcessCalculateLoop()
-	{
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
 
 
 	/** 演算処理を実行する.
@@ -148,23 +138,23 @@ namespace NeuralNetwork {
 	ErrorCode UpSampling_CPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
 	{
 		// 入力バッファのアドレスを配列に格納
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			this->m_lppInputBuffer[batchNum] = &i_lpInputBuffer[batchNum * this->inputBufferCount];
 
 		// 出力バッファをクリア
 		memset(&this->lpOutputBuffer[0], 0, sizeof(F32)*this->lpOutputBuffer.size());
 
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
-			for(U32 ch=0; ch<this->inputDataStruct.ch; ch++)
+			for(U32 ch=0; ch<this->GetInputDataStruct().ch; ch++)
 			{
-				for(U32 inputZ=0; inputZ<this->inputDataStruct.z; inputZ++)
+				for(U32 inputZ=0; inputZ<this->GetInputDataStruct().z; inputZ++)
 				{
-					for(U32 inputY=0; inputY<this->inputDataStruct.y; inputY++)
+					for(U32 inputY=0; inputY<this->GetInputDataStruct().y; inputY++)
 					{
-						for(U32 inputX=0; inputX<this->inputDataStruct.x; inputX++)
+						for(U32 inputX=0; inputX<this->GetInputDataStruct().x; inputX++)
 						{
-							U32 inputOffset = POSITION_TO_OFFSET_STRUCT(inputX, inputY, inputZ, ch, this->inputDataStruct);
+							U32 inputOffset = POSITION_TO_OFFSET_STRUCT(inputX, inputY, inputZ, ch, this->GetInputDataStruct());
 
 							switch(this->layerData.layerStructure.PaddingType)
 							{
@@ -181,7 +171,7 @@ namespace NeuralNetwork {
 													inputY*this->layerData.layerStructure.UpScale.y + offsetY,
 													inputZ*this->layerData.layerStructure.UpScale.z + offsetZ,
 													ch,
-													this->outputDataStruct);
+													this->GetOutputDataStruct());
 
 												this->lppBatchOutputBuffer[batchNum][outputOffset] = this->m_lppInputBuffer[batchNum][inputOffset];
 											}
@@ -196,7 +186,7 @@ namespace NeuralNetwork {
 										inputY*this->layerData.layerStructure.UpScale.y + 0,
 										inputZ*this->layerData.layerStructure.UpScale.z + 0,
 										ch,
-										this->outputDataStruct);
+										this->GetOutputDataStruct());
 
 									this->lppBatchOutputBuffer[batchNum][outputOffset] = this->m_lppInputBuffer[batchNum][inputOffset];
 								}
@@ -247,7 +237,7 @@ namespace NeuralNetwork {
 	ErrorCode UpSampling_CPU::CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		// 出力誤差バッファのアドレスを配列に格納
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			this->m_lppDOutputBuffer[batchNum] = &i_lppDOutputBuffer[batchNum * this->outputBufferCount];
 
 		// 入力誤差計算
@@ -255,24 +245,24 @@ namespace NeuralNetwork {
 		if(o_lppDInputBuffer)
 		{
 			// 入力誤差バッファのアドレスを配列に格納
-			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 				this->m_lppDInputBuffer[batchNum] = &o_lppDInputBuffer[batchNum * this->inputBufferCount];
 
 			// 入力誤差バッファを初期化
-			memset(this->m_lpDInputBuffer, 0, sizeof(F32)*this->inputBufferCount*this->batchSize);
+			memset(this->m_lpDInputBuffer, 0, sizeof(F32)*this->inputBufferCount*this->GetBatchSize());
 
 		
-			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
-				for(U32 ch=0; ch<this->inputDataStruct.ch; ch++)
+				for(U32 ch=0; ch<this->GetInputDataStruct().ch; ch++)
 				{
-					for(U32 inputZ=0; inputZ<this->inputDataStruct.z; inputZ++)
+					for(U32 inputZ=0; inputZ<this->GetInputDataStruct().z; inputZ++)
 					{
-						for(U32 inputY=0; inputY<this->inputDataStruct.y; inputY++)
+						for(U32 inputY=0; inputY<this->GetInputDataStruct().y; inputY++)
 						{
-							for(U32 inputX=0; inputX<this->inputDataStruct.x; inputX++)
+							for(U32 inputX=0; inputX<this->GetInputDataStruct().x; inputX++)
 							{
-								U32 inputOffset = POSITION_TO_OFFSET_STRUCT(inputX, inputY, inputZ, ch, this->inputDataStruct);
+								U32 inputOffset = POSITION_TO_OFFSET_STRUCT(inputX, inputY, inputZ, ch, this->GetInputDataStruct());
 
 								switch(this->layerData.layerStructure.PaddingType)
 								{
@@ -289,7 +279,7 @@ namespace NeuralNetwork {
 														inputY*this->layerData.layerStructure.UpScale.y + offsetY,
 														inputZ*this->layerData.layerStructure.UpScale.z + offsetZ,
 														ch,
-														this->outputDataStruct);
+														this->GetOutputDataStruct());
 
 
 													this->m_lppDInputBuffer[batchNum][inputOffset] += this->m_lppDOutputBuffer[batchNum][outputOffset];
@@ -305,7 +295,7 @@ namespace NeuralNetwork {
 											inputY*this->layerData.layerStructure.UpScale.y + 0,
 											inputZ*this->layerData.layerStructure.UpScale.z + 0,
 											ch,
-											this->outputDataStruct);
+											this->GetOutputDataStruct());
 
 										this->m_lppDInputBuffer[batchNum][inputOffset] = this->m_lppDOutputBuffer[batchNum][outputOffset];
 									}
@@ -349,7 +339,7 @@ namespace NeuralNetwork {
 		const U32 batchSize = this->GetBatchSize();
 		const U32 inputBufferCount = this->GetInputBufferCount();
 
-		memcpy(o_lpDInputBuffer, this->GetDInputBuffer(), sizeof(F32)*inputBufferCount*this->batchSize);
+		memcpy(o_lpDInputBuffer, this->GetDInputBuffer(), sizeof(F32)*inputBufferCount*this->GetBatchSize());
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

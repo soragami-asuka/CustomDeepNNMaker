@@ -75,9 +75,9 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode Residual_GPU::PreProcessLearn(unsigned int batchSize)
+	ErrorCode Residual_GPU::PreProcessLearn()
 	{
-		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
+		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
@@ -93,10 +93,8 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Residual_GPU::PreProcessCalculate(unsigned int batchSize)
+	ErrorCode Residual_GPU::PreProcessCalculate()
 	{
-		this->batchSize = batchSize;
-
 		// 入力バッファ数を確認
 		this->lpInputBufferCount.resize(this->GetInputDataCount());
 		for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
@@ -115,7 +113,7 @@ namespace NeuralNetwork {
 		this->m_lppInputBuffer.resize(this->GetInputDataCount());
 
 		// 出力バッファを作成
-		this->lpOutputBuffer.resize(this->batchSize * this->outputBufferCount);
+		this->lpOutputBuffer.resize(this->GetBatchSize() * this->outputBufferCount);
 
 
 
@@ -123,22 +121,13 @@ namespace NeuralNetwork {
 	}
 
 
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
+	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Residual_GPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
+	ErrorCode Residual_GPU::PreProcessLoop()
 	{
-		if(this->pLearnData != NULL)
-			delete this->pLearnData;
-		this->pLearnData = data.Clone();
+		return ErrorCode::ERROR_CODE_NONE;
+	}
 
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Residual_GPU::PreProcessCalculateLoop()
-	{
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
 
 
 	/** 演算処理を実行する.
@@ -155,7 +144,7 @@ namespace NeuralNetwork {
 		cudaMemset(thrust::raw_pointer_cast(&this->lpOutputBuffer[0]), 0, sizeof(F32)*this->lpOutputBuffer.size());
 
 		F32 alpha = 1.0f;
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
 			for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
 			{
@@ -223,7 +212,7 @@ namespace NeuralNetwork {
 				this->m_lppDInputBuffer[inputNum] = o_lppDInputBuffer[inputNum];
 			}
 
-			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
 				for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
 				{
@@ -241,20 +230,20 @@ namespace NeuralNetwork {
 
 
 #ifdef _DEBUG
-		std::vector<float> lpTmpInputBuffer0(this->batchSize * this->lpInputBufferCount[0]);
+		std::vector<float> lpTmpInputBuffer0(this->GetBatchSize() * this->lpInputBufferCount[0]);
 		cudaMemcpy(&lpTmpInputBuffer0[0], this->m_lppInputBuffer[0], sizeof(float)*lpTmpInputBuffer0.size(), cudaMemcpyDeviceToHost);
-		std::vector<float> lpTmpInputBuffer1(this->batchSize * this->lpInputBufferCount[1]);
+		std::vector<float> lpTmpInputBuffer1(this->GetBatchSize() * this->lpInputBufferCount[1]);
 		cudaMemcpy(&lpTmpInputBuffer1[0], this->m_lppInputBuffer[1], sizeof(float)*lpTmpInputBuffer1.size(), cudaMemcpyDeviceToHost);
 
-		std::vector<float> lpTmpOutputBuffer(this->batchSize * this->outputBufferCount);
+		std::vector<float> lpTmpOutputBuffer(this->GetBatchSize() * this->outputBufferCount);
 		cudaMemcpy(&lpTmpOutputBuffer[0], thrust::raw_pointer_cast(&this->lpOutputBuffer[0]), sizeof(float)*lpTmpOutputBuffer.size(), cudaMemcpyDeviceToHost);
 
-		std::vector<float> lpTmpDOutputBuffer(this->batchSize * this->outputBufferCount);
+		std::vector<float> lpTmpDOutputBuffer(this->GetBatchSize() * this->outputBufferCount);
 		cudaMemcpy(&lpTmpDOutputBuffer[0], i_lppDOutputBuffer, sizeof(float)*lpTmpDOutputBuffer.size(), cudaMemcpyDeviceToHost);
 
-		std::vector<float> lpTmpDInputBuffer0(this->batchSize * this->lpInputBufferCount[0]);
+		std::vector<float> lpTmpDInputBuffer0(this->GetBatchSize() * this->lpInputBufferCount[0]);
 		cudaMemcpy(&lpTmpDInputBuffer0[0], o_lppDInputBuffer[0], sizeof(float)*lpTmpDInputBuffer0.size(), cudaMemcpyDeviceToHost);
-		std::vector<float> lpTmpDInputBuffer1(this->batchSize * this->lpInputBufferCount[1]);
+		std::vector<float> lpTmpDInputBuffer1(this->GetBatchSize() * this->lpInputBufferCount[1]);
 		cudaMemcpy(&lpTmpDInputBuffer1[0], o_lppDInputBuffer[1], sizeof(float)*lpTmpDInputBuffer1.size(), cudaMemcpyDeviceToHost);
 #endif
 

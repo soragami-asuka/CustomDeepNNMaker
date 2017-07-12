@@ -13,11 +13,11 @@ namespace NeuralNetwork {
 
 	
 	/** コンストラクタ */
-	LayerConnectMult2Single::LayerConnectMult2Single(class FeedforwardNeuralNetwork_Base& neuralNetwork, ILayerBase* pLayer, Gravisbell::SettingData::Standard::IData* pLearnSettingData)
+	LayerConnectMult2Single::LayerConnectMult2Single(class FeedforwardNeuralNetwork_Base& neuralNetwork, ILayerBase* pLayer, Gravisbell::SettingData::Standard::IData* pRuntimeParameter)
 		:	neuralNetwork		(neuralNetwork)
 		,	pLayer				(pLayer)
 		,	pLayer_io			(dynamic_cast<INNMult2SingleLayer*>(pLayer))
-		,	pLearnSettingData	(pLearnSettingData)
+		,	pRuntimeParameter	(pRuntimeParameter)
 	{
 	}
 	/** デストラクタ */
@@ -25,8 +25,8 @@ namespace NeuralNetwork {
 	{
 		if(pLayer != NULL)
 			delete pLayer;
-		if(pLearnSettingData != NULL)
-			delete pLearnSettingData;
+		if(pRuntimeParameter != NULL)
+			delete pRuntimeParameter;
 	}
 
 	/** GUIDを取得する */
@@ -43,9 +43,9 @@ namespace NeuralNetwork {
 	
 	/** 学習設定のポインタを取得する.
 		取得したデータを直接書き換えることで次の学習ループに反映されるが、NULLが返ってくることもあるので注意. */
-	Gravisbell::SettingData::Standard::IData* LayerConnectMult2Single::GetLearnSettingData()
+	Gravisbell::SettingData::Standard::IData* LayerConnectMult2Single::GetRuntimeParameter()
 	{
-		return this->pLearnSettingData;
+		return this->pRuntimeParameter;
 	}
 
 	/** 出力データ構造を取得する.
@@ -388,21 +388,12 @@ namespace NeuralNetwork {
 
 		return this->pLayer->PreProcessCalculate(batchSize);
 	}
-
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
+	
+	/** 処理ループの初期化処理.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode LayerConnectMult2Single::PreProcessLearnLoop()
+	ErrorCode LayerConnectMult2Single::PreProcessLoop()
 	{
-		if(this->pLearnSettingData == NULL)
-			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-
-		return this->pLayer->PreProcessLearnLoop(*this->pLearnSettingData);
-	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode LayerConnectMult2Single::PreProcessCalculateLoop()
-	{
-		return this->pLayer->PreProcessCalculateLoop();
+		return this->pLayer->PreProcessLoop();
 	}
 
 	/** 演算処理を実行する. */

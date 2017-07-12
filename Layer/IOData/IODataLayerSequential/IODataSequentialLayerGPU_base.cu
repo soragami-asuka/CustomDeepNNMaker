@@ -172,16 +172,11 @@ namespace IOData {
 
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
+	
 
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
+	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	Gravisbell::ErrorCode IODataSequentialLayerGPU_base::PreProcessLearnLoop(const SettingData::Standard::IData& config)
-	{
-		return this->PreProcessCalculateLoop();
-	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	Gravisbell::ErrorCode IODataSequentialLayerGPU_base::PreProcessCalculateLoop()
+	ErrorCode IODataSequentialLayerGPU_base::PreProcessLoop()
 	{
 		this->calcErrorCount = 0;
 		cudaMemset(thrust::raw_pointer_cast(&this->lpErrorValue_max[0]), 0, sizeof(F32)*this->lpErrorValue_max.size());

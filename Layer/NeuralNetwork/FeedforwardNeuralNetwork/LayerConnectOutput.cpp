@@ -37,7 +37,7 @@ namespace NeuralNetwork {
 
 	/** 学習設定のポインタを取得する.
 		取得したデータを直接書き換えることで次の学習ループに反映されるが、NULLが返ってくることもあるので注意. */
-	Gravisbell::SettingData::Standard::IData* LayerConnectOutput::GetLearnSettingData()
+	Gravisbell::SettingData::Standard::IData* LayerConnectOutput::GetRuntimeParameter()
 	{
 		return NULL;
 	}
@@ -321,16 +321,10 @@ namespace NeuralNetwork {
 	{
 		return ErrorCode::ERROR_CODE_NONE;
 	}
-
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
+	
+	/** 処理ループの初期化処理.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode LayerConnectOutput::PreProcessLearnLoop()
-	{
-		return ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode LayerConnectOutput::PreProcessCalculateLoop()
+	ErrorCode LayerConnectOutput::PreProcessLoop()
 	{
 		return ErrorCode::ERROR_CODE_NONE;
 	}

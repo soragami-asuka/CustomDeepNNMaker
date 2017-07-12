@@ -65,13 +65,13 @@
       <Default>sigmoid</Default>
     </Enum>
 
-    <Int id="LeakyReLU_alpha">
+    <Float id="LeakyReLU_alpha">
       <Name>Leaky-ReLU-Alpha</Name>
       <Text>Leaky-ReLUで使用するαの値</Text>
       <Min>0.0</Min>
       <Min>100.0</Min>
       <Default>0.2</Default>
-    </Int>
+    </Float>
     
   </Structure>
 

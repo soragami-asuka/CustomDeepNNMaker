@@ -55,6 +55,9 @@
     <Filter Include="Layer">
       <UniqueIdentifier>{65317a4e-8411-4853-b7a7-572d9e80e862}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LayerBase">
+      <UniqueIdentifier>{a6c42085-39b6-44c7-a6ed-6f1f73acd71b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -158,6 +161,9 @@
     </ClInclude>
     <ClInclude Include="BatchNormalization_GPU.cuh">
       <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase.h">
+      <Filter>LayerBase</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

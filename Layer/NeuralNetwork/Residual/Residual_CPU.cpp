@@ -74,21 +74,21 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode Residual_CPU::PreProcessLearn(unsigned int batchSize)
+	ErrorCode Residual_CPU::PreProcessLearn()
 	{
-		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
+		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
 		// 出力誤差バッファ受け取り用のアドレス配列を作成する
-		this->m_lppDOutputBufferPrev.resize(batchSize);
+		this->m_lppDOutputBufferPrev.resize(this->GetBatchSize());
 
 		// 入力差分バッファ受け取り用のアドレス配列を作成する
 		this->m_lppDInputBuffer.resize(this->GetInputDataCount());
 		this->m_lppBatchDInputBuffer.resize(this->GetInputDataCount());
 		for(U32 inputNum=0; inputNum<this->GetInputDataCount(); inputNum++)
 		{
-			this->m_lppBatchDInputBuffer[inputNum].resize(this->batchSize);
+			this->m_lppBatchDInputBuffer[inputNum].resize(this->GetBatchSize());
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
@@ -99,10 +99,8 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Residual_CPU::PreProcessCalculate(unsigned int batchSize)
+	ErrorCode Residual_CPU::PreProcessCalculate()
 	{
-		this->batchSize = batchSize;
-
 		// 入力バッファ数を確認
 		this->lpInputBufferCount.resize(this->GetInputDataCount());
 		for(U32 inputNum=0; inputNum<this->GetInputDataCount(); inputNum++)
@@ -119,13 +117,13 @@ namespace NeuralNetwork {
 		this->m_lppInputBuffer.resize(this->GetInputDataCount());
 		for(U32 inputNum=0; inputNum<this->GetInputDataCount(); inputNum++)
 		{
-			this->m_lppInputBuffer[inputNum].resize(this->batchSize, NULL);
+			this->m_lppInputBuffer[inputNum].resize(this->GetBatchSize(), NULL);
 		}
 
 		// 出力バッファを作成
-		this->lpOutputBuffer.resize(this->batchSize * this->outputBufferCount);
-		this->lppBatchOutputBuffer.resize(this->batchSize);
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		this->lpOutputBuffer.resize(this->GetBatchSize() * this->outputBufferCount);
+		this->lppBatchOutputBuffer.resize(this->GetBatchSize());
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
 			this->lppBatchOutputBuffer[batchNum] = &this->lpOutputBuffer[batchNum * this->outputBufferCount];
 		}
@@ -134,23 +132,13 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
-
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
+	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Residual_CPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
+	ErrorCode Residual_CPU::PreProcessLoop()
 	{
-		if(this->pLearnData != NULL)
-			delete this->pLearnData;
-		this->pLearnData = data.Clone();
+		return ErrorCode::ERROR_CODE_NONE;
+	}
 
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Residual_CPU::PreProcessCalculateLoop()
-	{
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
 
 
 	/** 演算処理を実行する.
@@ -161,14 +149,14 @@ namespace NeuralNetwork {
 		// 入力バッファのアドレスを配列に格納
 		for(U32 inputNum=0; inputNum<this->GetInputDataCount(); inputNum++)
 		{
-			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 				this->m_lppInputBuffer[inputNum][batchNum] = &i_lpInputBuffer[inputNum][batchNum * this->lpInputBufferCount[inputNum]];
 		}
 
 		// 出力バッファを0クリア
 		memset(&this->lpOutputBuffer[0], 0, sizeof(F32)*this->lpOutputBuffer.size());
 
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
 			for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
 			{
@@ -218,7 +206,7 @@ namespace NeuralNetwork {
 	ErrorCode Residual_CPU::CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer[], CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		// 出力誤差バッファのアドレスを配列に格納
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			this->m_lppDOutputBufferPrev[batchNum] = &i_lppDOutputBuffer[batchNum * this->outputBufferCount];
 
 		if(o_lppDInputBuffer)
@@ -227,7 +215,7 @@ namespace NeuralNetwork {
 			for(U32 inputNum=0; inputNum<this->GetInputDataCount(); inputNum++)
 			{
 				this->m_lppDInputBuffer[inputNum] = o_lppDInputBuffer[inputNum];
-				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+				for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 				{
 					this->m_lppBatchDInputBuffer[inputNum][batchNum] = &this->m_lppDInputBuffer[inputNum][batchNum*this->lpInputBufferCount[inputNum]];
 				}
@@ -235,7 +223,7 @@ namespace NeuralNetwork {
 
 
 			U32 CH_SIZE = this->GetOutputDataStruct().x * this->GetOutputDataStruct().y * this->GetOutputDataStruct().z;
-			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
 				U32 offset_output = 0;
 				for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
@@ -249,20 +237,20 @@ namespace NeuralNetwork {
 		}
 
 #ifdef _DEBUG
-		std::vector<float> lpTmpInputBuffer0(this->batchSize * this->lpInputBufferCount[0]);
+		std::vector<float> lpTmpInputBuffer0(this->GetBatchSize() * this->lpInputBufferCount[0]);
 		memcpy(&lpTmpInputBuffer0[0], this->m_lppInputBuffer[0][0], sizeof(float)*lpTmpInputBuffer0.size());
-		std::vector<float> lpTmpInputBuffer1(this->batchSize * this->lpInputBufferCount[1]);
+		std::vector<float> lpTmpInputBuffer1(this->GetBatchSize() * this->lpInputBufferCount[1]);
 		memcpy(&lpTmpInputBuffer1[0], this->m_lppInputBuffer[1][0], sizeof(float)*lpTmpInputBuffer1.size());
 
-		std::vector<float> lpTmpOutputBuffer(this->batchSize * this->outputBufferCount);
+		std::vector<float> lpTmpOutputBuffer(this->GetBatchSize() * this->outputBufferCount);
 		memcpy(&lpTmpOutputBuffer[0], &this->lpOutputBuffer[0], sizeof(float)*lpTmpOutputBuffer.size());
 
-		std::vector<float> lpTmpDOutputBuffer(this->batchSize * this->outputBufferCount);
+		std::vector<float> lpTmpDOutputBuffer(this->GetBatchSize() * this->outputBufferCount);
 		memcpy(&lpTmpDOutputBuffer[0], i_lppDOutputBuffer, sizeof(float)*lpTmpDOutputBuffer.size());
 
-		std::vector<float> lpTmpDInputBuffer0(this->batchSize * this->lpInputBufferCount[0]);
+		std::vector<float> lpTmpDInputBuffer0(this->GetBatchSize() * this->lpInputBufferCount[0]);
 		memcpy(&lpTmpDInputBuffer0[0], o_lppDInputBuffer[0], sizeof(float)*lpTmpDInputBuffer0.size());
-		std::vector<float> lpTmpDInputBuffer1(this->batchSize * this->lpInputBufferCount[1]);
+		std::vector<float> lpTmpDInputBuffer1(this->GetBatchSize() * this->lpInputBufferCount[1]);
 		memcpy(&lpTmpDInputBuffer1[0], o_lppDInputBuffer[1], sizeof(float)*lpTmpDInputBuffer1.size());
 #endif
 

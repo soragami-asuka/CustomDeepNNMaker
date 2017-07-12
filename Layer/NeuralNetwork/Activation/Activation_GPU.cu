@@ -93,11 +93,11 @@ namespace NeuralNetwork {
 	// レイヤーデータ関連
 	//===========================
 	/** レイヤーデータを取得する */
-	Activation_LayerData_Base& Activation_GPU::GetLayerData()
+	ILayerData& Activation_GPU::GetLayerData()
 	{
 		return this->layerData;
 	}
-	const Activation_LayerData_Base& Activation_GPU::GetLayerData()const
+	const ILayerData& Activation_GPU::GetLayerData()const
 	{
 		return this->layerData;
 	}
@@ -110,9 +110,9 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode Activation_GPU::PreProcessLearn(unsigned int batchSize)
+	ErrorCode Activation_GPU::PreProcessLearn()
 	{
-		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
+		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
@@ -124,10 +124,8 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Activation_GPU::PreProcessCalculate(unsigned int batchSize)
+	ErrorCode Activation_GPU::PreProcessCalculate()
 	{
-		this->batchSize = batchSize;
-
 		// 入力バッファ数を確認
 		this->inputBufferCount = this->GetInputBufferCount();
 		if(this->inputBufferCount == 0)
@@ -146,9 +144,9 @@ namespace NeuralNetwork {
 			break;
 
 		default:
-			this->lpOutputBuffer_d.resize(this->batchSize * this->outputBufferCount);
+			this->lpOutputBuffer_d.resize(this->GetBatchSize() * this->outputBufferCount);
 			{
-				int n = this->batchSize;
+				int n = this->GetBatchSize();
 				int c = this->GetOutputDataStruct().ch;
 				int h = this->GetOutputDataStruct().z * this->GetOutputDataStruct().y;
 				int w = this->GetOutputDataStruct().x;
@@ -228,20 +226,10 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
-
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
+	
+	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Activation_GPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
-	{
-		if(this->pLearnData != NULL)
-			delete this->pLearnData;
-		this->pLearnData = data.Clone();
-
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Activation_GPU::PreProcessCalculateLoop()
+	ErrorCode Activation_GPU::PreProcessLoop()
 	{
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
@@ -289,7 +277,7 @@ namespace NeuralNetwork {
 		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_LeakyReLU:
 			{
 				U32 MAX_BUFFER_SIZE = 32768;
-				U32 bufferSize = this->inputBufferCount * this->batchSize;
+				U32 bufferSize = this->inputBufferCount * this->GetBatchSize();
 				U32 remainingSize = bufferSize;
 				while(remainingSize > 0)
 				{
@@ -409,7 +397,7 @@ namespace NeuralNetwork {
 			{
 				// lenear
 			case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_lenear:
-				cudaMemcpy(this->m_lpDInputBuffer_d, this->m_lpDOutputBufferPrev_d, sizeof(F32)*this->inputBufferCount*this->batchSize, cudaMemcpyDeviceToDevice);
+				cudaMemcpy(this->m_lpDInputBuffer_d, this->m_lpDOutputBufferPrev_d, sizeof(F32)*this->inputBufferCount*this->GetBatchSize(), cudaMemcpyDeviceToDevice);
 				break;
 
 			default:
@@ -443,7 +431,7 @@ namespace NeuralNetwork {
 				case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_LeakyReLU:
 					{
 						U32 MAX_BUFFER_SIZE = 32768;
-						U32 bufferSize = this->inputBufferCount * this->batchSize;
+						U32 bufferSize = this->inputBufferCount * this->GetBatchSize();
 						U32 remainingSize = bufferSize;
 						while(remainingSize > 0)
 						{
@@ -508,7 +496,7 @@ namespace NeuralNetwork {
 				case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_sigmoid_crossEntropy:
 				case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_ALL_crossEntropy:
 				case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_CH_crossEntropy:
-					cudaMemcpy(this->m_lpDInputBuffer_d, this->m_lpDOutputBufferPrev_d, sizeof(F32)*this->inputBufferCount*this->batchSize, cudaMemcpyDeviceToDevice);
+					cudaMemcpy(this->m_lpDInputBuffer_d, this->m_lpDOutputBufferPrev_d, sizeof(F32)*this->inputBufferCount*this->GetBatchSize(), cudaMemcpyDeviceToDevice);
 					break;
 			}
 		}

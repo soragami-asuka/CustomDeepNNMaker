@@ -62,11 +62,11 @@ namespace NeuralNetwork {
 	// レイヤーデータ関連
 	//===========================
 	/** レイヤーデータを取得する */
-	Convolution_LayerData_Base& Convolution_CPU::GetLayerData()
+	ILayerData& Convolution_CPU::GetLayerData()
 	{
 		return this->layerData;
 	}
-	const Convolution_LayerData_Base& Convolution_CPU::GetLayerData()const
+	const ILayerData& Convolution_CPU::GetLayerData()const
 	{
 		return this->layerData;
 	}
@@ -79,18 +79,21 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode Convolution_CPU::PreProcessLearn(unsigned int batchSize)
+	ErrorCode Convolution_CPU::PreProcessLearn()
 	{
-		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
+		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
 		// 出力誤差バッファ受け取り用のアドレス配列を作成する
-		this->m_lppDOutputBuffer.resize(batchSize);
+		this->m_lppDOutputBuffer.resize(this->GetBatchSize());
 		
 		// 入力誤差バッファ受け取り用のアドレス配列を作成する
-		this->m_lppDInputBuffer.resize(batchSize);
+		this->m_lppDInputBuffer.resize(this->GetBatchSize());
 
+		// ニューロン/バイアスの誤差を一時保存するバッファを作成
+		this->lpDBias.resize(this->layerData.lpBias.size());
+		this->lpDNeuron.resize(this->layerData.lpNeuron.size());
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -100,10 +103,8 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Convolution_CPU::PreProcessCalculate(unsigned int batchSize)
+	ErrorCode Convolution_CPU::PreProcessCalculate()
 	{
-		this->batchSize = batchSize;
-
 		// 入力バッファ数を確認
 		this->inputBufferCount = this->GetInputBufferCount();
 		if(this->inputBufferCount == 0)
@@ -125,18 +126,18 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_FRAUD_INPUT_COUNT;
 
 		// ニューロンバッファのサイズ確認
-		if(this->layerData.lpNeuron.size() != this->neuronCount * this->filterSize * this->inputDataStruct.ch)
+		if(this->layerData.lpNeuron.size() != this->neuronCount * this->filterSize * this->GetInputDataStruct().ch)
 			return ErrorCode::ERROR_CODE_FRAUD_NEURON_COUNT;
 		if(this->layerData.lppNeuron.size() != this->neuronCount)
 			return ErrorCode::ERROR_CODE_FRAUD_NEURON_COUNT;
 
 		// 入力バッファ保存用のアドレス配列を作成
-		this->m_lppInputBuffer.resize(batchSize, NULL);
+		this->m_lppInputBuffer.resize(this->GetBatchSize(), NULL);
 
 		// 出力バッファを作成
-		this->lpOutputBuffer.resize(this->batchSize * this->outputBufferCount);
-		this->lppBatchOutputBuffer.resize(this->batchSize);
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		this->lpOutputBuffer.resize(this->GetBatchSize() * this->outputBufferCount);
+		this->lppBatchOutputBuffer.resize(this->GetBatchSize());
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
 			this->lppBatchOutputBuffer[batchNum] = &this->lpOutputBuffer[batchNum * this->outputBufferCount];
 		}
@@ -146,30 +147,13 @@ namespace NeuralNetwork {
 	}
 
 
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
+	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Convolution_CPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
-	{
-		if(this->pLearnData != NULL)
-			delete this->pLearnData;
-		this->pLearnData = data.Clone();
-//		this->pLearnData->WriteToStruct((BYTE*)&this->learnData);
-
-		// ニューロン/バイアスの誤差を一時保存するバッファを作成
-		if(lpDBias.empty() || lpDNeuron.empty())
-		{
-			this->lpDBias.resize(this->layerData.lpBias.size());
-			this->lpDNeuron.resize(this->layerData.lpNeuron.size());
-		}
-
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Convolution_CPU::PreProcessCalculateLoop()
+	ErrorCode Convolution_CPU::PreProcessLoop()
 	{
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
+
 
 
 	/** 演算処理を実行する.
@@ -178,47 +162,47 @@ namespace NeuralNetwork {
 	ErrorCode Convolution_CPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
 	{
 		// 入力バッファのアドレスを配列に格納
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			this->m_lppInputBuffer[batchNum] = &i_lpInputBuffer[batchNum * this->inputBufferCount];
 		
 		// 畳みこみ結合処理
-		for(unsigned int batchNum=0; batchNum<this->batchSize; batchNum++)
+		for(unsigned int batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
 			for(U32 neuronNum=0; neuronNum<(U32)this->layerData.layerStructure.Output_Channel; neuronNum++)
 			{
-				for(S32 convZ=0; convZ<this->outputDataStruct.z; convZ++)
+				for(S32 convZ=0; convZ<this->GetOutputDataStruct().z; convZ++)
 				{
-					for(S32 convY=0; convY<this->outputDataStruct.y; convY++)
+					for(S32 convY=0; convY<this->GetOutputDataStruct().y; convY++)
 					{
-						for(S32 convX=0; convX<this->outputDataStruct.x; convX++)
+						for(S32 convX=0; convX<this->GetOutputDataStruct().x; convX++)
 						{
-							U32 outputOffset = POSITION_TO_OFFSET_STRUCT(convX,convY,convZ,neuronNum, this->outputDataStruct);
+							U32 outputOffset = POSITION_TO_OFFSET_STRUCT(convX,convY,convZ,neuronNum, this->GetOutputDataStruct());
 
 							// 一時保存用のバッファを作成
 							F32 tmp = 0.0f;
 
 							// フィルタを処理する
-							for(U32 chNum=0; chNum<this->inputDataStruct.ch; chNum++)
+							for(U32 chNum=0; chNum<this->GetInputDataStruct().ch; chNum++)
 							{
 								for(S32 filterZ=0; filterZ<this->layerData.layerStructure.FilterSize.z; filterZ++)
 								{
 									const S32 inputZ = (S32)(convZ * this->layerData.layerStructure.Stride.z + filterZ - this->layerData.layerStructure.Padding.z);
-									if((U32)inputZ >= this->inputDataStruct.z)
+									if((U32)inputZ >= this->GetInputDataStruct().z)
 										continue;
 
 									for(S32 filterY=0; filterY<this->layerData.layerStructure.FilterSize.y; filterY++)
 									{
 										const S32 inputY = (S32)(convY * this->layerData.layerStructure.Stride.y + filterY - this->layerData.layerStructure.Padding.y);
-										if((U32)inputY >= this->inputDataStruct.y)
+										if((U32)inputY >= this->GetInputDataStruct().y)
 											continue;
 
 										for(S32 filterX=0; filterX<this->layerData.layerStructure.FilterSize.x; filterX++)
 										{
 											const S32 inputX = (S32)(convX * this->layerData.layerStructure.Stride.x + filterX - this->layerData.layerStructure.Padding.x);
-											if((U32)inputX >= this->inputDataStruct.x)
+											if((U32)inputX >= this->GetInputDataStruct().x)
 												continue;
 
-											const S32 inputOffset  = POSITION_TO_OFFSET_STRUCT(inputX,inputY,inputZ, chNum, this->inputDataStruct);
+											const S32 inputOffset  = POSITION_TO_OFFSET_STRUCT(inputX,inputY,inputZ, chNum, this->GetInputDataStruct());
 											const S32 filterOffset = POSITION_TO_OFFSET_VECTOR(filterX, filterY, filterZ, chNum, this->layerData.layerStructure.FilterSize, this->layerData.inputDataStruct.ch);
 
 											tmp += this->layerData.lppNeuron[neuronNum][filterOffset] * this->m_lppInputBuffer[batchNum][inputOffset];
@@ -278,18 +262,18 @@ namespace NeuralNetwork {
 	ErrorCode Convolution_CPU::CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		// 出力誤差バッファのアドレスを配列に格納
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			this->m_lppDOutputBuffer[batchNum] = &i_lppDOutputBuffer[batchNum * this->outputBufferCount];
 		
 		// 入力誤差バッファのアドレスを配列に格納
 		this->m_lpDInputBuffer = o_lppDInputBuffer;
 		if(o_lppDInputBuffer)
 		{
-			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 				this->m_lppDInputBuffer[batchNum] = &o_lppDInputBuffer[batchNum * this->inputBufferCount];
 			
 			// 入力誤差バッファを初期化
-			memset(this->m_lpDInputBuffer, 0, sizeof(F32)*this->inputBufferCount*this->batchSize);
+			memset(this->m_lpDInputBuffer, 0, sizeof(F32)*this->inputBufferCount*this->GetBatchSize());
 		}
 
 		
@@ -297,49 +281,49 @@ namespace NeuralNetwork {
 		memset(&this->lpDBias[0], 0, sizeof(F32)*this->lpDBias.size());
 		memset(&this->lpDNeuron[0], 0, sizeof(F32)*this->lpDNeuron.size());
 
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
 			// 入力誤差計算
 			for(S32 neuronNum=0; neuronNum<this->layerData.layerStructure.Output_Channel; neuronNum++)
 			{
-				for(S32 convZ=0; convZ<this->outputDataStruct.z; convZ++)
+				for(S32 convZ=0; convZ<this->GetOutputDataStruct().z; convZ++)
 				{
-					for(S32 convY=0; convY<this->outputDataStruct.y; convY++)
+					for(S32 convY=0; convY<this->GetOutputDataStruct().y; convY++)
 					{
-						for(S32 convX=0; convX<this->outputDataStruct.x; convX++)
+						for(S32 convX=0; convX<this->GetOutputDataStruct().x; convX++)
 						{
-							U32 outputOffet = POSITION_TO_OFFSET_STRUCT(convX,convY,convZ,neuronNum, this->outputDataStruct);
+							U32 outputOffet = POSITION_TO_OFFSET_STRUCT(convX,convY,convZ,neuronNum, this->GetOutputDataStruct());
 							F32 dOutput = this->m_lppDOutputBuffer[batchNum][outputOffet];
 
 							// フィルタを処理する
-							for(U32 chNum=0; chNum<this->inputDataStruct.ch; chNum++)
+							for(U32 chNum=0; chNum<this->GetInputDataStruct().ch; chNum++)
 							{
 								for(S32 filterZ=0; filterZ<this->layerData.layerStructure.FilterSize.z; filterZ++)
 								{
 									const S32 inputZ = (S32)((convZ * this->layerData.layerStructure.Stride.z) - this->layerData.layerStructure.Padding.z + filterZ);
-									if((U32)inputZ>=this->inputDataStruct.z)
+									if((U32)inputZ>=this->GetInputDataStruct().z)
 										continue;
 
 									for(S32 filterY=0; filterY<this->layerData.layerStructure.FilterSize.y; filterY++)
 									{
 										const S32 inputY = (S32)((convY * this->layerData.layerStructure.Stride.y) - this->layerData.layerStructure.Padding.y + filterY);
-										if((U32)inputY>=this->inputDataStruct.y)
+										if((U32)inputY>=this->GetInputDataStruct().y)
 											continue;
 
 										for(S32 filterX=0; filterX<this->layerData.layerStructure.FilterSize.x; filterX++)
 										{
 											const S32 inputX = (S32)((convX * this->layerData.layerStructure.Stride.x) - this->layerData.layerStructure.Padding.x + filterX);
-											if((U32)inputX>=this->inputDataStruct.x)
+											if((U32)inputX>=this->GetInputDataStruct().x)
 												continue;
 
-											const S32 inputOffset  = POSITION_TO_OFFSET_STRUCT(inputX,inputY,inputZ, chNum, this->inputDataStruct);
+											const S32 inputOffset  = POSITION_TO_OFFSET_STRUCT(inputX,inputY,inputZ, chNum, this->GetInputDataStruct());
 											const S32 filterOffset = POSITION_TO_OFFSET_VECTOR(filterX, filterY, filterZ, chNum, this->layerData.layerStructure.FilterSize, this->layerData.inputDataStruct.ch);
 
 											if(this->m_lpDInputBuffer)
 												this->m_lppDInputBuffer[batchNum][inputOffset] += this->layerData.lppNeuron[neuronNum][filterOffset] * dOutput;
 
 											// ニューロンの重み変化量を追加
-											this->lpDNeuron[neuronNum*this->filterSize*this->inputDataStruct.ch + filterOffset] += this->m_lppInputBuffer[batchNum][inputOffset] * dOutput;
+											this->lpDNeuron[neuronNum*this->filterSize*this->GetInputDataStruct().ch + filterOffset] += this->m_lppInputBuffer[batchNum][inputOffset] * dOutput;
 										}
 									}
 								}
@@ -396,7 +380,7 @@ namespace NeuralNetwork {
 		const U32 batchSize = this->GetBatchSize();
 		const U32 inputBufferCount = this->GetInputBufferCount();
 
-		memcpy(o_lpDInputBuffer, this->GetDInputBuffer(), sizeof(F32)*inputBufferCount*this->batchSize);
+		memcpy(o_lpDInputBuffer, this->GetDInputBuffer(), sizeof(F32)*inputBufferCount*this->GetBatchSize());
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

@@ -185,6 +185,7 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerDLL.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
     <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h" />
+    <ClInclude Include="..\_LayerBase\CLayerBase.h" />
     <ClInclude Include="BatchNormalization_Base.h" />
     <ClInclude Include="BatchNormalization_CPU.h" />
     <ClInclude Include="BatchNormalization_DATA.hpp" />

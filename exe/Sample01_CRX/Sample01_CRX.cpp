@@ -435,7 +435,7 @@ Gravisbell::ErrorCode LearnNeuralNetwork(
 	Gravisbell::ErrorCode err;
 
 	// 学習係数を設定
-	pNeuralNetwork->SetLearnSettingData(L"LearnCoeff", 0.1f);
+	pNeuralNetwork->SetRuntimeParameter(L"LearnCoeff", 0.1f);
 
 	// 事前処理を実行
 	err = pNeuralNetwork->PreProcessLearn(BATCH_SIZE);
@@ -474,9 +474,9 @@ Gravisbell::ErrorCode LearnNeuralNetwork(
 
 		// 学習ループ先頭処理
 		pBatchDataNoListGenerator->PreProcessLearnLoop();
-		pInputLayer->PreProcessLearnLoop(*pLearnSetting);
-		pTeachLayer->PreProcessLearnLoop(*pLearnSetting);
-		pNeuralNetwork->PreProcessLearnLoop(*pLearnSetting);
+		pInputLayer->PreProcessLoop();
+		pTeachLayer->PreProcessLoop();
+		pNeuralNetwork->PreProcessLoop();
 
 		// バッチ単位で処理
 		for(U32 batchNum=0; batchNum<pBatchDataNoListGenerator->GetBatchDataNoListCount(); batchNum++)
@@ -532,9 +532,9 @@ Gravisbell::ErrorCode CalculateSampleError(
 		return err;
 
 	// 演算ループ先頭処理
-	pInputLayer->PreProcessCalculateLoop();
-	pTeachLayer->PreProcessCalculateLoop();
-	pNeuralNetwork->PreProcessCalculateLoop();
+	pInputLayer->PreProcessLoop();
+	pTeachLayer->PreProcessLoop();
+	pNeuralNetwork->PreProcessLoop();
 
 	// バッチ単位で処理
 	for(U32 dataNum=0; dataNum<pInputLayer->GetDataCount(); dataNum++)
@@ -577,7 +577,7 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 	Gravisbell::ErrorCode err;
 
 	// 学習係数を設定
-	pNeuralNetworkLearn->SetLearnSettingData(L"LearnCoeff", 0.01f);
+	pNeuralNetworkLearn->SetRuntimeParameter(L"LearnCoeff", 0.01f);
 
 	// 事前処理を実行
 	err = pNeuralNetworkLearn->PreProcessLearn(BATCH_SIZE);
@@ -634,9 +634,9 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 		{
 			// 学習ループ先頭処理
 //			pBatchDataNoListGenerator->PreProcessLearnLoop();
-			pTeachInputLayer->PreProcessLearnLoop(*pLearnSetting);
-			pTeachOutputLayer->PreProcessLearnLoop(*pLearnSetting);
-			pNeuralNetworkLearn->PreProcessLearnLoop(*pLearnSetting);
+			pTeachInputLayer->PreProcessLoop();
+			pTeachOutputLayer->PreProcessLoop();
+			pNeuralNetworkLearn->PreProcessLoop();
 
 			// 学習処理
 			// バッチ単位で処理
@@ -703,11 +703,11 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 
 
 		// サンプル実行
-		{		
+		{
 			// サンプル実行先頭処理
-			pSampleInputLayer->PreProcessCalculateLoop();
-			pSampleOutputLayer->PreProcessCalculateLoop();
-			pNeuralNetworkSample->PreProcessCalculateLoop();
+			pSampleInputLayer->PreProcessLoop();
+			pSampleOutputLayer->PreProcessLoop();
+			pNeuralNetworkSample->PreProcessLoop();
 
 			// バッチ単位で処理
 			for(U32 dataNum=0; dataNum<pSampleInputLayer->GetDataCount(); dataNum++)

@@ -56,7 +56,7 @@ namespace NeuralNetwork {
 
 		/** 学習設定のポインタを取得する.
 			取得したデータを直接書き換えることで次の学習ループに反映されるが、NULLが返ってくることもあるので注意. */
-		virtual Gravisbell::SettingData::Standard::IData* GetLearnSettingData() = 0;
+		virtual Gravisbell::SettingData::Standard::IData* GetRuntimeParameter() = 0;
 
 		/** 出力データ構造を取得する.
 			@return	出力データ構造 */
@@ -158,12 +158,9 @@ namespace NeuralNetwork {
 		virtual ErrorCode PreProcessCalculate(unsigned int batchSize) = 0;
 
 
-		/** 学習ループの初期化処理.データセットの学習開始前に実行する
+		/** 処理ループの初期化処理.
 			失敗した場合はCalculate以降の処理は実行不可. */
-		virtual ErrorCode PreProcessLearnLoop() = 0;
-		/** 演算ループの初期化処理.データセットの演算開始前に実行する
-			失敗した場合はCalculate以降の処理は実行不可. */
-		virtual ErrorCode PreProcessCalculateLoop() = 0;
+		virtual ErrorCode PreProcessLoop() = 0;
 
 
 		/** 演算処理を実行する. */

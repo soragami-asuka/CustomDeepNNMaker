@@ -30,7 +30,7 @@ namespace NeuralNetwork {
 		ILayerBase* pLayer;	/**< レイヤーのアドレス */
 		INNMult2SingleLayer*	pLayer_io;
 
-		Gravisbell::SettingData::Standard::IData* pLearnSettingData;	/**< 学習設定情報のアドレス */
+		Gravisbell::SettingData::Standard::IData* pRuntimeParameter;	/**< 学習設定情報のアドレス */
 
 		std::vector<LayerPosition>  lppOutputToLayer;		/**< 出力先レイヤー. SingleOutput扱いなので、必ず1個 */
 		std::vector<ILayerConnect*> lppInputFromLayer;	/**< 入力元レイヤー. SingleInput扱いなので、必ず1個 */
@@ -42,7 +42,7 @@ namespace NeuralNetwork {
 
 	public:
 		/** コンストラクタ */
-		LayerConnectMult2Single(class FeedforwardNeuralNetwork_Base& neuralNetwork, ILayerBase* pLayer, Gravisbell::SettingData::Standard::IData* pLearnSettingData);
+		LayerConnectMult2Single(class FeedforwardNeuralNetwork_Base& neuralNetwork, ILayerBase* pLayer, Gravisbell::SettingData::Standard::IData* pRuntimeParameter);
 		/** デストラクタ */
 		virtual ~LayerConnectMult2Single();
 
@@ -55,7 +55,7 @@ namespace NeuralNetwork {
 
 		/** 学習設定のポインタを取得する.
 			取得したデータを直接書き換えることで次の学習ループに反映されるが、NULLが返ってくることもあるので注意. */
-		Gravisbell::SettingData::Standard::IData* GetLearnSettingData();
+		Gravisbell::SettingData::Standard::IData* GetRuntimeParameter();
 
 		/** 出力データ構造を取得する.
 			@return	出力データ構造 */
@@ -160,12 +160,9 @@ namespace NeuralNetwork {
 		ErrorCode PreProcessCalculate(unsigned int batchSize);
 
 
-		/** 学習ループの初期化処理.データセットの学習開始前に実行する
+		/** 処理ループの初期化処理.
 			失敗した場合はCalculate以降の処理は実行不可. */
-		ErrorCode PreProcessLearnLoop();
-		/** 演算ループの初期化処理.データセットの演算開始前に実行する
-			失敗した場合はCalculate以降の処理は実行不可. */
-		ErrorCode PreProcessCalculateLoop();
+		ErrorCode PreProcessLoop();
 
 
 		/** 演算処理を実行する. */

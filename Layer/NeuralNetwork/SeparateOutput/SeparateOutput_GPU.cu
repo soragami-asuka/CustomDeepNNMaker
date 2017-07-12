@@ -75,9 +75,9 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode SeparateOutput_GPU::PreProcessLearn(unsigned int batchSize)
+	ErrorCode SeparateOutput_GPU::PreProcessLearn()
 	{
-		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
+		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
@@ -89,10 +89,8 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode SeparateOutput_GPU::PreProcessCalculate(unsigned int batchSize)
+	ErrorCode SeparateOutput_GPU::PreProcessCalculate()
 	{
-		this->batchSize = batchSize;
-
 		// 入力バッファ数を確認
 		this->inputBufferCount = this->GetInputBufferCount();
 		if(this->inputBufferCount == 0)
@@ -108,21 +106,12 @@ namespace NeuralNetwork {
 	}
 
 
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode SeparateOutput_GPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
-	{
-		if(this->pLearnData != NULL)
-			delete this->pLearnData;
-		this->pLearnData = data.Clone();
 
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
+	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode SeparateOutput_GPU::PreProcessCalculateLoop()
+	ErrorCode SeparateOutput_GPU::PreProcessLoop()
 	{
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 
 
@@ -179,7 +168,7 @@ namespace NeuralNetwork {
 		if(this->m_lpDInputBuffer_d)
 		{
 			// バッファ1つ目の出力誤差で上書き
-			cudaMemcpy(this->m_lpDInputBuffer_d, i_lppDOutputBuffer[0], sizeof(F32)*this->batchSize*this->outputBufferCount, cudaMemcpyDeviceToDevice);
+			cudaMemcpy(this->m_lpDInputBuffer_d, i_lppDOutputBuffer[0], sizeof(F32)*this->GetBatchSize()*this->outputBufferCount, cudaMemcpyDeviceToDevice);
 
 			// 加算
 			for(U32 outputLayerNum=1; outputLayerNum<(U32)this->layerData.layerStructure.separateCount; outputLayerNum++)
@@ -188,7 +177,7 @@ namespace NeuralNetwork {
 
 				cublasSaxpy_v2(
 					this->cublasHandle,
-					this->batchSize*this->outputBufferCount,
+					this->GetBatchSize()*this->outputBufferCount,
 					&alpha,
 					i_lppDOutputBuffer[outputLayerNum], 1,
 					this->m_lpDInputBuffer_d, 1);

@@ -69,8 +69,8 @@ public:
 	// レイヤーデータ関連
 	//===========================
 	/** レイヤーデータを取得する */
-	Activation_Discriminator_LayerData_Base& GetLayerData();
-	const Activation_Discriminator_LayerData_Base& GetLayerData()const;
+	ILayerData& GetLayerData();
+	const ILayerData& GetLayerData()const;
 
 
 public:
@@ -81,21 +81,18 @@ public:
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode PreProcessLearn(unsigned int batchSize);
+	ErrorCode PreProcessLearn();
 
 	/** 演算前処理を実行する.(演算用)
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode PreProcessCalculate(unsigned int batchSize);
+	ErrorCode PreProcessCalculate();
 
+	/** ループの初期化処理.データセットの実行開始前に実行する
+		失敗した場合はCalculate以降の処理は実行不可. */
+	ErrorCode PreProcessLoop();
 
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode PreProcessLearnLoop(const SettingData::Standard::IData& data);
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode PreProcessCalculateLoop();
 
 
 	/** 演算処理を実行する.

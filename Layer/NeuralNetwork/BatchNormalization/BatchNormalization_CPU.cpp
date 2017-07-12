@@ -59,11 +59,11 @@ namespace NeuralNetwork {
 	// レイヤーデータ関連
 	//===========================
 	/** レイヤーデータを取得する */
-	BatchNormalization_LayerData_Base& BatchNormalization_CPU::GetLayerData()
+	ILayerData& BatchNormalization_CPU::GetLayerData()
 	{
 		return this->layerData;
 	}
-	const BatchNormalization_LayerData_Base& BatchNormalization_CPU::GetLayerData()const
+	const ILayerData& BatchNormalization_CPU::GetLayerData()const
 	{
 		return this->layerData;
 	}
@@ -76,23 +76,23 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode BatchNormalization_CPU::PreProcessLearn(unsigned int batchSize)
+	ErrorCode BatchNormalization_CPU::PreProcessLearn()
 	{
-		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
+		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
 		// 学習用の変数を作成
 		this->onLearnMode = true;
 		this->learnCount = 0;
-		this->lpTmpMean.resize(this->inputDataStruct.ch, 0.0f);
-		this->lpTmpVariance.resize(this->inputDataStruct.ch, 0.0f);
+		this->lpTmpMean.resize(this->GetInputDataStruct().ch, 0.0f);
+		this->lpTmpVariance.resize(this->GetInputDataStruct().ch, 0.0f);
 
 		// 出力誤差バッファ受け取り用のアドレス配列を作成する
-		this->m_lppDOutputBufferPrev.resize(batchSize);
+		this->m_lppDOutputBufferPrev.resize(this->GetBatchSize());
 
 		// 入力誤差バッファ受け取り用のアドレス配列を作成する
-		this->m_lppDInputBuffer.resize(batchSize);
+		this->m_lppDInputBuffer.resize(this->GetBatchSize());
 
 		// パラメータ変化量のバッファを確保
 		this->lpDBias.resize(this->layerData.lpBias.size());
@@ -106,10 +106,8 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode BatchNormalization_CPU::PreProcessCalculate(unsigned int batchSize)
+	ErrorCode BatchNormalization_CPU::PreProcessCalculate()
 	{
-		this->batchSize = batchSize;
-
 		// 入力バッファ数を確認
 		this->inputBufferCount = this->GetInputBufferCount();
 		if(this->inputBufferCount == 0)
@@ -121,17 +119,17 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
 		// チャンネルごとのバッファ数を確認
-		this->channeclBufferCount = this->inputDataStruct.z * this->inputDataStruct.y * this->inputDataStruct.x;
+		this->channeclBufferCount = this->GetInputDataStruct().z * this->GetInputDataStruct().y * this->GetInputDataStruct().x;
 		if(this->channeclBufferCount == 0)
 			return ErrorCode::ERROR_CODE_FRAUD_INPUT_COUNT;
 
 		// 入力バッファ保存用のアドレス配列を作成
-		this->m_lppInputBuffer.resize(batchSize, NULL);
+		this->m_lppInputBuffer.resize(this->GetBatchSize(), NULL);
 
 		// 出力バッファを作成
-		this->lpOutputBuffer.resize(this->batchSize * this->outputBufferCount);
-		this->lppBatchOutputBuffer.resize(this->batchSize);
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		this->lpOutputBuffer.resize(this->GetBatchSize() * this->outputBufferCount);
+		this->lppBatchOutputBuffer.resize(this->GetBatchSize());
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
 			this->lppBatchOutputBuffer[batchNum] = &this->lpOutputBuffer[batchNum * this->outputBufferCount];
 		}
@@ -143,41 +141,37 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
-
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
+	
+	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode BatchNormalization_CPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
+	ErrorCode BatchNormalization_CPU::PreProcessLoop()
 	{
-		// 学習設定を保存
-		if(this->pLearnData != NULL)
-			delete this->pLearnData;
-		this->pLearnData = data.Clone();
-//		this->pLearnData->WriteToStruct((BYTE*)&learnData);
-
-
-		// 学習回数を初期化
-		this->learnCount = 0;
-
-		// 演算用の平均.分散を初期化
-		for(U32 ch=0; ch<this->inputDataStruct.ch; ch++)
+		switch(this->GetProcessType())
 		{
-			this->layerData.lpMean[ch] = 0.0f;
-			this->layerData.lpVariance[ch] = 0.0f;
+		case ProcessType::PROCESSTYPE_LEARN:
+			{
+				// 学習回数を初期化
+				this->learnCount = 0;
+
+				// 演算用の平均.分散を初期化
+				for(U32 ch=0; ch<this->GetInputDataStruct().ch; ch++)
+				{
+					this->layerData.lpMean[ch] = 0.0f;
+					this->layerData.lpVariance[ch] = 0.0f;
+				}
+			}
+			break;
+		case ProcessType::PROCESSTYPE_CALCULATE:	
+			{
+				// 平均,分散を一時バッファに移す
+				this->lpTmpMean = this->layerData.lpMean;
+				this->lpTmpVariance = this->layerData.lpVariance;
+			}
+			break;
 		}
 
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode BatchNormalization_CPU::PreProcessCalculateLoop()
-	{
-		// 平均,分散を一時バッファに移す
-		this->lpTmpMean = this->layerData.lpMean;
-		this->lpTmpVariance = this->layerData.lpVariance;
-
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
-
 
 	/** 演算処理を実行する.
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
@@ -185,31 +179,31 @@ namespace NeuralNetwork {
 	ErrorCode BatchNormalization_CPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
 	{
 		// 入力バッファのアドレスを配列に格納
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			this->m_lppInputBuffer[batchNum] = &i_lpInputBuffer[batchNum * this->inputBufferCount];
 
 		// 学習中ならば平均、分散を求める
 		if(this->onLearnMode)
 		{
 			// 平均を求める
-			for(U32 ch=0; ch<this->inputDataStruct.ch; ch++)
+			for(U32 ch=0; ch<this->GetInputDataStruct().ch; ch++)
 			{
 				this->lpTmpMean[ch] = 0.0f;
-				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+				for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 				{
 					for(U32 bufNum=0; bufNum<this->channeclBufferCount; bufNum++)
 					{
 						this->lpTmpMean[ch] += this->m_lppInputBuffer[batchNum][this->channeclBufferCount*ch + bufNum];
 					}
 				}
-				this->lpTmpMean[ch] /= (this->batchSize * this->channeclBufferCount);
+				this->lpTmpMean[ch] /= (this->GetBatchSize() * this->channeclBufferCount);
 			}
 
 			// 分散を求める
-			for(U32 ch=0; ch<this->inputDataStruct.ch; ch++)
+			for(U32 ch=0; ch<this->GetInputDataStruct().ch; ch++)
 			{
 				F64 tmp = 0.0f;
-				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+				for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 				{
 					for(U32 bufNum=0; bufNum<this->channeclBufferCount; bufNum++)
 					{
@@ -218,18 +212,18 @@ namespace NeuralNetwork {
 						tmp += (value - this->lpTmpMean[ch]) * (value - this->lpTmpMean[ch]);
 					}
 				}
-				this->lpTmpVariance[ch]    = (F32)(tmp / (this->batchSize * this->channeclBufferCount));
+				this->lpTmpVariance[ch]    = (F32)(tmp / (this->GetBatchSize() * this->channeclBufferCount));
 			}
 		}
 
 		// 平均,分散を利用して正規化
-		for(U32 ch=0; ch<this->inputDataStruct.ch; ch++)
+		for(U32 ch=0; ch<this->GetInputDataStruct().ch; ch++)
 		{
 			F32 mean = this->lpTmpMean[ch];
 			F32 variance = this->lpTmpVariance[ch] + (F32)max(this->layerData.layerStructure.epsilon, 1e-5);
 			F32 sqrtVariance = (F32)sqrt(variance);
 
-			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
 				for(U32 bufNum=0; bufNum<this->channeclBufferCount; bufNum++)
 				{
@@ -285,19 +279,19 @@ namespace NeuralNetwork {
 	ErrorCode BatchNormalization_CPU::CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		// 出力誤差バッファのアドレスを配列に格納
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			this->m_lppDOutputBufferPrev[batchNum] = &i_lppDOutputBuffer[batchNum * this->outputBufferCount];
 
 		// 入力誤差バッファのアドレスを配列に格納
 		this->m_lpDInputBuffer = o_lppDInputBuffer;
 		if(o_lppDInputBuffer)
 		{
-			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 				this->m_lppDInputBuffer[batchNum] = &o_lppDInputBuffer[batchNum * this->inputBufferCount];
 		}
 
 
-		for(U32 ch=0; ch<this->inputDataStruct.ch; ch++)
+		for(U32 ch=0; ch<this->GetInputDataStruct().ch; ch++)
 		{
 			F32 mean = this->lpTmpMean[ch];
 			F32 variance = this->lpTmpVariance[ch] + (F32)max(this->layerData.layerStructure.epsilon, 1e-5);
@@ -308,7 +302,7 @@ namespace NeuralNetwork {
 			// 平均と分散の誤差の合計値を求める
 			F32 dMean = 0.0f;
 			F32 dVariance = 0.0f;
-			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
 				for(U32 bufNum=0; bufNum<this->channeclBufferCount; bufNum++)
 				{
@@ -324,7 +318,7 @@ namespace NeuralNetwork {
 			// 入力誤差を求める
 			if(o_lppDInputBuffer)
 			{
-				for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+				for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 				{
 					for(U32 bufNum=0; bufNum<this->channeclBufferCount; bufNum++)
 					{
@@ -334,8 +328,8 @@ namespace NeuralNetwork {
 
 						this->m_lppDInputBuffer[batchNum][this->channeclBufferCount*ch + bufNum]
 							= dValue2 / sqrtVariance
-							+ dVariance * 2 * (value - mean) / (this->channeclBufferCount * this->batchSize)
-							+ dMean / (this->channeclBufferCount * this->batchSize);
+							+ dVariance * 2 * (value - mean) / (this->channeclBufferCount * this->GetBatchSize())
+							+ dMean / (this->channeclBufferCount * this->GetBatchSize());
 					}
 				}
 			}
@@ -343,16 +337,16 @@ namespace NeuralNetwork {
 
 
 #ifdef _DEBUG
-		std::vector<float> lpTmpInputBuffer(this->batchSize * this->inputBufferCount);
+		std::vector<float> lpTmpInputBuffer(this->GetBatchSize() * this->inputBufferCount);
 		memcpy(&lpTmpInputBuffer[0], this->m_lppInputBuffer[0], sizeof(float)*lpTmpInputBuffer.size());
 
-		std::vector<float> lpTmpOutputBuffer(this->batchSize * this->outputBufferCount);
+		std::vector<float> lpTmpOutputBuffer(this->GetBatchSize() * this->outputBufferCount);
 		memcpy(&lpTmpOutputBuffer[0], &this->lpOutputBuffer[0], sizeof(float)*lpTmpOutputBuffer.size());
 
-		std::vector<float> lpTmpDOutputBuffer(this->batchSize * this->outputBufferCount);
+		std::vector<float> lpTmpDOutputBuffer(this->GetBatchSize() * this->outputBufferCount);
 		memcpy(&lpTmpDOutputBuffer[0], i_lppDOutputBuffer, sizeof(float)*lpTmpDOutputBuffer.size());
 
-		std::vector<float> lpTmpDInputBuffer(this->batchSize * this->inputBufferCount);
+		std::vector<float> lpTmpDInputBuffer(this->GetBatchSize() * this->inputBufferCount);
 		memcpy(&lpTmpDInputBuffer[0], o_lppDInputBuffer, sizeof(float)*lpTmpDInputBuffer.size());
 #endif
 
@@ -377,7 +371,7 @@ namespace NeuralNetwork {
 		// 学習処理の実行回数をカウントアップ
 		this->learnCount++;
 
-		for(U32 ch=0; ch<this->inputDataStruct.ch; ch++)
+		for(U32 ch=0; ch<this->GetInputDataStruct().ch; ch++)
 		{
 			F32 mean = this->lpTmpMean[ch];
 			F32 variance = this->lpTmpVariance[ch] + (F32)max(this->layerData.layerStructure.epsilon, 1e-5);
@@ -387,7 +381,7 @@ namespace NeuralNetwork {
 			this->lpDScale[ch] = 0.0f;
 			this->lpDBias[ch] = 0.0f;
 
-			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
 				for(U32 bufNum=0; bufNum<this->channeclBufferCount; bufNum++)
 				{

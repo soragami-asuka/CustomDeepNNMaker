@@ -68,11 +68,11 @@ namespace NeuralNetwork {
 	// レイヤーデータ関連
 	//===========================
 	/** レイヤーデータを取得する */
-	Activation_Discriminator_LayerData_Base& Activation_Discriminator_GPU::GetLayerData()
+	ILayerData& Activation_Discriminator_GPU::GetLayerData()
 	{
 		return this->layerData;
 	}
-	const Activation_Discriminator_LayerData_Base& Activation_Discriminator_GPU::GetLayerData()const
+	const ILayerData& Activation_Discriminator_GPU::GetLayerData()const
 	{
 		return this->layerData;
 	}
@@ -85,9 +85,9 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode Activation_Discriminator_GPU::PreProcessLearn(unsigned int batchSize)
+	ErrorCode Activation_Discriminator_GPU::PreProcessLearn()
 	{
-		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
+		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
@@ -99,10 +99,8 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Activation_Discriminator_GPU::PreProcessCalculate(unsigned int batchSize)
+	ErrorCode Activation_Discriminator_GPU::PreProcessCalculate()
 	{
-		this->batchSize = batchSize;
-
 		// 入力バッファ数を確認
 		this->inputBufferCount = this->GetInputBufferCount();
 		if(this->inputBufferCount == 0)
@@ -114,10 +112,10 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
 		// 一時出力バッファを作成
-		this->lpTmpOutputBuffer_d.resize(this->batchSize * this->inputBufferCount);
-		this->lpDInputBuffer_h.resize(this->batchSize * this->inputBufferCount);
+		this->lpTmpOutputBuffer_d.resize(this->GetBatchSize() * this->inputBufferCount);
+		this->lpDInputBuffer_h.resize(this->GetBatchSize() * this->inputBufferCount);
 		{
-			int n = this->batchSize;
+			int n = this->GetBatchSize();
 			int c = this->GetInputDataStruct().ch;
 			int h = this->GetInputDataStruct().z * this->GetInputDataStruct().y;
 			int w = this->GetInputDataStruct().x;
@@ -156,10 +154,10 @@ namespace NeuralNetwork {
 		}
 
 		// 出力バッファを作成
-		this->lpOutputBuffer_d.resize(this->batchSize * this->outputBufferCount);
-		this->lpDOutputBuffer_h.resize(this->batchSize * this->outputBufferCount);	/**< 出力誤差バッファのCPU側アドレス */
+		this->lpOutputBuffer_d.resize(this->GetBatchSize() * this->outputBufferCount);
+		this->lpDOutputBuffer_h.resize(this->GetBatchSize() * this->outputBufferCount);	/**< 出力誤差バッファのCPU側アドレス */
 		{
-			int n = this->batchSize;
+			int n = this->GetBatchSize();
 			int c = this->GetOutputDataStruct().ch;
 			int h = this->GetOutputDataStruct().z * this->GetOutputDataStruct().y;
 			int w = this->GetOutputDataStruct().x;
@@ -182,20 +180,9 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
-
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
+	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Activation_Discriminator_GPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
-	{
-		if(this->pLearnData != NULL)
-			delete this->pLearnData;
-		this->pLearnData = data.Clone();
-
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Activation_Discriminator_GPU::PreProcessCalculateLoop()
+	ErrorCode Activation_Discriminator_GPU::PreProcessLoop()
 	{
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
@@ -226,7 +213,7 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
 
 		cublasStatus_t err_cublas =	cublasScopy_v2(this->cublasHandle,
-			this->batchSize,
+			this->GetBatchSize(),
 			thrust::raw_pointer_cast(&this->lpTmpOutputBuffer_d[0]),
 			this->inputBufferCount,
 			thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]),
@@ -286,13 +273,13 @@ namespace NeuralNetwork {
 			cudaMemcpy(thrust::raw_pointer_cast(&this->lpDOutputBuffer_h[0]), this->m_lpDOutputBufferPrev_d, sizeof(F32)*this->lpDOutputBuffer_h.size(), cudaMemcpyDeviceToHost);
 
 			// 入力誤差を計算
-			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
 				this->lpDInputBuffer_h[batchNum*this->inputBufferCount + 0] = (       this->lpOutputBuffer_d[batchNum]) *  this->lpDOutputBuffer_h[batchNum];
 				this->lpDInputBuffer_h[batchNum*this->inputBufferCount + 1] = (1.0f - this->lpOutputBuffer_d[batchNum]) * -this->lpDOutputBuffer_h[batchNum];
 			}
 
-			cudaMemcpy(this->m_lpDInputBuffer_d, thrust::raw_pointer_cast(&this->lpDInputBuffer_h[0]), sizeof(F32)*this->inputBufferCount*this->batchSize, cudaMemcpyHostToDevice);
+			cudaMemcpy(this->m_lpDInputBuffer_d, thrust::raw_pointer_cast(&this->lpDInputBuffer_h[0]), sizeof(F32)*this->inputBufferCount*this->GetBatchSize(), cudaMemcpyHostToDevice);
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;

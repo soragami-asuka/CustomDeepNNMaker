@@ -75,16 +75,16 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode Pooling_CPU::PreProcessLearn(unsigned int batchSize)
+	ErrorCode Pooling_CPU::PreProcessLearn()
 	{
-		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
+		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
 		// 出力誤差バッファ受け取り用のアドレス配列を作成する
-		this->m_lppDOutputBufferPrev.resize(batchSize);
+		this->m_lppDOutputBufferPrev.resize(this->GetBatchSize());
 		// 入力誤差バッファ受け取り用のアドレス配列を作成する
-		this->m_lppDInputBuffer.resize(batchSize);
+		this->m_lppDInputBuffer.resize(this->GetBatchSize());
 
 
 		return ErrorCode::ERROR_CODE_NONE;
@@ -95,10 +95,8 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Pooling_CPU::PreProcessCalculate(unsigned int batchSize)
+	ErrorCode Pooling_CPU::PreProcessCalculate()
 	{
-		this->batchSize = batchSize;
-
 		// 入力バッファ数を確認
 		this->inputBufferCount = this->GetInputBufferCount();
 		if(this->inputBufferCount == 0)
@@ -110,12 +108,12 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
 		// 入力バッファ保存用のアドレス配列を作成
-		this->m_lppInputBuffer.resize(batchSize, NULL);
+		this->m_lppInputBuffer.resize(this->GetBatchSize(), NULL);
 
 		// 出力バッファを作成
-		this->lpOutputBuffer.resize(this->batchSize * this->outputBufferCount);
-		this->lppBatchOutputBuffer.resize(this->batchSize);
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		this->lpOutputBuffer.resize(this->GetBatchSize() * this->outputBufferCount);
+		this->lppBatchOutputBuffer.resize(this->GetBatchSize());
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
 			this->lppBatchOutputBuffer[batchNum] = &this->lpOutputBuffer[batchNum * this->outputBufferCount];
 		}
@@ -125,21 +123,11 @@ namespace NeuralNetwork {
 	}
 
 
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
+	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Pooling_CPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
+	ErrorCode Pooling_CPU::PreProcessLoop()
 	{
-		if(this->pLearnData != NULL)
-			delete this->pLearnData;
-		this->pLearnData = data.Clone();
-
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Pooling_CPU::PreProcessCalculateLoop()
-	{
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 
 
@@ -149,37 +137,37 @@ namespace NeuralNetwork {
 	ErrorCode Pooling_CPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
 	{
 		// 入力バッファのアドレスを配列に格納
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			this->m_lppInputBuffer[batchNum] = &i_lpInputBuffer[batchNum * this->inputBufferCount];
 
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
-			for(U32 ch=0; ch<this->outputDataStruct.ch; ch++)
+			for(U32 ch=0; ch<this->GetOutputDataStruct().ch; ch++)
 			{
-				for(U32 outputZ=0; outputZ<this->outputDataStruct.z; outputZ++)
+				for(U32 outputZ=0; outputZ<this->GetOutputDataStruct().z; outputZ++)
 				{
-					for(U32 outputY=0; outputY<this->outputDataStruct.y; outputY++)
+					for(U32 outputY=0; outputY<this->GetOutputDataStruct().y; outputY++)
 					{
-						for(U32 outputX=0; outputX<this->outputDataStruct.x; outputX++)
+						for(U32 outputX=0; outputX<this->GetOutputDataStruct().x; outputX++)
 						{
 							// 最大値を調べる
 							F32 maxValue = -FLT_MAX;
 							for(S32 filterZ=0; filterZ<this->layerData.layerStructure.FilterSize.z; filterZ++)
 							{
 								U32 inputZ = outputZ * this->layerData.layerStructure.Stride.z + filterZ;
-								if(inputZ >= this->inputDataStruct.z)
+								if(inputZ >= this->GetInputDataStruct().z)
 									continue;
 
 								for(S32 filterY=0; filterY<this->layerData.layerStructure.FilterSize.y; filterY++)
 								{
 									U32 inputY = outputY * this->layerData.layerStructure.Stride.y + filterY;
-									if(inputY >= this->inputDataStruct.y)
+									if(inputY >= this->GetInputDataStruct().y)
 										continue;
 
 									for(S32 filterX=0; filterX<this->layerData.layerStructure.FilterSize.x; filterX++)
 									{
 										U32 inputX = outputX * this->layerData.layerStructure.Stride.x + filterX;
-										if(inputX >= this->inputDataStruct.x)
+										if(inputX >= this->GetInputDataStruct().x)
 											continue;
 
 										U32 inputOffset = POSITION_TO_OFFSET_STRUCT(
@@ -187,14 +175,14 @@ namespace NeuralNetwork {
 																inputY,
 																inputZ,
 																ch,
-																this->inputDataStruct);
+																this->GetInputDataStruct());
 
 										maxValue = max(maxValue, this->m_lppInputBuffer[batchNum][inputOffset]);
 									}
 								}
 							}
 							
-							U32 outputOffset = POSITION_TO_OFFSET_STRUCT(outputX,outputY,outputZ,ch, this->outputDataStruct);
+							U32 outputOffset = POSITION_TO_OFFSET_STRUCT(outputX,outputY,outputZ,ch, this->GetOutputDataStruct());
 							this->lppBatchOutputBuffer[batchNum][outputOffset] = maxValue;
 						}
 					}
@@ -241,7 +229,7 @@ namespace NeuralNetwork {
 	ErrorCode Pooling_CPU::CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		// 出力誤差バッファのアドレスを配列に格納
-		for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			this->m_lppDOutputBufferPrev[batchNum] = &i_lppDOutputBuffer[batchNum * this->outputBufferCount];
 
 		// 入力誤差計算
@@ -249,41 +237,41 @@ namespace NeuralNetwork {
 		if(o_lppDInputBuffer)
 		{
 			// 入力誤差バッファのアドレスを配列に格納
-			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 				this->m_lppDInputBuffer[batchNum] = &o_lppDInputBuffer[batchNum * this->inputBufferCount];
 
 			// 入力誤差バッファを初期化
-			memset(this->m_lpDInputBuffer, 0, sizeof(F32) * this->inputBufferCount * this->batchSize);
+			memset(this->m_lpDInputBuffer, 0, sizeof(F32) * this->inputBufferCount * this->GetBatchSize());
 
-			for(U32 batchNum=0; batchNum<this->batchSize; batchNum++)
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
-				for(U32 ch=0; ch<this->outputDataStruct.ch; ch++)
+				for(U32 ch=0; ch<this->GetOutputDataStruct().ch; ch++)
 				{
-					for(U32 outputZ=0; outputZ<this->outputDataStruct.z; outputZ++)
+					for(U32 outputZ=0; outputZ<this->GetOutputDataStruct().z; outputZ++)
 					{
-						for(U32 outputY=0; outputY<this->outputDataStruct.y; outputY++)
+						for(U32 outputY=0; outputY<this->GetOutputDataStruct().y; outputY++)
 						{
-							for(U32 outputX=0; outputX<this->outputDataStruct.x; outputX++)
+							for(U32 outputX=0; outputX<this->GetOutputDataStruct().x; outputX++)
 							{
-								U32 outputOffset = POSITION_TO_OFFSET_STRUCT(outputX,outputY,outputZ,ch, this->outputDataStruct);
+								U32 outputOffset = POSITION_TO_OFFSET_STRUCT(outputX,outputY,outputZ,ch, this->GetOutputDataStruct());
 
 								// 最大値を調べる
 								for(S32 filterZ=0; filterZ<this->layerData.layerStructure.FilterSize.z; filterZ++)
 								{
 									U32 inputZ = outputZ * this->layerData.layerStructure.Stride.z + filterZ;
-									if(inputZ >= this->inputDataStruct.z)
+									if(inputZ >= this->GetInputDataStruct().z)
 										continue;
 
 									for(S32 filterY=0; filterY<this->layerData.layerStructure.FilterSize.y; filterY++)
 									{
 										U32 inputY = outputY * this->layerData.layerStructure.Stride.y + filterY;
-										if(inputY >= this->inputDataStruct.y)
+										if(inputY >= this->GetInputDataStruct().y)
 											continue;
 
 										for(S32 filterX=0; filterX<this->layerData.layerStructure.FilterSize.x; filterX++)
 										{
 											U32 inputX = outputX * this->layerData.layerStructure.Stride.x + filterX;
-											if(inputX >= this->inputDataStruct.x)
+											if(inputX >= this->GetInputDataStruct().x)
 												continue;
 
 											U32 inputOffset = POSITION_TO_OFFSET_STRUCT(
@@ -291,7 +279,7 @@ namespace NeuralNetwork {
 																	inputY,
 																	inputZ,
 																	ch,
-																	this->inputDataStruct);
+																	this->GetInputDataStruct());
 
 											if(this->m_lppInputBuffer[batchNum][inputOffset] == this->lppBatchOutputBuffer[batchNum][outputOffset])
 											{

@@ -473,7 +473,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 #endif
 
 
-#if 0	// Single
+#if 1	// Single
 		// 2層目
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
@@ -495,7 +495,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lastLayerGUID,
-			CreateActivationLayer(layerDLLManager, layerDataManager, L"LeakyReLU"));
+			CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #if USE_DROPOUT
 		err = AddLayerToNetworkLast(
@@ -838,17 +838,17 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 
 	// 学習係数を設定
 #if USE_BATCHNORM
-	pNeuralNetworkLearn->SetLearnSettingData(L"LearnCoeff", 0.005f);
+	pNeuralNetworkLearn->SetRuntimeParameter(L"LearnCoeff", 0.005f);
 #else
-	pNeuralNetworkLearn->SetLearnSettingData(L"LearnCoeff", 0.001f);
+	pNeuralNetworkLearn->SetRuntimeParameter(L"LearnCoeff", 0.001f);
 #endif
-//	pNeuralNetworkLearn->SetLearnSettingData(L"Optimizer", L"SGD");
-//	pNeuralNetworkLearn->SetLearnSettingData(L"Optimizer", L"Momentum");
-//	pNeuralNetworkLearn->SetLearnSettingData(L"Optimizer", L"AdaDelta");
-	pNeuralNetworkLearn->SetLearnSettingData(L"Optimizer", L"Adam");
-	pNeuralNetworkLearn->SetLearnSettingData(L"Momentum_alpha", 0.9f);
-	pNeuralNetworkLearn->SetLearnSettingData(L"AdaDelta_rho", (F32)0.95f);
-	pNeuralNetworkLearn->SetLearnSettingData(L"AdaDelta_epsilon", (F32)1e-8);
+//	pNeuralNetworkLearn->SetRuntimeParameter(L"Optimizer", L"SGD");
+//	pNeuralNetworkLearn->SetRuntimeParameter(L"Optimizer", L"Momentum");
+//	pNeuralNetworkLearn->SetRuntimeParameter(L"Optimizer", L"AdaDelta");
+	pNeuralNetworkLearn->SetRuntimeParameter(L"Optimizer", L"Adam");
+	pNeuralNetworkLearn->SetRuntimeParameter(L"Momentum_alpha", 0.9f);
+	pNeuralNetworkLearn->SetRuntimeParameter(L"AdaDelta_rho", (F32)0.95f);
+	pNeuralNetworkLearn->SetRuntimeParameter(L"AdaDelta_epsilon", (F32)1e-8);
 
 	// 事前処理を実行
 	err = pNeuralNetworkLearn->PreProcessLearn(BATCH_SIZE);
@@ -905,9 +905,9 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 		{
 			// 学習ループ先頭処理
 //			pBatchDataNoListGenerator->PreProcessLearnLoop();
-			pTeachInputLayer->PreProcessLearnLoop(*pLearnSetting);
-			pTeachOutputLayer->PreProcessLearnLoop(*pLearnSetting);
-			pNeuralNetworkLearn->PreProcessLearnLoop(*pLearnSetting);
+			pTeachInputLayer->PreProcessLoop();
+			pTeachOutputLayer->PreProcessLoop();
+			pNeuralNetworkLearn->PreProcessLoop();
 
 			// 学習処理
 			// バッチ単位で処理
@@ -984,9 +984,9 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 		// サンプル実行
 		{		
 			// サンプル実行先頭処理
-			pSampleInputLayer->PreProcessCalculateLoop();
-			pSampleOutputLayer->PreProcessCalculateLoop();
-			pNeuralNetworkSample->PreProcessCalculateLoop();
+			pSampleInputLayer->PreProcessLoop();
+			pSampleOutputLayer->PreProcessLoop();
+			pNeuralNetworkSample->PreProcessLoop();
 
 			// バッチ単位で処理
 			for(U32 dataNum=0; dataNum<pSampleInputLayer->GetDataCount(); dataNum++)

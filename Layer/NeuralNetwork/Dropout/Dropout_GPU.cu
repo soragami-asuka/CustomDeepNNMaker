@@ -28,7 +28,6 @@ namespace NeuralNetwork {
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount				(0)				/**< 入力バッファ数 */
 		,	outputBufferCount				(0)				/**< 出力バッファ数 */
-		,	onLearning						(false)			/**< 学習処理中フラグ */
 		,	cudnnHandle		(NULL)
 		,	dropoutDesc		(NULL)
 		,	inputTensorDesc	(NULL)
@@ -92,18 +91,15 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode Dropout_GPU::PreProcessLearn(unsigned int batchSize)
+	ErrorCode Dropout_GPU::PreProcessLearn()
 	{
-		ErrorCode errorCode = this->PreProcessCalculate(batchSize);
+		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
-		// 学習処理中フラグを設定する
-		this->onLearning = true;
-
 		// 出力バッファを作成
 		{
-			int n = this->batchSize;
+			int n = this->GetBatchSize();
 			int c = this->GetOutputDataStruct().ch;
 			int h = this->GetOutputDataStruct().z * this->GetOutputDataStruct().y;
 			int w = this->GetOutputDataStruct().x;
@@ -130,7 +126,7 @@ namespace NeuralNetwork {
 			if(err != 0)
 				return ErrorCode::ERROR_CODE_CUDA_INITIALIZE;
 
-			this->lpOutputBuffer_d.resize(this->batchSize * this->inputBufferCount);
+			this->lpOutputBuffer_d.resize(this->GetBatchSize() * this->inputBufferCount);
 		}
 
 		// ドロップアウト設定を作成
@@ -191,10 +187,8 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Dropout_GPU::PreProcessCalculate(unsigned int batchSize)
+	ErrorCode Dropout_GPU::PreProcessCalculate()
 	{
-		this->batchSize = batchSize;
-
 		// 入力バッファ数を確認
 		this->inputBufferCount = this->GetInputBufferCount();
 		if(this->inputBufferCount == 0)
@@ -205,29 +199,17 @@ namespace NeuralNetwork {
 		if(this->outputBufferCount == 0)
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
-		// 学習処理中フラグを降ろす
-		this->onLearning = false;
-
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
 
-	/** 学習ループの初期化処理.データセットの学習開始前に実行する
+	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Dropout_GPU::PreProcessLearnLoop(const SettingData::Standard::IData& data)
+	ErrorCode Dropout_GPU::PreProcessLoop()
 	{
-		if(this->pLearnData != NULL)
-			delete this->pLearnData;
-		this->pLearnData = data.Clone();
+		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
+	}
 
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 演算ループの初期化処理.データセットの演算開始前に実行する
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Dropout_GPU::PreProcessCalculateLoop()
-	{
-		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
-	}
 
 
 	/** 演算処理を実行する.
@@ -238,7 +220,7 @@ namespace NeuralNetwork {
 		// 入力バッファのアドレスを配列に格納
 		this->m_lpInputBuffer_d = i_lpInputBuffer;
 
-		if(this->onLearning)
+		if(this->GetProcessType() == ProcessType::PROCESSTYPE_LEARN)
 		{
 			cudnnStatus_t err = cudnnDropoutForward(
 				this->cudnnHandle,
@@ -263,7 +245,7 @@ namespace NeuralNetwork {
 		@return 出力データ配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER Dropout_GPU::GetOutputBuffer()const
 	{
-		if(this->onLearning)
+		if(this->GetProcessType() == ProcessType::PROCESSTYPE_LEARN)
 		{
 			return thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]);
 		}
@@ -306,7 +288,7 @@ namespace NeuralNetwork {
 
 		if(this->m_lpDInputBuffer_d)
 		{
-			if(this->onLearning)
+			if(this->GetProcessType() == ProcessType::PROCESSTYPE_LEARN)
 			{
 				cudnnStatus_t err = cudnnDropoutBackward(
 					this->cudnnHandle,
@@ -323,7 +305,7 @@ namespace NeuralNetwork {
 			}
 			else
 			{
-				cudaMemcpy(this->m_lpDInputBuffer_d, this->m_lpDOutputBufferPrev_d, sizeof(F32)*this->inputBufferCount*this->batchSize, cudaMemcpyDeviceToDevice);
+				cudaMemcpy(this->m_lpDInputBuffer_d, this->m_lpDOutputBufferPrev_d, sizeof(F32)*this->inputBufferCount*this->GetBatchSize(), cudaMemcpyDeviceToDevice);
 			}
 		}
 

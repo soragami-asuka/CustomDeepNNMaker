@@ -103,7 +103,7 @@ namespace Activation {
 		  * ID   : LeakyReLU_alpha
 		  * Text : Leaky-ReLU‚ÅŽg—p‚·‚éƒ¿‚Ì’l
 		  */
-		S32 LeakyReLU_alpha;
+		F32 LeakyReLU_alpha;
 
 	};
 
