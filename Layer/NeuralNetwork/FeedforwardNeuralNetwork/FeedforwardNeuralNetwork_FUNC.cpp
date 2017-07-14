@@ -56,14 +56,14 @@ namespace DefaultLanguage
 
 
 
-    /** ItemData Learn <id, StringData> */
-    static const std::map<std::wstring, StringData> g_lpItemData_Learn = 
+    /** ItemData Runtiime Parameter <id, StringData> */
+    static const std::map<std::wstring, StringData> g_lpItemData_Runtime = 
     {
     };
 
 
-    /** ItemData Learn Enum <id, enumID, StringData> */
-    static const std::map<std::wstring, std::map<std::wstring, StringData>> g_lpItemDataEnum_Learn =
+    /** ItemData Runtime Enum <id, enumID, StringData> */
+    static const std::map<std::wstring, std::map<std::wstring, StringData>> g_lpItemDataEnum_Runtime =
     {
     };
 
@@ -88,11 +88,11 @@ namespace CurrentLanguage
     static const std::map<std::wstring, std::map<std::wstring, StringData>> g_lpItemDataEnum_LayerStructure = DefaultLanguage::g_lpItemDataEnum_LayerStructure;
 
 
-    /** ItemData Learn <id, StringData> */
-    static std::map<std::wstring, StringData> g_lpItemData_Learn = DefaultLanguage::g_lpItemData_Learn;
+    /** ItemData Runtime <id, StringData> */
+    static std::map<std::wstring, StringData> g_lpItemData_Learn = DefaultLanguage::g_lpItemData_Runtime;
 
-    /** ItemData Learn Enum <id, enumID, StringData> */
-    static const std::map<std::wstring, std::map<std::wstring, StringData>> g_lpItemDataEnum_Learn = DefaultLanguage::g_lpItemDataEnum_Learn;
+    /** ItemData Runtime Enum <id, enumID, StringData> */
+    static const std::map<std::wstring, std::map<std::wstring, StringData>> g_lpItemDataEnum_Learn = DefaultLanguage::g_lpItemDataEnum_Runtime;
 
 }
 
@@ -168,9 +168,9 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 }
 
 
-/** Create a learning setting.
+/** Create a runtime parameters.
   * @return If successful, new configuration information. */
-EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSetting(void)
+EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameter(void)
 {
 	Gravisbell::GUID layerCode;
 	GetLayerCode(layerCode);
@@ -189,15 +189,15 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSetting(void)
 	return pLayerConfig;
 }
 
-/** Create learning settings from buffer.
+/** Create runtime parameter from buffer.
   * @param  i_lpBuffer       Start address of the read buffer.
   * @param  i_bufferSize     The size of the readable buffer.
   * @param  o_useBufferSize  Buffer size actually read.
   * @return If successful, the configuration information created from the buffer
   */
-EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)
+EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameterFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)
 {
-	Gravisbell::SettingData::Standard::IDataEx* pLayerConfig = (Gravisbell::SettingData::Standard::IDataEx*)CreateLearningSetting();
+	Gravisbell::SettingData::Standard::IDataEx* pLayerConfig = (Gravisbell::SettingData::Standard::IDataEx*)CreateRuntimeParameter();
 	if(pLayerConfig == NULL)
 		return NULL;
 

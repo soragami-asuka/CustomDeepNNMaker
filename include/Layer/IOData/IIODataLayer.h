@@ -15,7 +15,7 @@ namespace Layer {
 namespace IOData {
 
 	/** 入出力データレイヤー */
-	class IIODataLayer : public IIODataLayer_base
+	class IIODataLayer : public virtual IIODataLayer_base
 	{
 	public:
 		/** コンストラクタ */

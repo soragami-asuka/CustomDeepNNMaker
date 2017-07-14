@@ -30,4 +30,13 @@
   <Learn>
   </Learn>
 
+  <!--実行時パラメータ-->
+  <RuntimeParameter>
+    <Bool id="UseDropOut">
+      <Name>ドロップアウトを使用するフラグ</Name>
+      <Text>ドロップアウトを使用するフラグ.trueの場合確率でドロップアウト.falseの場合係数を掛けた値.</Text>
+      <Default>false</Default>
+    </Bool>
+  </RuntimeParameter>
+
 </Config>

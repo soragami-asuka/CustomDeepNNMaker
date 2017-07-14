@@ -64,16 +64,6 @@ namespace UpConvolution {
 
 	};
 
-	/** Learning data structure */
-	struct LearnDataStructure
-	{
-		/** Name : ŠwKŒW”
-		  * ID   : LearnCoeff
-		  */
-		F32 LearnCoeff;
-
-	};
-
 } // UpConvolution
 } // NeuralNetwork
 } // Layer

@@ -965,7 +965,7 @@ int LayerConfigData::ReadFromXMLFile(const boost::filesystem::wpath& configFileP
 		}
 
 		// 学習設定
-		if(auto &learn_tree = pXmlTree.get_child_optional("Config.Learn"))
+		if(auto &learn_tree = pXmlTree.get_child_optional("Config.RuntimeParameter"))
 		{
 			if(this->pLearn)
 				delete this->pLearn;
@@ -976,7 +976,11 @@ int LayerConfigData::ReadFromXMLFile(const boost::filesystem::wpath& configFileP
 		}
 		else
 		{
-			return -1;
+			if(this->pLearn)
+				delete this->pLearn;
+
+			// ダミーで空の設定情報を作成する
+			this->pLearn = Gravisbell::SettingData::Standard::CreateEmptyData(this->guid, this->version);
 		}
 	}
 	catch(boost::exception& e)
@@ -1066,8 +1070,8 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		}
 		if(this->pLearn->GetItemCount() > 0)
 		{
-			fwprintf(fp, L"	/** Learning data structure */\n");
-			fwprintf(fp, L"	struct LearnDataStructure\n");
+			fwprintf(fp, L"	/** Runtime Parameter structure */\n");
+			fwprintf(fp, L"	struct RuntimeParameterStructure\n");
 			fwprintf(fp, L"	{\n");
 			WriteStructureToStructSource(fp, *this->pLearn);
 			fwprintf(fp, L"	};\n");
@@ -1156,17 +1160,17 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");
-		fwprintf(fp, L"/** Create a learning setting.\n");
+		fwprintf(fp, L"/** Create a runtime parameter.\n");
 		fwprintf(fp, L"  * @return If successful, new configuration information. */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSetting(void);\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameter(void);\n");
 		fwprintf(fp, L"\n");
-		fwprintf(fp, L"/** Create learning settings from buffer.\n");
+		fwprintf(fp, L"/** Create runtime parameter from buffer.\n");
 		fwprintf(fp, L"  * @param  i_lpBuffer       Start address of the read buffer.\n");
 		fwprintf(fp, L"  * @param  i_bufferSize     The size of the readable buffer.\n");
 		fwprintf(fp, L"  * @param  o_useBufferSize  Buffer size actually read.\n");
 		fwprintf(fp, L"  * @return If successful, the configuration information created from the buffer\n");
 		fwprintf(fp, L"  */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameterFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"/** Create a layer for CPU processing.\n");
@@ -1355,8 +1359,8 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"\n");
 		// 学習データ
 		{
-			fwprintf(fp, L"    /** ItemData Learn <id, StringData> */\n");
-			fwprintf(fp, L"    static const std::map<std::wstring, StringData> g_lpItemData_Learn = \n");
+			fwprintf(fp, L"    /** ItemData Runtiime Parameter <id, StringData> */\n");
+			fwprintf(fp, L"    static const std::map<std::wstring, StringData> g_lpItemData_Runtime = \n");
 			fwprintf(fp, L"    {\n");
 			for(unsigned int itemNum=0; itemNum<this->pLearn->GetItemCount(); itemNum++)
 			{
@@ -1384,8 +1388,8 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 			fwprintf(fp, L"    };\n");
 			fwprintf(fp, L"\n");
 			fwprintf(fp, L"\n");
-			fwprintf(fp, L"    /** ItemData Learn Enum <id, enumID, StringData> */\n");
-			fwprintf(fp, L"    static const std::map<std::wstring, std::map<std::wstring, StringData>> g_lpItemDataEnum_Learn =\n");
+			fwprintf(fp, L"    /** ItemData Runtime Enum <id, enumID, StringData> */\n");
+			fwprintf(fp, L"    static const std::map<std::wstring, std::map<std::wstring, StringData>> g_lpItemDataEnum_Runtime =\n");
 			fwprintf(fp, L"    {\n");
 			for(unsigned int itemNum=0; itemNum<this->pLearn->GetItemCount(); itemNum++)
 			{
@@ -1451,11 +1455,11 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");
 		// 学習設定
-		fwprintf(fp, L"    /** ItemData Learn <id, StringData> */\n");
-		fwprintf(fp, L"    static std::map<std::wstring, StringData> g_lpItemData_Learn = DefaultLanguage::g_lpItemData_Learn;\n");
+		fwprintf(fp, L"    /** ItemData Runtime <id, StringData> */\n");
+		fwprintf(fp, L"    static std::map<std::wstring, StringData> g_lpItemData_Learn = DefaultLanguage::g_lpItemData_Runtime;\n");
 		fwprintf(fp, L"\n");
-		fwprintf(fp, L"    /** ItemData Learn Enum <id, enumID, StringData> */\n");
-		fwprintf(fp, L"    static const std::map<std::wstring, std::map<std::wstring, StringData>> g_lpItemDataEnum_Learn = DefaultLanguage::g_lpItemDataEnum_Learn;\n");
+		fwprintf(fp, L"    /** ItemData Runtime Enum <id, enumID, StringData> */\n");
+		fwprintf(fp, L"    static const std::map<std::wstring, std::map<std::wstring, StringData>> g_lpItemDataEnum_Learn = DefaultLanguage::g_lpItemDataEnum_Runtime;\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"}\n");
 
@@ -1519,22 +1523,22 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"}\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");
-		fwprintf(fp, L"/** Create a learning setting.\n");
+		fwprintf(fp, L"/** Create a runtime parameters.\n");
 		fwprintf(fp, L"  * @return If successful, new configuration information. */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSetting(void)\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameter(void)\n");
 		fwprintf(fp, L"{\n");
 		::WriteStructureToCreateSource(fp, *this->pLearn, L"Learn");
 		fwprintf(fp, L"}\n");
 		fwprintf(fp, L"\n");
-		fwprintf(fp, L"/** Create learning settings from buffer.\n");
+		fwprintf(fp, L"/** Create runtime parameter from buffer.\n");
 		fwprintf(fp, L"  * @param  i_lpBuffer       Start address of the read buffer.\n");
 		fwprintf(fp, L"  * @param  i_bufferSize     The size of the readable buffer.\n");
 		fwprintf(fp, L"  * @param  o_useBufferSize  Buffer size actually read.\n");
 		fwprintf(fp, L"  * @return If successful, the configuration information created from the buffer\n");
 		fwprintf(fp, L"  */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameterFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)\n");
 		fwprintf(fp, L"{\n");
-		fwprintf(fp, L"	Gravisbell::SettingData::Standard::IDataEx* pLayerConfig = (Gravisbell::SettingData::Standard::IDataEx*)CreateLearningSetting();\n");
+		fwprintf(fp, L"	Gravisbell::SettingData::Standard::IDataEx* pLayerConfig = (Gravisbell::SettingData::Standard::IDataEx*)CreateRuntimeParameter();\n");
 		fwprintf(fp, L"	if(pLayerConfig == NULL)\n");
 		fwprintf(fp, L"		return NULL;\n");
 		fwprintf(fp, L"\n");

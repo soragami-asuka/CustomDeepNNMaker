@@ -13,11 +13,10 @@ namespace NeuralNetwork {
 
 	
 	/** コンストラクタ */
-	LayerConnectMult2Single::LayerConnectMult2Single(class FeedforwardNeuralNetwork_Base& neuralNetwork, ILayerBase* pLayer, Gravisbell::SettingData::Standard::IData* pRuntimeParameter)
+	LayerConnectMult2Single::LayerConnectMult2Single(class FeedforwardNeuralNetwork_Base& neuralNetwork, ILayerBase* pLayer)
 		:	neuralNetwork		(neuralNetwork)
 		,	pLayer				(pLayer)
 		,	pLayer_io			(dynamic_cast<INNMult2SingleLayer*>(pLayer))
-		,	pRuntimeParameter	(pRuntimeParameter)
 	{
 	}
 	/** デストラクタ */
@@ -25,8 +24,6 @@ namespace NeuralNetwork {
 	{
 		if(pLayer != NULL)
 			delete pLayer;
-		if(pRuntimeParameter != NULL)
-			delete pRuntimeParameter;
 	}
 
 	/** GUIDを取得する */
@@ -40,13 +37,55 @@ namespace NeuralNetwork {
 	{
 		return this->pLayer->GetLayerKind();
 	}
-	
-	/** 学習設定のポインタを取得する.
-		取得したデータを直接書き換えることで次の学習ループに反映されるが、NULLが返ってくることもあるので注意. */
-	Gravisbell::SettingData::Standard::IData* LayerConnectMult2Single::GetRuntimeParameter()
+
+
+	//====================================
+	// 実行時設定
+	//====================================
+	/** 実行時設定を取得する. */
+	const SettingData::Standard::IData* LayerConnectMult2Single::GetRuntimeParameter()const
 	{
-		return this->pRuntimeParameter;
+		return this->pLayer->GetRuntimeParameter();
 	}
+
+	/** 実行時設定を設定する.
+		int型、float型、enum型が対象.
+		@param	i_dataID	設定する値のID.
+		@param	i_param		設定する値. */
+	ErrorCode LayerConnectMult2Single::SetRuntimeParameter(const wchar_t* i_dataID, S32 i_param)
+	{
+		return this->pLayer->SetRuntimeParameter(i_dataID, i_param);
+	}
+	/** 実行時設定を設定する.
+		int型、float型が対象.
+		@param	i_dataID	設定する値のID.
+		@param	i_param		設定する値. */
+	ErrorCode LayerConnectMult2Single::SetRuntimeParameter(const wchar_t* i_dataID, F32 i_param)
+	{
+		return this->pLayer->SetRuntimeParameter(i_dataID, i_param);
+	}
+	/** 実行時設定を設定する.
+		bool型が対象.
+		@param	i_dataID	設定する値のID.
+		@param	i_param		設定する値. */
+	ErrorCode LayerConnectMult2Single::SetRuntimeParameter(const wchar_t* i_dataID, bool i_param)
+	{
+		return this->pLayer->SetRuntimeParameter(i_dataID, i_param);
+	}
+	/** 実行時設定を設定する.
+		string型が対象.
+		@param	i_dataID	設定する値のID.
+		@param	i_param		設定する値. */
+	ErrorCode LayerConnectMult2Single::SetRuntimeParameter(const wchar_t* i_dataID, const wchar_t* i_param)
+	{
+		return this->pLayer->SetRuntimeParameter(i_dataID, i_param);
+	}
+
+
+		
+	//====================================
+	// 入出力データ構造
+	//====================================
 
 	/** 出力データ構造を取得する.
 		@return	出力データ構造 */

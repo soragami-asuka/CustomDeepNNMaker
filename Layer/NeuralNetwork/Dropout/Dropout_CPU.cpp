@@ -85,12 +85,6 @@ namespace NeuralNetwork {
 		// 入力誤差バッファ受け取り用のアドレス配列を作成する
 		this->m_lppDInputBuffer.resize(this->GetBatchSize());
 
-		if(this->dropoutRate > 0)
-		{
-			// ドロップアウトバッファを作成
-			this->lpDropoutBuffer.resize(this->inputBufferCount);
-		}
-
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
@@ -128,6 +122,12 @@ namespace NeuralNetwork {
 			}
 		}
 
+		if(this->dropoutRate > 0)
+		{
+			// ドロップアウトバッファを作成
+			this->lpDropoutBuffer.resize(this->inputBufferCount);
+		}
+
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
@@ -149,7 +149,7 @@ namespace NeuralNetwork {
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			this->m_lppInputBuffer[batchNum] = &i_lpInputBuffer[batchNum * this->inputBufferCount];
 
-		if(this->dropoutRate>0 && this->GetProcessType() == ProcessType::PROCESSTYPE_LEARN)
+		if(this->dropoutRate>0 && this->GetRuntimeParameterByStructure().UseDropOut)
 		{
 			F32 scale = 1.0f / (1.0f - this->layerData.layerStructure.Rate);
 
@@ -181,7 +181,7 @@ namespace NeuralNetwork {
 		@return 出力データ配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER Dropout_CPU::GetOutputBuffer()const
 	{
-		if(this->dropoutRate>0 && this->GetProcessType() == ProcessType::PROCESSTYPE_LEARN)
+		if(this->dropoutRate>0 && this->GetRuntimeParameterByStructure().UseDropOut)
 		{
 			return &this->lpOutputBuffer[0];
 		}
@@ -230,7 +230,7 @@ namespace NeuralNetwork {
 			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 				this->m_lppDInputBuffer[batchNum] = &o_lppDInputBuffer[batchNum * this->inputBufferCount];
 
-			if(this->dropoutRate>0 && this->GetProcessType() == ProcessType::PROCESSTYPE_LEARN)
+			if(this->dropoutRate>0 && this->GetRuntimeParameterByStructure().UseDropOut)
 			{
 				for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 				{

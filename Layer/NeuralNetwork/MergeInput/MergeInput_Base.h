@@ -19,7 +19,7 @@ namespace NeuralNetwork {
 
 	typedef float NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class MergeInput_Base : public CNNMult2SingleLayerBase
+	class MergeInput_Base : public CNNMult2SingleLayerBase<>
 	{
 	public:
 		/** コンストラクタ */

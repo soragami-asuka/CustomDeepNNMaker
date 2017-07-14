@@ -37,13 +37,13 @@ namespace NeuralNetwork {
 
 
 	/** 学習設定を作成する */
-	typedef SettingData::Standard::IData* (*FuncCreateLayerLearningSetting)(void);
+	typedef SettingData::Standard::IData* (*FuncCreateLayerRuntimeParameter)(void);
 	/** 学習設定を作成する
 		@param i_lpBuffer	読み込みバッファの先頭アドレス.
 		@param i_bufferSize	読み込み可能バッファのサイズ.
 		@param o_useBufferSize 実際に読み込んだバッファサイズ
 		@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-	typedef SettingData::Standard::IData* (*FuncCreateLayerLearningSettingFromBuffer)(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);
+	typedef SettingData::Standard::IData* (*FuncCreateLayerRuntimeParameterFromBuffer)(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);
 
 
 	/** レイヤーを作成 */

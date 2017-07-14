@@ -13,7 +13,7 @@ using namespace Gravisbell::Layer::NeuralNetwork;
 
 /** コンストラクタ */
 Residual_Base::Residual_Base(Gravisbell::GUID guid, const std::vector<IODataStruct>& i_lpInputDataStruct, const IODataStruct& i_outputDataStruct)
-	:	CNNMult2SingleLayerBase(guid, ::CreateLearningSetting(), i_lpInputDataStruct, i_outputDataStruct)
+	:	CNNMult2SingleLayerBase(guid, i_lpInputDataStruct, i_outputDataStruct)
 {
 }
 

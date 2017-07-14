@@ -42,7 +42,7 @@ extern Gravisbell::ErrorCode GetVersionCode(Gravisbell::VersionCode& o_versionCo
 
 
 /** レイヤー学習設定を作成する */
-extern SettingData::Standard::IData* CreateLearningSetting(void)
+extern SettingData::Standard::IData* CreateRuntimeParameter(void)
 {
 	// Create Empty Setting Data
 	Gravisbell::SettingData::Standard::IDataEx* pLayerConfig = Gravisbell::SettingData::Standard::CreateEmptyData(g_guid, g_version);
@@ -56,9 +56,9 @@ extern SettingData::Standard::IData* CreateLearningSetting(void)
 	@param i_bufferSize	読み込み可能バッファのサイズ.
 	@param o_useBufferSize 実際に読み込んだバッファサイズ
 	@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-extern SettingData::Standard::IData* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)
+extern SettingData::Standard::IData* CreateRuntimeParameterFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)
 {
-	Gravisbell::SettingData::Standard::IDataEx* pLayerConfig = (Gravisbell::SettingData::Standard::IDataEx*)CreateLearningSetting();
+	Gravisbell::SettingData::Standard::IDataEx* pLayerConfig = (Gravisbell::SettingData::Standard::IDataEx*)CreateRuntimeParameter();
 	if(pLayerConfig == NULL)
 		return NULL;
 

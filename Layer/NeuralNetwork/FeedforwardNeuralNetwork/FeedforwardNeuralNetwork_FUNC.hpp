@@ -49,17 +49,17 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);
 
 
-/** Create a learning setting.
+/** Create a runtime parameter.
   * @return If successful, new configuration information. */
-EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSetting(void);
+EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameter(void);
 
-/** Create learning settings from buffer.
+/** Create runtime parameter from buffer.
   * @param  i_lpBuffer       Start address of the read buffer.
   * @param  i_bufferSize     The size of the readable buffer.
   * @param  o_useBufferSize  Buffer size actually read.
   * @return If successful, the configuration information created from the buffer
   */
-EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);
+EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameterFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);
 
 
 /** Create a layer for CPU processing.

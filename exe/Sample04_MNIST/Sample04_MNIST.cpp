@@ -24,7 +24,7 @@ using namespace Gravisbell;
 #define USE_HOST_MEMORY 1
 
 #define USE_BATCHNORM	1
-#define USE_DROPOUT		0
+#define USE_DROPOUT		1
 
 
 /** データファイルをを読み込む
@@ -467,8 +467,8 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 #if USE_DROPOUT
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct, 0.2f));
+			lastLayerGUID,
+			CreateDropoutLayer(layerDLLManager, layerDataManager, 0.2f));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #endif
 
@@ -500,8 +500,8 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 #if USE_DROPOUT
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
-			inputDataStruct, lastLayerGUID,
-			CreateDropoutLayer(layerDLLManager, layerDataManager, inputDataStruct, 0.5f));
+			lastLayerGUID,
+			CreateDropoutLayer(layerDLLManager, layerDataManager, 0.5f));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 #endif
 
@@ -836,19 +836,9 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 {
 	Gravisbell::ErrorCode err;
 
-	// 学習係数を設定
-#if USE_BATCHNORM
-	pNeuralNetworkLearn->SetRuntimeParameter(L"LearnCoeff", 0.005f);
-#else
-	pNeuralNetworkLearn->SetRuntimeParameter(L"LearnCoeff", 0.001f);
-#endif
-//	pNeuralNetworkLearn->SetRuntimeParameter(L"Optimizer", L"SGD");
-//	pNeuralNetworkLearn->SetRuntimeParameter(L"Optimizer", L"Momentum");
-//	pNeuralNetworkLearn->SetRuntimeParameter(L"Optimizer", L"AdaDelta");
-	pNeuralNetworkLearn->SetRuntimeParameter(L"Optimizer", L"Adam");
-	pNeuralNetworkLearn->SetRuntimeParameter(L"Momentum_alpha", 0.9f);
-	pNeuralNetworkLearn->SetRuntimeParameter(L"AdaDelta_rho", (F32)0.95f);
-	pNeuralNetworkLearn->SetRuntimeParameter(L"AdaDelta_epsilon", (F32)1e-8);
+	// 実行時設定
+	pNeuralNetworkLearn->SetRuntimeParameter(L"UseDropOut", true);
+	pNeuralNetworkSample->SetRuntimeParameter(L"UseDropOut", false);
 
 	// 事前処理を実行
 	err = pNeuralNetworkLearn->PreProcessLearn(BATCH_SIZE);
@@ -881,13 +871,6 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 		return err;
 	}
 
-	// ダミーの学習設定を作成
-	Gravisbell::SettingData::Standard::IData* pLearnSetting = Gravisbell::Layer::IOData::CreateLearningSetting();
-	if(pLearnSetting == NULL)
-	{
-		delete pBatchDataNoListGenerator;
-		return err;
-	}
 
 	std::vector<F32> lpOutputBuffer(pTeachOutputLayer->GetBufferCount() * BATCH_SIZE);
 	std::vector<F32> lpTeachBuffer(pTeachOutputLayer->GetBufferCount() * BATCH_SIZE);
@@ -1066,7 +1049,6 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 	}
 
 	// メモリ開放
-	delete pLearnSetting;
 	delete pBatchDataNoListGenerator;
 
 	return ErrorCode::ERROR_CODE_NONE;

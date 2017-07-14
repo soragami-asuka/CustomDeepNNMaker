@@ -30,6 +30,17 @@ namespace Dropout {
 
 	};
 
+	/** Runtime Parameter structure */
+	struct RuntimeParameterStructure
+	{
+		/** Name : ドロップアウトを使用するフラグ
+		  * ID   : UseDropOut
+		  * Text : ドロップアウトを使用するフラグ.trueの場合確率でドロップアウト.falseの場合係数を掛けた値.
+		  */
+		bool UseDropOut;
+
+	};
+
 } // Dropout
 } // NeuralNetwork
 } // Layer

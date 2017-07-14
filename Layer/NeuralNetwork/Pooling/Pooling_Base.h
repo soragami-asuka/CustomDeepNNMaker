@@ -19,7 +19,7 @@ namespace NeuralNetwork {
 
 	typedef float NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class Pooling_Base : public CNNSingle2SingleLayerBase
+	class Pooling_Base : public CNNSingle2SingleLayerBase<>
 	{
 	public:
 		/** コンストラクタ */

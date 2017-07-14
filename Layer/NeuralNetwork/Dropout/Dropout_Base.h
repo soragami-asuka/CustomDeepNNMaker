@@ -19,7 +19,7 @@ namespace NeuralNetwork {
 
 	typedef float NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class Dropout_Base : public CNNSingle2SingleLayerBase
+	class Dropout_Base : public CNNSingle2SingleLayerBase<Dropout::RuntimeParameterStructure>
 	{
 	public:
 		/** コンストラクタ */

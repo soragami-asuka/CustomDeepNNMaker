@@ -349,11 +349,9 @@ namespace NeuralNetwork {
 			// lenear
 		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_lenear:
 			return this->m_lpInputBuffer_d;
-			break;
 
 		default:
 			return thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]);
-			break;
 		}
 	}
 	/** 出力データバッファを取得する.

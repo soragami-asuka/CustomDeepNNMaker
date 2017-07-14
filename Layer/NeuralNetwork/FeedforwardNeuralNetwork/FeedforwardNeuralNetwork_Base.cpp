@@ -121,17 +121,17 @@ namespace NeuralNetwork {
 			if(pSingle2SingleLayer)
 			{
 				// 単一入力, 単一出力
-				this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectSingle2Single(*this, pLayer, this->layerData.GetLayerDLLManager().GetLayerDLLByGUID(pLayer->GetLayerCode())->CreateLearningSetting());
+				this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectSingle2Single(*this, pLayer);
 			}
 			else if(pSingle2MultLayer)
 			{
 				// 単一入力, 複数出力
-				this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectSingle2Mult(*this, pLayer, this->layerData.GetLayerDLLManager().GetLayerDLLByGUID(pLayer->GetLayerCode())->CreateLearningSetting());
+				this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectSingle2Mult(*this, pLayer);
 			}
 			else if(pMult2SingleLayer)
 			{
 				// 複数入力, 単一出力
-				this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectMult2Single(*this, pLayer, this->layerData.GetLayerDLLManager().GetLayerDLLByGUID(pLayer->GetLayerCode())->CreateLearningSetting());
+				this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectMult2Single(*this, pLayer);
 			}
 			else
 			{
@@ -473,46 +473,20 @@ namespace NeuralNetwork {
 	}
 	ErrorCode FeedforwardNeuralNetwork_Base::SetRuntimeParameter(const Gravisbell::GUID& guid, const wchar_t* i_dataID, S32 i_param)
 	{
+		// 指定レイヤーが存在することを確認する
+		auto it_layer = this->lpLayerInfo.find(guid);
+		if(it_layer == this->lpLayerInfo.end())
+			return ErrorCode::ERROR_CODE_COMMON_NOT_EXIST;
+
+		it_layer->second->SetRuntimeParameter(i_dataID, i_param);
+
+
 		// 該当IDの設定アイテムを取得
 		Gravisbell::SettingData::Standard::IItemBase* pItem = this->GetRuntimeParameterItem(guid, i_dataID);
 		if(pItem == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
 
-		switch(pItem->GetItemType())
-		{
-		case Gravisbell::SettingData::Standard::ITEMTYPE_INT:
-			{
-				Gravisbell::SettingData::Standard::IItem_Int* pItemInt = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Int*>(pItem);
-				if(pItemInt == NULL)
-					break;
-				pItemInt->SetValue(i_param);
-
-				return ErrorCode::ERROR_CODE_NONE;
-			}
-			break;
-		case Gravisbell::SettingData::Standard::ITEMTYPE_FLOAT:
-			{
-				Gravisbell::SettingData::Standard::IItem_Float* pItemInt = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Float*>(pItem);
-				if(pItemInt == NULL)
-					break;
-				pItemInt->SetValue((F32)i_param);
-
-				return ErrorCode::ERROR_CODE_NONE;
-			}
-			break;
-		case Gravisbell::SettingData::Standard::ITEMTYPE_ENUM:
-			{
-				Gravisbell::SettingData::Standard::IItem_Enum* pItemInt = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Enum*>(pItem);
-				if(pItemInt == NULL)
-					break;
-				pItemInt->SetValue(i_param);
-
-				return ErrorCode::ERROR_CODE_NONE;
-			}
-			break;
-		}
-
-		return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 	/** 学習設定を設定する.
 		設定した値はPreProcessLearnLoopを呼び出した際に適用される.
@@ -528,36 +502,20 @@ namespace NeuralNetwork {
 	}
 	ErrorCode FeedforwardNeuralNetwork_Base::SetRuntimeParameter(const Gravisbell::GUID& guid, const wchar_t* i_dataID, F32 i_param)
 	{
+		// 指定レイヤーが存在することを確認する
+		auto it_layer = this->lpLayerInfo.find(guid);
+		if(it_layer == this->lpLayerInfo.end())
+			return ErrorCode::ERROR_CODE_COMMON_NOT_EXIST;
+
+		it_layer->second->SetRuntimeParameter(i_dataID, i_param);
+
+
 		// 該当IDの設定アイテムを取得
 		Gravisbell::SettingData::Standard::IItemBase* pItem = this->GetRuntimeParameterItem(guid, i_dataID);
 		if(pItem == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
 
-		switch(pItem->GetItemType())
-		{
-		case Gravisbell::SettingData::Standard::ITEMTYPE_INT:
-			{
-				Gravisbell::SettingData::Standard::IItem_Int* pItemInt = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Int*>(pItem);
-				if(pItemInt == NULL)
-					break;
-				pItemInt->SetValue((S32)i_param);
-
-				return ErrorCode::ERROR_CODE_NONE;
-			}
-			break;
-		case Gravisbell::SettingData::Standard::ITEMTYPE_FLOAT:
-			{
-				Gravisbell::SettingData::Standard::IItem_Float* pItemInt = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Float*>(pItem);
-				if(pItemInt == NULL)
-					break;
-				pItemInt->SetValue((F32)i_param);
-
-				return ErrorCode::ERROR_CODE_NONE;
-			}
-			break;
-		}
-
-		return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 	/** 学習設定を設定する.
 		設定した値はPreProcessLearnLoopを呼び出した際に適用される.
@@ -573,26 +531,20 @@ namespace NeuralNetwork {
 	}
 	ErrorCode FeedforwardNeuralNetwork_Base::SetRuntimeParameter(const Gravisbell::GUID& guid, const wchar_t* i_dataID, bool i_param)
 	{
+		// 指定レイヤーが存在することを確認する
+		auto it_layer = this->lpLayerInfo.find(guid);
+		if(it_layer == this->lpLayerInfo.end())
+			return ErrorCode::ERROR_CODE_COMMON_NOT_EXIST;
+
+		it_layer->second->SetRuntimeParameter(i_dataID, i_param);
+
+
 		// 該当IDの設定アイテムを取得
 		Gravisbell::SettingData::Standard::IItemBase* pItem = this->GetRuntimeParameterItem(guid, i_dataID);
 		if(pItem == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
 
-		switch(pItem->GetItemType())
-		{
-		case Gravisbell::SettingData::Standard::ITEMTYPE_BOOL:
-			{
-				Gravisbell::SettingData::Standard::IItem_Bool* pItemBool = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Bool*>(pItem);
-				if(pItemBool == NULL)
-					break;
-				pItemBool->SetValue(i_param);
-
-				return ErrorCode::ERROR_CODE_NONE;
-			}
-			break;
-		}
-
-		return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 	/** 学習設定を設定する.
 		設定した値はPreProcessLearnLoopを呼び出した際に適用される.
@@ -608,36 +560,20 @@ namespace NeuralNetwork {
 	}
 	ErrorCode FeedforwardNeuralNetwork_Base::SetRuntimeParameter(const Gravisbell::GUID& guid, const wchar_t* i_dataID, const wchar_t* i_param)
 	{
+		// 指定レイヤーが存在することを確認する
+		auto it_layer = this->lpLayerInfo.find(guid);
+		if(it_layer == this->lpLayerInfo.end())
+			return ErrorCode::ERROR_CODE_COMMON_NOT_EXIST;
+
+		it_layer->second->SetRuntimeParameter(i_dataID, i_param);
+
+
 		// 該当IDの設定アイテムを取得
 		Gravisbell::SettingData::Standard::IItemBase* pItem = this->GetRuntimeParameterItem(guid, i_dataID);
 		if(pItem == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
 
-		switch(pItem->GetItemType())
-		{
-		case Gravisbell::SettingData::Standard::ITEMTYPE_STRING:
-			{
-				Gravisbell::SettingData::Standard::IItem_String* pItemString = dynamic_cast<Gravisbell::SettingData::Standard::IItem_String*>(pItem);
-				if(pItemString == NULL)
-					break;
-				pItemString->SetValue(i_param);
-
-				return ErrorCode::ERROR_CODE_NONE;
-			}
-			break;
-		case Gravisbell::SettingData::Standard::ITEMTYPE_ENUM:
-			{
-				Gravisbell::SettingData::Standard::IItem_Enum* pItemString = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Enum*>(pItem);
-				if(pItemString == NULL)
-					break;
-				pItemString->SetValue(i_param);
-
-				return ErrorCode::ERROR_CODE_NONE;
-			}
-			break;
-		}
-
-		return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 
 

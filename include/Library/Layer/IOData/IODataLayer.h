@@ -34,13 +34,13 @@ extern IODataLayer_API Gravisbell::ErrorCode GetVersionCode(Gravisbell::VersionC
 
 
 /** レイヤー学習設定を作成する */
-extern IODataLayer_API SettingData::Standard::IData* CreateLearningSetting(void);
+extern IODataLayer_API SettingData::Standard::IData* CreateRuntimeParameter(void);
 /** レイヤー学習設定を作成する
 	@param i_lpBuffer	読み込みバッファの先頭アドレス.
 	@param i_bufferSize	読み込み可能バッファのサイズ.
 	@param o_useBufferSize 実際に読み込んだバッファサイズ
 	@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-extern IODataLayer_API SettingData::Standard::IData* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);
+extern IODataLayer_API SettingData::Standard::IData* CreateRuntimeParameterFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);
 
 
 //======================================

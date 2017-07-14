@@ -459,7 +459,7 @@ Gravisbell::ErrorCode LearnNeuralNetwork(
 	}
 
 	// ダミーの学習設定を作成
-	Gravisbell::SettingData::Standard::IData* pLearnSetting = Gravisbell::Layer::IOData::CreateLearningSetting();
+	Gravisbell::SettingData::Standard::IData* pLearnSetting = Gravisbell::Layer::IOData::CreateRuntimeParameter();
 	if(pLearnSetting == NULL)
 	{
 		delete pBatchDataNoListGenerator;
@@ -611,7 +611,7 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 	}
 
 	// ダミーの学習設定を作成
-	Gravisbell::SettingData::Standard::IData* pLearnSetting = Gravisbell::Layer::IOData::CreateLearningSetting();
+	Gravisbell::SettingData::Standard::IData* pLearnSetting = Gravisbell::Layer::IOData::CreateRuntimeParameter();
 	if(pLearnSetting == NULL)
 	{
 		delete pBatchDataNoListGenerator;

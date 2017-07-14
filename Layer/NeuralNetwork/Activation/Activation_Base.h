@@ -19,7 +19,7 @@ namespace NeuralNetwork {
 
 	typedef float NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class Activation_Base : public CNNSingle2SingleLayerBase
+	class Activation_Base : public CNNSingle2SingleLayerBase<>
 	{
 	protected:
 	public:

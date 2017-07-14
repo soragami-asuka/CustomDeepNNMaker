@@ -26,8 +26,8 @@ namespace NeuralNetwork {
 		FuncCreateLayerStructureSetting				funcCreateLayerStructureSetting;
 		FuncCreateLayerStructureSettingFromBuffer	funcCreateLayerStructureSettingFromBuffer;
 
-		FuncCreateLayerLearningSetting				funcCreateLearningSetting;
-		FuncCreateLayerLearningSettingFromBuffer	funcCreateLearningSettingFromBuffer;
+		FuncCreateLayerRuntimeParameter				funcCreateRuntimeParameter;
+		FuncCreateLayerRuntimeParameterFromBuffer	funcCreateRuntimeParameterFromBuffer;
 
 		FuncCreateLayerData				funcCreateLayerData;
 		FuncCreateLayerDataFromBuffer	funcCreateLayerDataFromBuffer;
@@ -42,8 +42,8 @@ namespace NeuralNetwork {
 			,	funcGetVersionCode							(NULL)
 			,	funcCreateLayerStructureSetting				(NULL)
 			,	funcCreateLayerStructureSettingFromBuffer	(NULL)
-			,	funcCreateLearningSetting					(NULL)
-			,	funcCreateLearningSettingFromBuffer			(NULL)
+			,	funcCreateRuntimeParameter					(NULL)
+			,	funcCreateRuntimeParameterFromBuffer		(NULL)
 			,	funcCreateLayerData							(NULL)
 			,	funcCreateLayerDataFromBuffer				(NULL)
 			,	layerDLLManager								(i_layerDLLManager)
@@ -112,24 +112,24 @@ namespace NeuralNetwork {
 		//==============================
 	public:
 		/** レイヤー学習設定を作成する */
-		SettingData::Standard::IData* CreateLearningSetting(void)const
+		SettingData::Standard::IData* CreateRuntimeParameter(void)const
 		{
-			if(this->funcCreateLearningSetting == NULL)
+			if(this->funcCreateRuntimeParameter == NULL)
 				return NULL;
 
-			return this->funcCreateLearningSetting();
+			return this->funcCreateRuntimeParameter();
 		}
 		/** レイヤー学習設定を作成する
 			@param i_lpBuffer	読み込みバッファの先頭アドレス.
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@param o_useBufferSize 実際に読み込んだバッファサイズ
 			@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-		SettingData::Standard::IData* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)const
+		SettingData::Standard::IData* CreateRuntimeParameterFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)const
 		{
-			if(this->funcCreateLearningSettingFromBuffer == NULL)
+			if(this->funcCreateRuntimeParameterFromBuffer == NULL)
 				return NULL;
 
-			return this->funcCreateLearningSettingFromBuffer(i_lpBuffer, i_bufferSize, o_useBufferSize);
+			return this->funcCreateRuntimeParameterFromBuffer(i_lpBuffer, i_bufferSize, o_useBufferSize);
 		}
 
 
@@ -230,11 +230,11 @@ namespace NeuralNetwork {
 					break;
 
 				// 学習設定
-				pLayerDLL->funcCreateLearningSetting = (FuncCreateLayerStructureSetting)GetProcAddress(pLayerDLL->hModule, "CreateLearningSetting");
-				if(pLayerDLL->funcCreateLearningSetting == NULL)
+				pLayerDLL->funcCreateRuntimeParameter = (FuncCreateLayerStructureSetting)GetProcAddress(pLayerDLL->hModule, "CreateRuntimeParameter");
+				if(pLayerDLL->funcCreateRuntimeParameter == NULL)
 					break;
-				pLayerDLL->funcCreateLearningSettingFromBuffer = (FuncCreateLayerStructureSettingFromBuffer)GetProcAddress(pLayerDLL->hModule, "CreateLearningSettingFromBuffer");
-				if(pLayerDLL->funcCreateLearningSettingFromBuffer == NULL)
+				pLayerDLL->funcCreateRuntimeParameterFromBuffer = (FuncCreateLayerStructureSettingFromBuffer)GetProcAddress(pLayerDLL->hModule, "CreateRuntimeParameterFromBuffer");
+				if(pLayerDLL->funcCreateRuntimeParameterFromBuffer == NULL)
 					break;
 
 				return pLayerDLL;

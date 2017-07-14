@@ -15,7 +15,7 @@ namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-	template<class IOLayer>
+	template<typename IOLayer>
 	class CLayerBase : public IOLayer
 	{
 	protected:
@@ -30,201 +30,27 @@ namespace NeuralNetwork {
 
 	private:
 		Gravisbell::GUID guid;	/**< レイヤー識別用のGUID */
-		SettingData::Standard::IData* pRuntimeParameter;
 
 		ProcessType processType;
 		U32 batchSize;	/**< バッチサイズ */
 
 	public:
 		/** コンストラクタ */
-		CLayerBase(Gravisbell::GUID guid, SettingData::Standard::IData* i_pRuntimeParameter)
-			:	guid				(guid)
-			,	pRuntimeParameter	(i_pRuntimeParameter)
-			,	processType			(PROCESSTYPE_CALCULATE)
+		CLayerBase(Gravisbell::GUID guid)
+			:	guid						(guid)
+			,	processType					(PROCESSTYPE_CALCULATE)
 		{
 		}
 		/** デストラクタ */
 		virtual ~CLayerBase()
 		{
-			if(pRuntimeParameter)
-				delete pRuntimeParameter;
-		}
-
-
-		//====================================
-		// 実行時設定
-		//====================================
-	public:
-		/** 実行時設定を取得する. */
-		const SettingData::Standard::IData* GetRuntimeParameter()const
-		{
-			return pRuntimeParameter;
-		}
-		SettingData::Standard::IData* GetRuntimeParameter()
-		{
-			return pRuntimeParameter;
-		}
-
-		/** 学習設定のアイテムを取得する.
-			@param	guid		取得対象レイヤーのGUID.	指定が無い場合は全てのレイヤーに対して実行する.
-			@param	i_dataID	設定する値のID. */
-		SettingData::Standard::IItemBase* GetRuntimeParameterItem(const wchar_t* i_dataID)
-		{
-			// 学習設定データを取得
-			Gravisbell::SettingData::Standard::IData* pLearnSettingData = this->GetRuntimeParameter();
-			if(pLearnSettingData == NULL)
-				return NULL;
-
-			// 該当IDの設定アイテムを取得
-			Gravisbell::SettingData::Standard::IItemBase* pItem = pLearnSettingData->GetItemByID(i_dataID);
-			if(pItem == NULL)
-				return NULL;
-
-			return pItem;
-		}
-
-		/** 実行時設定を設定する.
-			int型、float型、enum型が対象.
-			@param	i_dataID	設定する値のID.
-			@param	i_param		設定する値. */
-		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, S32 i_param)
-		{
-			// 該当IDの設定アイテムを取得
-			Gravisbell::SettingData::Standard::IItemBase* pItem = this->GetRuntimeParameterItem(i_dataID);
-			if(pItem == NULL)
-				return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-
-			switch(pItem->GetItemType())
-			{
-			case Gravisbell::SettingData::Standard::ITEMTYPE_INT:
-				{
-					Gravisbell::SettingData::Standard::IItem_Int* pItemInt = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Int*>(pItem);
-					if(pItemInt == NULL)
-						break;
-					pItemInt->SetValue(i_param);
-				}
-				return ErrorCode::ERROR_CODE_NONE;
-
-			case Gravisbell::SettingData::Standard::ITEMTYPE_FLOAT:
-				{
-					Gravisbell::SettingData::Standard::IItem_Float* pItemInt = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Float*>(pItem);
-					if(pItemInt == NULL)
-						break;
-					pItemInt->SetValue((F32)i_param);
-				}
-				return ErrorCode::ERROR_CODE_NONE;
-
-			case Gravisbell::SettingData::Standard::ITEMTYPE_ENUM:
-				{
-					Gravisbell::SettingData::Standard::IItem_Enum* pItemInt = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Enum*>(pItem);
-					if(pItemInt == NULL)
-						break;
-					pItemInt->SetValue(i_param);
-				}
-				return ErrorCode::ERROR_CODE_NONE;
-			}
-
-			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
-		}
-		/** 実行時設定を設定する.
-			int型、float型が対象.
-			@param	i_dataID	設定する値のID.
-			@param	i_param		設定する値. */
-		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, F32 i_param)
-		{
-			// 該当IDの設定アイテムを取得
-			Gravisbell::SettingData::Standard::IItemBase* pItem = this->GetRuntimeParameterItem(i_dataID);
-			if(pItem == NULL)
-				return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-
-			switch(pItem->GetItemType())
-			{
-			case Gravisbell::SettingData::Standard::ITEMTYPE_INT:
-				{
-					Gravisbell::SettingData::Standard::IItem_Int* pItemInt = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Int*>(pItem);
-					if(pItemInt == NULL)
-						break;
-					pItemInt->SetValue((S32)i_param);
-				}
-				return ErrorCode::ERROR_CODE_NONE;
-
-			case Gravisbell::SettingData::Standard::ITEMTYPE_FLOAT:
-				{
-					Gravisbell::SettingData::Standard::IItem_Float* pItemInt = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Float*>(pItem);
-					if(pItemInt == NULL)
-						break;
-					pItemInt->SetValue((F32)i_param);
-				}
-				return ErrorCode::ERROR_CODE_NONE;
-			}
-
-			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
-		}
-		/** 実行時設定を設定する.
-			bool型が対象.
-			@param	i_dataID	設定する値のID.
-			@param	i_param		設定する値. */
-		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, bool i_param)
-		{
-			// 該当IDの設定アイテムを取得
-			Gravisbell::SettingData::Standard::IItemBase* pItem = this->GetRuntimeParameterItem(i_dataID);
-			if(pItem == NULL)
-				return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-
-			switch(pItem->GetItemType())
-			{
-			case Gravisbell::SettingData::Standard::ITEMTYPE_BOOL:
-				{
-					Gravisbell::SettingData::Standard::IItem_Bool* pItemBool = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Bool*>(pItem);
-					if(pItemBool == NULL)
-						break;
-					pItemBool->SetValue(i_param);
-
-				}
-				return ErrorCode::ERROR_CODE_NONE;
-			}
-
-			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
-		}
-		/** 実行時設定を設定する.
-			string型が対象.
-			@param	i_dataID	設定する値のID.
-			@param	i_param		設定する値. */
-		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, const wchar_t* i_param)
-		{
-			// 該当IDの設定アイテムを取得
-			Gravisbell::SettingData::Standard::IItemBase* pItem = this->GetRuntimeParameterItem(i_dataID);
-			if(pItem == NULL)
-				return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-
-			switch(pItem->GetItemType())
-			{
-			case Gravisbell::SettingData::Standard::ITEMTYPE_STRING:
-				{
-					Gravisbell::SettingData::Standard::IItem_String* pItemString = dynamic_cast<Gravisbell::SettingData::Standard::IItem_String*>(pItem);
-					if(pItemString == NULL)
-						break;
-					pItemString->SetValue(i_param);
-
-				}
-				return ErrorCode::ERROR_CODE_NONE;
-			case Gravisbell::SettingData::Standard::ITEMTYPE_ENUM:
-				{
-					Gravisbell::SettingData::Standard::IItem_Enum* pItemString = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Enum*>(pItem);
-					if(pItemString == NULL)
-						break;
-					pItemString->SetValue(i_param);
-				}
-				return ErrorCode::ERROR_CODE_NONE;
-			}
-
-			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
 		}
 
 
 		//===========================
 		// レイヤー共通
 		//===========================
+	public:
 
 		/** レイヤー固有のGUIDを取得する */
 		Gravisbell::GUID GetGUID(void)const
@@ -290,8 +116,6 @@ namespace NeuralNetwork {
 		}
 
 
-
-
 		//===========================
 		// レイヤーデータ関連
 		//===========================
@@ -301,7 +125,302 @@ namespace NeuralNetwork {
 		virtual const ILayerData& GetLayerData()const = 0;
 	};
 
-	class CNNSingle2SingleLayerBase : public CLayerBase<INNSingle2SingleLayer>
+
+	template<typename IOLayer, typename RuntimeParameter>
+	class CLayerBaseRuntimeParameter  : public CLayerBase<IOLayer>
+	{
+	private:
+		SettingData::Standard::IData* pRuntimeParameter;
+		bool onUpdateRuntimeParameter;	// 実行時パラメータを更新したフラグ
+
+		RuntimeParameter runtimeParameter;
+
+	protected:
+		/** コンストラクタ */
+		CLayerBaseRuntimeParameter(Gravisbell::GUID guid, SettingData::Standard::IData* i_pRuntimeParameter)
+			:	CLayerBase					(guid)
+			,	pRuntimeParameter			(i_pRuntimeParameter)
+			,	onUpdateRuntimeParameter	(false)
+			,	runtimeParameter			()
+		{
+		}
+		/** デストラクタ */
+		virtual ~CLayerBaseRuntimeParameter()
+		{
+			if(pRuntimeParameter)
+				delete pRuntimeParameter;
+		}
+		
+
+	protected:
+		/** 実行時設定を構造体で取得する */
+		const RuntimeParameter& GetRuntimeParameterByStructure()
+		{
+			if(this->onUpdateRuntimeParameter)
+			{
+				this->pRuntimeParameter->WriteToStruct((BYTE*)&runtimeParameter);
+				this->onUpdateRuntimeParameter = false;
+			}
+
+			return runtimeParameter;
+		}
+		/** 実行時設定を構造体で取得する */
+		const RuntimeParameter& GetRuntimeParameterByStructure()const
+		{
+			return runtimeParameter;
+		}
+
+		//====================================
+		// 実行時設定
+		//====================================
+	public:
+		/** 実行時設定を取得する. */
+		const SettingData::Standard::IData* GetRuntimeParameter()const
+		{
+			return pRuntimeParameter;
+		}
+		SettingData::Standard::IData* GetRuntimeParameter()
+		{
+			return pRuntimeParameter;
+		}
+
+		/** 学習設定のアイテムを取得する.
+			@param	guid		取得対象レイヤーのGUID.	指定が無い場合は全てのレイヤーに対して実行する.
+			@param	i_dataID	設定する値のID. */
+		SettingData::Standard::IItemBase* GetRuntimeParameterItem(const wchar_t* i_dataID)
+		{
+			// 学習設定データを取得
+			Gravisbell::SettingData::Standard::IData* pLearnSettingData = this->GetRuntimeParameter();
+			if(pLearnSettingData == NULL)
+				return NULL;
+
+			// 該当IDの設定アイテムを取得
+			Gravisbell::SettingData::Standard::IItemBase* pItem = pLearnSettingData->GetItemByID(i_dataID);
+			if(pItem == NULL)
+				return NULL;
+
+			return pItem;
+		}
+
+		/** 実行時設定を設定する.
+			int型、float型、enum型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, S32 i_param)
+		{
+			// 該当IDの設定アイテムを取得
+			Gravisbell::SettingData::Standard::IItemBase* pItem = this->GetRuntimeParameterItem(i_dataID);
+			if(pItem == NULL)
+				return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
+
+			switch(pItem->GetItemType())
+			{
+			case Gravisbell::SettingData::Standard::ITEMTYPE_INT:
+				{
+					Gravisbell::SettingData::Standard::IItem_Int* pItemInt = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Int*>(pItem);
+					if(pItemInt == NULL)
+						break;
+					pItemInt->SetValue(i_param);
+					this->onUpdateRuntimeParameter = true;
+				}
+				return ErrorCode::ERROR_CODE_NONE;
+
+			case Gravisbell::SettingData::Standard::ITEMTYPE_FLOAT:
+				{
+					Gravisbell::SettingData::Standard::IItem_Float* pItemInt = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Float*>(pItem);
+					if(pItemInt == NULL)
+						break;
+					pItemInt->SetValue((F32)i_param);
+					this->onUpdateRuntimeParameter = true;
+				}
+				return ErrorCode::ERROR_CODE_NONE;
+
+			case Gravisbell::SettingData::Standard::ITEMTYPE_ENUM:
+				{
+					Gravisbell::SettingData::Standard::IItem_Enum* pItemInt = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Enum*>(pItem);
+					if(pItemInt == NULL)
+						break;
+					pItemInt->SetValue(i_param);
+					this->onUpdateRuntimeParameter = true;
+				}
+				return ErrorCode::ERROR_CODE_NONE;
+			}
+
+			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+		}
+		/** 実行時設定を設定する.
+			int型、float型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, F32 i_param)
+		{
+			// 該当IDの設定アイテムを取得
+			Gravisbell::SettingData::Standard::IItemBase* pItem = this->GetRuntimeParameterItem(i_dataID);
+			if(pItem == NULL)
+				return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
+
+			switch(pItem->GetItemType())
+			{
+			case Gravisbell::SettingData::Standard::ITEMTYPE_INT:
+				{
+					Gravisbell::SettingData::Standard::IItem_Int* pItemInt = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Int*>(pItem);
+					if(pItemInt == NULL)
+						break;
+					pItemInt->SetValue((S32)i_param);
+					this->onUpdateRuntimeParameter = true;
+				}
+				return ErrorCode::ERROR_CODE_NONE;
+
+			case Gravisbell::SettingData::Standard::ITEMTYPE_FLOAT:
+				{
+					Gravisbell::SettingData::Standard::IItem_Float* pItemInt = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Float*>(pItem);
+					if(pItemInt == NULL)
+						break;
+					pItemInt->SetValue((F32)i_param);
+					this->onUpdateRuntimeParameter = true;
+				}
+				return ErrorCode::ERROR_CODE_NONE;
+			}
+
+			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+		}
+		/** 実行時設定を設定する.
+			bool型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, bool i_param)
+		{
+			// 該当IDの設定アイテムを取得
+			Gravisbell::SettingData::Standard::IItemBase* pItem = this->GetRuntimeParameterItem(i_dataID);
+			if(pItem == NULL)
+				return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
+
+			switch(pItem->GetItemType())
+			{
+			case Gravisbell::SettingData::Standard::ITEMTYPE_BOOL:
+				{
+					Gravisbell::SettingData::Standard::IItem_Bool* pItemBool = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Bool*>(pItem);
+					if(pItemBool == NULL)
+						break;
+					pItemBool->SetValue(i_param);
+					this->onUpdateRuntimeParameter = true;
+				}
+				return ErrorCode::ERROR_CODE_NONE;
+			}
+
+			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+		}
+		/** 実行時設定を設定する.
+			string型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, const wchar_t* i_param)
+		{
+			// 該当IDの設定アイテムを取得
+			Gravisbell::SettingData::Standard::IItemBase* pItem = this->GetRuntimeParameterItem(i_dataID);
+			if(pItem == NULL)
+				return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
+
+			switch(pItem->GetItemType())
+			{
+			case Gravisbell::SettingData::Standard::ITEMTYPE_STRING:
+				{
+					Gravisbell::SettingData::Standard::IItem_String* pItemString = dynamic_cast<Gravisbell::SettingData::Standard::IItem_String*>(pItem);
+					if(pItemString == NULL)
+						break;
+					pItemString->SetValue(i_param);
+					this->onUpdateRuntimeParameter = true;
+				}
+				return ErrorCode::ERROR_CODE_NONE;
+			case Gravisbell::SettingData::Standard::ITEMTYPE_ENUM:
+				{
+					Gravisbell::SettingData::Standard::IItem_Enum* pItemString = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Enum*>(pItem);
+					if(pItemString == NULL)
+						break;
+					pItemString->SetValue(i_param);
+					this->onUpdateRuntimeParameter = true;
+				}
+				return ErrorCode::ERROR_CODE_NONE;
+			}
+
+			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+		}
+	};
+
+	template<typename IOLayer>
+	class CLayerBaseRuntimeParameterNone : public CLayerBase<IOLayer>
+	{
+	protected:
+		/** コンストラクタ */
+		CLayerBaseRuntimeParameterNone(Gravisbell::GUID guid)
+			:	CLayerBase	(guid)
+		{
+		}
+		/** デストラクタ */
+		virtual ~CLayerBaseRuntimeParameterNone()
+		{
+		}
+
+		//====================================
+		// 実行時設定
+		//====================================
+	public:
+		/** 実行時設定を取得する. */
+		const SettingData::Standard::IData* GetRuntimeParameter()const
+		{
+			return NULL;
+		}
+		SettingData::Standard::IData* GetRuntimeParameter()
+		{
+			return NULL;
+		}
+
+		/** 学習設定のアイテムを取得する.
+			@param	guid		取得対象レイヤーのGUID.	指定が無い場合は全てのレイヤーに対して実行する.
+			@param	i_dataID	設定する値のID. */
+		SettingData::Standard::IItemBase* GetRuntimeParameterItem(const wchar_t* i_dataID)
+		{
+			return NULL;
+		}
+
+		/** 実行時設定を設定する.
+			int型、float型、enum型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, S32 i_param)
+		{
+			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+		}
+		/** 実行時設定を設定する.
+			int型、float型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, F32 i_param)
+		{
+			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+		}
+		/** 実行時設定を設定する.
+			bool型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, bool i_param)
+		{
+			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+		}
+		/** 実行時設定を設定する.
+			string型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, const wchar_t* i_param)
+		{
+			return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+		}
+	};
+
+
+
+	template<typename... RuntimeParameter>
+	class CNNSingle2SingleLayerBase : public CLayerBaseRuntimeParameter<INNSingle2SingleLayer, RuntimeParameter...>
 	{
 	private:
 		IODataStruct inputDataStruct;	/**< 入力データ構造 */
@@ -310,9 +429,75 @@ namespace NeuralNetwork {
 	public:
 		/** コンストラクタ */
 		CNNSingle2SingleLayerBase(Gravisbell::GUID guid, SettingData::Standard::IData* i_pRuntimeParameter, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct)
-			:	CLayerBase			(guid, i_pRuntimeParameter)
-			,	inputDataStruct		(i_inputDataStruct)
-			,	outputDataStruct	(i_outputDataStruct)
+			:	CLayerBaseRuntimeParameter<INNSingle2SingleLayer, RuntimeParameter...>	(guid, i_pRuntimeParameter)
+			,	inputDataStruct															(i_inputDataStruct)
+			,	outputDataStruct														(i_outputDataStruct)
+		{
+		}
+		/** デストラクタ */
+		virtual ~CNNSingle2SingleLayerBase()
+		{
+		}
+
+
+	public:
+		//===========================
+		// レイヤー共通
+		//===========================
+		/** レイヤー種別の取得.
+			ELayerKind の組み合わせ. */
+		U32 GetLayerKindBase(void)const
+		{
+			return Gravisbell::Layer::ELayerKind::LAYER_KIND_NEURALNETWORK | Gravisbell::Layer::ELayerKind::LAYER_KIND_SINGLE_INPUT | Gravisbell::Layer::ELayerKind::LAYER_KIND_SINGLE_OUTPUT;
+		}
+
+	public:
+		//===========================
+		// 入力レイヤー関連
+		//===========================
+		/** 入力データ構造を取得する.
+			@return	入力データ構造 */
+		IODataStruct GetInputDataStruct()const
+		{
+			return this->inputDataStruct;
+		}
+
+		/** 入力バッファ数を取得する. */
+		unsigned int GetInputBufferCount()const
+		{
+			return this->GetInputDataStruct().GetDataCount();
+		}
+
+
+	public:
+		//===========================
+		// 出力レイヤー関連
+		//===========================
+		/** 出力データ構造を取得する */
+		IODataStruct GetOutputDataStruct()const
+		{
+			return this->outputDataStruct;
+		}
+
+		/** 出力バッファ数を取得する */
+		unsigned int GetOutputBufferCount()const
+		{
+			return this->GetOutputDataStruct().GetDataCount();
+		}
+	};
+	template<>
+	class CNNSingle2SingleLayerBase<> : public CLayerBaseRuntimeParameterNone<INNSingle2SingleLayer>
+	{
+	private:
+		IODataStruct inputDataStruct;	/**< 入力データ構造 */
+		IODataStruct outputDataStruct;	/**< 出力データ構造 */
+
+	public:
+		/** コンストラクタ */
+		CNNSingle2SingleLayerBase(Gravisbell::GUID guid, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct)
+			:	CLayerBaseRuntimeParameterNone<INNSingle2SingleLayer>	(guid)
+			,	inputDataStruct											(i_inputDataStruct)
+			,	outputDataStruct										(i_outputDataStruct)
 		{
 		}
 		/** デストラクタ */
@@ -367,7 +552,10 @@ namespace NeuralNetwork {
 		}
 	};
 
-	class CNNSingle2MultLayerBase : public CLayerBase<INNSingle2MultLayer>
+
+	
+	template<typename... RuntimeParameter>
+	class CNNSingle2MultLayerBase : public CLayerBaseRuntimeParameter<INNSingle2MultLayer, RuntimeParameter...>
 	{
 	private:
 		IODataStruct inputDataStruct;	/**< 入力データ構造 */
@@ -375,10 +563,76 @@ namespace NeuralNetwork {
 
 	public:
 		/** コンストラクタ */
-		CNNSingle2MultLayerBase(Gravisbell::GUID guid, SettingData::Standard::IData* i_pRuntimeParameter, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct)
-			:	CLayerBase			(guid, i_pRuntimeParameter)
-			,	inputDataStruct		(i_inputDataStruct)
-			,	outputDataStruct	(i_outputDataStruct)
+		CNNSingle2MultLayerBase(Gravisbell::GUID guid, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct)
+			:	CLayerBaseRuntimeParameter<INNSingle2MultLayer, RuntimeParameter...>		(guid)
+			,	inputDataStruct																(i_inputDataStruct)
+			,	outputDataStruct															(i_outputDataStruct)
+		{
+		}
+		/** デストラクタ */
+		virtual ~CNNSingle2MultLayerBase()
+		{
+		}
+
+
+	public:
+		//===========================
+		// レイヤー共通
+		//===========================
+		/** レイヤー種別の取得.
+			ELayerKind の組み合わせ. */
+		U32 GetLayerKindBase(void)const
+		{
+			return Gravisbell::Layer::ELayerKind::LAYER_KIND_NEURALNETWORK | Gravisbell::Layer::ELayerKind::LAYER_KIND_SINGLE_INPUT | Gravisbell::Layer::ELayerKind::LAYER_KIND_MULT_OUTPUT;
+		}
+
+	public:
+		//===========================
+		// 入力レイヤー関連
+		//===========================
+		/** 入力データ構造を取得する.
+			@return	入力データ構造 */
+		IODataStruct GetInputDataStruct()const
+		{
+			return this->inputDataStruct;
+		}
+
+		/** 入力バッファ数を取得する. */
+		unsigned int GetInputBufferCount()const
+		{
+			return this->GetInputDataStruct().GetDataCount();
+		}
+
+
+	public:
+		//===========================
+		// 出力レイヤー関連
+		//===========================
+		/** 出力データ構造を取得する */
+		IODataStruct GetOutputDataStruct()const
+		{
+			return this->outputDataStruct;
+		}
+
+		/** 出力バッファ数を取得する */
+		unsigned int GetOutputBufferCount()const
+		{
+			return this->GetOutputDataStruct().GetDataCount();
+		}
+	};
+	template<>
+	class CNNSingle2MultLayerBase<> : public CLayerBaseRuntimeParameterNone<INNSingle2MultLayer>
+	{
+	private:
+		IODataStruct inputDataStruct;	/**< 入力データ構造 */
+		IODataStruct outputDataStruct;	/**< 出力データ構造 */
+
+	public:
+		/** コンストラクタ */
+		CNNSingle2MultLayerBase(Gravisbell::GUID guid, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct)
+			:	CLayerBaseRuntimeParameterNone<INNSingle2MultLayer>	(guid)
+			,	inputDataStruct										(i_inputDataStruct)
+			,	outputDataStruct									(i_outputDataStruct)
 		{
 		}
 		/** デストラクタ */
@@ -433,7 +687,10 @@ namespace NeuralNetwork {
 		}
 	};
 
-	class CNNMult2SingleLayerBase : public CLayerBase<INNMult2SingleLayer>
+
+
+	template<typename... RuntimeParameter>
+	class CNNMult2SingleLayerBase : public CLayerBaseRuntimeParameter<INNMult2SingleLayer, RuntimeParameter...>
 	{
 	private:
 		std::vector<IODataStruct>	lpInputDataStruct;	/**< 入力データ構造 */
@@ -441,10 +698,10 @@ namespace NeuralNetwork {
 
 	public:
 		/** コンストラクタ */
-		CNNMult2SingleLayerBase(Gravisbell::GUID guid, SettingData::Standard::IData* i_pRuntimeParameter, const std::vector<IODataStruct>& i_lpInputDataStruct, const IODataStruct& i_outputDataStruct)
-			:	CLayerBase			(guid, i_pRuntimeParameter)
-			,	lpInputDataStruct	(i_lpInputDataStruct)
-			,	outputDataStruct	(i_outputDataStruct)
+		CNNMult2SingleLayerBase(Gravisbell::GUID guid, const std::vector<IODataStruct>& i_lpInputDataStruct, const IODataStruct& i_outputDataStruct)
+			:	CLayerBaseRuntimeParameter<INNMult2SingleLayer, RuntimeParameter...>	(guid)
+			,	lpInputDataStruct														(i_lpInputDataStruct)
+			,	outputDataStruct														(i_outputDataStruct)
 		{
 		}
 		/** デストラクタ */
@@ -508,6 +765,86 @@ namespace NeuralNetwork {
 			return this->GetOutputDataStruct().GetDataCount();
 		}
 	};
+	template<>
+	class CNNMult2SingleLayerBase<> : public CLayerBaseRuntimeParameterNone<INNMult2SingleLayer>
+	{
+	private:
+		std::vector<IODataStruct>	lpInputDataStruct;	/**< 入力データ構造 */
+		IODataStruct				outputDataStruct;	/**< 出力データ構造 */
+
+	public:
+		/** コンストラクタ */
+		CNNMult2SingleLayerBase(Gravisbell::GUID guid, const std::vector<IODataStruct>& i_lpInputDataStruct, const IODataStruct& i_outputDataStruct)
+			:	CLayerBaseRuntimeParameterNone<INNMult2SingleLayer>	(guid)
+			,	lpInputDataStruct									(i_lpInputDataStruct)
+			,	outputDataStruct									(i_outputDataStruct)
+		{
+		}
+		/** デストラクタ */
+		virtual ~CNNMult2SingleLayerBase()
+		{
+		}
+
+
+	public:
+		//===========================
+		// レイヤー共通
+		//===========================
+		/** レイヤー種別の取得.
+			ELayerKind の組み合わせ. */
+		U32 GetLayerKindBase(void)const
+		{
+			return Gravisbell::Layer::ELayerKind::LAYER_KIND_NEURALNETWORK | Gravisbell::Layer::ELayerKind::LAYER_KIND_MULT_INPUT | Gravisbell::Layer::ELayerKind::LAYER_KIND_SINGLE_OUTPUT;
+		}
+
+	public:
+		//===========================
+		// 入力レイヤー関連
+		//===========================
+		/** 入力データの数を取得する */
+		U32 GetInputDataCount()const
+		{
+			return (U32)this->lpInputDataStruct.size();
+		}
+
+		/** 入力データ構造を取得する.
+			@return	入力データ構造 */
+		IODataStruct GetInputDataStruct(U32 i_dataNum)const
+		{
+			if(i_dataNum >= this->GetInputDataCount())
+				return IODataStruct(0,0,0,0);
+
+			return this->lpInputDataStruct[i_dataNum];
+		}
+
+		/** 入力バッファ数を取得する. */
+		U32 GetInputBufferCount(U32 i_dataNum)const
+		{
+			return this->GetInputDataStruct(i_dataNum).GetDataCount();
+		}
+
+
+
+	public:
+		//===========================
+		// 出力レイヤー関連
+		//===========================
+		/** 出力データ構造を取得する */
+		IODataStruct GetOutputDataStruct()const
+		{
+			return this->outputDataStruct;
+		}
+
+		/** 出力バッファ数を取得する */
+		U32 GetOutputBufferCount()const
+		{
+			return this->GetOutputDataStruct().GetDataCount();
+		}
+	};
+
+
+
+
 
 
 }	// NeuralNetwork

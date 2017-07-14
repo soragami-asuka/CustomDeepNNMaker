@@ -49,13 +49,13 @@ namespace NeuralNetwork {
 		// 学習設定作成
 		//==============================
 		/** レイヤー学習設定を作成する */
-		virtual SettingData::Standard::IData* CreateLearningSetting(void)const = 0;
+		virtual SettingData::Standard::IData* CreateRuntimeParameter(void)const = 0;
 		/** レイヤー学習設定を作成する
 			@param i_lpBuffer	読み込みバッファの先頭アドレス.
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@param o_useBufferSize 実際に読み込んだバッファサイズ
 			@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-		virtual SettingData::Standard::IData* CreateLearningSettingFromBuffer(const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)const = 0;
+		virtual SettingData::Standard::IData* CreateRuntimeParameterFromBuffer(const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)const = 0;
 
 
 		//==============================

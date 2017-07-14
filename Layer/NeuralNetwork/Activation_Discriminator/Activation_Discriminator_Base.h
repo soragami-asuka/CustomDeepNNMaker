@@ -17,7 +17,7 @@ namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-	class Activation_Discriminator_Base : public CNNSingle2SingleLayerBase
+	class Activation_Discriminator_Base : public CNNSingle2SingleLayerBase<>
 	{
 	public:
 		/** コンストラクタ */

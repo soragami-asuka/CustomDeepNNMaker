@@ -100,16 +100,6 @@ namespace FullyConnect_Activation {
 
 	};
 
-	/** Learning data structure */
-	struct LearnDataStructure
-	{
-		/** Name : ŠwKŒW”
-		  * ID   : LearnCoeff
-		  */
-		F32 LearnCoeff;
-
-	};
-
 } // FullyConnect_Activation
 } // NeuralNetwork
 } // Layer

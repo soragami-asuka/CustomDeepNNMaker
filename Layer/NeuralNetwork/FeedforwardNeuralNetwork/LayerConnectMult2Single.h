@@ -30,8 +30,6 @@ namespace NeuralNetwork {
 		ILayerBase* pLayer;	/**< レイヤーのアドレス */
 		INNMult2SingleLayer*	pLayer_io;
 
-		Gravisbell::SettingData::Standard::IData* pRuntimeParameter;	/**< 学習設定情報のアドレス */
-
 		std::vector<LayerPosition>  lppOutputToLayer;		/**< 出力先レイヤー. SingleOutput扱いなので、必ず1個 */
 		std::vector<ILayerConnect*> lppInputFromLayer;	/**< 入力元レイヤー. SingleInput扱いなので、必ず1個 */
 
@@ -42,7 +40,7 @@ namespace NeuralNetwork {
 
 	public:
 		/** コンストラクタ */
-		LayerConnectMult2Single(class FeedforwardNeuralNetwork_Base& neuralNetwork, ILayerBase* pLayer, Gravisbell::SettingData::Standard::IData* pRuntimeParameter);
+		LayerConnectMult2Single(class FeedforwardNeuralNetwork_Base& neuralNetwork, ILayerBase* pLayer);
 		/** デストラクタ */
 		virtual ~LayerConnectMult2Single();
 
@@ -53,10 +51,37 @@ namespace NeuralNetwork {
 			ELayerKind の組み合わせ. */
 		U32 GetLayerKind()const;
 
-		/** 学習設定のポインタを取得する.
-			取得したデータを直接書き換えることで次の学習ループに反映されるが、NULLが返ってくることもあるので注意. */
-		Gravisbell::SettingData::Standard::IData* GetRuntimeParameter();
+		//====================================
+		// 実行時設定
+		//====================================
+		/** 実行時設定を取得する. */
+		const SettingData::Standard::IData* GetRuntimeParameter()const;
 
+		/** 実行時設定を設定する.
+			int型、float型、enum型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, S32 i_param);
+		/** 実行時設定を設定する.
+			int型、float型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, F32 i_param);
+		/** 実行時設定を設定する.
+			bool型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, bool i_param);
+		/** 実行時設定を設定する.
+			string型が対象.
+			@param	i_dataID	設定する値のID.
+			@param	i_param		設定する値. */
+		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, const wchar_t* i_param);
+
+
+		//====================================
+		// 入出力データ構造
+		//====================================
 		/** 出力データ構造を取得する.
 			@return	出力データ構造 */
 		IODataStruct GetOutputDataStruct()const;

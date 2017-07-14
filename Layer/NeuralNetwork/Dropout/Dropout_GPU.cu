@@ -97,6 +97,26 @@ namespace NeuralNetwork {
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+
+
+	/** 演算前処理を実行する.(演算用)
+		@param batchSize	同時に演算を行うバッチのサイズ.
+		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
+		失敗した場合はCalculate以降の処理は実行不可. */
+	ErrorCode Dropout_GPU::PreProcessCalculate()
+	{
+		// 入力バッファ数を確認
+		this->inputBufferCount = this->GetInputBufferCount();
+		if(this->inputBufferCount == 0)
+			return ErrorCode::ERROR_CODE_FRAUD_INPUT_COUNT;
+
+		// 出力バッファ数を確認
+		this->outputBufferCount = this->GetOutputBufferCount();
+		if(this->outputBufferCount == 0)
+			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
+
 		// 出力バッファを作成
 		{
 			int n = this->GetBatchSize();
@@ -183,26 +203,6 @@ namespace NeuralNetwork {
 	}
 
 
-	/** 演算前処理を実行する.(演算用)
-		@param batchSize	同時に演算を行うバッチのサイズ.
-		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
-		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Dropout_GPU::PreProcessCalculate()
-	{
-		// 入力バッファ数を確認
-		this->inputBufferCount = this->GetInputBufferCount();
-		if(this->inputBufferCount == 0)
-			return ErrorCode::ERROR_CODE_FRAUD_INPUT_COUNT;
-
-		// 出力バッファ数を確認
-		this->outputBufferCount = this->GetOutputBufferCount();
-		if(this->outputBufferCount == 0)
-			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
-
-		return ErrorCode::ERROR_CODE_NONE;
-	}
-
-
 	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
 	ErrorCode Dropout_GPU::PreProcessLoop()
@@ -220,7 +220,7 @@ namespace NeuralNetwork {
 		// 入力バッファのアドレスを配列に格納
 		this->m_lpInputBuffer_d = i_lpInputBuffer;
 
-		if(this->GetProcessType() == ProcessType::PROCESSTYPE_LEARN)
+		if(this->GetRuntimeParameterByStructure().UseDropOut)
 		{
 			cudnnStatus_t err = cudnnDropoutForward(
 				this->cudnnHandle,
@@ -245,7 +245,7 @@ namespace NeuralNetwork {
 		@return 出力データ配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER Dropout_GPU::GetOutputBuffer()const
 	{
-		if(this->GetProcessType() == ProcessType::PROCESSTYPE_LEARN)
+		if(this->GetRuntimeParameterByStructure().UseDropOut)
 		{
 			return thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]);
 		}
@@ -288,7 +288,7 @@ namespace NeuralNetwork {
 
 		if(this->m_lpDInputBuffer_d)
 		{
-			if(this->GetProcessType() == ProcessType::PROCESSTYPE_LEARN)
+			if(this->GetRuntimeParameterByStructure().UseDropOut)
 			{
 				cudnnStatus_t err = cudnnDropoutBackward(
 					this->cudnnHandle,
