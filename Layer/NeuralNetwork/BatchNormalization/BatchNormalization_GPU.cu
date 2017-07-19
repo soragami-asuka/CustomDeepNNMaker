@@ -361,6 +361,8 @@ namespace NeuralNetwork {
 			this->lpLearnMean     = this->layerData.lpMean;
 			this->lpLearnVariance = this->layerData.lpVariance;
 
+			F64 averageUpdateCoeff = max((1.0 / (this->learnCount+1)), this->GetRuntimeParameterByStructure().AverageUpdateCoeffMin);
+
 			err_cudnn = cudnnBatchNormalizationForwardTraining(
 				this->cudnnHandle,
 				cudnnBatchNormMode_t::CUDNN_BATCHNORM_SPATIAL,
@@ -373,7 +375,7 @@ namespace NeuralNetwork {
 				this->paramTensorDesc,
 				thrust::raw_pointer_cast(&this->layerData.lpScale[0]),
 				thrust::raw_pointer_cast(&this->layerData.lpBias[0]),
-				(1.0 / (this->learnCount+1)),
+				averageUpdateCoeff,
 				thrust::raw_pointer_cast(&this->lpLearnMean[0]),
 				thrust::raw_pointer_cast(&this->lpLearnVariance[0]),
 				max(CUDNN_BN_MIN_EPSILON, this->layerData.layerStructure.epsilon),

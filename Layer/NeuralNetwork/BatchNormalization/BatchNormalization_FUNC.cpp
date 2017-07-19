@@ -72,6 +72,13 @@ namespace DefaultLanguage
     /** ItemData Runtiime Parameter <id, StringData> */
     static const std::map<std::wstring, StringData> g_lpItemData_Runtime = 
     {
+        {
+            L"AverageUpdateCoeffMin",
+            {
+                L"最小平均値更新係数",
+                L"平均値を更新する際の係数の最小値.0=Epochの全データの平均値を使用する.1=直近のデータの平均値を使用する.",
+            }
+        },
     };
 
 
@@ -221,6 +228,17 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameter(void
 
 
 	// Create Item
+	/** Name : 最小平均値更新係数
+	  * ID   : AverageUpdateCoeffMin
+	  * Text : 平均値を更新する際の係数の最小値.0=Epochの全データの平均値を使用する.1=直近のデータの平均値を使用する.
+	  */
+	pLayerConfig->AddItem(
+		Gravisbell::SettingData::Standard::CreateItem_Float(
+			L"AverageUpdateCoeffMin",
+			CurrentLanguage::g_lpItemData_Learn[L"AverageUpdateCoeffMin"].name.c_str(),
+			CurrentLanguage::g_lpItemData_Learn[L"AverageUpdateCoeffMin"].text.c_str(),
+			0.0000000000000000f, 1.0000000000000000f, 0.0000000000000000f));
+
 	return pLayerConfig;
 }
 

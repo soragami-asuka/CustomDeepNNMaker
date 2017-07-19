@@ -35,6 +35,17 @@ namespace BatchNormalization {
 
 	};
 
+	/** Runtime Parameter structure */
+	struct RuntimeParameterStructure
+	{
+		/** Name : 最小平均値更新係数
+		  * ID   : AverageUpdateCoeffMin
+		  * Text : 平均値を更新する際の係数の最小値.0=Epochの全データの平均値を使用する.1=直近のデータの平均値を使用する.
+		  */
+		F32 AverageUpdateCoeffMin;
+
+	};
+
 } // BatchNormalization
 } // NeuralNetwork
 } // Layer

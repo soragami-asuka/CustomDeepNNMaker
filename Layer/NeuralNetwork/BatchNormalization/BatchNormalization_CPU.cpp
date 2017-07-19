@@ -366,7 +366,7 @@ namespace NeuralNetwork {
 
 
 		// 平均値更新用の係数を算出
-		F64 factor = 1.0 / (this->learnCount+1);
+		F64 factor = max(1.0 / (this->learnCount+1), this->GetRuntimeParameterByStructure().AverageUpdateCoeffMin);
 
 		// 学習処理の実行回数をカウントアップ
 		this->learnCount++;

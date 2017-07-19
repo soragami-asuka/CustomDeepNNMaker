@@ -35,9 +35,16 @@
 
   </Structure>
 
-  <!--学習に使用するデータの構造-->
-  <Learn>
+  <!--実行時パラメータ-->
+  <RuntimeParameter>
+    <Float id="AverageUpdateCoeffMin">
+      <Name>最小平均値更新係数</Name>
+      <Text>平均値を更新する際の係数の最小値.0=Epochの全データの平均値を使用する.1=直近のデータの平均値を使用する.</Text>
+      <Default>0</Default>
+      <Min>0.0</Min>
+      <Max>1.0</Max>
+    </Float>
+  </RuntimeParameter>
 
-  </Learn>
 
 </Config>
