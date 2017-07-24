@@ -39,7 +39,9 @@ namespace NeuralNetwork {
 	ErrorCode FullyConnect_LayerData_CPU::Initialize(void)
 	{
 		// 乱数固定化
+#ifdef _DEBUG
 		Utility::Random::Initialize(0);
+#endif
 
 		// 入力バッファ数を確認
 		unsigned int inputBufferCount = this->GetInputBufferCount();
