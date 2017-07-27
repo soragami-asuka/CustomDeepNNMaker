@@ -4,6 +4,9 @@
 #include "stdafx.h"
 #include<crtdbg.h>
 
+#include<cuda.h>
+#include<cuda_runtime.h>
+
 #include<vector>
 #include<boost/filesystem/path.hpp>
 #include<boost/uuid/uuid_generators.hpp>
@@ -66,6 +69,7 @@ int _tmain(int argc, _TCHAR* argv[])
 #ifdef _DEBUG
 	::_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_ALLOC_MEM_DF);
 #endif
+
 
 	// 画像を読み込み
 	Layer::IOData::IIODataLayer* pDataLayerTeach_Input  = NULL;
@@ -439,6 +443,14 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 	{
 		// 入力信号を直前レイヤーに設定
 		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID();
+
+		// ノイズレイヤー
+		err = AddLayerToNetworkLast(
+			*pNeuralNetwork,
+			lastLayerGUID,
+			CreateGaussianNoiseLayer(layerDLLManager, layerDataManager));
+		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
+
 
 		// 1層目
 		err = AddLayerToNetworkLast(
@@ -839,6 +851,12 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 	// 実行時設定
 	pNeuralNetworkLearn->SetRuntimeParameter(L"UseDropOut", true);
 	pNeuralNetworkSample->SetRuntimeParameter(L"UseDropOut", false);
+	
+	pNeuralNetworkLearn->SetRuntimeParameter(L"GaussianNoise_Average", 0.0f);
+	pNeuralNetworkLearn->SetRuntimeParameter(L"GaussianNoise_Variance", 0.1f);
+	pNeuralNetworkSample->SetRuntimeParameter(L"GaussianNoise_Average", 0.0f);
+	pNeuralNetworkSample->SetRuntimeParameter(L"GaussianNoise_Variance", 0.0f);
+
 
 	// 事前処理を実行
 	err = pNeuralNetworkLearn->PreProcessLearn(BATCH_SIZE);

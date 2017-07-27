@@ -29,12 +29,14 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Sample04_MNIST.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="DataFormat_image.xml" />
     <Xml Include="DataFormat_label.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="Sample04_MNIST.cu">
+      <Filter>ソース ファイル</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

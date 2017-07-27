@@ -15,6 +15,7 @@ call ConvertNNConfigToSource.exe "./BatchNormalization/Config.xml" "./BatchNorma
 call ConvertNNConfigToSource.exe "./SeparateOutput/Config.xml" "./SeparateOutput/" "SeparateOutput"
 call ConvertNNConfigToSource.exe "./MergeInput/Config.xml" "./MergeInput/" "MergeInput"
 call ConvertNNConfigToSource.exe "./Residual/Config.xml" "./Residual/" "Residual"
+call ConvertNNConfigToSource.exe "./GaussianNoise/Config.xml" "./GaussianNoise/" "GaussianNoise"
 
 
 pause

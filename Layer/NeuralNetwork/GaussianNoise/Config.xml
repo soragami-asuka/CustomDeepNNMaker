@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="AC27C912-A11D-4519-81A0-17C078E4431F" version="1.0.0.0" default-language="ja">
+ 
+  <SourceName>GaussianNoise</SourceName>
+  <Name>GaussianNoise</Name>
+  <Text>GaussianNoise.</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+
+  </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <RuntimeParameter>
+    
+    <Float id="GaussianNoise_Average">
+      <Name>平均</Name>
+      <Text>発生するノイズの平均値.ノイズのバイアス</Text>
+      <Min>0.0</Min>
+      <Max>65535</Max>
+      <Default>0.0</Default>
+    </Float>
+
+    <Float id="GaussianNoise_Variance">
+      <Name>分散</Name>
+      <Text>発生するノイズの分散.ノイズの強度</Text>
+      <Min>0.0</Min>
+      <Max>65535</Max>
+      <Default>0.0</Default>
+    </Float>
+
+  </RuntimeParameter>
+
+</Config>

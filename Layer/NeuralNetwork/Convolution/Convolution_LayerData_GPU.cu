@@ -53,7 +53,6 @@ namespace NeuralNetwork {
 		if(neuronCount == 0)
 			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_VALUERANGE;
 
-
 		// バッファを確保しつつ、初期値を設定
 		this->lppNeuron_d.resize(neuronCount * inputBufferCount);
 		this->lpBias_d.resize(neuronCount);

@@ -241,6 +241,38 @@ Layer::ILayerData* CreateDropoutLayer(
 
 	return pLayer;
 }
+/** ガウスノイズレイヤー.
+		@param	layerDLLManager		レイヤーDLL管理クラス.
+		@param	inputDataStruct		入力データ構造.
+		@param	rate				ドロップアウト率.(0.0～1.0).(0.0＝ドロップアウトなし,1.0=全入力無視) */
+GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+Layer::ILayerData* CreateGaussianNoiseLayer(
+	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager)
+{
+	const Gravisbell::GUID TYPE_CODE(0xac27c912, 0xa11d, 0x4519, 0x81, 0xa0, 0x17, 0xc0, 0x78, 0xe4, 0x43, 0x1f);
+
+
+	// DLL取得
+	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(TYPE_CODE);
+	if(pLayerDLL == NULL)
+		return NULL;
+
+	// 設定の作成
+	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
+	if(pConfig == NULL)
+		return NULL;
+
+	// レイヤーの作成
+	Layer::ILayerData* pLayer = layerDataManager.CreateLayerData(layerDLLManager, TYPE_CODE, boost::uuids::random_generator()().data, *pConfig);
+	if(pLayer == NULL)
+		return NULL;
+
+	// 設定情報を削除
+	delete pConfig;
+
+	return pLayer;
+}
+
 Layer::ILayerData* CreatePoolingLayer(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 	Vector3D<S32> filterSize, Vector3D<S32> stride)
