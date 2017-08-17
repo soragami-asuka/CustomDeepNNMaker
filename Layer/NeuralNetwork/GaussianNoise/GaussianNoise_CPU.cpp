@@ -140,8 +140,8 @@ namespace NeuralNetwork {
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			this->m_lppInputBuffer[batchNum] = &i_lpInputBuffer[batchNum * this->inputBufferCount];
 
-		F32 average  = this->GetRuntimeParameterByStructure().GaussianNoise_Average;
-		F32 variance = this->GetRuntimeParameterByStructure().GaussianNoise_Variance;
+		F32 average  = this->layerData.layerStructure.Average  + this->GetRuntimeParameterByStructure().GaussianNoise_Bias;
+		F32 variance = this->layerData.layerStructure.Variance * this->GetRuntimeParameterByStructure().GaussianNoise_Power;
 
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{

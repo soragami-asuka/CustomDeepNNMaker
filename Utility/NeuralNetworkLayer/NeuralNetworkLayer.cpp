@@ -242,12 +242,13 @@ Layer::ILayerData* CreateDropoutLayer(
 	return pLayer;
 }
 /** ガウスノイズレイヤー.
-		@param	layerDLLManager		レイヤーDLL管理クラス.
-		@param	inputDataStruct		入力データ構造.
-		@param	rate				ドロップアウト率.(0.0～1.0).(0.0＝ドロップアウトなし,1.0=全入力無視) */
+	@param	layerDLLManager		レイヤーDLL管理クラス.
+	@param	inputDataStruct		入力データ構造.
+	@param	average				発生する乱数の平均値
+	@param	variance			発生する乱数の分散 */
 GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 Layer::ILayerData* CreateGaussianNoiseLayer(
-	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager)
+	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager, F32 average, F32 variance)
 {
 	const Gravisbell::GUID TYPE_CODE(0xac27c912, 0xa11d, 0x4519, 0x81, 0xa0, 0x17, 0xc0, 0x78, 0xe4, 0x43, 0x1f);
 
@@ -261,6 +262,20 @@ Layer::ILayerData* CreateGaussianNoiseLayer(
 	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
 	if(pConfig == NULL)
 		return NULL;
+
+	// 平均
+	SettingData::Standard::IItem_Float* pItem_Average = dynamic_cast<SettingData::Standard::IItem_Float*>(pConfig->GetItemByID(L"Average"));
+	if(pItem_Average)
+	{
+		pItem_Average->SetValue(average);
+	}
+
+	// 分散
+	SettingData::Standard::IItem_Float* pItem_Variance = dynamic_cast<SettingData::Standard::IItem_Float*>(pConfig->GetItemByID(L"Variance"));
+	if(pItem_Variance)
+	{
+		pItem_Variance->SetValue(variance);
+	}
 
 	// レイヤーの作成
 	Layer::ILayerData* pLayer = layerDataManager.CreateLayerData(layerDLLManager, TYPE_CODE, boost::uuids::random_generator()().data, *pConfig);

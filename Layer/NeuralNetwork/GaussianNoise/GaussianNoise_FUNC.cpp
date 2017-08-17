@@ -45,6 +45,20 @@ namespace DefaultLanguage
     /** ItemData Layer Structure <id, StringData> */
     static const std::map<std::wstring, StringData> g_lpItemData_LayerStructure = 
     {
+        {
+            L"Average",
+            {
+                L"平均",
+                L"発生するノイズの平均値.ノイズのバイアス",
+            }
+        },
+        {
+            L"Variance",
+            {
+                L"分散",
+                L"発生するノイズの分散.ノイズの強度",
+            }
+        },
     };
 
 
@@ -59,17 +73,17 @@ namespace DefaultLanguage
     static const std::map<std::wstring, StringData> g_lpItemData_Runtime = 
     {
         {
-            L"GaussianNoise_Average",
+            L"GaussianNoise_Bias",
             {
                 L"平均",
                 L"発生するノイズの平均値.ノイズのバイアス",
             }
         },
         {
-            L"GaussianNoise_Variance",
+            L"GaussianNoise_Power",
             {
                 L"分散",
-                L"発生するノイズの分散.ノイズの強度",
+                L"ノイズの強度",
             }
         },
     };
@@ -153,6 +167,28 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 
 
 	// Create Item
+	/** Name : 平均
+	  * ID   : Average
+	  * Text : 発生するノイズの平均値.ノイズのバイアス
+	  */
+	pLayerConfig->AddItem(
+		Gravisbell::SettingData::Standard::CreateItem_Float(
+			L"Average",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"Average"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"Average"].text.c_str(),
+			0.0000000000000000f, 65535.0000000000000000f, 0.0000000000000000f));
+
+	/** Name : 分散
+	  * ID   : Variance
+	  * Text : 発生するノイズの分散.ノイズの強度
+	  */
+	pLayerConfig->AddItem(
+		Gravisbell::SettingData::Standard::CreateItem_Float(
+			L"Variance",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"Variance"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"Variance"].text.c_str(),
+			0.0000000000000000f, 65535.0000000000000000f, 0.0000000000000000f));
+
 	return pLayerConfig;
 }
 
@@ -200,25 +236,25 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameter(void
 
 	// Create Item
 	/** Name : 平均
-	  * ID   : GaussianNoise_Average
+	  * ID   : GaussianNoise_Bias
 	  * Text : 発生するノイズの平均値.ノイズのバイアス
 	  */
 	pLayerConfig->AddItem(
 		Gravisbell::SettingData::Standard::CreateItem_Float(
-			L"GaussianNoise_Average",
-			CurrentLanguage::g_lpItemData_Learn[L"GaussianNoise_Average"].name.c_str(),
-			CurrentLanguage::g_lpItemData_Learn[L"GaussianNoise_Average"].text.c_str(),
+			L"GaussianNoise_Bias",
+			CurrentLanguage::g_lpItemData_Learn[L"GaussianNoise_Bias"].name.c_str(),
+			CurrentLanguage::g_lpItemData_Learn[L"GaussianNoise_Bias"].text.c_str(),
 			0.0000000000000000f, 65535.0000000000000000f, 0.0000000000000000f));
 
 	/** Name : 分散
-	  * ID   : GaussianNoise_Variance
-	  * Text : 発生するノイズの分散.ノイズの強度
+	  * ID   : GaussianNoise_Power
+	  * Text : ノイズの強度
 	  */
 	pLayerConfig->AddItem(
 		Gravisbell::SettingData::Standard::CreateItem_Float(
-			L"GaussianNoise_Variance",
-			CurrentLanguage::g_lpItemData_Learn[L"GaussianNoise_Variance"].name.c_str(),
-			CurrentLanguage::g_lpItemData_Learn[L"GaussianNoise_Variance"].text.c_str(),
+			L"GaussianNoise_Power",
+			CurrentLanguage::g_lpItemData_Learn[L"GaussianNoise_Power"].name.c_str(),
+			CurrentLanguage::g_lpItemData_Learn[L"GaussianNoise_Power"].text.c_str(),
 			0.0000000000000000f, 65535.0000000000000000f, 0.0000000000000000f));
 
 	return pLayerConfig;

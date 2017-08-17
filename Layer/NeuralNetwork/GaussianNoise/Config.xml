@@ -18,12 +18,7 @@
   <!--レイヤーのデータ構造-->
   <Structure>
 
-  </Structure>
-
-  <!--学習に使用するデータの構造-->
-  <RuntimeParameter>
-    
-    <Float id="GaussianNoise_Average">
+    <Float id="Average">
       <Name>平均</Name>
       <Text>発生するノイズの平均値.ノイズのバイアス</Text>
       <Min>0.0</Min>
@@ -31,9 +26,30 @@
       <Default>0.0</Default>
     </Float>
 
-    <Float id="GaussianNoise_Variance">
+    <Float id="Variance">
       <Name>分散</Name>
       <Text>発生するノイズの分散.ノイズの強度</Text>
+      <Min>0.0</Min>
+      <Max>65535</Max>
+      <Default>0.0</Default>
+    </Float>
+    
+  </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <RuntimeParameter>
+    
+    <Float id="GaussianNoise_Bias">
+      <Name>平均</Name>
+      <Text>発生するノイズの平均値.ノイズのバイアス</Text>
+      <Min>0.0</Min>
+      <Max>65535</Max>
+      <Default>0.0</Default>
+    </Float>
+
+    <Float id="GaussianNoise_Power">
+      <Name>分散</Name>
+      <Text>ノイズの強度</Text>
       <Min>0.0</Min>
       <Max>65535</Max>
       <Default>0.0</Default>

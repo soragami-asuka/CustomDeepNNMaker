@@ -16,7 +16,7 @@ namespace NeuralNetwork {
 	GaussianNoise_LayerData_Base::GaussianNoise_LayerData_Base(const Gravisbell::GUID& guid)
 		:	guid	(guid)
 		,	pLayerStructure	(NULL)	/**< レイヤー構造を定義したコンフィグクラス */
-//		,	layerStructure	()		/**< レイヤー構造 */
+		,	layerStructure	()		/**< レイヤー構造 */
 	{
 	}
 	/** デストラクタ */
@@ -127,7 +127,7 @@ namespace NeuralNetwork {
 		this->pLayerStructure = config.Clone();
 
 		// 構造体に読み込む
-//		this->pLayerStructure->WriteToStruct((BYTE*)&this->layerStructure);
+		this->pLayerStructure->WriteToStruct((BYTE*)&this->layerStructure);
 
 		return ERROR_CODE_NONE;
 	}

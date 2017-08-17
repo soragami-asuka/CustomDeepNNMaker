@@ -18,20 +18,37 @@ namespace Layer {
 namespace NeuralNetwork {
 namespace GaussianNoise {
 
+	/** Layer structure */
+	struct LayerStructure
+	{
+		/** Name : 平均
+		  * ID   : Average
+		  * Text : 発生するノイズの平均値.ノイズのバイアス
+		  */
+		F32 Average;
+
+		/** Name : 分散
+		  * ID   : Variance
+		  * Text : 発生するノイズの分散.ノイズの強度
+		  */
+		F32 Variance;
+
+	};
+
 	/** Runtime Parameter structure */
 	struct RuntimeParameterStructure
 	{
 		/** Name : 平均
-		  * ID   : GaussianNoise_Average
+		  * ID   : GaussianNoise_Bias
 		  * Text : 発生するノイズの平均値.ノイズのバイアス
 		  */
-		F32 GaussianNoise_Average;
+		F32 GaussianNoise_Bias;
 
 		/** Name : 分散
-		  * ID   : GaussianNoise_Variance
-		  * Text : 発生するノイズの分散.ノイズの強度
+		  * ID   : GaussianNoise_Power
+		  * Text : ノイズの強度
 		  */
-		F32 GaussianNoise_Variance;
+		F32 GaussianNoise_Power;
 
 	};
 

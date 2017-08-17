@@ -448,7 +448,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lastLayerGUID,
-			CreateGaussianNoiseLayer(layerDLLManager, layerDataManager));
+			CreateGaussianNoiseLayer(layerDLLManager, layerDataManager, 0.0f, 0.1f));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 
 
@@ -852,10 +852,10 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 	pNeuralNetworkLearn->SetRuntimeParameter(L"UseDropOut", true);
 	pNeuralNetworkSample->SetRuntimeParameter(L"UseDropOut", false);
 	
-	pNeuralNetworkLearn->SetRuntimeParameter(L"GaussianNoise_Average", 0.0f);
-	pNeuralNetworkLearn->SetRuntimeParameter(L"GaussianNoise_Variance", 0.1f);
-	pNeuralNetworkSample->SetRuntimeParameter(L"GaussianNoise_Average", 0.0f);
-	pNeuralNetworkSample->SetRuntimeParameter(L"GaussianNoise_Variance", 0.0f);
+	pNeuralNetworkLearn->SetRuntimeParameter(L"GaussianNoise_Bias", 0.0f);
+	pNeuralNetworkLearn->SetRuntimeParameter(L"GaussianNoise_Power", 0.0f);
+	pNeuralNetworkSample->SetRuntimeParameter(L"GaussianNoise_Bias", 0.0f);
+	pNeuralNetworkSample->SetRuntimeParameter(L"GaussianNoise_Power", 0.0f);
 
 
 	// –‘Oˆ—‚ğÀs

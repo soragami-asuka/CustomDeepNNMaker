@@ -158,10 +158,13 @@ namespace NeuralNetwork {
 		// 入力バッファを出力バッファにコピー
 		cudaMemcpy(thrust::raw_pointer_cast(&this->lpOutputBuffer[0]), i_lpInputBuffer, sizeof(F32)*this->outputBufferCount*this->GetBatchSize(), cudaMemcpyDeviceToDevice);
 
+		F32 average  = this->layerData.layerStructure.Average  + this->GetRuntimeParameterByStructure().GaussianNoise_Bias;
+		F32 variance = this->layerData.layerStructure.Variance * this->GetRuntimeParameterByStructure().GaussianNoise_Power;
+
 		// ノイズを加算
 		dim3 grid((this->outputBufferCount*this->GetBatchSize() + (BLOCK_SIZE*THREAD_EXEC_SIZE-1)) / (BLOCK_SIZE*THREAD_EXEC_SIZE), 1 , 1);
 		dim3 block(BLOCK_SIZE);
-		RandomGenerator<<<grid, block>>>(0, this->GetRuntimeParameterByStructure().GaussianNoise_Average, this->GetRuntimeParameterByStructure().GaussianNoise_Variance, thrust::raw_pointer_cast(&this->lpOutputBuffer[0]), this->outputBufferCount*this->GetBatchSize());
+		RandomGenerator<<<grid, block>>>(0, average, variance, thrust::raw_pointer_cast(&this->lpOutputBuffer[0]), this->outputBufferCount*this->GetBatchSize());
 
 #ifdef _DEBUG
 		std::vector<F32> lpTmpInputBuffer(this->inputBufferCount*this->GetBatchSize());

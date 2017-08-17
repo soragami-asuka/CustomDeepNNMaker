@@ -23,7 +23,7 @@ namespace NeuralNetwork {
 		Gravisbell::GUID guid;	/**< レイヤーデータ識別用のGUID */
 
 		SettingData::Standard::IData* pLayerStructure;	/**< レイヤー構造を定義したコンフィグクラス */
-//		GaussianNoise::LayerStructure layerStructure;	/**< レイヤー構造 */
+		GaussianNoise::LayerStructure layerStructure;	/**< レイヤー構造 */
 
 
 		//===========================
