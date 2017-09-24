@@ -28,7 +28,6 @@ namespace NeuralNetwork {
 		,	inputBufferCount		(0)				/**< 入力バッファ数 */
 		,	outputBufferCount		(0)				/**< 出力バッファ数 */
 		,	channeclBufferCount		(0)				/**< 1チャンネル当たりのバッファ数 */
-		,	onLearnMode				(false)			/**< 学習処理中フラグ */
 		,	learnCount				(0)				/**< 学習実行回数 */
 		,	m_lppInputBuffer				(NULL)			/**< 演算時の入力データ */
 		,	m_lppDOutputBufferPrev			(NULL)			/**< 入力誤差計算時の出力誤差データ */
@@ -93,7 +92,6 @@ namespace NeuralNetwork {
 			return errorCode;
 
 		// 学習用の変数を作成
-		this->onLearnMode = true;
 		this->learnCount = 0;
 		this->lpTmpMean.resize(this->GetInputDataStruct().ch, 0.0f);
 		this->lpTmpVariance.resize(this->GetInputDataStruct().ch, 0.0f);
@@ -347,66 +345,67 @@ namespace NeuralNetwork {
 		this->m_lppInputBuffer = i_lpInputBuffer;
 
 		// 学習中ならば平均、分散を求める
-		if(this->onLearnMode)
+		switch(this->GetProcessType())
 		{
-			// 学習中の場合
-			F32 alpha = 1.0f;
-			F32 beta = 0.0f;
+		case ProcessType::PROCESSTYPE_LEARN:
+			{
+				// 学習中の場合
+				F32 alpha = 1.0f;
+				F32 beta = 0.0f;
 
-			std::vector<F32> lpVarianceLast(this->GetInputDataStruct().ch);
-			for(U32 i=0; i<lpVarianceLast.size(); i++)
-				lpVarianceLast[i] = this->layerData.lpVariance[i];
+				// 平均、分散を学習用に移す
+				this->lpLearnMean     = this->layerData.lpMean;
+				this->lpLearnVariance = this->layerData.lpVariance;
 
-			// 平均、分散を学習用に移す
-			this->lpLearnMean     = this->layerData.lpMean;
-			this->lpLearnVariance = this->layerData.lpVariance;
+				F64 averageUpdateCoeff = max((1.0 / (this->learnCount+1)), this->GetRuntimeParameterByStructure().AverageUpdateCoeffMin);
 
-			F64 averageUpdateCoeff = max((1.0 / (this->learnCount+1)), this->GetRuntimeParameterByStructure().AverageUpdateCoeffMin);
+				err_cudnn = cudnnBatchNormalizationForwardTraining(
+					this->cudnnHandle,
+					cudnnBatchNormMode_t::CUDNN_BATCHNORM_SPATIAL,
+					&alpha,
+					&beta,
+					this->inputTensorDesc,
+					this->m_lppInputBuffer,
+					this->outputTensorDesc,
+					thrust::raw_pointer_cast(&this->lpOutputBuffer[0]),
+					this->paramTensorDesc,
+					thrust::raw_pointer_cast(&this->layerData.lpScale[0]),
+					thrust::raw_pointer_cast(&this->layerData.lpBias[0]),
+					averageUpdateCoeff,
+					thrust::raw_pointer_cast(&this->lpLearnMean[0]),
+					thrust::raw_pointer_cast(&this->lpLearnVariance[0]),
+					max(CUDNN_BN_MIN_EPSILON, this->layerData.layerStructure.epsilon),
+					thrust::raw_pointer_cast(&this->lpTmpMean[0]),
+					thrust::raw_pointer_cast(&this->lpTmpVariance[0]));
+				if(err_cudnn != 0)
+					return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
+			}
+			break;
+		case ProcessType::PROCESSTYPE_CALCULATE:
+			{
+				// 学習中でない場合
+				F32 alpha = 1.0f;
+				F32 beta = 0.0f;
 
-			err_cudnn = cudnnBatchNormalizationForwardTraining(
-				this->cudnnHandle,
-				cudnnBatchNormMode_t::CUDNN_BATCHNORM_SPATIAL,
-				&alpha,
-				&beta,
-				this->inputTensorDesc,
-				this->m_lppInputBuffer,
-				this->outputTensorDesc,
-				thrust::raw_pointer_cast(&this->lpOutputBuffer[0]),
-				this->paramTensorDesc,
-				thrust::raw_pointer_cast(&this->layerData.lpScale[0]),
-				thrust::raw_pointer_cast(&this->layerData.lpBias[0]),
-				averageUpdateCoeff,
-				thrust::raw_pointer_cast(&this->lpLearnMean[0]),
-				thrust::raw_pointer_cast(&this->lpLearnVariance[0]),
-				max(CUDNN_BN_MIN_EPSILON, this->layerData.layerStructure.epsilon),
-				thrust::raw_pointer_cast(&this->lpTmpMean[0]),
-				thrust::raw_pointer_cast(&this->lpTmpVariance[0]));
-			if(err_cudnn != 0)
-				return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
-		}
-		else
-		{
-			// 学習中でない場合
-			F32 alpha = 1.0f;
-			F32 beta = 0.0f;
-
-			err_cudnn = cudnnBatchNormalizationForwardInference(
-				this->cudnnHandle,
-				cudnnBatchNormMode_t::CUDNN_BATCHNORM_SPATIAL,
-				&alpha,
-				&beta,
-				this->inputTensorDesc,
-				this->m_lppInputBuffer,
-				this->outputTensorDesc,
-				thrust::raw_pointer_cast(&this->lpOutputBuffer[0]),
-				this->paramTensorDesc,
-				thrust::raw_pointer_cast(&this->layerData.lpScale[0]),
-				thrust::raw_pointer_cast(&this->layerData.lpBias[0]),
-				thrust::raw_pointer_cast(&this->layerData.lpMean[0]),
-				thrust::raw_pointer_cast(&this->layerData.lpVariance[0]),
-				max(CUDNN_BN_MIN_EPSILON, this->layerData.layerStructure.epsilon));
-			if(err_cudnn != 0)
-				return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
+				err_cudnn = cudnnBatchNormalizationForwardInference(
+					this->cudnnHandle,
+					cudnnBatchNormMode_t::CUDNN_BATCHNORM_SPATIAL,
+					&alpha,
+					&beta,
+					this->inputTensorDesc,
+					this->m_lppInputBuffer,
+					this->outputTensorDesc,
+					thrust::raw_pointer_cast(&this->lpOutputBuffer[0]),
+					this->paramTensorDesc,
+					thrust::raw_pointer_cast(&this->layerData.lpScale[0]),
+					thrust::raw_pointer_cast(&this->layerData.lpBias[0]),
+					thrust::raw_pointer_cast(&this->layerData.lpMean[0]),
+					thrust::raw_pointer_cast(&this->layerData.lpVariance[0]),
+					max(CUDNN_BN_MIN_EPSILON, this->layerData.layerStructure.epsilon));
+				if(err_cudnn != 0)
+					return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
+			}
+			break;
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
@@ -487,8 +486,8 @@ namespace NeuralNetwork {
 			this->m_lpDInputBuffer_d,
 			this->paramTensorDesc,
 			thrust::raw_pointer_cast(&this->layerData.lpScale[0]),
-			thrust::raw_pointer_cast(&this->layerData.lpScale[0]),
-			thrust::raw_pointer_cast(&this->layerData.lpBias[0]),
+			thrust::raw_pointer_cast(&this->lpDScale[0]),
+			thrust::raw_pointer_cast(&this->lpDBias[0]),
 			max(CUDNN_BN_MIN_EPSILON, this->layerData.layerStructure.epsilon),
 			thrust::raw_pointer_cast(&this->lpTmpMean[0]),
 			thrust::raw_pointer_cast(&this->lpTmpVariance[0]));

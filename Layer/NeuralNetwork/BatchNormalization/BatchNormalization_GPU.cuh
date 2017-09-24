@@ -41,7 +41,6 @@ private:
 	U32 channeclBufferCount;				/**< 1チャンネル当たりのバッファ数 */
 
 	// 学習用のデータ
-	bool onLearnMode;	/**< 学習処理中フラグ */
 	U32 learnCount;		/**< 学習実行回数 */
 	thrust::device_vector<F32> lpTmpMean;			/**< 平均値格納用の一時変数 */
 	thrust::device_vector<F32> lpTmpVariance;		/**< 分散値格納用の一時変数 */
