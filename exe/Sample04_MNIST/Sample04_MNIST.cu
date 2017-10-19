@@ -23,7 +23,7 @@
 
 using namespace Gravisbell;
 
-#define USE_GPU	1
+#define USE_GPU	0
 #define USE_HOST_MEMORY 1
 
 #define USE_BATCHNORM	1
@@ -70,6 +70,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	::_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_ALLOC_MEM_DF);
 #endif
 
+	void* pValue = NULL;
+	cudaMalloc(&pValue, 16);
+	cudaFree(&pValue);
 
 	// âÊëúÇì«Ç›çûÇ›
 	Layer::IOData::IIODataLayer* pDataLayerTeach_Input  = NULL;
