@@ -1,36 +1,21 @@
 //======================================
-// フィードフォワードニューラルネットワークの統合処理レイヤー
-// 結合、活性化
+// 出力信号分割レイヤー
 // CPU処理用
 //======================================
 #include"stdafx.h"
 
-#include"Activation_Discriminator_DATA.hpp"
-#include"Activation_Discriminator_FUNC.hpp"
-#include"Activation_Discriminator_Base.h"
+#include"ChooseChannel_DATA.hpp"
+#include"ChooseChannel_FUNC.hpp"
+#include"ChooseChannel_Base.h"
 
-#include"Activation_Discriminator_CPU.h"
-#include"Activation_Discriminator_LayerData_CPU.h"
+#include"ChooseChannel_CPU.h"
+#include"ChooseChannel_LayerData_CPU.h"
 
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
 
-namespace
-{
-	//================================
-	// 活性化関数
-	//================================
-	// SoftMax系
-	F32 func_Activation_Discriminator_SoftMax(F32 x)
-	{
-		return (F32)exp(x);	// 平均は別に行う
-	}
-	F32 func_dactivation_Discriminator_SoftMax_crossEntropy(F32 x)
-	{
-		return 1.0f;
-	}
-}
-
+#define POSITION_TO_OFFSET(x,y,z,ch,xSize,ySize,zSize,chSize)		((((((ch)*(zSize)+(z))*(ySize))+(y))*(xSize))+(x))
+#define POSITION_TO_OFFSET_STRUCT(inX,inY,inZ,inCh,structure)		POSITION_TO_OFFSET(inX, inY, inZ, inCh, structure.x, structure.y, structure.z, structure.ch)
 
 namespace Gravisbell {
 namespace Layer {
@@ -38,17 +23,15 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	Activation_Discriminator_CPU::Activation_Discriminator_CPU(Gravisbell::GUID guid, Activation_Discriminator_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct)
-		:	Activation_Discriminator_Base	(guid, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
+	ChooseChannel_CPU::ChooseChannel_CPU(Gravisbell::GUID guid, ChooseChannel_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct)
+		:	ChooseChannel_Base				(guid, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount				(0)		/**< 入力バッファ数 */
 		,	outputBufferCount				(0)		/**< 出力バッファ数 */
-		,	func_Activation					(func_Activation_Discriminator_SoftMax)
-		,	func_dActivation				(func_dactivation_Discriminator_SoftMax_crossEntropy)
 	{
 	}
 	/** デストラクタ */
-	Activation_Discriminator_CPU::~Activation_Discriminator_CPU()
+	ChooseChannel_CPU::~ChooseChannel_CPU()
 	{
 	}
 
@@ -57,14 +40,14 @@ namespace NeuralNetwork {
 	// 基本処理
 	//================================
 	/** レイヤー種別の取得 */
-	U32 Activation_Discriminator_CPU::GetLayerKind()const
+	U32 ChooseChannel_CPU::GetLayerKind()const
 	{
 		return Layer::ELayerKind::LAYER_KIND_CPU | GetLayerKindBase();
 	}
 
 	/** 初期化. 各ニューロンの値をランダムに初期化
 		@return	成功した場合0 */
-	ErrorCode Activation_Discriminator_CPU::Initialize(void)
+	ErrorCode ChooseChannel_CPU::Initialize(void)
 	{
 		return this->layerData.Initialize();
 	}
@@ -74,11 +57,11 @@ namespace NeuralNetwork {
 	// レイヤーデータ関連
 	//===========================
 	/** レイヤーデータを取得する */
-	ILayerData& Activation_Discriminator_CPU::GetLayerData()
+	ChooseChannel_LayerData_Base& ChooseChannel_CPU::GetLayerData()
 	{
 		return this->layerData;
 	}
-	const ILayerData& Activation_Discriminator_CPU::GetLayerData()const
+	const ChooseChannel_LayerData_Base& ChooseChannel_CPU::GetLayerData()const
 	{
 		return this->layerData;
 	}
@@ -91,17 +74,17 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode Activation_Discriminator_CPU::PreProcessLearn()
+	ErrorCode ChooseChannel_CPU::PreProcessLearn()
 	{
 		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
-		// 出力誤差バッファ受け取り用のアドレス配列を作成する
-		this->m_lppDOutputBufferPrev.resize(this->GetBatchSize());
-
 		// 入力誤差バッファ受け取り用のアドレス配列を作成する
 		this->m_lppDInputBuffer.resize(this->GetBatchSize());
+
+		// 出力誤差バッファ受け取り用のアドレス配列を作成する
+		this->m_lppDOutputBuffer.resize(this->GetBatchSize());
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -111,7 +94,7 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Activation_Discriminator_CPU::PreProcessCalculate()
+	ErrorCode ChooseChannel_CPU::PreProcessCalculate()
 	{
 		// 入力バッファ数を確認
 		this->inputBufferCount = this->GetInputBufferCount();
@@ -123,24 +106,27 @@ namespace NeuralNetwork {
 		if(this->outputBufferCount == 0)
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
-		// 入力バッファ保存用のアドレス配列を作成
-		this->m_lppInputBuffer.resize(this->GetBatchSize(), NULL);
+		// チャンネルのバッファサイズを保存
+		this->channelSize = this->GetOutputDataStruct().x * this->GetOutputDataStruct().y * this->GetOutputDataStruct().z;
 
 		// 出力バッファを作成
-		this->lpOutputBuffer.resize(this->GetBatchSize() * this->outputBufferCount);
-		this->lppBatchOutputBuffer.resize(this->GetBatchSize());
+		this->m_lpOutputBuffer.resize(this->outputBufferCount * this->GetBatchSize());
+		this->m_lppOutputBuffer.resize(this->GetBatchSize());
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
-			this->lppBatchOutputBuffer[batchNum] = &this->lpOutputBuffer[batchNum * this->outputBufferCount];
+			this->m_lppOutputBuffer[batchNum] = &this->m_lpOutputBuffer[batchNum * this->outputBufferCount];
 		}
+
+		// 入力バッファ保存用のアドレス配列を作成
+		this->m_lppInputBuffer.resize(this->GetBatchSize(), NULL);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
-
+	
 	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode Activation_Discriminator_CPU::PreProcessLoop()
+	ErrorCode ChooseChannel_CPU::PreProcessLoop()
 	{
 		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
 	}
@@ -149,29 +135,20 @@ namespace NeuralNetwork {
 	/** 演算処理を実行する.
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 		@return 成功した場合0が返る */
-	ErrorCode Activation_Discriminator_CPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
+	ErrorCode ChooseChannel_CPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
 	{
 		// 入力バッファのアドレスを配列に格納
-		this->m_lpInputBuffer = i_lpInputBuffer;
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			this->m_lppInputBuffer[batchNum] = &i_lpInputBuffer[batchNum * this->inputBufferCount];
 
-		std::vector<F32> lpOutputBuffer(this->inputBufferCount);
+		// 入力バッファの指定チャンネルを出力バッファにコピー
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
-			// 活性化して合計値を算出
-			F32 sum = 0.0f;
-			for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
-			{
-				// 活性化
-				lpOutputBuffer[inputNum] = this->func_Activation(this->m_lppInputBuffer[batchNum][inputNum]);
-				sum += lpOutputBuffer[inputNum];
-			}
-
-			// 値を合計値で割る
-			this->lppBatchOutputBuffer[batchNum][0] = lpOutputBuffer[0] / sum;
+			memcpy(
+				this->m_lppOutputBuffer[batchNum],
+				&this->m_lppInputBuffer[batchNum][this->layerData.layerStructure.startChannelNo*this->channelSize],
+				sizeof(F32)*this->layerData.layerStructure.channelCount*this->channelSize);
 		}
-
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -180,14 +157,14 @@ namespace NeuralNetwork {
 	/** 出力データバッファを取得する.
 		配列の要素数はGetOutputBufferCountの戻り値.
 		@return 出力データ配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER Activation_Discriminator_CPU::GetOutputBuffer()const
+	CONST_BATCH_BUFFER_POINTER ChooseChannel_CPU::GetOutputBuffer()const
 	{
-		return &this->lpOutputBuffer[0];
+		return &this->m_lpOutputBuffer[0];
 	}
 	/** 出力データバッファを取得する.
 		@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
 		@return 成功した場合0 */
-	ErrorCode Activation_Discriminator_CPU::GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
+	ErrorCode ChooseChannel_CPU::GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
 	{
 		if(o_lpOutputBuffer == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
@@ -207,30 +184,31 @@ namespace NeuralNetwork {
 	/** 入力誤差計算をを実行する.学習せずに入力誤差を取得したい場合に使用する.
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
-		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
+		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要な配列の[GetOutputDataCount()]配列
 		直前の計算結果を使用する */
-	ErrorCode Activation_Discriminator_CPU::CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode ChooseChannel_CPU::CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lpDOutputBuffer)
 	{
-		// 出力誤差バッファのアドレスを配列に格納
-		this->m_lpDOutputBufferPrev = i_lppDOutputBuffer;
-		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
-			this->m_lppDOutputBufferPrev[batchNum] = &this->m_lpDOutputBufferPrev[batchNum * this->outputBufferCount];
-
 		// 入力誤差計算
 		this->m_lpDInputBuffer = o_lppDInputBuffer;
 		if(o_lppDInputBuffer)
 		{
-			// 入力誤差バッファのアドレスを配列に格納
-			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
-				this->m_lppDInputBuffer[batchNum] = &o_lppDInputBuffer[batchNum * this->inputBufferCount];
-
-			// 入力誤差を計算
+			// 入出力誤差バッファのアドレスを配列に格納
 			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
-			//	this->m_lppDInputBuffer[batchNum][0] = this->func_dActivation(       this->lppBatchOutputBuffer[batchNum][0]) *  this->m_lppDOutputBufferPrev[batchNum][0];
-			//	this->m_lppDInputBuffer[batchNum][1] = this->func_dActivation(1.0f - this->lppBatchOutputBuffer[batchNum][0]) * -this->m_lppDOutputBufferPrev[batchNum][0];
-				this->m_lppDInputBuffer[batchNum][0] =  this->m_lppDOutputBufferPrev[batchNum][0];
-				this->m_lppDInputBuffer[batchNum][1] = -this->m_lppDOutputBufferPrev[batchNum][0];
+				this->m_lppDInputBuffer[batchNum]  = &o_lppDInputBuffer[batchNum * this->inputBufferCount];
+				this->m_lppDOutputBuffer[batchNum] = &i_lpDOutputBuffer[batchNum * this->inputBufferCount];
+			}
+
+			// 入力誤差バッファをクリア
+			memset(this->m_lpDInputBuffer, 0, sizeof(F32)*this->inputBufferCount*this->GetBatchSize());
+
+			// 出力誤差の各要素を所定のチャンネルに格納する
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
+			{
+				memcpy(
+					&this->m_lppDInputBuffer[batchNum][this->layerData.layerStructure.startChannelNo*this->channelSize],
+					this->m_lppDOutputBuffer[batchNum],
+					sizeof(F32)*this->layerData.layerStructure.channelCount*channelSize);
 			}
 		}
 
@@ -241,22 +219,22 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Activation_Discriminator_CPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode ChooseChannel_CPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lpDOutputBuffer)
 	{
-		return this->CalculateDInput(o_lppDInputBuffer, i_lppDOutputBuffer);
+		return this->CalculateDInput(o_lppDInputBuffer, i_lpDOutputBuffer);
 	}
 
 
 	/** 学習差分を取得する.
 		配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]
 		@return	誤差差分配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER Activation_Discriminator_CPU::GetDInputBuffer()const
+	CONST_BATCH_BUFFER_POINTER ChooseChannel_CPU::GetDInputBuffer()const
 	{
 		return this->m_lpDInputBuffer;
 	}
 	/** 学習差分を取得する.
 		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
-	ErrorCode Activation_Discriminator_CPU::GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const
+	ErrorCode ChooseChannel_CPU::GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const
 	{
 		if(o_lpDInputBuffer == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;

@@ -488,6 +488,46 @@ Layer::ILayerData* CreateMergeInputLayer(
 	return pLayer;
 }
 
+/** チャンネル抽出レイヤー. 入力されたレイヤーの特定チャンネルを抽出する. 入力/出力データ構造でX,Y,Zは同じサイズ.
+	@param	startChannelNo	開始チャンネル番号.
+	@param	channelCount	抽出チャンネル数. */
+GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+Layer::ILayerData* CreateChooseChannelLayer(
+	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+	U32 startChannelNo, U32 channelCount)
+{
+	const Gravisbell::GUID TYPE_CODE(0x244824b3, 0xbcfc, 0x4655, 0xa9, 0x91, 0x0f, 0x61, 0x36, 0xd3, 0x7a, 0x34);
+
+	// DLL取得
+	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(TYPE_CODE);
+	if(pLayerDLL == NULL)
+		return NULL;
+
+	// 設定の作成
+	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
+	if(pConfig == NULL)
+		return NULL;
+
+	// 開始チャンネル番号
+	{
+		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"startChannelNo"));
+		pItem->SetValue(startChannelNo);
+	}
+	// 出力チャンネル数
+	{
+		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"channelCount"));
+		pItem->SetValue(channelCount);
+	}
+
+	// レイヤーの作成
+	Layer::ILayerData* pLayer = layerDataManager.CreateLayerData(layerDLLManager, TYPE_CODE, boost::uuids::random_generator()().data, *pConfig);
+	if(pLayer == NULL)
+		return NULL;
+
+	// 設定情報を削除
+	delete pConfig;
+}
+
 
 Layer::ILayerData* CreateResidualLayer(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager)

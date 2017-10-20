@@ -275,8 +275,10 @@ namespace NeuralNetwork {
 			// “ü—ÍŒë·‚ğŒvZ
 			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
-				this->lpDInputBuffer_h[batchNum*this->inputBufferCount + 0] = (       this->lpOutputBuffer_d[batchNum]) *  this->lpDOutputBuffer_h[batchNum];
-				this->lpDInputBuffer_h[batchNum*this->inputBufferCount + 1] = (1.0f - this->lpOutputBuffer_d[batchNum]) * -this->lpDOutputBuffer_h[batchNum];
+				//this->lpDInputBuffer_h[batchNum*this->inputBufferCount + 0] = (       this->lpOutputBuffer_d[batchNum]) *  this->lpDOutputBuffer_h[batchNum];
+				//this->lpDInputBuffer_h[batchNum*this->inputBufferCount + 1] = (1.0f - this->lpOutputBuffer_d[batchNum]) * -this->lpDOutputBuffer_h[batchNum];
+				this->lpDInputBuffer_h[batchNum*this->inputBufferCount + 0] =  this->lpDOutputBuffer_h[batchNum];
+				this->lpDInputBuffer_h[batchNum*this->inputBufferCount + 1] = -this->lpDOutputBuffer_h[batchNum];
 			}
 
 			cudaMemcpy(this->m_lpDInputBuffer_d, thrust::raw_pointer_cast(&this->lpDInputBuffer_h[0]), sizeof(F32)*this->inputBufferCount*this->GetBatchSize(), cudaMemcpyHostToDevice);

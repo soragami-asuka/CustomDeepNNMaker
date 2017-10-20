@@ -145,6 +145,13 @@ namespace NeuralNetworkLayer {
 	Layer::ILayerData* CreateMergeInputLayer(
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager);
 
+	/** チャンネル抽出レイヤー. 入力されたレイヤーの特定チャンネルを抽出する. 入力/出力データ構造でX,Y,Zは同じサイズ.
+		@param	startChannelNo	開始チャンネル番号.
+		@param	channelCount	抽出チャンネル数. */
+	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+	Layer::ILayerData* CreateChooseChannelLayer(
+		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+		U32 startChannelNo, U32 channelCount);
 
 
 	/** 入力結合レイヤー. 入力されたレイヤーの値を合算する. 出力されるレイヤーのサイズは全サイズのうちの最大値になる.

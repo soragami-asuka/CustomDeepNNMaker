@@ -6,6 +6,7 @@
 
 #include<cuda.h>
 #include<cuda_runtime.h>
+#include<thrust/device_vector.h>
 
 #include<vector>
 #include<boost/filesystem/path.hpp>
@@ -23,7 +24,7 @@
 
 using namespace Gravisbell;
 
-#define USE_GPU	0
+#define USE_GPU	1
 #define USE_HOST_MEMORY 1
 
 #define USE_BATCHNORM	1

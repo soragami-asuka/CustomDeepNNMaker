@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="244824B3-BCFC-4655-A991-0F6136D37A34" version="1.0.0.0" default-language="ja">
+
+  <SourceName>ChooseChannel</SourceName>
+  <Name>入力信号から特定チャンネルを抽出する</Name>
+  <Text>入力信号から特定チャンネルを抽出する.&#x0A;</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+   	<Int id="startChannelNo">
+      <Name>開始チャンネル番号</Name>
+      <Text></Text>
+      <Min>0</Min>
+      <Max>65535</Max>
+      <Default>0</Default>
+    </Int>
+    <Int id="channelCount">
+      <Name>出力チャンネル数</Name>
+      <Text></Text>
+      <Min>1</Min>
+      <Max>65535</Max>
+      <Default>1</Default>
+    </Int>
+  </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <Learn>
+
+  </Learn>
+
+</Config>

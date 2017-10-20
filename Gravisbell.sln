@@ -93,6 +93,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.IOData.IODataLayer_im
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.GaussianNoise", "Layer\NeuralNetwork\GaussianNoise\GaussianNoise.vcxproj", "{A679D565-9092-427A-A7B3-E25DB5D66E9C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.ChooseChannel", "Layer\NeuralNetwork\ChooseChannel\ChooseChannel.vcxproj", "{98690EEC-1D5D-4163-8A5E-2ED07809E268}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -508,6 +510,18 @@ Global
 		{A679D565-9092-427A-A7B3-E25DB5D66E9C}.Release|Win32.Build.0 = Release|Win32
 		{A679D565-9092-427A-A7B3-E25DB5D66E9C}.Release|x64.ActiveCfg = Release|x64
 		{A679D565-9092-427A-A7B3-E25DB5D66E9C}.Release|x64.Build.0 = Release|x64
+		{98690EEC-1D5D-4163-8A5E-2ED07809E268}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{98690EEC-1D5D-4163-8A5E-2ED07809E268}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{98690EEC-1D5D-4163-8A5E-2ED07809E268}.Debug|Win32.ActiveCfg = Debug|Win32
+		{98690EEC-1D5D-4163-8A5E-2ED07809E268}.Debug|Win32.Build.0 = Debug|Win32
+		{98690EEC-1D5D-4163-8A5E-2ED07809E268}.Debug|x64.ActiveCfg = Debug|x64
+		{98690EEC-1D5D-4163-8A5E-2ED07809E268}.Debug|x64.Build.0 = Debug|x64
+		{98690EEC-1D5D-4163-8A5E-2ED07809E268}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{98690EEC-1D5D-4163-8A5E-2ED07809E268}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{98690EEC-1D5D-4163-8A5E-2ED07809E268}.Release|Win32.ActiveCfg = Release|Win32
+		{98690EEC-1D5D-4163-8A5E-2ED07809E268}.Release|Win32.Build.0 = Release|Win32
+		{98690EEC-1D5D-4163-8A5E-2ED07809E268}.Release|x64.ActiveCfg = Release|x64
+		{98690EEC-1D5D-4163-8A5E-2ED07809E268}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -553,6 +567,7 @@ Global
 		{6863B36D-D1C4-4F1E-AB3A-0EBA732FEC1D} = {D9D2E199-15AC-4BC5-B86F-466DEB2F97F9}
 		{A711B080-F5E4-4CEF-A8D2-1A98BB041CF0} = {82040EB7-85BE-4915-9DC4-25A0979CA86B}
 		{A679D565-9092-427A-A7B3-E25DB5D66E9C} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
+		{98690EEC-1D5D-4163-8A5E-2ED07809E268} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		VisualSVNWorkingCopyRoot = .
