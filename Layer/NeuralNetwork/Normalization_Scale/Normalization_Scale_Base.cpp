@@ -13,7 +13,7 @@ using namespace Gravisbell::Layer::NeuralNetwork;
 
 /** コンストラクタ */
 Normalization_Scale_Base::Normalization_Scale_Base(Gravisbell::GUID guid, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct)
-	:	CNNSingle2SingleLayerBase(guid, ::CreateRuntimeParameter(), i_inputDataStruct, i_outputDataStruct)
+	:	CNNSingle2SingleLayerBase(guid, i_inputDataStruct, i_outputDataStruct)
 {
 }
 

@@ -31,10 +31,10 @@ private:
 	// データ本体
 	class Normalization_Scale_LayerData_GPU& layerData;
 
-	// 入出力バッファ
-	thrust::device_vector<F32>			lpOutputBuffer_d;				/**< 出力バッファ <バッチ数><入力信号数> */
-	std::vector<F32>					lpOutputBuffer_h;				/**< 出力バッファ(ホスト側) */
-	std::vector<F32*>					lppBatchOutputBuffer_h;			/**< バッチ処理用出力バッファ(ホスト側) <バッチ数> */
+	// 出力バッファ
+	thrust::device_vector<F32>			m_lpOutputBuffer_d;				/**< 出力バッファ <バッチ数><入力信号数> */
+	std::vector<F32>					m_lpOutputBuffer_h;				/**< 出力バッファ(ホスト側) */
+	std::vector<F32*>					m_lppOutputBuffer_h;			/**< バッチ処理用出力バッファ(ホスト側) <バッチ数> */
 
 
 	// Get関数を使うと処理負荷がかさむので一時保存用. PreCalculateで値を格納.
@@ -46,13 +46,13 @@ private:
 
 	// 演算時の入力データ
 	std::vector<F32>						m_lpInputBuffer_h;		/**< 入力バッファ(ホスト側) */
-	std::vector<CONST_BATCH_BUFFER_POINTER>	m_lppInputBuffer;		/**< 演算時の入力データ */
+	std::vector<BATCH_BUFFER_POINTER>		m_lppInputBuffer_h;		/**< 演算時の入力データ */
 	std::vector<F32>						m_lpDOutputBuffer_h;	/**< 出力誤差バッファ(ホスト側) */
-	std::vector<CONST_BATCH_BUFFER_POINTER>	m_lppDOutputBuffer;		/**< 出力誤差データ */
+	std::vector<BATCH_BUFFER_POINTER>		m_lppDOutputBuffer_h;	/**< 出力誤差データ */
 
 	BATCH_BUFFER_POINTER					m_lpDInputBuffer_d;		/**< 入力誤差バッファ */
 	std::vector<F32>						m_lpDInputBuffer_h;		/**< 入力誤差バッファ(ホスト側) */
-	std::vector<BATCH_BUFFER_POINTER>		m_lppDInputBuffer;		/**< 入力誤差計算時の出力誤差データ */
+	std::vector<BATCH_BUFFER_POINTER>		m_lppDInputBuffer_h;	/**< 入力誤差計算時の出力誤差データ */
 
 
 public:

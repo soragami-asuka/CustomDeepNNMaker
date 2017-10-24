@@ -288,6 +288,11 @@ Layer::ILayerData* CreateGaussianNoiseLayer(
 	return pLayer;
 }
 
+/** プーリングレイヤー.
+	@param	layerDLLManager		レイヤーDLL管理クラス.
+	@param	inputDataStruct		入力データ構造.
+	@param	filterSize			プーリング幅.
+	@param	stride				フィルタ移動量. */
 Layer::ILayerData* CreatePoolingLayer(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 	Vector3D<S32> filterSize, Vector3D<S32> stride)
@@ -325,6 +330,8 @@ Layer::ILayerData* CreatePoolingLayer(
 
 	return pLayer;
 }
+
+/** バッチ正規化レイヤー */
 Layer::ILayerData* CreateBatchNormalizationLayer(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 	U32 inputChannelCount)
@@ -358,6 +365,37 @@ Layer::ILayerData* CreateBatchNormalizationLayer(
 
 	return pLayer;
 }
+
+/** スケール正規化レイヤー */
+Layer::ILayerData* CreateNormalizationScaleLayer(
+	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager)
+{
+	const Gravisbell::GUID TYPE_CODE(0xd8c0de15, 0x5445, 0x482d, 0xbb, 0xc9, 0x00, 0x26, 0xbf, 0xa9, 0x6a, 0xdd);
+
+	// DLL取得
+	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(TYPE_CODE);
+	if(pLayerDLL == NULL)
+		return NULL;
+
+	// 設定の作成
+	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
+	if(pConfig == NULL)
+		return NULL;
+
+	// レイヤーの作成
+	Layer::ILayerData* pLayer = layerDataManager.CreateLayerData(layerDLLManager, TYPE_CODE, boost::uuids::random_generator()().data, *pConfig);
+	if(pLayer == NULL)
+		return NULL;
+
+	// 設定情報を削除
+	delete pConfig;
+
+	return pLayer;
+}
+
+/** 広域平均プーリングレイヤー
+	@param	layerDLLManager		レイヤーDLL管理クラス.
+	@param	inputDataStruct		入力データ構造. */
 Layer::ILayerData* CreateGlobalAveragePoolingLayer(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager)
 {
@@ -491,7 +529,6 @@ Layer::ILayerData* CreateMergeInputLayer(
 /** チャンネル抽出レイヤー. 入力されたレイヤーの特定チャンネルを抽出する. 入力/出力データ構造でX,Y,Zは同じサイズ.
 	@param	startChannelNo	開始チャンネル番号.
 	@param	channelCount	抽出チャンネル数. */
-GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 Layer::ILayerData* CreateChooseChannelLayer(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 	U32 startChannelNo, U32 channelCount)
@@ -526,6 +563,8 @@ Layer::ILayerData* CreateChooseChannelLayer(
 
 	// 設定情報を削除
 	delete pConfig;
+
+	return pLayer;
 }
 
 

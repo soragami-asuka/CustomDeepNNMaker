@@ -112,10 +112,8 @@ namespace NeuralNetwork {
 		bufferSize += pLayerStructure->GetUseBufferByteCount();
 
 		// 各データ数
-		bufferSize += sizeof(F32) * this->layerStructure.InputChannelCount;	// 平均
-		bufferSize += sizeof(F32) * this->layerStructure.InputChannelCount;	// 分散
-		bufferSize += sizeof(F32) * this->layerStructure.InputChannelCount;	// スケーリング値
-		bufferSize += sizeof(F32) * this->layerStructure.InputChannelCount;	// バイアス値
+		bufferSize += sizeof(F32) * 1;	// スケーリング値
+		bufferSize += sizeof(F32) * 1;	// バイアス値
 
 		// オプティマイザーのバイト数
 		bufferSize += this->m_pOptimizer_bias->GetUseBufferByteCount();
@@ -148,8 +146,6 @@ namespace NeuralNetwork {
 		if(i_lpInputDataStruct[0].z == 0)
 			return false;
 		if(i_lpInputDataStruct[0].ch == 0)
-			return false;
-		if(i_lpInputDataStruct[0].ch != this->layerStructure.InputChannelCount)
 			return false;
 
 		return true;

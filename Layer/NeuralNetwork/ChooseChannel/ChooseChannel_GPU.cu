@@ -147,10 +147,11 @@ namespace NeuralNetwork {
 		// 入力バッファの指定チャンネルを出力バッファにコピー
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
-			memcpy(
+			cudaMemcpy(
 				this->m_lppOutputBuffer[batchNum],
 				&this->m_lppInputBuffer[batchNum][this->layerData.layerStructure.startChannelNo*this->channelSize],
-				sizeof(F32)*this->layerData.layerStructure.channelCount*this->channelSize);
+				sizeof(F32)*this->layerData.layerStructure.channelCount*this->channelSize,
+				cudaMemcpyDeviceToDevice);
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;

@@ -171,8 +171,9 @@ namespace NeuralNetwork {
 	/** オプティマイザーを変更する */
 	ErrorCode Normalization_Scale_LayerData_GPU::ChangeOptimizer(const wchar_t i_optimizerID[])
 	{
-		ChangeOptimizer_GPU(&this->m_pOptimizer_bias,  i_optimizerID, 1);
-		ChangeOptimizer_GPU(&this->m_pOptimizer_scale, i_optimizerID, 1);
+		// バッファはホストメモリに用意しているので、CPU制御オプティマイザ
+		ChangeOptimizer_CPU(&this->m_pOptimizer_bias,  i_optimizerID, 1);
+		ChangeOptimizer_CPU(&this->m_pOptimizer_scale, i_optimizerID, 1);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
