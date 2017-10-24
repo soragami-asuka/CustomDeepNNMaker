@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="D8C0DE15-5445-482D-BBC9-0026BFA96ADD" version="1.0.0.0" default-language="ja">
+
+  <SourceName>Normalization_Scale</SourceName>
+  <Name>スケール値で正規化</Name>
+  <Text>全てのチャンネルをスケール値と平均値を用いて正規化する</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+
+    <Int id="dummy">
+      <Name>dummy</Name>
+      <Text>dummy</Text>
+      <Min>0</Min>
+      <Min>0</Min>
+      <Default>0</Default>
+    </Int>
+    
+  </Structure>
+
+  <!--実行時パラメータ-->
+  <RuntimeParameter>
+  </RuntimeParameter>
+
+
+</Config>
