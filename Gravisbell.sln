@@ -97,6 +97,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.ChooseC
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.Normalization_Scale", "Layer\NeuralNetwork\Normalization_Scale\Normalization_Scale.vcxproj", "{FA298EC7-489E-4B9E-AAE7-E26319F31221}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.BatchNormalizationAll", "Layer\NeuralNetwork\BatchNormalizationAll\BatchNormalizationAll.vcxproj", "{D4272B66-73B4-45BF-BA25-21124E0240F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -536,6 +538,18 @@ Global
 		{FA298EC7-489E-4B9E-AAE7-E26319F31221}.Release|Win32.Build.0 = Release|Win32
 		{FA298EC7-489E-4B9E-AAE7-E26319F31221}.Release|x64.ActiveCfg = Release|x64
 		{FA298EC7-489E-4B9E-AAE7-E26319F31221}.Release|x64.Build.0 = Release|x64
+		{D4272B66-73B4-45BF-BA25-21124E0240F0}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{D4272B66-73B4-45BF-BA25-21124E0240F0}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{D4272B66-73B4-45BF-BA25-21124E0240F0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D4272B66-73B4-45BF-BA25-21124E0240F0}.Debug|Win32.Build.0 = Debug|Win32
+		{D4272B66-73B4-45BF-BA25-21124E0240F0}.Debug|x64.ActiveCfg = Debug|x64
+		{D4272B66-73B4-45BF-BA25-21124E0240F0}.Debug|x64.Build.0 = Debug|x64
+		{D4272B66-73B4-45BF-BA25-21124E0240F0}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{D4272B66-73B4-45BF-BA25-21124E0240F0}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{D4272B66-73B4-45BF-BA25-21124E0240F0}.Release|Win32.ActiveCfg = Release|Win32
+		{D4272B66-73B4-45BF-BA25-21124E0240F0}.Release|Win32.Build.0 = Release|Win32
+		{D4272B66-73B4-45BF-BA25-21124E0240F0}.Release|x64.ActiveCfg = Release|x64
+		{D4272B66-73B4-45BF-BA25-21124E0240F0}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -583,6 +597,7 @@ Global
 		{A679D565-9092-427A-A7B3-E25DB5D66E9C} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
 		{98690EEC-1D5D-4163-8A5E-2ED07809E268} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
 		{FA298EC7-489E-4B9E-AAE7-E26319F31221} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
+		{D4272B66-73B4-45BF-BA25-21124E0240F0} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		VisualSVNWorkingCopyRoot = .

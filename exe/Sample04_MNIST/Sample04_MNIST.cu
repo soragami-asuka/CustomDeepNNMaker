@@ -24,7 +24,7 @@
 
 using namespace Gravisbell;
 
-#define USE_GPU	1
+#define USE_GPU	0
 #define USE_HOST_MEMORY 1
 
 #define USE_BATCHNORM	1
@@ -880,7 +880,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver02(const Layer::Neural
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lastLayerGUID,
-			CreateNormalizationScaleLayer(layerDLLManager, layerDataManager));
+			CreateBatchNormalizationAllLayer(layerDLLManager, layerDataManager));
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 
 		// 2‘w–Ú

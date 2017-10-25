@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="8AECB925-8DCF-4876-BA6A-6ADBE280D285" version="1.0.0.0" default-language="ja">
+
+  <SourceName>BatchNormalizationAll</SourceName>
+  <Name>バッチ正規化(チャンネル区別なし)</Name>
+  <Text>チャンネルの区別なくバッチ単位で正規化を行う.(≒ 1chのデータとして扱う)</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+    <Float id="epsilon">
+      <Name>安定化係数</Name>
+      <Text>分散の値が小さすぎる場合に割り算を安定させるための値</Text>
+      <Min>0.00001</Min>
+      <Max>1.0</Max>
+      <Default>0.00001</Default>
+    </Float>
+
+  </Structure>
+
+  <!--実行時パラメータ-->
+  <RuntimeParameter>
+    <Float id="AverageUpdateCoeffMin">
+      <Name>最小平均値更新係数</Name>
+      <Text>平均値を更新する際の係数の最小値.0=Epochの全データの平均値を使用する.1=直近のデータの平均値を使用する.</Text>
+      <Default>0</Default>
+      <Min>0.0</Min>
+      <Max>1.0</Max>
+    </Float>
+  </RuntimeParameter>
+
+
+</Config>

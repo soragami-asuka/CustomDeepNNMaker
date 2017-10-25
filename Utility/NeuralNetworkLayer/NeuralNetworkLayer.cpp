@@ -366,6 +366,35 @@ Layer::ILayerData* CreateBatchNormalizationLayer(
 	return pLayer;
 }
 
+/** バッチ正規化レイヤー(チャンネル区別なし)
+	@param	layerDLLManager		レイヤーDLL管理クラス. */
+Layer::ILayerData* CreateBatchNormalizationAllLayer(
+	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager)
+{
+	const Gravisbell::GUID TYPE_CODE(0x8aecb925, 0x8dcf, 0x4876, 0xba, 0x6a, 0x6a, 0xdb, 0xe2, 0x80, 0xd2, 0x85);
+
+
+	// DLL取得
+	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(TYPE_CODE);
+	if(pLayerDLL == NULL)
+		return NULL;
+
+	// 設定の作成
+	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
+	if(pConfig == NULL)
+		return NULL;
+
+	// レイヤーの作成
+	Layer::ILayerData* pLayer = layerDataManager.CreateLayerData(layerDLLManager, TYPE_CODE, boost::uuids::random_generator()().data, *pConfig);
+	if(pLayer == NULL)
+		return NULL;
+
+	// 設定情報を削除
+	delete pConfig;
+
+	return pLayer;
+}
+
 /** スケール正規化レイヤー */
 Layer::ILayerData* CreateNormalizationScaleLayer(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager)

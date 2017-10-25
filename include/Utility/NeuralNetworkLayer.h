@@ -112,6 +112,12 @@ namespace NeuralNetworkLayer {
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 		U32 inputChannelCount);
 
+	/** バッチ正規化レイヤー(チャンネル区別なし)
+		@param	layerDLLManager		レイヤーDLL管理クラス. */
+	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+	Layer::ILayerData* CreateBatchNormalizationAllLayer(
+		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager);
+
 	/** スケール正規化レイヤー */
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 	Layer::ILayerData* CreateNormalizationScaleLayer(
