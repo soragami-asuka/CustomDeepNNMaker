@@ -164,6 +164,21 @@ namespace NeuralNetworkLayer {
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 		U32 startChannelNo, U32 channelCount);
 
+	/** 出力データ構造変換レイヤー.
+		@param	ch	CH数.
+		@param	x	X軸.
+		@param	y	Y軸.
+		@param	z	Z軸. */
+	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+	Layer::ILayerData* CreateChooseChannelLayer(
+		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+		U32 ch, U32 x, U32 y, U32 z);
+	/** 出力データ構造変換レイヤー.
+		@param	outputDataStruct 出力データ構造 */
+	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+	Layer::ILayerData* CreateChooseChannelLayer(
+		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+		const IODataStruct& outputDataStruct);
 
 	/** 入力結合レイヤー. 入力されたレイヤーの値を合算する. 出力されるレイヤーのサイズは全サイズのうちの最大値になる.
 		@param	layerDLLManager		レイヤーDLL管理クラス.

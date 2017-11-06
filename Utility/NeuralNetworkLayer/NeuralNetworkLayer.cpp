@@ -597,6 +597,68 @@ Layer::ILayerData* CreateChooseChannelLayer(
 }
 
 
+/** 出力データ構造変換レイヤー.
+	@param	ch	CH数.
+	@param	x	X軸.
+	@param	y	Y軸.
+	@param	z	Z軸. */
+Layer::ILayerData* CreateChooseChannelLayer(
+	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+	U32 ch, U32 x, U32 y, U32 z)
+{
+	const Gravisbell::GUID TYPE_CODE(0xe78e7f59, 0xd4b3, 0x45a1, 0xae, 0xeb, 0x9f, 0x2a, 0x51, 0x55, 0x47, 0x3f);
+
+	// DLL取得
+	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(TYPE_CODE);
+	if(pLayerDLL == NULL)
+		return NULL;
+
+	// 設定の作成
+	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
+	if(pConfig == NULL)
+		return NULL;
+
+	// CH数
+	{
+		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"ch"));
+		pItem->SetValue(ch);
+	}
+	// X軸
+	{
+		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"x"));
+		pItem->SetValue(x);
+	}
+	// Y軸
+	{
+		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"y"));
+		pItem->SetValue(y);
+	}
+	// Z軸
+	{
+		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"z"));
+		pItem->SetValue(z);
+	}
+
+	// レイヤーの作成
+	Layer::ILayerData* pLayer = layerDataManager.CreateLayerData(layerDLLManager, TYPE_CODE, boost::uuids::random_generator()().data, *pConfig);
+	if(pLayer == NULL)
+		return NULL;
+
+	// 設定情報を削除
+	delete pConfig;
+
+	return pLayer;
+}
+/** 出力データ構造変換レイヤー.
+	@param	outputDataStruct 出力データ構造 */
+Layer::ILayerData* CreateChooseChannelLayer(
+	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+	const IODataStruct& outputDataStruct)
+{
+	return CreateChooseChannelLayer(layerDLLManager, layerDataManager, outputDataStruct.ch, outputDataStruct.x, outputDataStruct.y, outputDataStruct.z);
+}
+
+
 Layer::ILayerData* CreateResidualLayer(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager)
 {

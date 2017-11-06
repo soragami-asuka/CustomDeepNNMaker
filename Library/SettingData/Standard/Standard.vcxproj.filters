@@ -51,9 +51,6 @@
     <ClInclude Include="ItemBase.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="IItemEx_Enum.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\Common\Common.h">
       <Filter>include\Common</Filter>
     </ClInclude>

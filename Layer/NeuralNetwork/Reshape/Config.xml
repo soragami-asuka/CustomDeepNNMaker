@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="E78E7F59-D4B3-45A1-AEEB-9F2A5155473F" version="1.0.0.0" default-language="ja">
+
+  <SourceName>Reshape</SourceName>
+  <Name>入力信号構造を変換する</Name>
+  <Text>入力信号構造を変換する.&#x0A;</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+   	<Int id="x">
+      <Name>X軸要素数</Name>
+      <Text></Text>
+      <Min>0</Min>
+      <Max>65535</Max>
+      <Default>0</Default>
+    </Int>
+    <Int id="y">
+      <Name>Y軸要素数</Name>
+      <Text></Text>
+      <Min>0</Min>
+      <Max>65535</Max>
+      <Default>0</Default>
+    </Int>
+    <Int id="z">
+      <Name>Z軸要素数</Name>
+      <Text></Text>
+      <Min>0</Min>
+      <Max>65535</Max>
+      <Default>0</Default>
+    </Int>
+    <Int id="ch">
+      <Name>CH要素数</Name>
+      <Text></Text>
+      <Min>0</Min>
+      <Max>65535</Max>
+      <Default>0</Default>
+    </Int>
+  </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <Learn>
+
+  </Learn>
+
+</Config>
