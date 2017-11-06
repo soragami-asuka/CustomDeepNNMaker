@@ -602,7 +602,7 @@ Layer::ILayerData* CreateChooseChannelLayer(
 	@param	x	X軸.
 	@param	y	Y軸.
 	@param	z	Z軸. */
-Layer::ILayerData* CreateChooseChannelLayer(
+Layer::ILayerData* CreateReshapeLayer(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 	U32 ch, U32 x, U32 y, U32 z)
 {
@@ -651,11 +651,11 @@ Layer::ILayerData* CreateChooseChannelLayer(
 }
 /** 出力データ構造変換レイヤー.
 	@param	outputDataStruct 出力データ構造 */
-Layer::ILayerData* CreateChooseChannelLayer(
+Layer::ILayerData* CreateReshapeLayer(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 	const IODataStruct& outputDataStruct)
 {
-	return CreateChooseChannelLayer(layerDLLManager, layerDataManager, outputDataStruct.ch, outputDataStruct.x, outputDataStruct.y, outputDataStruct.z);
+	return CreateReshapeLayer(layerDLLManager, layerDataManager, outputDataStruct.ch, outputDataStruct.x, outputDataStruct.y, outputDataStruct.z);
 }
 
 

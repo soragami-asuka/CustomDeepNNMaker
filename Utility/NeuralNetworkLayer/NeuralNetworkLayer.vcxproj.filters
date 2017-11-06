@@ -27,6 +27,9 @@
     <ClInclude Include="..\..\include\Utility\NeuralNetworkLayer.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\Utility\NeuralNetworkMaker.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -36,6 +39,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuralNetworkMaker.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

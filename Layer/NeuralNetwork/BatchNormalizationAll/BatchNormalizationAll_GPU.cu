@@ -134,37 +134,43 @@ namespace NeuralNetwork {
 		std::vector<S32> dimParam;
 		std::vector<S32> dimParamStride;
 		{
-			dataDim = 1 + 1 + 1;
+			dataDim = 1 + 1 + 2;
 
 			dimInput.resize(dataDim);
 			dimInput[0] = this->GetBatchSize();
 			dimInput[1] = 1;
-			dimInput[2] = this->GetInputDataStruct().GetDataCount();
+			dimInput[2] = this->GetInputDataStruct().y * this->GetInputDataStruct().ch;
+			dimInput[3] = this->GetInputDataStruct().x;
 
 			dimInputStride.resize(dataDim);
-			dimInputStride[0] = dimInput[1] * dimInput[2];
-			dimInputStride[1] = dimInput[2];
-			dimInputStride[2] = 1;
+			dimInputStride[0] = dimInput[1] * dimInput[2] * dimInput[3];
+			dimInputStride[1] = dimInput[2] * dimInput[3];
+			dimInputStride[2] = dimInput[3];
+			dimInputStride[3] = 1;
 			
 			dimOutput.resize(dataDim);
 			dimOutput[0] = this->GetBatchSize();
 			dimOutput[1] = 1;
-			dimOutput[2] = this->GetOutputDataStruct().GetDataCount();
+			dimOutput[2] = this->GetOutputDataStruct().y * this->GetOutputDataStruct().ch;
+			dimOutput[3] = this->GetOutputDataStruct().x;
 
 			dimOutputStride.resize(dataDim);
-			dimOutputStride[0] = dimOutput[1] * dimOutput[2];
-			dimOutputStride[1] = dimOutput[2];
-			dimOutputStride[2] = 1;
+			dimOutputStride[0] = dimOutput[1] * dimOutput[2] * dimOutput[3];
+			dimOutputStride[1] = dimOutput[2] * dimOutput[3];
+			dimOutputStride[2] = dimOutput[3];
+			dimOutputStride[3] = 1;
 
 			dimParam.resize(dataDim);
 			dimParam[0] = 1;
 			dimParam[1] = 1;
 			dimParam[2] = 1;
+			dimParam[3] = 1;
 
 			dimParamStride.resize(dataDim);
-			dimParamStride[0] = dimParam[1] * dimParam[2];
-			dimParamStride[1] = dimParam[2];
-			dimParamStride[2] = 1;
+			dimParamStride[0] = dimParam[1] * dimParam[2] * dimParam[3];
+			dimParamStride[1] = dimParam[2] * dimParam[3];
+			dimParamStride[2] = dimParam[3];
+			dimParamStride[3] = 1;
 		}
 
 
