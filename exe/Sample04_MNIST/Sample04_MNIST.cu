@@ -150,15 +150,15 @@ int _tmain(int argc, _TCHAR* argv[])
 	// ファイルに保存する
 	printf("バイナリファイル保存\n");
 	Gravisbell::Utility::NeuralNetworkLayer::WriteNetworkToBinaryFile(*pNeuralNetworkData, L"../../LayerData/test.bin");
+	delete pNeuralNetworkData;
+	pNeuralNetworkData = NULL;
 	// ファイルから読み込む
 	printf("バイナリファイル読み込み\n");
-	Gravisbell::Layer::ILayerData* pNeuralNetworkData2 = NULL;
-	Gravisbell::Utility::NeuralNetworkLayer::ReadNetworkFromBinaryFile(*pLayerDLLManager, &pNeuralNetworkData2,  L"../../LayerData/test.bin");
+	Gravisbell::Utility::NeuralNetworkLayer::ReadNetworkFromBinaryFile(*pLayerDLLManager, &pNeuralNetworkData,  L"../../LayerData/test.bin");
 	// 別ファイルに保存する
 	printf("バイナリファイル保存2\n");
-	Gravisbell::Utility::NeuralNetworkLayer::WriteNetworkToBinaryFile(*pNeuralNetworkData2,  L"../../LayerData/test2.bin");
+	Gravisbell::Utility::NeuralNetworkLayer::WriteNetworkToBinaryFile(*pNeuralNetworkData,  L"../../LayerData/test2.bin");
 	printf("終了\n");
-	delete pNeuralNetworkData2;
 
 	//// XMLファイルに保存する
 	//Gravisbell::Layer::NeuralNetwork::Parser::SaveLayerToXML(*pNeuralNetworkData, L"../../LayerData/", L"test.xml");
