@@ -1060,7 +1060,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver03(const Layer::Neural
 		lastLayerGUID = pNetworkMaker->AddActivationLayer(lastLayerGUID, L"ReLU");
 
 		// ³‹K‰»ƒŒƒCƒ„[
-		lastLayerGUID = pNetworkMaker->AddBatchNormalizationAllLayer(lastLayerGUID);
+		lastLayerGUID = pNetworkMaker->AddNormalizationScaleLayer(lastLayerGUID);
 
 		// 2‘w–Ú
 		lastLayerGUID = pNetworkMaker->AddConvolutionLayer(lastLayerGUID, Vector3D<S32>(5,5,1), 16, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0));
