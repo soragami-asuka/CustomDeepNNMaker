@@ -134,7 +134,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 	// ニューラルネットワーク作成
-	Gravisbell::Layer::ILayerData* pNeuralNetworkData = CreateNeuralNetwork_ver04(*pLayerDLLManager, *pLayerDataManager, pDataLayerTeach_Input->GetInputDataStruct(), pDataLayerTeach_Output->GetDataStruct());
+	Gravisbell::Layer::ILayerData* pNeuralNetworkData = CreateNeuralNetwork_ver03(*pLayerDLLManager, *pLayerDataManager, pDataLayerTeach_Input->GetInputDataStruct(), pDataLayerTeach_Output->GetDataStruct());
 	if(pNeuralNetworkData == NULL)
 	{
 		delete pDataLayerTeach_Input;
