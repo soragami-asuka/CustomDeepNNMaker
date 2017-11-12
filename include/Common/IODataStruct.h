@@ -58,6 +58,11 @@ namespace Gravisbell {
 		{
 			return this->x * this->y * this->z * this->ch;
 		}
+
+		U32 POSITION_TO_OFFSET(U32 x, U32 y, U32 z, U32 ch)
+		{
+			return (((((ch*this->z+z)*this->y)+y)*this->x)+x);
+		}
 	};
 
 }	// Gravisbell

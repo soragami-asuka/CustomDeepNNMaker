@@ -17,6 +17,8 @@ call ConvertNNConfigToSource.exe "./Normalization_Scale/Config.xml" "./Normaliza
 call ConvertNNConfigToSource.exe "./SeparateOutput/Config.xml" "./SeparateOutput/" "SeparateOutput"
 call ConvertNNConfigToSource.exe "./ChooseChannel/Config.xml" "./ChooseChannel/" "ChooseChannel"
 call ConvertNNConfigToSource.exe "./Reshape/Config.xml" "./Reshape/" "Reshape"
+call ConvertNNConfigToSource.exe "./Reshape_MirrorX/Config.xml" "./Reshape_MirrorX/" "Reshape_MirrorX"
+call ConvertNNConfigToSource.exe "./Reshape_SquaresCenterCross/Config.xml" "./Reshape_SquaresCenterCross/" "Reshape_SquaresCenterCross"
 call ConvertNNConfigToSource.exe "./MergeInput/Config.xml" "./MergeInput/" "MergeInput"
 call ConvertNNConfigToSource.exe "./Residual/Config.xml" "./Residual/" "Residual"
 call ConvertNNConfigToSource.exe "./GaussianNoise/Config.xml" "./GaussianNoise/" "GaussianNoise"

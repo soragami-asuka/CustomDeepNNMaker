@@ -101,6 +101,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.BatchNo
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.Reshape", "Layer\NeuralNetwork\Reshape\Reshape.vcxproj", "{5304030C-CFA4-4DB3-B355-01078D793DB3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.Reshape_MirrorX", "Layer\NeuralNetwork\Reshape_MirrorX\Reshape_MirrorX.vcxproj", "{3560B450-010E-4637-96B2-39B0C380FE8C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.Reshape_SquaresCenterCross", "Layer\NeuralNetwork\Reshape_SquaresCenterCross\Reshape_SquaresCenterCross.vcxproj", "{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_Kepler|Mixed Platforms = Debug_Kepler|Mixed Platforms
@@ -1221,6 +1225,66 @@ Global
 		{5304030C-CFA4-4DB3-B355-01078D793DB3}.Release|Win32.Build.0 = Release|Win32
 		{5304030C-CFA4-4DB3-B355-01078D793DB3}.Release|x64.ActiveCfg = Release|x64
 		{5304030C-CFA4-4DB3-B355-01078D793DB3}.Release|x64.Build.0 = Release|x64
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Debug_Kepler|Mixed Platforms.ActiveCfg = Debug_Kepler|Win32
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Debug_Kepler|Mixed Platforms.Build.0 = Debug_Kepler|Win32
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Debug_Kepler|Win32.ActiveCfg = Debug_Kepler|Win32
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Debug_Kepler|Win32.Build.0 = Debug_Kepler|Win32
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Debug_Kepler|x64.ActiveCfg = Debug_Kepler|x64
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Debug_Kepler|x64.Build.0 = Debug_Kepler|x64
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Debug_Maxwell|Mixed Platforms.ActiveCfg = Debug_Maxwell|Win32
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Debug_Maxwell|Mixed Platforms.Build.0 = Debug_Maxwell|Win32
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Debug_Maxwell|Win32.ActiveCfg = Debug_Maxwell|Win32
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Debug_Maxwell|Win32.Build.0 = Debug_Maxwell|Win32
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Debug_Maxwell|x64.ActiveCfg = Debug_Maxwell|x64
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Debug_Maxwell|x64.Build.0 = Debug_Maxwell|x64
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Debug|Win32.Build.0 = Debug|Win32
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Debug|x64.ActiveCfg = Debug|x64
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Debug|x64.Build.0 = Debug|x64
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Release_Kepler|Mixed Platforms.ActiveCfg = Release_Kepler|Win32
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Release_Kepler|Mixed Platforms.Build.0 = Release_Kepler|Win32
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Release_Kepler|Win32.ActiveCfg = Release_Kepler|Win32
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Release_Kepler|Win32.Build.0 = Release_Kepler|Win32
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Release_Kepler|x64.ActiveCfg = Release_Kepler|x64
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Release_Kepler|x64.Build.0 = Release_Kepler|x64
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Release|Win32.ActiveCfg = Release|Win32
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Release|Win32.Build.0 = Release|Win32
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Release|x64.ActiveCfg = Release|x64
+		{3560B450-010E-4637-96B2-39B0C380FE8C}.Release|x64.Build.0 = Release|x64
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Debug_Kepler|Mixed Platforms.ActiveCfg = Debug_Kepler|Win32
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Debug_Kepler|Mixed Platforms.Build.0 = Debug_Kepler|Win32
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Debug_Kepler|Win32.ActiveCfg = Debug_Kepler|Win32
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Debug_Kepler|Win32.Build.0 = Debug_Kepler|Win32
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Debug_Kepler|x64.ActiveCfg = Debug_Kepler|x64
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Debug_Kepler|x64.Build.0 = Debug_Kepler|x64
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Debug_Maxwell|Mixed Platforms.ActiveCfg = Debug_Maxwell|Win32
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Debug_Maxwell|Mixed Platforms.Build.0 = Debug_Maxwell|Win32
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Debug_Maxwell|Win32.ActiveCfg = Debug_Maxwell|Win32
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Debug_Maxwell|Win32.Build.0 = Debug_Maxwell|Win32
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Debug_Maxwell|x64.ActiveCfg = Debug_Maxwell|x64
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Debug_Maxwell|x64.Build.0 = Debug_Maxwell|x64
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Debug|Win32.Build.0 = Debug|Win32
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Debug|x64.ActiveCfg = Debug|x64
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Debug|x64.Build.0 = Debug|x64
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Release_Kepler|Mixed Platforms.ActiveCfg = Release_Kepler|Win32
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Release_Kepler|Mixed Platforms.Build.0 = Release_Kepler|Win32
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Release_Kepler|Win32.ActiveCfg = Release_Kepler|Win32
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Release_Kepler|Win32.Build.0 = Release_Kepler|Win32
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Release_Kepler|x64.ActiveCfg = Release_Kepler|x64
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Release_Kepler|x64.Build.0 = Release_Kepler|x64
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Release|Win32.ActiveCfg = Release|Win32
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Release|Win32.Build.0 = Release|Win32
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Release|x64.ActiveCfg = Release|x64
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1270,6 +1334,8 @@ Global
 		{FA298EC7-489E-4B9E-AAE7-E26319F31221} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
 		{D4272B66-73B4-45BF-BA25-21124E0240F0} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
 		{5304030C-CFA4-4DB3-B355-01078D793DB3} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
+		{3560B450-010E-4637-96B2-39B0C380FE8C} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
+		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		VisualSVNWorkingCopyRoot = .

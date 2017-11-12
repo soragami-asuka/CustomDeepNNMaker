@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="5C2729D1-33EB-45EF-ABA5-0C36AC22D0BC" version="1.0.0.0" default-language="ja">
+
+  <SourceName>Reshape_SquaresCenterCross</SourceName>
+  <Name></Name>
+  <Text>X座標0を中心に入力信号を平方化する.&#x0A;出力X,Y信号数=sqrt(入力X信号数-1)×2+1</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+   	<Int id="dummy">
+      <Name>ダミー</Name>
+      <Text></Text>
+      <Min>0</Min>
+      <Max>65535</Max>
+      <Default>0</Default>
+    </Int>
+  </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <Learn>
+
+  </Learn>
+
+</Config>

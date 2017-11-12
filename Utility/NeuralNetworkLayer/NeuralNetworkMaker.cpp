@@ -308,6 +308,35 @@ namespace NeuralNetworkLayer {
 			return AddReshapeLayer(i_inputLayerGUID, outputDataStruct.ch, outputDataStruct.x, outputDataStruct.y, outputDataStruct.z);
 		}
 
+		/** X=0でミラー化する */
+		Gravisbell::GUID AddReshapeMirrorXLayer(const Gravisbell::GUID& i_inputLayerGUID)
+		{
+			Gravisbell::GUID layerGUID = i_inputLayerGUID;
+
+			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
+				*this->pLayerConnectData,
+				layerGUID,
+				CreateReshapeMirrorXLayer(layerDLLManager, layerDataManager) );
+			if(err != ErrorCode::ERROR_CODE_NONE)
+				return Gravisbell::GUID();
+
+			return layerGUID;
+		}
+		/** X=0で平方化する */
+		Gravisbell::GUID AddReshapeSquareCenterCrossLayer(const Gravisbell::GUID& i_inputLayerGUID)
+		{
+			Gravisbell::GUID layerGUID = i_inputLayerGUID;
+
+			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
+				*this->pLayerConnectData,
+				layerGUID,
+				CreateReshapeSquareCenterCrossLayer(layerDLLManager, layerDataManager) );
+			if(err != ErrorCode::ERROR_CODE_NONE)
+				return Gravisbell::GUID();
+
+			return layerGUID;
+		}
+
 	protected:
 		/** 入力結合レイヤー. 入力されたレイヤーのCHを結合する. 入力データ構造はX,Y,Zで同じサイズである必要がある. */
 		Gravisbell::GUID AddMergeInputLayer(const Gravisbell::GUID lpInputLayerGUID[], U32 inputLayerCount)

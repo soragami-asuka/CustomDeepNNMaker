@@ -473,7 +473,7 @@ namespace NeuralNetwork {
 	// SoftMaxŒn
 	F32 Activation_CPU::func_activation_SoftMax(F32 x)
 	{
-		return (F32)exp(x);	// •½‹Ï‚Í•Ê‚És‚¤
+		return min(FLT_MAX, (F32)exp(x));	// •½‹Ï‚Í•Ê‚És‚¤
 	}
 
 } // Gravisbell;
