@@ -22,6 +22,9 @@ namespace NeuralNetworkLayer {
 		/** 作成したニューラルネットワークを取得する */
 		virtual Layer::Connect::ILayerConnectData* GetNeuralNetworkLayer()=0;
 
+		/** 指定レイヤーの出力データ構造を取得する */
+		virtual IODataStruct GetOutputDataStruct(const Gravisbell::GUID& i_layerGUID) = 0;
+
 	public:
 		//==================================
 		// 基本レイヤー

@@ -50,10 +50,10 @@ namespace NeuralNetworkLayer {
 			return this->pLayerConnectData;
 		}
 
-	private:
-		IODataStruct GetInputDataStruct(Gravisbell::GUID i_layerGUID)
+		/** 指定レイヤーの出力データ構造を取得する */
+		IODataStruct GetOutputDataStruct(const Gravisbell::GUID& i_layerGUID)
 		{
-			return this->pLayerConnectData->GetOutputDataStruct(i_layerGUID, &this->lpInputDataStruct[0], (U32)this->lpInputDataStruct.size());;
+			return this->pLayerConnectData->GetOutputDataStruct(i_layerGUID, &this->lpInputDataStruct[0], (U32)this->lpInputDataStruct.size());
 		}
 
 	public:
@@ -73,7 +73,7 @@ namespace NeuralNetworkLayer {
 			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
 				*this->pLayerConnectData,
 				layerGUID,
-				CreateConvolutionLayer(layerDLLManager, layerDataManager, this->GetInputDataStruct(i_inputLayerGUID).ch, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize));
+				CreateConvolutionLayer(layerDLLManager, layerDataManager, this->GetOutputDataStruct(i_inputLayerGUID).ch, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize));
 			if(err != ErrorCode::ERROR_CODE_NONE)
 				return Gravisbell::GUID();
 
@@ -90,7 +90,7 @@ namespace NeuralNetworkLayer {
 			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
 				*this->pLayerConnectData,
 				layerGUID,
-				CreateFullyConnectLayer(layerDLLManager, layerDataManager, this->GetInputDataStruct(i_inputLayerGUID).GetDataCount(), i_neuronCount) );
+				CreateFullyConnectLayer(layerDLLManager, layerDataManager, this->GetOutputDataStruct(i_inputLayerGUID).GetDataCount(), i_neuronCount) );
 			if(err != ErrorCode::ERROR_CODE_NONE)
 				return Gravisbell::GUID();
 
@@ -176,7 +176,7 @@ namespace NeuralNetworkLayer {
 			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
 				*this->pLayerConnectData,
 				layerGUID,
-				CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, this->GetInputDataStruct(i_inputLayerGUID).ch) );
+				CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, this->GetOutputDataStruct(i_inputLayerGUID).ch) );
 			if(err != ErrorCode::ERROR_CODE_NONE)
 				return Gravisbell::GUID();
 
@@ -568,7 +568,7 @@ namespace NeuralNetworkLayer {
 			GUID bypassLayerGUID = i_inputLayerGUID;
 			GUID layerGUID = i_inputLayerGUID;
 
-			U32 outputChannel = this->GetInputDataStruct(i_inputLayerGUID).ch;
+			U32 outputChannel = this->GetOutputDataStruct(i_inputLayerGUID).ch;
 
 			for(U32 layerNum=0; layerNum<i_layerCount-1; layerNum++)
 			{
@@ -606,7 +606,7 @@ namespace NeuralNetworkLayer {
 			GUID bypassLayerGUID = i_inputLayerGUID;
 			GUID layerGUID = i_inputLayerGUID;
 
-			U32 inputChannelCount = this->GetInputDataStruct(i_inputLayerGUID).ch;
+			U32 inputChannelCount = this->GetOutputDataStruct(i_inputLayerGUID).ch;
 
 			// 前半
 			for(S32 layerNum=0; layerNum<(S32)i_front_layerCount-1; layerNum++)
