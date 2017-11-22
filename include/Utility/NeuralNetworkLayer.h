@@ -182,6 +182,12 @@ namespace NeuralNetworkLayer {
 	Layer::ILayerData* CreateReshapeSquareCenterCrossLayer(
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager);
 
+	/** X=0を中心に平方化する. */
+	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+	Layer::ILayerData* CreateReshapeSquareZeroSideLeftTopLayer(
+		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+		Gravisbell::U32 x, Gravisbell::U32 y);
+
 
 	/** 入力結合レイヤー. 入力されたレイヤーのCHを結合する. 入力データ構造はX,Y,Zで同じサイズである必要がある.
 		@param	layerDLLManager		レイヤーDLL管理クラス.

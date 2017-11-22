@@ -1200,9 +1200,10 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver05(const Layer::Neural
 		// 入力信号を直前レイヤーに設定
 		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID();
 
-		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_CA(lastLayerGUID, Vector3D<S32>(3,3,1),  1, Vector3D<S32>(1,1,1), Vector3D<S32>(0,0,0), L"ReLU");
-		lastLayerGUID = pNetworkMaker->AddReshapeLayer(lastLayerGUID, IODataStruct(26, 26, 1, 1));
-		lastLayerGUID = pNetworkMaker->AddReshapeSquareCenterCrossLayer(lastLayerGUID);
+		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_CA(lastLayerGUID, Vector3D<S32>(3,3,1),  1, Vector3D<S32>(1,1,1), Vector3D<S32>(1,1,0), L"ReLU");
+		lastLayerGUID = pNetworkMaker->AddReshapeLayer(lastLayerGUID, IODataStruct(14, 56, 1, 1));
+		lastLayerGUID = pNetworkMaker->AddNormalizationScaleLayer(lastLayerGUID);
+		lastLayerGUID = pNetworkMaker->AddReshapeSquareZeroSideLeftTopLayer(lastLayerGUID, 10, 6);
 		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_CAD(lastLayerGUID, Vector3D<S32>(5,5,1),  4, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0), L"ReLU", 0.5f);
 		lastLayerGUID = pNetworkMaker->AddPoolingLayer(lastLayerGUID, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1));
 		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_CAD(lastLayerGUID, Vector3D<S32>(5,5,1),  8, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0), L"ReLU", 0.5f);

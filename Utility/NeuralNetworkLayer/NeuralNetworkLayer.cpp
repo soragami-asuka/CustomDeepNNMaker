@@ -713,6 +713,45 @@ Layer::ILayerData* CreateReshapeSquareCenterCrossLayer(
 	return pLayer;
 }
 
+/** X=0‚ğ’†S‚É•½•û‰»‚·‚é. */
+Layer::ILayerData* CreateReshapeSquareZeroSideLeftTopLayer(
+	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+	Gravisbell::U32 x, Gravisbell::U32 y)
+{
+	const Gravisbell::GUID TYPE_CODE(0xf6d9c5da, 0xd583, 0x455b, 0x92, 0x54, 0x5a, 0xef, 0x3c, 0xa9, 0x02, 0x1b);
+
+	// DLLæ“¾
+	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(TYPE_CODE);
+	if(pLayerDLL == NULL)
+		return NULL;
+
+	// İ’è‚Ìì¬
+	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
+	if(pConfig == NULL)
+		return NULL;
+
+	// X²
+	{
+		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"x"));
+		pItem->SetValue(x);
+	}
+	// Y²
+	{
+		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"y"));
+		pItem->SetValue(y);
+	}
+
+	// ƒŒƒCƒ„[‚Ìì¬
+	Layer::ILayerData* pLayer = layerDataManager.CreateLayerData(layerDLLManager, TYPE_CODE, boost::uuids::random_generator()().data, *pConfig);
+	if(pLayer == NULL)
+		return NULL;
+
+	// İ’èî•ñ‚ğíœ
+	delete pConfig;
+
+	return pLayer;
+}
+
 
 
 Layer::ILayerData* CreateResidualLayer(

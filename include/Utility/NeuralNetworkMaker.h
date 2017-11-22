@@ -110,6 +110,11 @@ namespace NeuralNetworkLayer {
 		virtual Gravisbell::GUID AddReshapeMirrorXLayer(const Gravisbell::GUID& i_inputLayerGUID) = 0;
 		/** X=0で平方化する */
 		virtual Gravisbell::GUID AddReshapeSquareCenterCrossLayer(const Gravisbell::GUID& i_inputLayerGUID) = 0;
+		/** X=0で平方化する.
+			入力信号数は1次元配列で(x-1)*(y-1)+1以上の要素数が必要.
+			@param	x	X軸.
+			@param	y	Y軸. */
+		virtual Gravisbell::GUID AddReshapeSquareZeroSideLeftTopLayer(const Gravisbell::GUID& i_inputLayerGUID, U32 x, U32 y) = 0;
 
 
 	protected:

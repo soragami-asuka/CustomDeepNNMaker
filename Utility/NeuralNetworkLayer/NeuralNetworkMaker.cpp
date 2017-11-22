@@ -336,6 +336,23 @@ namespace NeuralNetworkLayer {
 
 			return layerGUID;
 		}
+		/** X=0で平方化する.
+			入力信号数は1次元配列で(x-1)*(y-1)+1以上の要素数が必要.
+			@param	x	X軸.
+			@param	y	Y軸. */
+		Gravisbell::GUID AddReshapeSquareZeroSideLeftTopLayer(const Gravisbell::GUID& i_inputLayerGUID, U32 x, U32 y)
+		{
+			Gravisbell::GUID layerGUID = i_inputLayerGUID;
+
+			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
+				*this->pLayerConnectData,
+				layerGUID,
+				CreateReshapeSquareZeroSideLeftTopLayer(layerDLLManager, layerDataManager, x, y) );
+			if(err != ErrorCode::ERROR_CODE_NONE)
+				return Gravisbell::GUID();
+
+			return layerGUID;
+		}
 
 	protected:
 		/** 入力結合レイヤー. 入力されたレイヤーのCHを結合する. 入力データ構造はX,Y,Zで同じサイズである必要がある. */

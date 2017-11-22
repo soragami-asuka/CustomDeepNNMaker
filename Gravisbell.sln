@@ -105,6 +105,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.Reshape
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.Reshape_SquaresCenterCross", "Layer\NeuralNetwork\Reshape_SquaresCenterCross\Reshape_SquaresCenterCross.vcxproj", "{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.Reshape_SquaresZeroSideLeftTop", "Layer\NeuralNetwork\Reshape_SquaresZeroSideLeftTop\Reshape_SquaresZeroSideLeftTop.vcxproj", "{1EC340D5-026D-45C2-A41F-B54B4C736922}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_Kepler|Mixed Platforms = Debug_Kepler|Mixed Platforms
@@ -1285,6 +1287,36 @@ Global
 		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Release|Win32.Build.0 = Release|Win32
 		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Release|x64.ActiveCfg = Release|x64
 		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812}.Release|x64.Build.0 = Release|x64
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Debug_Kepler|Mixed Platforms.ActiveCfg = Debug_Kepler|Win32
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Debug_Kepler|Mixed Platforms.Build.0 = Debug_Kepler|Win32
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Debug_Kepler|Win32.ActiveCfg = Debug_Kepler|Win32
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Debug_Kepler|Win32.Build.0 = Debug_Kepler|Win32
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Debug_Kepler|x64.ActiveCfg = Debug_Kepler|x64
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Debug_Kepler|x64.Build.0 = Debug_Kepler|x64
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Debug_Maxwell|Mixed Platforms.ActiveCfg = Debug_Maxwell|Win32
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Debug_Maxwell|Mixed Platforms.Build.0 = Debug_Maxwell|Win32
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Debug_Maxwell|Win32.ActiveCfg = Debug_Maxwell|Win32
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Debug_Maxwell|Win32.Build.0 = Debug_Maxwell|Win32
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Debug_Maxwell|x64.ActiveCfg = Debug_Maxwell|x64
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Debug_Maxwell|x64.Build.0 = Debug_Maxwell|x64
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Debug|Win32.Build.0 = Debug|Win32
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Debug|x64.ActiveCfg = Debug|x64
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Debug|x64.Build.0 = Debug|x64
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Release_Kepler|Mixed Platforms.ActiveCfg = Release_Kepler|Win32
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Release_Kepler|Mixed Platforms.Build.0 = Release_Kepler|Win32
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Release_Kepler|Win32.ActiveCfg = Release_Kepler|Win32
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Release_Kepler|Win32.Build.0 = Release_Kepler|Win32
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Release_Kepler|x64.ActiveCfg = Release_Kepler|x64
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Release_Kepler|x64.Build.0 = Release_Kepler|x64
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Release|Win32.ActiveCfg = Release|Win32
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Release|Win32.Build.0 = Release|Win32
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Release|x64.ActiveCfg = Release|x64
+		{1EC340D5-026D-45C2-A41F-B54B4C736922}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1336,6 +1368,7 @@ Global
 		{5304030C-CFA4-4DB3-B355-01078D793DB3} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
 		{3560B450-010E-4637-96B2-39B0C380FE8C} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
 		{DB207CA5-B1D9-4A4F-AF18-1E5B83E1C812} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
+		{1EC340D5-026D-45C2-A41F-B54B4C736922} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		VisualSVNWorkingCopyRoot = .
