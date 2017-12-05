@@ -43,7 +43,7 @@ namespace NeuralNetwork {
 	public:
 		/** レイヤーを作成する.
 			@param guid	新規生成するレイヤーのGUID. */
-		ILayerBase* CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
+		ILayerBase* CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager);
 	};
 
 } // Gravisbell;

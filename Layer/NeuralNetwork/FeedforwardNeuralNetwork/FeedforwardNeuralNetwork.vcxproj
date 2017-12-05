@@ -558,6 +558,9 @@
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Library\Common\TemporaryMemoryManager\TemporaryMemoryManager.vcxproj">
+      <Project>{17833218-fef6-4b87-b97f-f91e4a6d845e}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Library\SettingData\Standard\Standard.vcxproj">
       <Project>{79fd5f13-1407-43ab-834c-04c1aeccdbb5}</Project>
     </ProjectReference>

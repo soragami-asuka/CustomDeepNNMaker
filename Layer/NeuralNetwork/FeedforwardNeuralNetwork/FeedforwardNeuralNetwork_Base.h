@@ -52,12 +52,17 @@ namespace NeuralNetwork {
 
 		BATCH_BUFFER_POINTER m_lppDInputBuffer;		/**< 入力誤差バッファ */
 
+		Gravisbell::Common::ITemporaryMemoryManager* pLocalTemporaryMemoryManager;
+		Gravisbell::Common::ITemporaryMemoryManager& temporaryMemoryManager;
+
 	public:
 		//====================================
 		// コンストラクタ/デストラクタ
 		//====================================
 		/** コンストラクタ */
-		FeedforwardNeuralNetwork_Base(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct);
+		FeedforwardNeuralNetwork_Base(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct, Gravisbell::Common::ITemporaryMemoryManager* i_pTemporaryMemoryManager);
+		/** コンストラクタ */
+		FeedforwardNeuralNetwork_Base(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager);
 		/** デストラクタ */
 		virtual ~FeedforwardNeuralNetwork_Base();
 
@@ -261,6 +266,8 @@ namespace NeuralNetwork {
 			@return 同時に演算を行うバッチのサイズ */
 		U32 GetBatchSize()const;
 
+		/** 一時バッファ管理クラスを取得する */
+		Common::ITemporaryMemoryManager& GetTemporaryMemoryManager();
 
 		//================================
 		// 初期化処理

@@ -20,13 +20,14 @@ namespace NeuralNetwork {
 	private:
 		std::vector<std::vector<F32>> lpDInputBuffer;
 
-
 		//====================================
 		// コンストラクタ/デストラクタ
 		//====================================
 	public:
 		/** コンストラクタ */
 		FeedforwardNeuralNetwork_CPU(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct);
+		/** コンストラクタ */
+		FeedforwardNeuralNetwork_CPU(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager);
 		/** デストラクタ */
 		virtual ~FeedforwardNeuralNetwork_CPU();
 

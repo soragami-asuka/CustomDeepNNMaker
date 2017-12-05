@@ -57,14 +57,15 @@ private:
 	cudnnConvolutionFwdAlgo_t		useForwardAlgorithm;		/**< 前方伝播時に使用するアルゴリズム番号 */
 	cudnnConvolutionBwdDataAlgo_t	useBackwardDataAlgorithm;	/**< 後方伝播時のデータ計算に使用するアルゴリズム番号 */
 	cudnnConvolutionBwdFilterAlgo_t	useBackwardFilterAlgorithm;	/**< 後方伝播時のフィルタ計算に使用するアルゴリズム番号 */
-	thrust::device_vector<BYTE>		workSpace;					/**< 処理用のメモリ.前方伝播、後方伝播全てで共用する. */
 
 	thrust::device_vector<F32> lpDBias;		/**< バイアスの変化量 */
 	thrust::device_vector<F32> lpDNeuron;	/**< ニューロンの変化量 */
 
+	Gravisbell::Common::ITemporaryMemoryManager& temporaryMemoryManager;	/**< 一時バッファ用のメモリ管理クラス */
+
 public:
 	/** コンストラクタ */
-	Convolution_GPU(Gravisbell::GUID guid, class Convolution_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct);
+	Convolution_GPU(Gravisbell::GUID guid, class Convolution_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager);
 	/** デストラクタ */
 	virtual ~Convolution_GPU();
 

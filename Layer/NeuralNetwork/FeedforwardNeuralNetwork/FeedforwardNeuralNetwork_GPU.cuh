@@ -27,6 +27,8 @@ namespace NeuralNetwork {
 	public:
 		/** コンストラクタ */
 		FeedforwardNeuralNetwork_GPU(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct);
+		/** コンストラクタ */
+		FeedforwardNeuralNetwork_GPU(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager);
 		/** デストラクタ */
 		virtual ~FeedforwardNeuralNetwork_GPU();
 

@@ -122,6 +122,19 @@ namespace Connect {
 			@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定.
 			@param	o_postLayerGUID	レイヤーに接続しているレイヤーのGUID格納先. */
 		virtual ErrorCode GetBypassLayerGUIDbyNum(const Gravisbell::GUID& i_layerGUID, U32 i_inputNum, Gravisbell::GUID& o_postLayerGUID) = 0;
+
+	public:
+		//===========================
+		// レイヤー作成
+		//===========================
+		/** レイヤーを作成する.
+			@param	guid	新規生成するレイヤーのGUID.
+			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要 */
+		virtual ILayerBase* CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager) = 0;
+		/** レイヤーを作成する.
+			@param	guid	新規生成するレイヤーのGUID.
+			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要 */
+		virtual ILayerBase* CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount) = 0;
 	};
 
 }	// Connect

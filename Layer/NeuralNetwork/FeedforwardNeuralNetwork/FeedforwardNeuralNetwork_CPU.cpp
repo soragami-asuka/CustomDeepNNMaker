@@ -10,15 +10,23 @@
 
 #include"FeedforwardNeuralNetwork_LayerData_Base.h"
 
+#include"Library/Common/TemporaryMemoryManager.h"
+
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
 	/** コンストラクタ */
 	FeedforwardNeuralNetwork_CPU::FeedforwardNeuralNetwork_CPU(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct)
-		:	FeedforwardNeuralNetwork_Base	(i_guid, i_layerData, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
+		:	FeedforwardNeuralNetwork_Base	(i_guid, i_layerData, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1), Common::CreateTemporaryMemoryManagerCPU())
 	{
 	}
+	/** コンストラクタ */
+	FeedforwardNeuralNetwork_CPU::FeedforwardNeuralNetwork_CPU(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
+		:	FeedforwardNeuralNetwork_Base	(i_guid, i_layerData, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1), i_temporaryMemoryManager)
+	{
+	}
+
 	/** デストラクタ */
 	FeedforwardNeuralNetwork_CPU::~FeedforwardNeuralNetwork_CPU()
 	{

@@ -44,11 +44,11 @@ private:
 	std::vector<BATCH_BUFFER_POINTER> m_lppDInputBuffer;			/**< 入力誤差計算時の出力誤差データ */
 
 	// 演算処理用のバッファ
-
+	Gravisbell::Common::ITemporaryMemoryManager& temporaryMemoryManager;	/**< 一時バッファ用のメモリ管理クラス */
 
 public:
 	/** コンストラクタ */
-	Convolution_CPU(Gravisbell::GUID guid, class Convolution_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct);
+	Convolution_CPU(Gravisbell::GUID guid, class Convolution_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager);
 	/** デストラクタ */
 	virtual ~Convolution_CPU();
 

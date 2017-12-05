@@ -178,7 +178,7 @@ namespace NeuralNetwork {
 	//===========================
 	/** レイヤーを作成する.
 		@param guid	新規生成するレイヤーのGUID. */
-	ILayerBase* BatchNormalization_LayerData_CPU::CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
+	ILayerBase* BatchNormalization_LayerData_CPU::CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
 	{
 		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
 			return NULL;

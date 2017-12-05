@@ -52,6 +52,25 @@ namespace NeuralNetwork {
 
 			return pNeuralNetwork;
 		}
+		/** レイヤーを作成する.
+			@param guid	新規生成するレイヤーのGUID. */
+		ILayerBase* CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
+		{
+			if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
+				return NULL;
+
+			FeedforwardNeuralNetwork_Base* pNeuralNetwork = new FeedforwardNeuralNetwork_GPU(guid, *this, i_lpInputDataStruct[0], i_temporaryMemoryManager);
+
+			// ニューラルネットワークにレイヤーを追加
+			ErrorCode err = AddConnectionLayersToNeuralNetwork(*pNeuralNetwork, i_lpInputDataStruct, i_inputLayerCount);
+			if(err != ErrorCode::ERROR_CODE_NONE)
+			{
+				delete pNeuralNetwork;
+				return NULL;
+			}
+
+			return pNeuralNetwork;
+		}
 	};
 
 

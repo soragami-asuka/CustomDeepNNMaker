@@ -53,7 +53,7 @@ namespace NeuralNetwork {
 	// コンストラクタ/デストラクタ
 	//====================================
 	/** コンストラクタ */
-	FeedforwardNeuralNetwork_Base::FeedforwardNeuralNetwork_Base(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct)
+	FeedforwardNeuralNetwork_Base::FeedforwardNeuralNetwork_Base(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct, Gravisbell::Common::ITemporaryMemoryManager* i_pTemporaryMemoryManager)
 		:	layerData			(i_layerData)
 		,	guid				(i_guid)			/**< レイヤー識別用のGUID */
 		,	inputDataStruct		(i_inputDataStruct)
@@ -62,6 +62,22 @@ namespace NeuralNetwork {
 		,	outputLayer			(*this)	/**< 出力信号の代替レイヤーのアドレス. */
 		,	pLearnData			(NULL)
 		,	m_lppDInputBuffer	(NULL)		/**< 入力誤差バッファ */
+		,	pLocalTemporaryMemoryManager	(i_pTemporaryMemoryManager)
+		,	temporaryMemoryManager			(*pLocalTemporaryMemoryManager)
+	{
+	}
+	/** コンストラクタ */
+	FeedforwardNeuralNetwork_Base::FeedforwardNeuralNetwork_Base(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
+		:	layerData						(i_layerData)
+		,	guid							(i_guid)			/**< レイヤー識別用のGUID */
+		,	inputDataStruct					(i_inputDataStruct)
+		,	outputDataStruct				(i_outputDataStruct)
+		,	inputLayer						(*this)	/**< 入力信号の代替レイヤーのアドレス. */
+		,	outputLayer						(*this)	/**< 出力信号の代替レイヤーのアドレス. */
+		,	pLearnData						(NULL)
+		,	m_lppDInputBuffer				(NULL)		/**< 入力誤差バッファ */
+		,	pLocalTemporaryMemoryManager	(NULL)
+		,	temporaryMemoryManager			(i_temporaryMemoryManager)
 	{
 
 	}
@@ -92,6 +108,10 @@ namespace NeuralNetwork {
 		// 学習データの削除
 		if(this->pLearnData)
 			delete this->pLearnData;
+
+		// 一時バッファ管理削除
+		if(this->pLocalTemporaryMemoryManager != NULL)
+			delete this->pLocalTemporaryMemoryManager;
 	}
 
 
@@ -157,7 +177,7 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
 		lpTemporaryLayerData.push_back(i_pLayerData);
 
-		ILayerBase* pLayer = i_pLayerData->CreateLayer(boost::uuids::random_generator()().data, i_lpInputDataStruct, i_inputLayerCount);
+		ILayerBase* pLayer = i_pLayerData->CreateLayer(boost::uuids::random_generator()().data, i_lpInputDataStruct, i_inputLayerCount, this->temporaryMemoryManager);
 		if(pLayer == NULL)
 			return ErrorCode::ERROR_CODE_LAYER_CREATE;
 
@@ -650,6 +670,11 @@ namespace NeuralNetwork {
 		return this->batchSize;
 	}
 
+	/** 一時バッファ管理クラスを取得する */
+	Common::ITemporaryMemoryManager& FeedforwardNeuralNetwork_Base::GetTemporaryMemoryManager()
+	{
+		return this->temporaryMemoryManager;
+	}
 
 	//================================
 	// 初期化処理

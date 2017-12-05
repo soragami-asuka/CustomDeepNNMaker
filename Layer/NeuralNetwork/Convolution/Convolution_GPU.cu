@@ -18,6 +18,8 @@ using namespace Gravisbell::Layer::NeuralNetwork;
 
 #define TEMPORARY_MEMORY_MAX	(100 * 1024 * 1024)
 
+#define WORKSPACE_CODE			L"WorkSpace"
+
 
 namespace Gravisbell {
 namespace Layer {
@@ -25,7 +27,7 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	Convolution_GPU::Convolution_GPU(Gravisbell::GUID guid, Convolution_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct)
+	Convolution_GPU::Convolution_GPU(Gravisbell::GUID guid, Convolution_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
 		:	Convolution_Base	(guid, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
 		,	layerData			(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount	(0)		/**< 入力バッファ数 */
@@ -37,6 +39,7 @@ namespace NeuralNetwork {
 		,	biasTensorDesc		(NULL)
 		,	filterDesc			(NULL)
 		,	convDesc			(NULL)
+		,	temporaryMemoryManager	(i_temporaryMemoryManager)
 	{
 		cudnnCreate(&cudnnHandle);
 		cudnnCreateTensorDescriptor(&inputTensorDesc);
@@ -485,7 +488,7 @@ namespace NeuralNetwork {
 
 
 		// 処理用バッファの確保
-		this->workSpace.resize(max(workSpaceSizeByte_forward, max(workSpaceSizeByte_backwardData, workSpaceSizeByte_backwardFilter)));
+		this->temporaryMemoryManager.SetBufferSize(this->GetGUID(), WORKSPACE_CODE, max(workSpaceSizeByte_forward, max(workSpaceSizeByte_backwardData, workSpaceSizeByte_backwardFilter)));
 
 		// 出力バッファを作成
 		this->lpOutputBuffer.resize(this->GetBatchSize() * this->outputBufferCount);
@@ -534,8 +537,8 @@ namespace NeuralNetwork {
 				thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]),
 				this->convDesc,
 				this->useForwardAlgorithm,
-				thrust::raw_pointer_cast(&this->workSpace[0]),
-				this->workSpace.size(),
+				this->temporaryMemoryManager.GetBufer(this->GetGUID(), WORKSPACE_CODE),
+				this->temporaryMemoryManager.GetBufferSize(this->GetGUID(), WORKSPACE_CODE),
 				&beta,
 				this->outputTensorDesc,
 				thrust::raw_pointer_cast(&this->lpOutputBuffer[0]));
@@ -619,8 +622,8 @@ namespace NeuralNetwork {
 				this->m_lppDOutputBuffer_d,
 				this->convDesc,
 				this->useBackwardDataAlgorithm,
-				thrust::raw_pointer_cast(&this->workSpace[0]),
-				this->workSpace.size(),
+				this->temporaryMemoryManager.GetBufer(this->GetGUID(), WORKSPACE_CODE),
+				this->temporaryMemoryManager.GetBufferSize(this->GetGUID(), WORKSPACE_CODE),
 				&beta,
 				this->inputTensorDesc,
 				this->m_lpDInputBuffer_d);
@@ -659,8 +662,8 @@ namespace NeuralNetwork {
 				this->m_lppDOutputBuffer_d,
 				this->convDesc,
 				this->useBackwardFilterAlgorithm,
-				thrust::raw_pointer_cast(&this->workSpace[0]),
-				this->workSpace.size(),
+				this->temporaryMemoryManager.GetBufer(this->GetGUID(), WORKSPACE_CODE),
+				this->temporaryMemoryManager.GetBufferSize(this->GetGUID(), WORKSPACE_CODE),
 				&beta,
 				this->filterDesc,
 				thrust::raw_pointer_cast(&this->lpDNeuron[0]));
