@@ -20,7 +20,7 @@ namespace NeuralNetwork {
 
 	typedef float NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class FullyConnect_Base : public CNNSingle2SingleLayerBase<>
+	class FullyConnect_Base : public CNNSingle2SingleLayerBase<FullyConnect::RuntimeParameterStructure>
 	{
 	public:
 		/** コンストラクタ */

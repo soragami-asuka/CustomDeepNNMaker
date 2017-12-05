@@ -107,6 +107,10 @@ public:
 		@return ¬Œ÷‚µ‚½ê‡0 */
 	ErrorCode GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const;
 
+private:
+	/** ‰‰Zˆ—‚ğÀs‚·‚é. */
+	ErrorCode Calculate();
+
 public:
 	//================================
 	// ŠwKˆ—

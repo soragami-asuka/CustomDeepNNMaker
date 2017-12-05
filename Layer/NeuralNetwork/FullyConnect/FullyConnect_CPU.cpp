@@ -156,29 +156,69 @@ namespace NeuralNetwork {
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			this->m_lppInputBuffer[batchNum] = &i_lpInputBuffer[batchNum * this->inputBufferCount];
 
-		for(unsigned int batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
+		if(this->GetProcessType() == ProcessType::PROCESSTYPE_LEARN && this->GetRuntimeParameterByStructure().UpdateWeigthWithOutputVariance)
 		{
-			for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
+			U32 PROCTIME_MAX = 5;			// 実行最大値
+			F32	VARIANCE_TOLERANCE = 0.1f;	// 分散交差(許容範囲)
+
+			U32 procTime = 0;
+			do
 			{
-				float tmp = 0;
+				// 演算を実行
+				ErrorCode err = this->Calculate();
+				if(err != ErrorCode::ERROR_CODE_NONE)
+					return err;
 
-				// ニューロンの値を加算
-				for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
+				// 出力の分散を求める
+				F32 variance = 0.0f;
+				F32 average  = 0.0f;
 				{
-					tmp += this->m_lppInputBuffer[batchNum][inputNum] * this->layerData.lppNeuron[neuronNum][inputNum];
+					// 平均を求める
+					for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
+					{
+						for(U32 outputNum=0; outputNum<this->outputBufferCount; outputNum++)
+						{
+							average += this->lppBatchOutputBuffer[batchNum][outputNum];
+						}
+					}
+					average /= (this->outputBufferCount * this->GetBatchSize());
+
+					// 分散を求める
+					for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
+					{
+						for(U32 outputNum=0; outputNum<this->outputBufferCount; outputNum++)
+						{
+							variance += (this->lppBatchOutputBuffer[batchNum][outputNum] - average) * (this->lppBatchOutputBuffer[batchNum][outputNum] - average);
+						}
+					}
+					variance /= (this->outputBufferCount * this->GetBatchSize());
 				}
-				tmp += this->layerData.lpBias[neuronNum];
 
-				// 活性化
-				this->lppBatchOutputBuffer[batchNum][neuronNum] = tmp;
+				if( abs(variance - 1.0f) < VARIANCE_TOLERANCE)
+					break;
 
-#ifdef _DEBUG
-				if(isnan(this->lppBatchOutputBuffer[batchNum][neuronNum]))
-					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
-#endif
-			}
+				// 標準偏差で重みを割って更新する
+				F32 deviation = sqrtf(variance);
+				{
+					for(U32 neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
+					{
+						for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
+						{
+							this->layerData.lppNeuron[neuronNum][inputNum] /= deviation;
+						}
+						this->layerData.lpBias[neuronNum] /= deviation;
+					}
+				}
+
+				procTime++;
+			}while(procTime < 5);
 		}
-
+		else
+		{
+			ErrorCode err = this->Calculate();
+			if(err != ErrorCode::ERROR_CODE_NONE)
+				return err;
+		}
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -207,6 +247,34 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
+	/** 演算処理を実行する. */
+	ErrorCode FullyConnect_CPU::Calculate()
+	{
+		for(unsigned int batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
+		{
+			for(unsigned int neuronNum=0; neuronNum<this->neuronCount; neuronNum++)
+			{
+				float tmp = 0;
+
+				// ニューロンの値を加算
+				for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
+				{
+					tmp += this->m_lppInputBuffer[batchNum][inputNum] * this->layerData.lppNeuron[neuronNum][inputNum];
+				}
+				tmp += this->layerData.lpBias[neuronNum];
+
+				// 活性化
+				this->lppBatchOutputBuffer[batchNum][neuronNum] = tmp;
+
+#ifdef _DEBUG
+				if(isnan(this->lppBatchOutputBuffer[batchNum][neuronNum]))
+					return ErrorCode::ERROR_CODE_COMMON_CALCULATE_NAN;
+#endif
+			}
+		}
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
 
 	//================================
 	// 学習処理

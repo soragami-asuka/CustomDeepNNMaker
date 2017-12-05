@@ -72,6 +72,13 @@ namespace DefaultLanguage
     /** ItemData Runtiime Parameter <id, StringData> */
     static const std::map<std::wstring, StringData> g_lpItemData_Runtime = 
     {
+        {
+            L"UpdateWeigthWithOutputVariance",
+            {
+                L"出力の分散を用いて重みを更新するフラグ",
+                L"出力の分散を用いて重みを更新するフラグ.trueにした場合Calculate時に出力の分散が1になるまで重みを更新する.",
+            }
+        },
     };
 
 
@@ -222,6 +229,17 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameter(void
 
 
 	// Create Item
+	/** Name : 出力の分散を用いて重みを更新するフラグ
+	  * ID   : UpdateWeigthWithOutputVariance
+	  * Text : 出力の分散を用いて重みを更新するフラグ.trueにした場合Calculate時に出力の分散が1になるまで重みを更新する.
+	  */
+	pLayerConfig->AddItem(
+		Gravisbell::SettingData::Standard::CreateItem_Bool(
+			L"UpdateWeigthWithOutputVariance",
+			CurrentLanguage::g_lpItemData_Learn[L"UpdateWeigthWithOutputVariance"].name.c_str(),
+			CurrentLanguage::g_lpItemData_Learn[L"UpdateWeigthWithOutputVariance"].text.c_str(),
+			false));
+
 	return pLayerConfig;
 }
 

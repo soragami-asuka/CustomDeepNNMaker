@@ -4,7 +4,8 @@
  * guid      : F6D9C5DA-D583-455B-9254-5AEF3CA9021B
  * 
  * Text      : X座標0を中心に入力信号を平方化する.
- *           : X×Y+1の入力信号を必要とする
+ *           : (X-1)*(Y-1)+1以上の入力信号を必要とする
+ *           : 例)(8,6)の場合、入力信号数のXは(7*5)+1=36
  *           : X=0 or Y=0を元データのX=0とする
 --------------------------------------------*/
 #ifndef __GRAVISBELL_NEURALNETWORK_LAYER_DATA_Reshape_SquaresZeroSideLeftTop_H__
