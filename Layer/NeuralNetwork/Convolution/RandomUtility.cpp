@@ -85,3 +85,14 @@ double Random::GetValue(double min, double max)
 
 	return dist(random.gen);
 }
+
+/** ¢‹I—”‚ğæ“¾‚·‚é */
+double Random::GetNormalValue(double average, double variance)
+{
+	double alpha = GetValue();
+	double beta  = GetValue();
+
+	double randomValue = sqrt(-2.0 * log(alpha)) * sin(2.0 * 3.1415 * beta);
+
+	return randomValue * variance + average;
+}

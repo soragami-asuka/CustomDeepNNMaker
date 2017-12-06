@@ -75,9 +75,15 @@ namespace NeuralNetwork {
 
 		float maxArea = sqrt(6.0f / (inputBufferCount + neuronCount));
 		for(U32 i=0; i<lpTmpNeuron.size(); i++)
-			lpTmpNeuron[i] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
+		{
+//			lpTmpNeuron[i] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
+			lpTmpNeuron[i] = (F32)Utility::Random::GetNormalValue(0.0, maxArea);
+		}
 		for(U32 i=0; i<lpTmpBias.size(); i++)
-			lpTmpBias[i] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
+		{
+//			lpTmpBias[i] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
+			lpTmpBias[i] = (F32)Utility::Random::GetNormalValue(0.0, maxArea);
+		}
 
 		this->lppNeuron_d = lpTmpNeuron;
 		this->lpBias_d = lpTmpBias;

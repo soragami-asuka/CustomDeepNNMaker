@@ -56,5 +56,9 @@ namespace Utility
 
 		/** min ` max‚Ì”ÍˆÍ‚Å’l‚ğæ“¾‚·‚é */
 		static double GetValue(double min, double max);
+
+	public:
+		/** ¢‹I—”‚ğæ“¾‚·‚é */
+		static double GetNormalValue(double average, double variance);
 	};
 }

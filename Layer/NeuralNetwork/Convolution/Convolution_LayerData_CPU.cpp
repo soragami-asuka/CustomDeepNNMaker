@@ -65,13 +65,15 @@ namespace NeuralNetwork {
 			lppNeuron[neuronNum] = &this->lpNeuron[inputBufferCount * neuronNum];
 			for(unsigned int inputNum=0; inputNum<inputBufferCount; inputNum++)
 			{
-				lppNeuron[neuronNum][inputNum] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
+//				this->lppNeuron[neuronNum][inputNum] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
+				this->lppNeuron[neuronNum][inputNum] = (F32)Utility::Random::GetNormalValue(0.0, maxArea);
 			}
 		}
 		// バイアス
 		for(unsigned int neuronNum=0; neuronNum<lppNeuron.size(); neuronNum++)
 		{
-			this->lpBias[neuronNum] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
+//			this->lpBias[neuronNum] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
+			this->lpBias[neuronNum] = (F32)Utility::Random::GetNormalValue(0.0, maxArea);
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
