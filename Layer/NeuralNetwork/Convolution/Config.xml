@@ -121,8 +121,13 @@
   </Structure>
 
   <!--学習に使用するデータの構造-->
-  <Learn>
+  <RuntimeParameter>
+    <Bool id="UpdateWeigthWithOutputVariance">
+      <Name>出力の分散を用いて重みを更新するフラグ</Name>
+      <Text>出力の分散を用いて重みを更新するフラグ.trueにした場合Calculate時に出力の分散が1になるまで重みを更新する.</Text>
+      <Default>false</Default>
+    </Bool>
 
-  </Learn>
+  </RuntimeParameter>
 
 </Config>

@@ -519,10 +519,90 @@ namespace NeuralNetwork {
 		@return 成功した場合0が返る */
 	ErrorCode Convolution_GPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
 	{
-		cudnnStatus_t err_cudnn;
-
 		// 入力バッファを保存
 		this->m_lppInputBuffer_d = i_lpInputBuffer;
+
+
+		if(this->GetProcessType() == ProcessType::PROCESSTYPE_LEARN && this->GetRuntimeParameterByStructure().UpdateWeigthWithOutputVariance)
+		{
+			// ※とりあえずCPU側で処理.
+			// 基本的に1回しか通らないから処理負荷に影響は与えない・・・はず
+			// 超手抜き
+
+
+			U32 PROCTIME_MAX = 5;			// 実行最大値
+			F32	VARIANCE_TOLERANCE = 0.1f;	// 分散交差(許容範囲)
+
+			std::vector<F32> lpTmpOutputBuffer(this->GetBatchSize() * this->outputBufferCount);
+
+			U32 procTime = 0;
+			do
+			{
+				// 演算を実行
+				ErrorCode err = this->Calculate();
+				if(err != ErrorCode::ERROR_CODE_NONE)
+					return err;
+
+				// バッファをコピー
+				cudaMemcpy(&lpTmpOutputBuffer[0], thrust::raw_pointer_cast(&this->lpOutputBuffer[0]), sizeof(F32)*lpTmpOutputBuffer.size(), cudaMemcpyDeviceToHost);
+
+				// 出力の分散を求める
+				F32 variance = 0.0f;
+				F32 average  = 0.0f;
+				{
+					// 平均を求める
+					for(U32 outputNum=0; outputNum<lpTmpOutputBuffer.size(); outputNum++)
+					{
+						average += lpTmpOutputBuffer[outputNum];
+					}
+					average /= lpTmpOutputBuffer.size();
+
+					// 分散を求める
+					for(U32 outputNum=0; outputNum<lpTmpOutputBuffer.size(); outputNum++)
+					{
+						variance += (lpTmpOutputBuffer[outputNum] - average) * (lpTmpOutputBuffer[outputNum] - average);
+					}
+					variance /= lpTmpOutputBuffer.size();
+				}
+
+				if( abs(variance - 1.0f) < VARIANCE_TOLERANCE)
+					break;
+
+				// 標準偏差で重みを割って更新する
+				F32 deviation = sqrtf(variance);
+				{
+					thrust::host_vector<F32> lpTmpNeuron = this->layerData.lppNeuron_d;
+					thrust::host_vector<F32> lpTmpBias   = this->layerData.lpBias_d;
+
+					for(U32 neuronNum=0; neuronNum<lpTmpNeuron.size(); neuronNum++)
+					{
+						lpTmpNeuron[neuronNum] /= deviation;
+					}
+					for(U32 neuronNum=0; neuronNum<lpTmpBias.size(); neuronNum++)
+					{
+						lpTmpBias[neuronNum] /= deviation;
+					}
+
+					this->layerData.lppNeuron_d = lpTmpNeuron;
+					this->layerData.lpBias_d    = lpTmpBias;
+				}
+
+				procTime++;
+			}while(procTime < 5);
+		}
+		else
+		{
+			ErrorCode err = this->Calculate();
+			if(err != ErrorCode::ERROR_CODE_NONE)
+				return err;
+		}
+
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+	ErrorCode Convolution_GPU::Calculate()
+	{
+		cudnnStatus_t err_cudnn;
 
 		// 畳み込み処理
 		{
@@ -532,7 +612,7 @@ namespace NeuralNetwork {
 				this->cudnnHandle,
 				&alpha,
 				this->inputTensorDesc,
-				i_lpInputBuffer,
+				this->m_lppInputBuffer_d,
 				this->filterDesc,
 				thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]),
 				this->convDesc,

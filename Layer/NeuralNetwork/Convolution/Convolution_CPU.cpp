@@ -165,7 +165,76 @@ namespace NeuralNetwork {
 		// 入力バッファのアドレスを配列に格納
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			this->m_lppInputBuffer[batchNum] = &i_lpInputBuffer[batchNum * this->inputBufferCount];
-		
+
+		if(this->GetProcessType() == ProcessType::PROCESSTYPE_LEARN && this->GetRuntimeParameterByStructure().UpdateWeigthWithOutputVariance)
+		{
+			U32 PROCTIME_MAX = 5;			// 実行最大値
+			F32	VARIANCE_TOLERANCE = 0.1f;	// 分散交差(許容範囲)
+
+			U32 procTime = 0;
+			do
+			{
+				// 演算を実行
+				ErrorCode err = this->Calculate();
+				if(err != ErrorCode::ERROR_CODE_NONE)
+					return err;
+
+				// 出力の分散を求める
+				F32 variance = 0.0f;
+				F32 average  = 0.0f;
+				{
+					// 平均を求める
+					for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
+					{
+						for(U32 outputNum=0; outputNum<this->outputBufferCount; outputNum++)
+						{
+							average += this->lppBatchOutputBuffer[batchNum][outputNum];
+						}
+					}
+					average /= (this->outputBufferCount * this->GetBatchSize());
+
+					// 分散を求める
+					for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
+					{
+						for(U32 outputNum=0; outputNum<this->outputBufferCount; outputNum++)
+						{
+							variance += (this->lppBatchOutputBuffer[batchNum][outputNum] - average) * (this->lppBatchOutputBuffer[batchNum][outputNum] - average);
+						}
+					}
+					variance /= (this->outputBufferCount * this->GetBatchSize());
+				}
+
+				if( abs(variance - 1.0f) < VARIANCE_TOLERANCE)
+					break;
+
+				// 標準偏差で重みを割って更新する
+				F32 deviation = sqrtf(variance);
+				{
+					for(U32 neuronNum=0; neuronNum<this->layerData.lpNeuron.size(); neuronNum++)
+					{
+						this->layerData.lpNeuron[neuronNum] /= deviation;
+					}
+					for(U32 neuronNum=0; neuronNum<this->layerData.lpBias.size(); neuronNum++)
+					{
+						this->layerData.lpBias[neuronNum] /= deviation;
+					}
+				}
+
+				procTime++;
+			}while(procTime < PROCTIME_MAX);
+		}
+		else
+		{
+			ErrorCode err = this->Calculate();
+			if(err != ErrorCode::ERROR_CODE_NONE)
+				return err;
+		}
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+
+	ErrorCode Convolution_CPU::Calculate()
+	{
 		// 畳みこみ結合処理
 		for(unsigned int batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
@@ -222,7 +291,6 @@ namespace NeuralNetwork {
 				}
 			}
 		}
-
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

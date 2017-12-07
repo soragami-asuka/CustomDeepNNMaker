@@ -65,6 +65,17 @@ namespace Convolution {
 
 	};
 
+	/** Runtime Parameter structure */
+	struct RuntimeParameterStructure
+	{
+		/** Name : 出力の分散を用いて重みを更新するフラグ
+		  * ID   : UpdateWeigthWithOutputVariance
+		  * Text : 出力の分散を用いて重みを更新するフラグ.trueにした場合Calculate時に出力の分散が1になるまで重みを更新する.
+		  */
+		bool UpdateWeigthWithOutputVariance;
+
+	};
+
 } // Convolution
 } // NeuralNetwork
 } // Layer

@@ -22,7 +22,7 @@ namespace NeuralNetwork {
 
 	typedef float NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class Convolution_Base : public CNNSingle2SingleLayerBase<>
+	class Convolution_Base : public CNNSingle2SingleLayerBase<Convolution::RuntimeParameterStructure>
 	{
 	public:
 		/** コンストラクタ */

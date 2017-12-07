@@ -100,6 +100,7 @@ public:
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 		@return 成功した場合0が返る */
 	ErrorCode Calculate(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer);
+	ErrorCode Calculate();
 
 	/** 出力データバッファを取得する.
 		配列の要素数はGetOutputBufferCountの戻り値.
