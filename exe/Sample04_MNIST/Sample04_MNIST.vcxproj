@@ -399,6 +399,9 @@
     <ProjectReference Include="..\..\Library\DataFormat\Binary\Binary.vcxproj">
       <Project>{b3700b28-5d2c-4b7b-9857-09682f048974}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\Library\NeuralNetwork\Initializer\Initializer.vcxproj">
+      <Project>{77c0f1be-8e5e-4f63-b575-78a2358b0a42}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\Library\NeuralNetwork\LayerDataManager\LayerDataManager.vcxproj">
       <Project>{0d56f731-5409-4b4c-8a69-d74e3ac68cda}</Project>
     </ProjectReference>

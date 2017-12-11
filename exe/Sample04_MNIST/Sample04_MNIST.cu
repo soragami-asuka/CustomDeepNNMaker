@@ -23,6 +23,8 @@
 #include"Utility/NeuralNetworkLayer.h"
 #include"Utility/NeuralNetworkMaker.h"
 
+#include"Library/NeuralNetwork/Initializer.h"
+
 using namespace Gravisbell;
 
 #define USE_GPU	1
@@ -134,6 +136,10 @@ int _tmain(int argc, _TCHAR* argv[])
 		return -1;
 	}
 
+	// 乱数を固定
+#ifdef _DEBUG
+	Gravisbell::Layer::NeuralNetwork::GetInitializerManager().InitializeRandomParameter(0);
+#endif
 
 	// ニューラルネットワーク作成
 	Gravisbell::Layer::Connect::ILayerConnectData* pNeuralNetworkData = CreateNeuralNetwork_ver03(*pLayerDLLManager, *pLayerDataManager, pDataLayerTeach_Input->GetInputDataStruct(), pDataLayerTeach_Output->GetDataStruct());

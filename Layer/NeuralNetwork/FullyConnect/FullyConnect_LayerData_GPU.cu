@@ -8,8 +8,6 @@
 #include"FullyConnect_FUNC.hpp"
 #include"FullyConnect_GPU.cuh"
 
-#include"RandomUtility.h"
-
 #pragma warning(push)
 #pragma warning(disable : 4267)
 #include <cuda.h> // need CUDA_VERSION
@@ -50,11 +48,6 @@ namespace NeuralNetwork {
 		@return	成功した場合0 */
 	ErrorCode FullyConnect_LayerData_GPU::Initialize(void)
 	{
-		// 乱数固定化
-#ifdef _DEBUG
-		Utility::Random::Initialize(0);
-#endif
-
 		// 入力バッファ数を確認
 		unsigned int inputBufferCount = this->GetInputBufferCount();
 		if(inputBufferCount == 0)

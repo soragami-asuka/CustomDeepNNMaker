@@ -132,9 +132,6 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerData.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
-    <ClInclude Include="RandomUtility.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="FullyConnect_Base.h">
       <Filter>Layer</Filter>
     </ClInclude>
@@ -169,9 +166,6 @@
     </ClCompile>
     <ClCompile Include="FullyConnect_FUNC.cpp">
       <Filter>FromXML</Filter>
-    </ClCompile>
-    <ClCompile Include="RandomUtility.cpp">
-      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="FullyConnect_Base.cpp">
       <Filter>Layer</Filter>
