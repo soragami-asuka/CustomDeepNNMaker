@@ -87,6 +87,13 @@ namespace DefaultLanguage
                 L"パディングを行う際の方法設定",
             }
         },
+        {
+            L"Initializer",
+            {
+                L"初期化関数",
+                L"初期化関数の種類",
+            }
+        },
     };
 
 
@@ -281,6 +288,17 @@ pItemEnum->SetValue(pItemEnum->GetDefault());
 
 		pLayerConfig->AddItem(pItemEnum);
 	}
+
+	/** Name : 初期化関数
+	  * ID   : Initializer
+	  * Text : 初期化関数の種類
+	  */
+	pLayerConfig->AddItem(
+		Gravisbell::SettingData::Standard::CreateItem_String(
+			L"Initializer",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"Initializer"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"Initializer"].text.c_str(),
+			L"glorot_uniform"));
 
 	return pLayerConfig;
 }

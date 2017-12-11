@@ -1,0 +1,243 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{5bd9fe03-7625-4b0b-afef-65ffb365248c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Common">
+      <UniqueIdentifier>{1ba813e6-6467-4e3e-b032-680e911bc35f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\SettingData">
+      <UniqueIdentifier>{77ad0c99-95e8-491a-9526-e6a39fbd72e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\SettingData\Standard">
+      <UniqueIdentifier>{1332d953-2932-46c3-a978-8c49c4cdf510}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Layer">
+      <UniqueIdentifier>{cab2f0f9-645e-43dc-b0f1-fbb79413a6bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Layer\IOData">
+      <UniqueIdentifier>{81abcc10-9924-4edf-8960-6ec370f5b894}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Layer\NeuralNetwork">
+      <UniqueIdentifier>{b6303560-bc77-412e-bf16-e30580d21d03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Layer\IO">
+      <UniqueIdentifier>{cac536c5-dd96-4366-b009-114863a0f0c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Initializer">
+      <UniqueIdentifier>{cf708eec-9c1a-48f9-aaa6-70f8f562bc40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Initializer\zero">
+      <UniqueIdentifier>{a5f77241-ea61-4b04-8327-71d28f4562c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Initializer\base">
+      <UniqueIdentifier>{a285c531-4e95-4b4e-a877-826f82e7f23e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Initializer\one">
+      <UniqueIdentifier>{a2da29ab-caa9-4bfd-b4e9-da48c617ce49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Initializer\uniform">
+      <UniqueIdentifier>{81b582af-8bb2-44b8-8eb8-84c5edcc685a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Initializer\normal">
+      <UniqueIdentifier>{5744c8d5-d6ba-43fd-8e78-f176cce31b0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Initializer\glorot_normal">
+      <UniqueIdentifier>{9ef27b01-9a01-4297-bdcf-043f69c1093b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Initializer\glorot_uniform">
+      <UniqueIdentifier>{4fd10938-eb07-4440-b170-40eda09de2cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Initializer\he_normal">
+      <UniqueIdentifier>{8aecf91d-8d47-421c-a908-eb49aef39958}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Initializer\he_uniform">
+      <UniqueIdentifier>{6bb7a088-16ce-4943-a512-5e05522f9a12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Initializer\lecun_uniform">
+      <UniqueIdentifier>{88f8bae2-b020-47ce-8746-fefa14e53568}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Common\Common.h">
+      <Filter>include\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Common\ErrorCode.h">
+      <Filter>include\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Common\Guiddef.h">
+      <Filter>include\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Common\IBatchDataNoListGenerator.h">
+      <Filter>include\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Common\IODataStruct.h">
+      <Filter>include\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Common\VersionCode.h">
+      <Filter>include\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h">
+      <Filter>include\SettingData\Standard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\ILayerBase.h">
+      <Filter>include\Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\ILayerData.h">
+      <Filter>include\Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IOData\IDataLayer.h">
+      <Filter>include\Layer\IOData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer.h">
+      <Filter>include\Layer\IOData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDataManager.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INeuralNetwork.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayer.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IO\IInputLayer.h">
+      <Filter>include\Layer\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IO\IMultInputLayer.h">
+      <Filter>include\Layer\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IO\IOutputLayer.h">
+      <Filter>include\Layer\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IO\ISingleInputLayer.h">
+      <Filter>include\Layer\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IO\ISingleOutputLayer.h">
+      <Filter>include\Layer\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Library\NeuralNetwork\Initializer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingle2SingleLayer.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\IInitializer.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNMult2SingleLayer.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingle2MultLayer.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="RandomUtility.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Initializer_zero.h">
+      <Filter>Initializer\zero</Filter>
+    </ClInclude>
+    <ClInclude Include="Initializer_base.h">
+      <Filter>Initializer\base</Filter>
+    </ClInclude>
+    <ClInclude Include="Initializer_one.h">
+      <Filter>Initializer\one</Filter>
+    </ClInclude>
+    <ClInclude Include="Initializer_uniform.h">
+      <Filter>Initializer\uniform</Filter>
+    </ClInclude>
+    <ClInclude Include="Initializer_normal.h">
+      <Filter>Initializer\normal</Filter>
+    </ClInclude>
+    <ClInclude Include="Initializer_glorot_normal.h">
+      <Filter>Initializer\glorot_normal</Filter>
+    </ClInclude>
+    <ClInclude Include="Initializer_glorot_uniform.h">
+      <Filter>Initializer\glorot_uniform</Filter>
+    </ClInclude>
+    <ClInclude Include="Initializer_he_normal.h">
+      <Filter>Initializer\he_normal</Filter>
+    </ClInclude>
+    <ClInclude Include="Initializer_he_uniform.h">
+      <Filter>Initializer\he_uniform</Filter>
+    </ClInclude>
+    <ClInclude Include="Initializer_lecun_uniform.h">
+      <Filter>Initializer\lecun_uniform</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Initializer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="RandomUtility.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Initializer_zero.cpp">
+      <Filter>Initializer\zero</Filter>
+    </ClCompile>
+    <ClCompile Include="Initializer_base.cpp">
+      <Filter>Initializer\base</Filter>
+    </ClCompile>
+    <ClCompile Include="Initializer_one.cpp">
+      <Filter>Initializer\one</Filter>
+    </ClCompile>
+    <ClCompile Include="Initializer_uniform.cpp">
+      <Filter>Initializer\uniform</Filter>
+    </ClCompile>
+    <ClCompile Include="Initializer_normal.cpp">
+      <Filter>Initializer\normal</Filter>
+    </ClCompile>
+    <ClCompile Include="Initializer_glorot_normal.cpp">
+      <Filter>Initializer\glorot_normal</Filter>
+    </ClCompile>
+    <ClCompile Include="Initializer_glorot_uniform.cpp">
+      <Filter>Initializer\glorot_uniform</Filter>
+    </ClCompile>
+    <ClCompile Include="Initializer_he_normal.cpp">
+      <Filter>Initializer\he_normal</Filter>
+    </ClCompile>
+    <ClCompile Include="Initializer_he_uniform.cpp">
+      <Filter>Initializer\he_uniform</Filter>
+    </ClCompile>
+    <ClCompile Include="Initializer_lecun_uniform.cpp">
+      <Filter>Initializer\lecun_uniform</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

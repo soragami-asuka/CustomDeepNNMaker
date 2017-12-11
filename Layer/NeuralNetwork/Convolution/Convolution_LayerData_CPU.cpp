@@ -9,6 +9,7 @@
 #include"Convolution_CPU.h"
 
 #include"Library/NeuralNetwork/Optimizer.h"
+#include"Library/NeuralNetwork/Initializer.h"
 
 #include"RandomUtility.h"
 
@@ -54,8 +55,10 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_VALUERANGE;
 
 		// バッファを確保しつつ、初期値を設定
-//		float maxArea = sqrt(6.0f / (this->GetInputBufferCount() + this->GetOutputBufferCount()));
-		float maxArea = sqrt(6.0f / (this->layerStructure.FilterSize.x*this->layerStructure.FilterSize.y*this->layerStructure.FilterSize.z  + this->layerStructure.Output_Channel));
+		auto& initializer = Gravisbell::Layer::NeuralNetwork::GetInitializerManager().GetInitializer(this->layerStructure.Initializer);
+		U32 inputCount  = this->layerStructure.FilterSize.x * this->layerStructure.FilterSize.y * this->layerStructure.FilterSize.z * this->layerStructure.Input_Channel;
+		U32 outputCount = this->layerStructure.Output_Channel;
+
 		this->lpNeuron.resize(neuronCount * inputBufferCount);
 		this->lppNeuron.resize(neuronCount);
 		this->lpBias.resize(neuronCount);
@@ -65,15 +68,13 @@ namespace NeuralNetwork {
 			lppNeuron[neuronNum] = &this->lpNeuron[inputBufferCount * neuronNum];
 			for(unsigned int inputNum=0; inputNum<inputBufferCount; inputNum++)
 			{
-//				this->lppNeuron[neuronNum][inputNum] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
-				this->lppNeuron[neuronNum][inputNum] = (F32)Utility::Random::GetNormalValue(0.0, maxArea);
+				this->lppNeuron[neuronNum][inputNum] = initializer.GetParameter(inputCount, outputCount);
 			}
 		}
 		// バイアス
 		for(unsigned int neuronNum=0; neuronNum<lppNeuron.size(); neuronNum++)
 		{
-//			this->lpBias[neuronNum] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
-			this->lpBias[neuronNum] = (F32)Utility::Random::GetNormalValue(0.0, maxArea);
+			this->lpBias[neuronNum] = initializer.GetParameter(inputCount, outputCount);
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;

@@ -21,6 +21,7 @@
 #pragma warning(pop)
 
 #include"Library/NeuralNetwork/Optimizer.h"
+#include"Library/NeuralNetwork/Initializer.h"
 
 
 namespace Gravisbell {
@@ -65,6 +66,10 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_VALUERANGE;
 
 		// バッファを確保しつつ、初期値を設定
+		auto& initializer = Gravisbell::Layer::NeuralNetwork::GetInitializerManager().GetInitializer(this->layerStructure.Initializer);
+		U32 inputCount  = inputBufferCount;
+		U32 outputCount = neuronCount;
+
 		this->lppNeuron_d.reserve(neuronCount * inputBufferCount);
 		this->lppNeuron_d.resize(neuronCount * inputBufferCount);
 		this->lpBias_d.reserve(neuronCount);
@@ -73,16 +78,13 @@ namespace NeuralNetwork {
 		thrust::host_vector<F32> lpTmpNeuron(neuronCount * inputBufferCount);
 		thrust::host_vector<F32> lpTmpBias(neuronCount);
 
-		float maxArea = sqrt(6.0f / (inputBufferCount + neuronCount));
 		for(U32 i=0; i<lpTmpNeuron.size(); i++)
 		{
-//			lpTmpNeuron[i] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
-			lpTmpNeuron[i] = (F32)Utility::Random::GetNormalValue(0.0, maxArea);
+			lpTmpNeuron[i] = initializer.GetParameter(inputCount, outputCount);
 		}
 		for(U32 i=0; i<lpTmpBias.size(); i++)
 		{
-//			lpTmpBias[i] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
-			lpTmpBias[i] = (F32)Utility::Random::GetNormalValue(0.0, maxArea);
+			lpTmpBias[i] = initializer.GetParameter(inputCount, outputCount);
 		}
 
 		this->lppNeuron_d = lpTmpNeuron;

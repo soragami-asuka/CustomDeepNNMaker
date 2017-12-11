@@ -9,6 +9,7 @@
 #include"Convolution_GPU.cuh"
 
 #include"Library/NeuralNetwork/Optimizer.h"
+#include"Library/NeuralNetwork/Initializer.h"
 
 #include"RandomUtility.h"
 
@@ -54,24 +55,23 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_VALUERANGE;
 
 		// バッファを確保しつつ、初期値を設定
+		auto& initializer = Gravisbell::Layer::NeuralNetwork::GetInitializerManager().GetInitializer(this->layerStructure.Initializer);
+		U32 inputCount  = this->layerStructure.FilterSize.x * this->layerStructure.FilterSize.y * this->layerStructure.FilterSize.z * this->layerStructure.Input_Channel;
+		U32 outputCount = this->layerStructure.Output_Channel;
+
 		this->lppNeuron_d.resize(neuronCount * inputBufferCount);
 		this->lpBias_d.resize(neuronCount);
 		
 		thrust::host_vector<F32> lpTmpNeuron(this->lppNeuron_d.size());
 		thrust::host_vector<F32> lpTmpBias(this->lpBias_d.size());
 
-//		float maxArea = sqrt(6.0f / (this->GetInputBufferCount() + this->GetOutputBufferCount()));
-//		float maxArea = sqrt(6.0f / (this->layerStructure.FilterSize.x*this->layerStructure.FilterSize.y*this->layerStructure.FilterSize.z  + this->layerStructure.Output_Channel));
-		float maxArea = sqrt(6.0f / (this->layerStructure.FilterSize.x*this->layerStructure.FilterSize.y*this->layerStructure.FilterSize.z*this->layerStructure.Input_Channel + this->layerStructure.Output_Channel));
 		for(U32 i=0; i<lpTmpNeuron.size(); i++)
 		{
-//			lpTmpNeuron[i] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
-			lpTmpNeuron[i] = (F32)Utility::Random::GetNormalValue(0.0, maxArea);
+			lpTmpNeuron[i] = initializer.GetParameter(inputCount, outputCount);
 		}
 		for(U32 i=0; i<lpTmpBias.size(); i++)
 		{
-//			lpTmpBias[i] = ((F32)Utility::Random::GetValue() - 0.5f) * 2.0f * maxArea;
-			lpTmpBias[i] = (F32)Utility::Random::GetNormalValue(0.0, maxArea);
+			lpTmpBias[i] = initializer.GetParameter(inputCount, outputCount);
 		}
 
 		this->lppNeuron_d = lpTmpNeuron;

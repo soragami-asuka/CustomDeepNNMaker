@@ -500,6 +500,9 @@
     <None Include="Convolution_LayerData_GPU.cuh" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Library\NeuralNetwork\Initializer\Initializer.vcxproj">
+      <Project>{77c0f1be-8e5e-4f63-b575-78a2358b0a42}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Library\NeuralNetwork\Optimizer\Optimizer.vcxproj">
       <Project>{6863b36d-d1c4-4f1e-ab3a-0eba732fec1d}</Project>
     </ProjectReference>

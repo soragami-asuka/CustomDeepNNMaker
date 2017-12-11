@@ -55,7 +55,8 @@ namespace NeuralNetworkLayer {
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 	Layer::ILayerData* CreateConvolutionLayer(
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		U32 inputChannelCount, Vector3D<S32> filterSize, U32 outputChannelCount, Vector3D<S32> stride, Vector3D<S32> paddingSize);
+		U32 inputChannelCount, Vector3D<S32> filterSize, U32 outputChannelCount, Vector3D<S32> stride, Vector3D<S32> paddingSize,
+		const wchar_t i_szInitializerID[] = L"glorot_uniform");
 
 	/** 全結合ニューラルネットワークレイヤー.
 		@param	layerDLLManager		レイヤーDLL管理クラス.
@@ -64,7 +65,8 @@ namespace NeuralNetworkLayer {
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 	Layer::ILayerData* CreateFullyConnectLayer(
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-		U32 inputBufferCount, U32 neuronCount);
+		U32 inputBufferCount, U32 neuronCount,
+		const wchar_t i_szInitializerID[] = L"glorot_uniform");
 
 	/** 活性化レイヤー.
 		@param	layerDLLManager		レイヤーDLL管理クラス.

@@ -66,14 +66,14 @@ namespace NeuralNetworkLayer {
 			@param	i_outputChannelCount	フィルタの個数.
 			@param	i_stride				フィルタの移動量.
 			@param	i_paddingSize			パディングサイズ. */
-		Gravisbell::GUID AddConvolutionLayer(const Gravisbell::GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize)
+		Gravisbell::GUID AddConvolutionLayer(const Gravisbell::GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize, const wchar_t i_szInitializerID[] = L"glorot_uniform")
 		{
 			Gravisbell::GUID layerGUID = i_inputLayerGUID;
 
 			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
 				*this->pLayerConnectData,
 				layerGUID,
-				CreateConvolutionLayer(layerDLLManager, layerDataManager, this->GetOutputDataStruct(i_inputLayerGUID).ch, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize));
+				CreateConvolutionLayer(layerDLLManager, layerDataManager, this->GetOutputDataStruct(i_inputLayerGUID).ch, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize, i_szInitializerID));
 			if(err != ErrorCode::ERROR_CODE_NONE)
 				return Gravisbell::GUID();
 
@@ -83,14 +83,14 @@ namespace NeuralNetworkLayer {
 		/** 全結合ニューラルネットワークレイヤー.
 			@param	i_inputLayerGUID		追加レイヤーの入力先レイヤーのGUID.
 			@param	i_neuronCount			ニューロン数. */
-		Gravisbell::GUID AddFullyConnectLayer(const Gravisbell::GUID& i_inputLayerGUID, U32 i_neuronCount)
+		Gravisbell::GUID AddFullyConnectLayer(const Gravisbell::GUID& i_inputLayerGUID, U32 i_neuronCount, const wchar_t i_szInitializerID[] = L"glorot_uniform")
 		{
 			Gravisbell::GUID layerGUID = i_inputLayerGUID;
 
 			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
 				*this->pLayerConnectData,
 				layerGUID,
-				CreateFullyConnectLayer(layerDLLManager, layerDataManager, this->GetOutputDataStruct(i_inputLayerGUID).GetDataCount(), i_neuronCount) );
+				CreateFullyConnectLayer(layerDLLManager, layerDataManager, this->GetOutputDataStruct(i_inputLayerGUID).GetDataCount(), i_neuronCount, i_szInitializerID) );
 			if(err != ErrorCode::ERROR_CODE_NONE)
 				return Gravisbell::GUID();
 
@@ -389,12 +389,12 @@ namespace NeuralNetworkLayer {
 		// 特殊レイヤー
 		//==================================
 		/** ニューラルネットワークにConvolution, Activationを行うレイヤーを追加する. */
-		Gravisbell::GUID AddNeuralNetworkLayer_CA(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize, const wchar_t i_activationType[])
+		Gravisbell::GUID AddNeuralNetworkLayer_CA(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize, const wchar_t i_activationType[], const wchar_t i_szInitializerID[] = L"glorot_uniform")
 		{
 			GUID layerGUID = i_inputLayerGUID;
 
 			// 畳み込み
-			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize);
+			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize, i_szInitializerID);
 
 			// 活性化
 			layerGUID = this->AddActivationLayer(layerGUID, i_activationType);
@@ -403,12 +403,12 @@ namespace NeuralNetworkLayer {
 		}
 
 		/** ニューラルネットワークにConvolution, BatchNormalization, Activationを行うレイヤーを追加する. */
-		Gravisbell::GUID AddNeuralNetworkLayer_CBA(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize, const wchar_t i_activationType[])
+		Gravisbell::GUID AddNeuralNetworkLayer_CBA(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize, const wchar_t i_activationType[], const wchar_t i_szInitializerID[] = L"glorot_uniform")
 		{
 			GUID layerGUID = i_inputLayerGUID;
 
 			// 畳み込み
-			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize);
+			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize, i_szInitializerID);
 
 			// バッチ正規化
 			layerGUID = this->AddBatchNormalizationLayer(layerGUID);
@@ -420,12 +420,12 @@ namespace NeuralNetworkLayer {
 		}
 
 		/** ニューラルネットワークにConvolution, BatchNormalization, Noise, Activationを行うレイヤーを追加する. */
-		Gravisbell::GUID AddNeuralNetworkLayer_CBNA(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize, const wchar_t i_activationType[], Gravisbell::F32 i_noiseVariance)
+		Gravisbell::GUID AddNeuralNetworkLayer_CBNA(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize, const wchar_t i_activationType[], Gravisbell::F32 i_noiseVariance, const wchar_t i_szInitializerID[] = L"glorot_uniform")
 		{
 			GUID layerGUID = i_inputLayerGUID;
 
 			// 畳み込み
-			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize);
+			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize, i_szInitializerID);
 
 			// バッチ正規化
 			layerGUID = this->AddBatchNormalizationLayer(layerGUID);
@@ -441,7 +441,7 @@ namespace NeuralNetworkLayer {
 		}
 
 		/** ニューラルネットワークにBatchNormalization, Activation, Convolutionを行うレイヤーを追加する. */
-		Gravisbell::GUID AddNeuralNetworkLayer_BAC(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize, const wchar_t i_activationType[])
+		Gravisbell::GUID AddNeuralNetworkLayer_BAC(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize, const wchar_t i_activationType[], const wchar_t i_szInitializerID[] = L"glorot_uniform")
 		{
 			GUID layerGUID = i_inputLayerGUID;
 
@@ -452,13 +452,13 @@ namespace NeuralNetworkLayer {
 			layerGUID = this->AddActivationLayer(layerGUID, i_activationType);
 
 			// 畳み込み
-			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize);
+			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize, i_szInitializerID);
 
 			return layerGUID;
 		}
 
 		/** ニューラルネットワークにBatchNormalization, Activation. Fully-Connectを行うレイヤーを追加する. */
-		Gravisbell::GUID AddNeuralNetworkLayer_BAF(const GUID& i_inputLayerGUID, U32 i_outputChannelCount, const wchar_t i_activationType[])
+		Gravisbell::GUID AddNeuralNetworkLayer_BAF(const GUID& i_inputLayerGUID, U32 i_outputChannelCount, const wchar_t i_activationType[], const wchar_t i_szInitializerID[] = L"glorot_uniform")
 		{
 			GUID layerGUID = i_inputLayerGUID;
 
@@ -469,24 +469,24 @@ namespace NeuralNetworkLayer {
 			layerGUID = this->AddActivationLayer(layerGUID, i_activationType);
 
 			// 全結合
-			layerGUID = this->AddFullyConnectLayer(layerGUID, i_outputChannelCount);
+			layerGUID = this->AddFullyConnectLayer(layerGUID, i_outputChannelCount, i_szInitializerID);
 
 			return layerGUID;
 		}
 
 		/** ニューラルネットワークにFully-Connect, Activationを行うレイヤーを追加する. */
-		Gravisbell::GUID AddNeuralNetworkLayer_FA(const GUID& i_inputLayerGUID, U32 i_outputChannelCount, const wchar_t i_activationType[])
+		Gravisbell::GUID AddNeuralNetworkLayer_FA(const GUID& i_inputLayerGUID, U32 i_outputChannelCount, const wchar_t i_activationType[], const wchar_t i_szInitializerID[] = L"glorot_uniform")
 		{
-			return AddNeuralNetworkLayer_FAD(i_inputLayerGUID, i_outputChannelCount, i_activationType, 0.0f);
+			return AddNeuralNetworkLayer_FAD(i_inputLayerGUID, i_outputChannelCount, i_activationType, 0.0f, i_szInitializerID);
 		}
 
 		/** ニューラルネットワークにFully-Connect, Activation, Dropoutを行うレイヤーを追加する. */
-		Gravisbell::GUID AddNeuralNetworkLayer_FAD(const GUID& i_inputLayerGUID, U32 i_outputChannelCount, const wchar_t i_activationType[], F32 i_dropOutRate)
+		Gravisbell::GUID AddNeuralNetworkLayer_FAD(const GUID& i_inputLayerGUID, U32 i_outputChannelCount, const wchar_t i_activationType[], F32 i_dropOutRate, const wchar_t i_szInitializerID[] = L"glorot_uniform")
 		{
 			GUID layerGUID = i_inputLayerGUID;
 
 			// 全結合
-			layerGUID = this->AddFullyConnectLayer(layerGUID, i_outputChannelCount);
+			layerGUID = this->AddFullyConnectLayer(layerGUID, i_outputChannelCount, i_szInitializerID);
 
 			// 活性化
 			layerGUID = this->AddActivationLayer(layerGUID, i_activationType);
@@ -499,7 +499,7 @@ namespace NeuralNetworkLayer {
 		}
 
 		/** ニューラルネットワークにBatchNormalization, Noise, Activation, Convolutionを行うレイヤーを追加する. */
-		Gravisbell::GUID AddNeuralNetworkLayer_BNAC(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize, const wchar_t i_activationType[], F32 i_noiseVariance)
+		Gravisbell::GUID AddNeuralNetworkLayer_BNAC(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize, const wchar_t i_activationType[], F32 i_noiseVariance, const wchar_t i_szInitializerID[] = L"glorot_uniform")
 		{
 			GUID layerGUID = i_inputLayerGUID;
 
@@ -514,13 +514,13 @@ namespace NeuralNetworkLayer {
 			layerGUID = this->AddActivationLayer(layerGUID, i_activationType);
 
 			// 畳み込み
-			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize);
+			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize, i_szInitializerID);
 
 			return layerGUID;
 		}
 
 		/** ニューラルネットワークにNoise, BatchNormalization, Activation, Convolutionを行うレイヤーを追加する. */
-		Gravisbell::GUID AddNeuralNetworkLayer_NBAC(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize, const wchar_t i_activationType[], F32 i_noiseVariance)
+		Gravisbell::GUID AddNeuralNetworkLayer_NBAC(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize, const wchar_t i_activationType[], F32 i_noiseVariance, const wchar_t i_szInitializerID[] = L"glorot_uniform")
 		{
 			GUID layerGUID = i_inputLayerGUID;
 
@@ -535,18 +535,18 @@ namespace NeuralNetworkLayer {
 			layerGUID = this->AddActivationLayer(layerGUID, i_activationType);
 
 			// 畳み込み
-			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize);
+			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize, i_szInitializerID);
 
 			return layerGUID;
 		}
 
 		/** ニューラルネットワークにConvolution, Activation, DropOutを行うレイヤーを追加する. */
-		Gravisbell::GUID AddNeuralNetworkLayer_CAD(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize, const wchar_t i_activationType[], Gravisbell::F32 i_dropOutRate)
+		Gravisbell::GUID AddNeuralNetworkLayer_CAD(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize, const wchar_t i_activationType[], Gravisbell::F32 i_dropOutRate, const wchar_t i_szInitializerID[] = L"glorot_uniform")
 		{
 			GUID layerGUID = i_inputLayerGUID;
 
 			// 畳み込み
-			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize);
+			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize, i_szInitializerID);
 
 			// 活性化
 			layerGUID = this->AddActivationLayer(layerGUID, i_activationType);
@@ -559,12 +559,12 @@ namespace NeuralNetworkLayer {
 		}
 
 		/** ニューラルネットワークにConvolution, BatchNormalization, Activation, DropOutを行うレイヤーを追加する. */
-		Gravisbell::GUID AddNeuralNetworkLayer_CBAD(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize, const wchar_t i_activationType[], Gravisbell::F32 i_dropOutRate)
+		Gravisbell::GUID AddNeuralNetworkLayer_CBAD(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize, const wchar_t i_activationType[], Gravisbell::F32 i_dropOutRate, const wchar_t i_szInitializerID[] = L"glorot_uniform")
 		{
 			GUID layerGUID = i_inputLayerGUID;
 
 			// 畳み込み
-			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize);
+			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize, i_szInitializerID);
 
 			// バッチ正規化
 			layerGUID = this->AddBatchNormalizationLayer(layerGUID);
@@ -580,7 +580,7 @@ namespace NeuralNetworkLayer {
 		}
 
 		/** ニューラルネットワークにResNetレイヤーを追加する.(ノイズ付き) */
-		Gravisbell::GUID AddNeuralNetworkLayer_ResNet(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, F32 i_dropOutRate, U32 i_layerCount, F32 i_noiseVariance)
+		Gravisbell::GUID AddNeuralNetworkLayer_ResNet(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, F32 i_dropOutRate, U32 i_layerCount, F32 i_noiseVariance, const wchar_t i_szInitializerID[] = L"glorot_uniform")
 		{
 			GUID bypassLayerGUID = i_inputLayerGUID;
 			GUID layerGUID = i_inputLayerGUID;
@@ -590,7 +590,7 @@ namespace NeuralNetworkLayer {
 			for(U32 layerNum=0; layerNum<i_layerCount-1; layerNum++)
 			{
 				// 2層目
-				layerGUID = this->AddNeuralNetworkLayer_BAC(layerGUID, i_filterSize, outputChannel, Vector3D<S32>(1,1,1), Vector3D<S32>(i_filterSize.x/2,i_filterSize.y/2,i_filterSize.z/2), L"ReLU");
+				layerGUID = this->AddNeuralNetworkLayer_BAC(layerGUID, i_filterSize, outputChannel, Vector3D<S32>(1,1,1), Vector3D<S32>(i_filterSize.x/2,i_filterSize.y/2,i_filterSize.z/2), L"ReLU", i_szInitializerID);
 			}
 
 			// バッチ正規化
@@ -608,7 +608,7 @@ namespace NeuralNetworkLayer {
 				layerGUID = this->AddDropoutLayer(layerGUID, i_dropOutRate);
 
 			// 畳み込み
-			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, outputChannel, Vector3D<S32>(1,1,1), Vector3D<S32>(i_filterSize.x/2,i_filterSize.y/2,i_filterSize.z/2) );
+			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, outputChannel, Vector3D<S32>(1,1,1), Vector3D<S32>(i_filterSize.x/2,i_filterSize.y/2,i_filterSize.z/2), i_szInitializerID );
 
 			// Residual
 			layerGUID = INeuralNetworkMaker::AddResidualLayer(layerGUID, bypassLayerGUID);
@@ -618,7 +618,7 @@ namespace NeuralNetworkLayer {
 		}
 
 		/** ニューラルネットワークにResNetレイヤーを追加する. */
-		Gravisbell::GUID AddNeuralNetworkLayer_ResNetResize(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, F32 i_dropOutRate, U32 i_front_layerCount, U32 i_back_layerCount, F32 i_noiseVariance)
+		Gravisbell::GUID AddNeuralNetworkLayer_ResNetResize(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, F32 i_dropOutRate, U32 i_front_layerCount, U32 i_back_layerCount, F32 i_noiseVariance, const wchar_t i_szInitializerID[] = L"glorot_uniform")
 		{
 			GUID bypassLayerGUID = i_inputLayerGUID;
 			GUID layerGUID = i_inputLayerGUID;
@@ -628,17 +628,17 @@ namespace NeuralNetworkLayer {
 			// 前半
 			for(S32 layerNum=0; layerNum<(S32)i_front_layerCount-1; layerNum++)
 			{
-				layerGUID = this->AddNeuralNetworkLayer_BAC(layerGUID, i_filterSize, inputChannelCount, Vector3D<S32>(1,1,1), Vector3D<S32>(i_filterSize.x/2,i_filterSize.y/2,i_filterSize.z/2), L"ReLU");
+				layerGUID = this->AddNeuralNetworkLayer_BAC(layerGUID, i_filterSize, inputChannelCount, Vector3D<S32>(1,1,1), Vector3D<S32>(i_filterSize.x/2,i_filterSize.y/2,i_filterSize.z/2), L"ReLU", i_szInitializerID);
 			}
 
 			// CH数を変更
-			layerGUID = this->AddNeuralNetworkLayer_BAC(layerGUID, i_filterSize, i_outputChannelCount, Vector3D<S32>(1,1,1), Vector3D<S32>(i_filterSize.x/2,i_filterSize.y/2,i_filterSize.z/2), L"ReLU");
+			layerGUID = this->AddNeuralNetworkLayer_BAC(layerGUID, i_filterSize, i_outputChannelCount, Vector3D<S32>(1,1,1), Vector3D<S32>(i_filterSize.x/2,i_filterSize.y/2,i_filterSize.z/2), L"ReLU", i_szInitializerID);
 
 			// 後半
 			for(S32 layerNum=0; layerNum<(S32)i_back_layerCount-1; layerNum++)
 			{
 				// 2層目
-				layerGUID = AddNeuralNetworkLayer_BAC(layerGUID, i_filterSize, i_outputChannelCount, Vector3D<S32>(1,1,1), Vector3D<S32>(i_filterSize.x/2,i_filterSize.y/2,i_filterSize.z/2), L"ReLU");
+				layerGUID = AddNeuralNetworkLayer_BAC(layerGUID, i_filterSize, i_outputChannelCount, Vector3D<S32>(1,1,1), Vector3D<S32>(i_filterSize.x/2,i_filterSize.y/2,i_filterSize.z/2), L"ReLU", i_szInitializerID);
 			}
 
 			// バッチ正規化
@@ -656,7 +656,7 @@ namespace NeuralNetworkLayer {
 				layerGUID = this->AddDropoutLayer(layerGUID, i_dropOutRate);
 
 			// 畳み込み
-			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, Vector3D<S32>(1,1,1), Vector3D<S32>(i_filterSize.x/2,i_filterSize.y/2,i_filterSize.z/2) );
+			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, Vector3D<S32>(1,1,1), Vector3D<S32>(i_filterSize.x/2,i_filterSize.y/2,i_filterSize.z/2), i_szInitializerID );
 
 			// Residual
 			layerGUID = INeuralNetworkMaker::AddResidualLayer(layerGUID, bypassLayerGUID);
@@ -666,9 +666,9 @@ namespace NeuralNetworkLayer {
 		}
 
 		/** ニューラルネットワークにResNetレイヤーを追加する. */
-		Gravisbell::GUID AddNeuralNetworkLayer_ResNetResize_single(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, F32 i_dropOutRate, U32 i_layerCount, F32 i_noiseVariance)
+		Gravisbell::GUID AddNeuralNetworkLayer_ResNetResize_single(const GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, F32 i_dropOutRate, U32 i_layerCount, F32 i_noiseVariance, const wchar_t i_szInitializerID[] = L"glorot_uniform")
 		{
-			return this->AddNeuralNetworkLayer_ResNetResize(i_inputLayerGUID, i_filterSize, i_outputChannelCount, i_dropOutRate, 1, max(0, (Gravisbell::S32)i_layerCount-1), i_noiseVariance);
+			return this->AddNeuralNetworkLayer_ResNetResize(i_inputLayerGUID, i_filterSize, i_outputChannelCount, i_dropOutRate, 1, max(0, (Gravisbell::S32)i_layerCount-1), i_noiseVariance, i_szInitializerID);
 		}
 	};
 

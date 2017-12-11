@@ -59,6 +59,13 @@ namespace DefaultLanguage
                 L"レイヤー内のニューロン数.\n出力バッファ数に直結する.",
             }
         },
+        {
+            L"Initializer",
+            {
+                L"初期化関数",
+                L"初期化関数の種類",
+            }
+        },
     };
 
 
@@ -182,6 +189,17 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			CurrentLanguage::g_lpItemData_LayerStructure[L"NeuronCount"].name.c_str(),
 			CurrentLanguage::g_lpItemData_LayerStructure[L"NeuronCount"].text.c_str(),
 			1, 65535, 200));
+
+	/** Name : 初期化関数
+	  * ID   : Initializer
+	  * Text : 初期化関数の種類
+	  */
+	pLayerConfig->AddItem(
+		Gravisbell::SettingData::Standard::CreateItem_String(
+			L"Initializer",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"Initializer"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"Initializer"].text.c_str(),
+			L"glorot_uniform"));
 
 	return pLayerConfig;
 }

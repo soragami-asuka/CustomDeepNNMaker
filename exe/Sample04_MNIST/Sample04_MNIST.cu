@@ -1057,7 +1057,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver03(const Layer::Neural
 		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID();
 
 		// 1‘w–Ú
-		lastLayerGUID = pNetworkMaker->AddConvolutionLayer(lastLayerGUID, Vector3D<S32>(5,5,1), 4, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0));
+		lastLayerGUID = pNetworkMaker->AddConvolutionLayer(lastLayerGUID, Vector3D<S32>(5,5,1), 4, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0), L"he_normal");
 		lastLayerGUID = pNetworkMaker->AddPoolingLayer(lastLayerGUID, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1));
 		lastLayerGUID = pNetworkMaker->AddActivationLayer(lastLayerGUID, L"ReLU");
 
@@ -1065,7 +1065,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver03(const Layer::Neural
 		lastLayerGUID = pNetworkMaker->AddNormalizationScaleLayer(lastLayerGUID);
 
 		// 2‘w–Ú
-		lastLayerGUID = pNetworkMaker->AddConvolutionLayer(lastLayerGUID, Vector3D<S32>(5,5,1), 16, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0));
+		lastLayerGUID = pNetworkMaker->AddConvolutionLayer(lastLayerGUID, Vector3D<S32>(5,5,1), 16, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0), L"he_normal");
 		lastLayerGUID = pNetworkMaker->AddPoolingLayer(lastLayerGUID, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1));
 		lastLayerGUID = pNetworkMaker->AddActivationLayer(lastLayerGUID, L"ReLU");
 
@@ -1079,7 +1079,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver03(const Layer::Neural
 			// •ªŠ„
 			lastLayerGUID_chA = pNetworkMaker->AddChooseChannelLayer(lastLayerGUID_chA, 0, 4);
 
-			lastLayerGUID_chA = pNetworkMaker->AddConvolutionLayer(lastLayerGUID_chA, Vector3D<S32>(5,5,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0));
+			lastLayerGUID_chA = pNetworkMaker->AddConvolutionLayer(lastLayerGUID_chA, Vector3D<S32>(5,5,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0), L"he_normal");
 			lastLayerGUID_chA = pNetworkMaker->AddActivationLayer(lastLayerGUID_chA, L"ReLU");
 		}
 		// B
@@ -1087,7 +1087,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver03(const Layer::Neural
 			// •ªŠ„
 			lastLayerGUID_chB = pNetworkMaker->AddChooseChannelLayer(lastLayerGUID_chB, 4, 4);
 
-			lastLayerGUID_chB = pNetworkMaker->AddConvolutionLayer(lastLayerGUID_chB, Vector3D<S32>(5,5,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0));
+			lastLayerGUID_chB = pNetworkMaker->AddConvolutionLayer(lastLayerGUID_chB, Vector3D<S32>(5,5,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0), L"he_normal");
 			lastLayerGUID_chB = pNetworkMaker->AddActivationLayer(lastLayerGUID_chB, L"ReLU");
 		}
 		// C
@@ -1095,7 +1095,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver03(const Layer::Neural
 			// •ªŠ„
 			lastLayerGUID_chC = pNetworkMaker->AddChooseChannelLayer(lastLayerGUID_chC, 8, 8);
 
-			lastLayerGUID_chC = pNetworkMaker->AddConvolutionLayer(lastLayerGUID_chC, Vector3D<S32>(5,5,1), 16, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0));
+			lastLayerGUID_chC = pNetworkMaker->AddConvolutionLayer(lastLayerGUID_chC, Vector3D<S32>(5,5,1), 16, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0), L"he_normal");
 			lastLayerGUID_chC = pNetworkMaker->AddActivationLayer(lastLayerGUID_chC, L"ReLU");
 		}
 
@@ -1103,12 +1103,12 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver03(const Layer::Neural
 		lastLayerGUID = pNetworkMaker->AddMergeInputLayer(lastLayerGUID_chA, lastLayerGUID_chB, lastLayerGUID_chC);
 
 		// 4‘w–Ú
-		lastLayerGUID = pNetworkMaker->AddConvolutionLayer(lastLayerGUID, Vector3D<S32>(5,5,1), 32, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0));
+		lastLayerGUID = pNetworkMaker->AddConvolutionLayer(lastLayerGUID, Vector3D<S32>(5,5,1), 32, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0), L"he_normal");
 		lastLayerGUID = pNetworkMaker->AddPoolingLayer(lastLayerGUID, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1));
 		lastLayerGUID = pNetworkMaker->AddActivationLayer(lastLayerGUID, L"ReLU");
 
 		// ‘SŒ‹‡
-		lastLayerGUID = pNetworkMaker->AddFullyConnectLayer(lastLayerGUID, i_outputDataStruct.GetDataCount());
+		lastLayerGUID = pNetworkMaker->AddFullyConnectLayer(lastLayerGUID, i_outputDataStruct.GetDataCount(), L"glorot_normal");
 		lastLayerGUID = pNetworkMaker->AddActivationLayer(lastLayerGUID, L"softmax_ALL_crossEntropy");
 
 

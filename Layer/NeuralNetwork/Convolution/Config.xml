@@ -118,6 +118,12 @@
       <Default>zero</Default>
     </Enum>
 
+    <String id="Initializer">
+      <Name>初期化関数</Name>
+      <Text>初期化関数の種類</Text>
+      <Default>glorot_uniform</Default>
+    </String>
+
   </Structure>
 
   <!--学習に使用するデータの構造-->

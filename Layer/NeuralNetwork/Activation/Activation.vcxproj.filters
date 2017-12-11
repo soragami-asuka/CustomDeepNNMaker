@@ -58,9 +58,6 @@
     <Filter Include="include\Layer\Connect">
       <UniqueIdentifier>{a998b8c4-bcde-4c3b-8bdc-fcd43c0eb747}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\Layer\Optimizer">
-      <UniqueIdentifier>{a2831bfe-e4c2-4770-819c-f709ca1054d1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="LayerBase">
       <UniqueIdentifier>{f78774bc-e771-4244-9238-4a47e3eb917a}</UniqueIdentifier>
     </Filter>
@@ -156,9 +153,6 @@
     <ClInclude Include="..\..\..\include\Layer\Connect\ILayerConnectData.h">
       <Filter>include\Layer\Connect</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\Optimizer\IOptimizer.h">
-      <Filter>include\Layer\Optimizer</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNMult2SingleLayer.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
@@ -188,6 +182,9 @@
     </ClInclude>
     <ClInclude Include="..\_LayerBase\CLayerBase.h">
       <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\IInitializer.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

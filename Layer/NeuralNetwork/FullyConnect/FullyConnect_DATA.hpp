@@ -34,6 +34,12 @@ namespace FullyConnect {
 		  */
 		S32 NeuronCount;
 
+		/** Name : ‰Šú‰»ŠÖ”
+		  * ID   : Initializer
+		  * Text : ‰Šú‰»ŠÖ”‚Ìí—Ş
+		  */
+		const wchar_t* Initializer;
+
 	};
 
 	/** Runtime Parameter structure */

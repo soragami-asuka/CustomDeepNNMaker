@@ -425,6 +425,7 @@
     <ClInclude Include="..\..\..\include\Layer\IO\IOutputLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\IO\ISingleInputLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\IO\ISingleOutputLayer.h" />
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\IInitializer.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDataManager.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h" />
@@ -434,7 +435,6 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingle2SingleLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\IOptimizer.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
-    <ClInclude Include="..\..\..\include\Layer\Optimizer\IOptimizer.h" />
     <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h" />
     <ClInclude Include="..\_LayerBase\CLayerBase.h" />
     <ClInclude Include="Activation_Base.h" />
