@@ -8,6 +8,8 @@
 #include"MergeInput_FUNC.hpp"
 #include"MergeInput_CPU.h"
 
+#include"../_LayerBase/CLayerBase_CPU.h"
+
 using namespace Gravisbell;
 
 namespace Gravisbell {
@@ -45,7 +47,7 @@ namespace NeuralNetwork {
 			lpInputDataStruct.push_back(i_lpInputDataStruct[i]);
 		}
 
-		return new MergeInput_CPU(guid, *this, lpInputDataStruct);
+		return new CNNMult2SingleLayerBase_CPU<MergeInput_CPU, MergeInput_LayerData_CPU>(guid, *this, lpInputDataStruct, i_temporaryMemoryManager);
 	}
 
 } // Gravisbell;

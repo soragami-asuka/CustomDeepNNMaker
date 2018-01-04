@@ -31,9 +31,14 @@ namespace Layer {
 		LAYER_KIND_NEURALNETWORK = 0x02 << 8,	/**< ニューラルネットワークレイヤー */
 		
 		LAYER_KIND_CALCTYPE = 0x0F << 16,
-		LAYER_KIND_UNKNOWN	= 0x00 << 16,	/**< CPU処理レイヤー */
+		LAYER_KIND_UNKNOWN	= 0x00 << 16,
 		LAYER_KIND_CPU		= 0x01 << 16,	/**< CPU処理レイヤー */
 		LAYER_KIND_GPU		= 0x02 << 16,	/**< GPU処理レイヤー */
+
+		LAYER_KIND_MEMORYTYPE		= 0x0F << 20,
+		LAYER_KIND_UNKNOWNMEMORY	= 0x00 << 20,	
+		LAYER_KIND_HOSTMEMORY		= 0x01 << 20,	/**< ホストメモリでデータのやりを取りを行う */
+		LAYER_KIND_DEVICEMEMORY		= 0x02 << 20,	/**< デバイスメモリでデータのやりを取りを行う */
 	};
 
 

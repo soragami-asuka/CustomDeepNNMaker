@@ -89,12 +89,19 @@ namespace NeuralNetwork {
 	{
 		return this->neuralNetwork.GetInputDataStruct();
 	}
-	/** 出力データバッファを取得する.
+	/** 出力データバッファを取得する.(ホストメモリ)
 		配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
 		@return 出力データ配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER LayerConnectInput::GetOutputBuffer()const
 	{
 		return this->neuralNetwork.GetInputBuffer();
+	}
+	/** 出力データバッファを取得する.
+		配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
+		@return 出力データ配列の先頭ポインタ */
+	CONST_BATCH_BUFFER_POINTER LayerConnectInput::GetOutputBuffer_d()const
+	{
+		return this->neuralNetwork.GetInputBuffer_d();
 	}
 
 	/** 入力誤差バッファの位置を入力元レイヤーのGUID指定で取得する */
@@ -103,11 +110,11 @@ namespace NeuralNetwork {
 		return 0;
 	}
 	/** 入力誤差バッファを位置指定で取得する */
-	CONST_BATCH_BUFFER_POINTER LayerConnectInput::GetDInputBufferByNum(S32 num)const
+	CONST_BATCH_BUFFER_POINTER LayerConnectInput::GetDInputBufferByNum_d(S32 num)const
 	{
 		if(this->lppOutputToLayer.empty())
 			return NULL;
-		return this->neuralNetwork.GetDInputBuffer();
+		return this->neuralNetwork.GetDInputBuffer_d();
 	}
 
 	/** レイヤーリストを作成する.
@@ -262,6 +269,13 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
+
+	/** レイヤーで使用する出力バッファのIDを登録する */
+	ErrorCode LayerConnectInput::SetOutputBufferID(S32 i_outputBufferID)
+	{
+		// 入力レイヤーの出力バッファはニューラルネットワークの入力バッファと同一なので、出力バッファを割り当てる必要はない.
+		return ErrorCode::ERROR_CODE_NONE;
+	}
 	
 	/** レイヤーで使用する入力誤差バッファのIDを取得する
 		@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */

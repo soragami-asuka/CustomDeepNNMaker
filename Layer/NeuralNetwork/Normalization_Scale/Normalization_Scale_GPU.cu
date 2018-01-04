@@ -22,7 +22,7 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	Normalization_Scale_GPU::Normalization_Scale_GPU(Gravisbell::GUID guid, Normalization_Scale_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct)
+	Normalization_Scale_GPU::Normalization_Scale_GPU(Gravisbell::GUID guid, Normalization_Scale_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
 		:	Normalization_Scale_Base	(guid, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
 		,	layerData					(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount			(0)				/**< 入力バッファ数 */
@@ -125,7 +125,6 @@ namespace NeuralNetwork {
 			this->m_lppInputBuffer_h[i] = &this->m_lpInputBuffer_h[i * this->inputBufferCount];
 
 		// 出力バッファを作成
-		this->m_lpOutputBuffer_d.resize(this->GetBatchSize() * this->outputBufferCount);
 		this->m_lpOutputBuffer_h.resize(this->GetBatchSize() * this->outputBufferCount);
 		this->m_lppOutputBuffer_h.resize(this->GetBatchSize());
 		for(U32 i=0; i<this->GetBatchSize(); i++)
@@ -147,12 +146,12 @@ namespace NeuralNetwork {
 	/** 演算処理を実行する.
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 		@return 成功した場合0が返る */
-	ErrorCode Normalization_Scale_GPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
+	ErrorCode Normalization_Scale_GPU::Calculate_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer)
 	{
 		cudnnStatus_t err_cudnn;
 
 		// 入力バッファをホストにコピー
-		cudaMemcpy(&this->m_lpInputBuffer_h[0], i_lpInputBuffer, sizeof(F32)*this->m_lpInputBuffer_h.size(), cudaMemcpyDeviceToHost);
+		cudaMemcpy(&this->m_lpInputBuffer_h[0], i_lppInputBuffer, sizeof(F32)*this->m_lpInputBuffer_h.size(), cudaMemcpyDeviceToHost);
 
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
@@ -175,34 +174,8 @@ namespace NeuralNetwork {
 		}
 
 		// 出力バッファをデバイスにコピー
-		cudaMemcpy(thrust::raw_pointer_cast(&this->m_lpOutputBuffer_d[0]), &this->m_lpOutputBuffer_h[0], sizeof(F32)*this->m_lpOutputBuffer_h.size(), cudaMemcpyHostToDevice);
+		cudaMemcpy(o_lppOutputBuffer, &this->m_lpOutputBuffer_h[0], sizeof(F32)*this->m_lpOutputBuffer_h.size(), cudaMemcpyHostToDevice);
 
-
-		return ErrorCode::ERROR_CODE_NONE;
-	}
-
-
-	/** 出力データバッファを取得する.
-		配列の要素数はGetOutputBufferCountの戻り値.
-		@return 出力データ配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER Normalization_Scale_GPU::GetOutputBuffer()const
-	{
-		return thrust::raw_pointer_cast(&this->m_lpOutputBuffer_d[0]);
-	}
-	/** 出力データバッファを取得する.
-		@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
-		@return 成功した場合0 */
-	ErrorCode Normalization_Scale_GPU::GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
-	{
-		if(o_lpOutputBuffer == NULL)
-			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-
-		const U32 batchSize = this->GetBatchSize();
-		const U32 outputBufferCount = this->GetOutputBufferCount();
-
-		CONST_BATCH_BUFFER_POINTER lppUseOutputBuffer = this->GetOutputBuffer();
-
-		cudaMemcpy(o_lpOutputBuffer, this->GetOutputBuffer(), sizeof(F32) * outputBufferCount * this->GetBatchSize(), cudaMemcpyDeviceToHost);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -216,7 +189,7 @@ namespace NeuralNetwork {
 		@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Normalization_Scale_GPU::CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode Normalization_Scale_GPU::CalculateDInput_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		// 出力誤差バッファをホストにコピー
 		cudaMemcpy(&this->m_lpDOutputBuffer_h[0], i_lppDOutputBuffer, sizeof(F32)*this->m_lpDOutputBuffer_h.size(), cudaMemcpyDeviceToHost);
@@ -245,9 +218,9 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Normalization_Scale_GPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode Normalization_Scale_GPU::Training_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
-		Gravisbell::ErrorCode errCode = this->CalculateDInput(o_lppDInputBuffer, i_lppDOutputBuffer);
+		Gravisbell::ErrorCode errCode = this->CalculateDInput_device(i_lppInputBuffer, o_lppDInputBuffer, i_lppOutputBuffer, i_lppDOutputBuffer);
 		if(errCode != ErrorCode::ERROR_CODE_NONE)
 			return errCode;
 
@@ -271,31 +244,6 @@ namespace NeuralNetwork {
 			this->layerData.m_pOptimizer_scale->UpdateParameter(&this->layerData.scale, &dScale);
 		if(this->layerData.m_pOptimizer_bias)
 			this->layerData.m_pOptimizer_bias->UpdateParameter(&this->layerData.bias, &dBias);
-
-		return ErrorCode::ERROR_CODE_NONE;
-	}
-
-
-	/** 学習差分を取得する.
-		配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]
-		@return	誤差差分配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER Normalization_Scale_GPU::GetDInputBuffer()const
-	{
-		return this->m_lpDInputBuffer_d;
-	}
-	/** 学習差分を取得する.
-		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
-	ErrorCode Normalization_Scale_GPU::GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const
-	{
-		if(o_lpDInputBuffer == NULL)
-			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-
-		const U32 batchSize = this->GetBatchSize();
-		const U32 inputBufferCount = this->GetInputBufferCount();
-
-		CONST_BATCH_BUFFER_POINTER lppUseDInputBuffer = this->GetDInputBuffer();
-
-		cudaMemcpy(o_lpDInputBuffer, this->GetDInputBuffer(), sizeof(F32) * inputBufferCount * batchSize, cudaMemcpyDeviceToHost);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

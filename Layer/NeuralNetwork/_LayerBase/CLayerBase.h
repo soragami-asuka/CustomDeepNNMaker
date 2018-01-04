@@ -5,10 +5,17 @@
 #ifndef __GRAVISBELL_LAYER_NEURALNETWORK_CLAYREBASE_H__
 #define __GRAVISBELL_LAYER_NEURALNETWORK_CLAYREBASE_H__
 
+#include<vector>
+
+#include<Layer/ILayerData.h>
 
 #include<Layer/NeuralNetwork/INNSingle2SingleLayer.h>
 #include<Layer/NeuralNetwork/INNSingle2MultLayer.h>
 #include<Layer/NeuralNetwork/INNMult2SingleLayer.h>
+
+#include<Layer/NeuralNetwork/INNCoreSingle2SingleLayer.h>
+#include<Layer/NeuralNetwork/INNCoreSingle2MultLayer.h>
+#include<Layer/NeuralNetwork/INNCoreMult2SingleLayer.h>
 
 
 namespace Gravisbell {
@@ -16,7 +23,7 @@ namespace Layer {
 namespace NeuralNetwork {
 
 	template<typename IOLayer>
-	class CLayerBase : public IOLayer
+	class CLayerBase : public virtual IOLayer
 	{
 	protected:
 		enum ProcessType
@@ -29,16 +36,13 @@ namespace NeuralNetwork {
 		};
 
 	private:
-		Gravisbell::GUID guid;	/**< レイヤー識別用のGUID */
-
 		ProcessType processType;
 		U32 batchSize;	/**< バッチサイズ */
 
 	public:
 		/** コンストラクタ */
-		CLayerBase(Gravisbell::GUID guid)
-			:	guid						(guid)
-			,	processType					(PROCESSTYPE_CALCULATE)
+		CLayerBase()
+			:	processType					(PROCESSTYPE_CALCULATE)
 		{
 		}
 		/** デストラクタ */
@@ -51,12 +55,8 @@ namespace NeuralNetwork {
 		// レイヤー共通
 		//===========================
 	public:
-
 		/** レイヤー固有のGUIDを取得する */
-		Gravisbell::GUID GetGUID(void)const
-		{
-			return this->guid;
-		}
+		virtual Gravisbell::GUID GetGUID(void)const = 0;
 
 		/** レイヤーの種類識別コードを取得する.
 			@param o_layerCode	格納先バッファ
@@ -79,7 +79,7 @@ namespace NeuralNetwork {
 			@param batchSize	同時に演算を行うバッチのサイズ.
 			NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 			失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-		ErrorCode PreProcessLearn(U32 batchSize)
+		virtual ErrorCode PreProcessLearn(U32 batchSize)
 		{
 			this->batchSize = batchSize;
 			this->processType = PROCESSTYPE_LEARN;
@@ -92,7 +92,7 @@ namespace NeuralNetwork {
 			@param batchSize	同時に演算を行うバッチのサイズ.
 			NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 			失敗した場合はCalculate以降の処理は実行不可. */
-		ErrorCode PreProcessCalculate(U32 batchSize)
+		virtual ErrorCode PreProcessCalculate(U32 batchSize)
 		{
 			this->batchSize = batchSize;
 			this->processType = PROCESSTYPE_CALCULATE;
@@ -127,21 +127,25 @@ namespace NeuralNetwork {
 
 
 	template<typename IOLayer, typename RuntimeParameter>
-	class CLayerBaseRuntimeParameter  : public CLayerBase<IOLayer>
+	class CLayerBaseRuntimeParameter  : public virtual CLayerBase<IOLayer>
 	{
 	private:
+		Gravisbell::GUID guid;	/**< レイヤー識別用のGUID */
+
 		SettingData::Standard::IData* pRuntimeParameter;
 		bool onUpdateRuntimeParameter;	// 実行時パラメータを更新したフラグ
 
 		RuntimeParameter runtimeParameter;
 
+
 	protected:
 		/** コンストラクタ */
 		CLayerBaseRuntimeParameter(Gravisbell::GUID guid, SettingData::Standard::IData* i_pRuntimeParameter)
-			:	CLayerBase					(guid)
-			,	pRuntimeParameter			(i_pRuntimeParameter)
-			,	onUpdateRuntimeParameter	(false)
-			,	runtimeParameter			()
+			:	CLayerBase<IOLayer>				()
+			,	guid							(guid)
+			,	pRuntimeParameter				(i_pRuntimeParameter)
+			,	onUpdateRuntimeParameter		(false)
+			,	runtimeParameter				()
 		{
 		}
 		/** デストラクタ */
@@ -150,7 +154,16 @@ namespace NeuralNetwork {
 			if(pRuntimeParameter)
 				delete pRuntimeParameter;
 		}
-		
+
+		//===========================
+		// レイヤー共通
+		//===========================
+	public:
+		/** レイヤー固有のGUIDを取得する */
+		Gravisbell::GUID GetGUID(void)const
+		{
+			return guid;
+		}
 
 	protected:
 		/** 実行時設定を構造体で取得する */
@@ -348,17 +361,31 @@ namespace NeuralNetwork {
 	};
 
 	template<typename IOLayer>
-	class CLayerBaseRuntimeParameterNone : public CLayerBase<IOLayer>
+	class CLayerBaseRuntimeParameterNone : public virtual CLayerBase<IOLayer>
 	{
+	private:
+		Gravisbell::GUID guid;	/**< レイヤー識別用のGUID */
+
 	protected:
 		/** コンストラクタ */
 		CLayerBaseRuntimeParameterNone(Gravisbell::GUID guid)
-			:	CLayerBase	(guid)
+			:	CLayerBase<IOLayer>	()
+			,	guid				(guid)
 		{
 		}
 		/** デストラクタ */
 		virtual ~CLayerBaseRuntimeParameterNone()
 		{
+		}
+
+		//===========================
+		// レイヤー共通
+		//===========================
+	public:
+		/** レイヤー固有のGUIDを取得する */
+		Gravisbell::GUID GetGUID(void)const
+		{
+			return guid;
 		}
 
 		//====================================
@@ -429,9 +456,9 @@ namespace NeuralNetwork {
 	public:
 		/** コンストラクタ */
 		CNNSingle2SingleLayerBase(Gravisbell::GUID guid, SettingData::Standard::IData* i_pRuntimeParameter, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct)
-			:	CLayerBaseRuntimeParameter<INNSingle2SingleLayer, RuntimeParameter...>	(guid, i_pRuntimeParameter)
-			,	inputDataStruct															(i_inputDataStruct)
-			,	outputDataStruct														(i_outputDataStruct)
+			:	CLayerBaseRuntimeParameter<INNSingle2SingleLayer, RuntimeParameter...>								(guid, i_pRuntimeParameter)
+			,	inputDataStruct																						(i_inputDataStruct)
+			,	outputDataStruct																					(i_outputDataStruct)
 		{
 		}
 		/** デストラクタ */
@@ -564,9 +591,9 @@ namespace NeuralNetwork {
 	public:
 		/** コンストラクタ */
 		CNNSingle2MultLayerBase(Gravisbell::GUID guid, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct)
-			:	CLayerBaseRuntimeParameter<INNSingle2MultLayer, RuntimeParameter...>		(guid)
-			,	inputDataStruct																(i_inputDataStruct)
-			,	outputDataStruct															(i_outputDataStruct)
+			:	CLayerBaseRuntimeParameter<INNSingle2MultLayer, RuntimeParameter...>	(guid)
+			,	inputDataStruct															(i_inputDataStruct)
+			,	outputDataStruct														(i_outputDataStruct)
 		{
 		}
 		/** デストラクタ */
@@ -630,9 +657,9 @@ namespace NeuralNetwork {
 	public:
 		/** コンストラクタ */
 		CNNSingle2MultLayerBase(Gravisbell::GUID guid, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct)
-			:	CLayerBaseRuntimeParameterNone<INNSingle2MultLayer>	(guid)
-			,	inputDataStruct										(i_inputDataStruct)
-			,	outputDataStruct									(i_outputDataStruct)
+			:	CLayerBaseRuntimeParameterNone<INNSingle2MultLayer>		(guid)
+			,	inputDataStruct											(i_inputDataStruct)
+			,	outputDataStruct										(i_outputDataStruct)
 		{
 		}
 		/** デストラクタ */
@@ -776,8 +803,8 @@ namespace NeuralNetwork {
 		/** コンストラクタ */
 		CNNMult2SingleLayerBase(Gravisbell::GUID guid, const std::vector<IODataStruct>& i_lpInputDataStruct, const IODataStruct& i_outputDataStruct)
 			:	CLayerBaseRuntimeParameterNone<INNMult2SingleLayer>	(guid)
-			,	lpInputDataStruct									(i_lpInputDataStruct)
-			,	outputDataStruct									(i_outputDataStruct)
+			,	lpInputDataStruct																(i_lpInputDataStruct)
+			,	outputDataStruct																(i_outputDataStruct)
 		{
 		}
 		/** デストラクタ */

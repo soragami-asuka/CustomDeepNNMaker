@@ -8,6 +8,8 @@
 #include"FullyConnect_FUNC.hpp"
 #include"FullyConnect_GPU.cuh"
 
+#include"../_LayerBase/CLayerBase_GPU.cuh"
+
 #pragma warning(push)
 #pragma warning(disable : 4267)
 #include <cuda.h> // need CUDA_VERSION
@@ -219,7 +221,10 @@ namespace NeuralNetwork {
 		@param guid	V‹K¶¬‚·‚éƒŒƒCƒ„[‚ÌGUID. */
 	ILayerBase* FullyConnect_LayerData_GPU::CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
 	{
-		return new FullyConnect_GPU(guid, *this, i_lpInputDataStruct[0]);
+		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
+			return NULL;
+
+		return new CNNSingle2SingleLayerBase_GPU<FullyConnect_GPU, FullyConnect_LayerData_GPU>(guid, *this, i_lpInputDataStruct[0], i_temporaryMemoryManager);
 	}
 
 

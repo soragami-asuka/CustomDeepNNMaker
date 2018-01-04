@@ -153,15 +153,6 @@
     <ClInclude Include="..\..\..\include\Layer\Connect\ILayerConnectData.h">
       <Filter>include\Layer\Connect</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNMult2SingleLayer.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingle2MultLayer.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingle2SingleLayer.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\IOptimizer.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
@@ -185,6 +176,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\IInitializer.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase_GPU.cuh">
+      <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase_CPU.h">
+      <Filter>LayerBase</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

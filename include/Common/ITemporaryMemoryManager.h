@@ -32,7 +32,12 @@ namespace Common {
 		virtual U32 GetBufferSize(GUID i_layerGUID, const wchar_t i_szCode[])const = 0;
 
 		/** バッファを取得する */
-		virtual BYTE* GetBufer(GUID i_layerGUID, const wchar_t i_szCode[]) = 0;
+//		virtual BYTE* GetBuffer(GUID i_layerGUID, const wchar_t i_szCode[]) = 0;
+
+		/** バッファを予約して取得する */
+		virtual BYTE* ReserveBuffer(GUID i_layerGUID, const wchar_t i_szCode[]) = 0;
+		/** 予約済みバッファを開放する */
+		virtual void RestoreBuffer(GUID i_layerGUID, const wchar_t i_szCode[]) = 0;
 	};
 
 }	// Layer

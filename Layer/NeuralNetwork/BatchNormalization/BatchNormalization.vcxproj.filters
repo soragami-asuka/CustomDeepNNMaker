@@ -165,6 +165,12 @@
     <ClInclude Include="..\_LayerBase\CLayerBase.h">
       <Filter>LayerBase</Filter>
     </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase_GPU.cuh">
+      <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase_CPU.h">
+      <Filter>LayerBase</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

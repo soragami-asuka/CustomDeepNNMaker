@@ -404,9 +404,11 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INeuralNetwork.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerData.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
     <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h" />
+    <ClInclude Include="..\_LayerBase\CLayerBase.h" />
+    <ClInclude Include="..\_LayerBase\CLayerBase_CPU.h" />
+    <ClInclude Include="..\_LayerBase\CLayerBase_GPU.cuh" />
     <ClInclude Include="MergeInput_Base.h" />
     <ClInclude Include="MergeInput_CPU.h" />
     <ClInclude Include="MergeInput_DATA.hpp" />

@@ -8,6 +8,8 @@
 #include"FullyConnect_FUNC.hpp"
 #include"FullyConnect_CPU.h"
 
+#include"../_LayerBase/CLayerBase_CPU.h"
+
 #include"Library/NeuralNetwork/Optimizer.h"
 #include"Library/NeuralNetwork/Initializer.h"
 
@@ -192,9 +194,8 @@ namespace NeuralNetwork {
 		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
 			return NULL;
 
-		return new FullyConnect_CPU(guid, *this, i_lpInputDataStruct[0]);
+		return new CNNSingle2SingleLayerBase_CPU<FullyConnect_CPU, FullyConnect_LayerData_CPU>(guid, *this, i_lpInputDataStruct[0], i_temporaryMemoryManager);
 	}
-	
 
 	//===========================
 	// オプティマイザー設定

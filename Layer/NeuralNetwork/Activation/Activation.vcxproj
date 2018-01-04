@@ -430,13 +430,12 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INeuralNetwork.h" />
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNMult2SingleLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingle2MultLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingle2SingleLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\IOptimizer.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
     <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h" />
     <ClInclude Include="..\_LayerBase\CLayerBase.h" />
+    <ClInclude Include="..\_LayerBase\CLayerBase_CPU.h" />
+    <ClInclude Include="..\_LayerBase\CLayerBase_GPU.cuh" />
     <ClInclude Include="Activation_Base.h" />
     <ClInclude Include="Activation_CPU.h" />
     <ClInclude Include="Activation_DATA.hpp" />

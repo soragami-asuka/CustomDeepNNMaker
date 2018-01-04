@@ -34,9 +34,6 @@
     <Filter Include="include\Layer\IOData">
       <UniqueIdentifier>{1ffc9360-858a-4c65-9dd2-34ebea05dc75}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\Layer\NeuralNetwork">
-      <UniqueIdentifier>{c3328bc0-27e7-4ed6-af5c-ef401dab5f04}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\Layer\IO">
       <UniqueIdentifier>{c25a0088-3043-4729-8838-ba94658cf357}</UniqueIdentifier>
     </Filter>
@@ -45,6 +42,12 @@
     </Filter>
     <Filter Include="LayerData">
       <UniqueIdentifier>{7f756651-cf39-4ef5-895c-29a97761d20e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LayerBase">
+      <UniqueIdentifier>{4e6b089d-fa09-44e6-a022-6be121035562}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Layer\NeuralNetwork">
+      <UniqueIdentifier>{023b9097-bfab-452f-80dc-4639ae627526}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -90,12 +93,6 @@
     <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer.h">
       <Filter>include\Layer\IOData</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayer.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\IO\IInputLayer.h">
       <Filter>include\Layer\IO</Filter>
     </ClInclude>
@@ -111,26 +108,14 @@
     <ClInclude Include="..\..\..\include\Layer\IO\ISingleOutputLayer.h">
       <Filter>include\Layer\IO</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INeuralNetwork.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
     <ClInclude Include="FullyConnect_FUNC.hpp">
       <Filter>FromXML</Filter>
     </ClInclude>
     <ClInclude Include="FullyConnect_DATA.hpp">
       <Filter>FromXML</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\ILayerData.h">
       <Filter>include\Layer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerData.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
     <ClInclude Include="FullyConnect_Base.h">
       <Filter>Layer</Filter>
@@ -150,11 +135,56 @@
     <ClInclude Include="FullyConnect_LayerData_GPU.cuh">
       <Filter>LayerData</Filter>
     </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase.h">
+      <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase_GPU.cuh">
+      <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\IInitializer.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDataManager.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerConnectData.h">
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INeuralNetwork.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNCoreMult2SingleLayer.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNCoreSingle2MultLayer.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNCoreSingle2SingleLayer.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNMult2SingleLayer.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingle2MultLayer.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingle2SingleLayer.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\IOptimizer.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase_CPU.h">
+      <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\ILayerCore.h">
+      <Filter>LayerBase</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

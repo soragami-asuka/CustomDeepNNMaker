@@ -11,6 +11,7 @@
 #include"Library/NeuralNetwork/Optimizer.h"
 #include"Library/NeuralNetwork/Initializer.h"
 
+#include"../_LayerBase/CLayerBase_GPU.cuh"
 
 namespace Gravisbell {
 namespace Layer {
@@ -210,9 +211,8 @@ namespace NeuralNetwork {
 		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
 			return NULL;
 
-		return new Convolution_GPU(guid, *this, i_lpInputDataStruct[0], i_temporaryMemoryManager);
+		return new CNNSingle2SingleLayerBase_GPU<Convolution_GPU, Convolution_LayerData_GPU>(guid, *this, i_lpInputDataStruct[0], i_temporaryMemoryManager);
 	}
-
 
 	//===========================
 	// オプティマイザー設定

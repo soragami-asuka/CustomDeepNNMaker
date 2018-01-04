@@ -10,6 +10,8 @@
 
 #include"RandomUtility.h"
 
+#include"../_LayerBase/CLayerBase_CPU.h"
+
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
@@ -39,7 +41,7 @@ namespace NeuralNetwork {
 		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
 			return NULL;
 
-		return new UpSampling_CPU(guid, *this, i_lpInputDataStruct[0]);
+		return new CNNSingle2SingleLayerBase_CPU<UpSampling_CPU,UpSampling_LayerData_CPU>(guid, *this, i_lpInputDataStruct[0], i_temporaryMemoryManager);
 	}
 
 } // Gravisbell;

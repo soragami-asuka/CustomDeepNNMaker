@@ -55,6 +55,9 @@
     <Filter Include="LayerData">
       <UniqueIdentifier>{bf062363-0436-482c-9da7-4fc147c1e3e9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LayerBase">
+      <UniqueIdentifier>{f18c40a7-2db8-4c42-a1ed-628a3ee7d524}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -152,6 +155,15 @@
     </ClInclude>
     <ClInclude Include="Convolution_CPU.h">
       <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase.h">
+      <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase_GPU.cuh">
+      <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase_CPU.h">
+      <Filter>LayerBase</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

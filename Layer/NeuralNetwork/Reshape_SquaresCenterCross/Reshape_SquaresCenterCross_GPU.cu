@@ -21,11 +21,9 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	Reshape_SquaresCenterCross_GPU::Reshape_SquaresCenterCross_GPU(Gravisbell::GUID guid, Reshape_SquaresCenterCross_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct)
+	Reshape_SquaresCenterCross_GPU::Reshape_SquaresCenterCross_GPU(Gravisbell::GUID guid, Reshape_SquaresCenterCross_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
 		:	Reshape_SquaresCenterCross_Base				(guid, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
-		,	m_lpInputBuffer				(NULL)		/**< 演算時の入力データ */
-		,	m_lpDOutputBuffer			(NULL)		/**< 出力誤差データ */
 	{
 	}
 	/** デストラクタ */
@@ -120,12 +118,11 @@ namespace NeuralNetwork {
 		}
 
 		// 出力バッファを作成
-		this->m_lpOutputBuffer.resize(this->GetBatchSize() * this->outputBufferCount);
-		this->m_lpOutputBuffer_d.resize(this->GetBatchSize() * this->outputBufferCount);
+		this->m_lpOutputBuffer_h.resize(this->GetBatchSize() * this->outputBufferCount);
 		this->m_lppOutputBuffer.resize(this->GetBatchSize());
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
-			this->m_lppOutputBuffer[batchNum] = &this->m_lpOutputBuffer[batchNum * this->outputBufferCount];
+			this->m_lppOutputBuffer[batchNum] = &this->m_lpOutputBuffer_h[batchNum * this->outputBufferCount];
 		}
 
 		// 変換テーブルを作成
@@ -162,10 +159,9 @@ namespace NeuralNetwork {
 	/** 演算処理を実行する.
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 		@return 成功した場合0が返る */
-	ErrorCode Reshape_SquaresCenterCross_GPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
+	ErrorCode Reshape_SquaresCenterCross_GPU::Calculate_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer)
 	{
-		this->m_lpInputBuffer = i_lpInputBuffer;
-		cudaMemcpy(&this->m_lpInputBuffer_h[0], this->m_lpInputBuffer, sizeof(F32)*this->inputBufferCount*this->GetBatchSize(), cudaMemcpyDeviceToHost);
+		cudaMemcpy(&this->m_lpInputBuffer_h[0], i_lppInputBuffer, sizeof(F32)*this->inputBufferCount*this->GetBatchSize(), cudaMemcpyDeviceToHost);
 
 		// 出力バッファに変換
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
@@ -191,31 +187,7 @@ namespace NeuralNetwork {
 		}
 
 		// 出力バッファをデバイスにコピー
-		cudaMemcpy(thrust::raw_pointer_cast(&this->m_lpOutputBuffer_d[0]), &this->m_lpOutputBuffer[0], sizeof(F32)*this->outputBufferCount*this->GetBatchSize(), cudaMemcpyHostToDevice);
-
-		return ErrorCode::ERROR_CODE_NONE;
-	}
-
-
-	/** 出力データバッファを取得する.
-		配列の要素数はGetOutputBufferCountの戻り値.
-		@return 出力データ配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER Reshape_SquaresCenterCross_GPU::GetOutputBuffer()const
-	{
-		return thrust::raw_pointer_cast(&this->m_lpOutputBuffer_d[0]);
-	}
-	/** 出力データバッファを取得する.
-		@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
-		@return 成功した場合0 */
-	ErrorCode Reshape_SquaresCenterCross_GPU::GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
-	{
-		if(o_lpOutputBuffer == NULL)
-			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-
-		const U32 batchSize = this->GetBatchSize();
-		const U32 outputBufferCount = this->GetOutputBufferCount();
-
-		cudaMemcpy(o_lpOutputBuffer, this->GetOutputBuffer(), sizeof(F32)*outputBufferCount*this->GetBatchSize(), cudaMemcpyDeviceToHost);
+		cudaMemcpy(o_lppOutputBuffer, &this->m_lpOutputBuffer_h[0], sizeof(F32)*this->outputBufferCount*this->GetBatchSize(), cudaMemcpyHostToDevice);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -229,15 +201,13 @@ namespace NeuralNetwork {
 		@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要な配列の[GetOutputDataCount()]配列
 		直前の計算結果を使用する */
-	ErrorCode Reshape_SquaresCenterCross_GPU::CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lpDOutputBuffer)
+	ErrorCode Reshape_SquaresCenterCross_GPU::CalculateDInput_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		// 入力誤差計算
-		this->m_lpDOutputBuffer = i_lpDOutputBuffer;
-		this->m_lpDInputBuffer  = o_lppDInputBuffer;
-		if(this->m_lpDOutputBuffer && this->m_lpDInputBuffer)
+		if(i_lppDOutputBuffer && o_lppDInputBuffer)
 		{
 			// 出力誤差バッファをホストにコピー
-			cudaMemcpy(&this->m_lpDOutputBuffer_h[0], i_lpDOutputBuffer, sizeof(F32)*this->outputBufferCount*this->GetBatchSize(), cudaMemcpyDeviceToHost);
+			cudaMemcpy(&this->m_lpDOutputBuffer_h[0], i_lppDOutputBuffer, sizeof(F32)*this->outputBufferCount*this->GetBatchSize(), cudaMemcpyDeviceToHost);
 
 			// 入力誤差を初期化
 			memset(&this->m_lpDInputBuffer_h[0], 0, sizeof(F32)*this->GetBatchSize()*this->inputBufferCount);
@@ -266,7 +236,7 @@ namespace NeuralNetwork {
 			}
 
 			// 入力誤差をデバイスにコピー
-			cudaMemcpy(m_lpDInputBuffer, &this->m_lpDInputBuffer_h[0], sizeof(F32)*this->inputBufferCount*this->GetBatchSize(), cudaMemcpyHostToDevice);
+			cudaMemcpy(o_lppDInputBuffer, &this->m_lpDInputBuffer_h[0], sizeof(F32)*this->inputBufferCount*this->GetBatchSize(), cudaMemcpyHostToDevice);
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
@@ -276,32 +246,9 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Reshape_SquaresCenterCross_GPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lpDOutputBuffer)
+	ErrorCode Reshape_SquaresCenterCross_GPU::Training_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
-		return this->CalculateDInput(o_lppDInputBuffer, i_lpDOutputBuffer);
-	}
-
-
-	/** 学習差分を取得する.
-		配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]
-		@return	誤差差分配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER Reshape_SquaresCenterCross_GPU::GetDInputBuffer()const
-	{
-		return this->m_lpDOutputBuffer;
-	}
-	/** 学習差分を取得する.
-		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
-	ErrorCode Reshape_SquaresCenterCross_GPU::GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const
-	{
-		if(o_lpDInputBuffer == NULL)
-			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-
-		const U32 batchSize = this->GetBatchSize();
-		const U32 inputBufferCount = this->GetInputBufferCount();
-
-		cudaMemcpy(o_lpDInputBuffer, this->GetDInputBuffer(), sizeof(F32)*inputBufferCount*batchSize, cudaMemcpyDeviceToHost);
-
-		return ErrorCode::ERROR_CODE_NONE;
+		return this->CalculateDInput_device(i_lppInputBuffer, o_lppDInputBuffer, i_lppOutputBuffer, i_lppDOutputBuffer);
 	}
 
 

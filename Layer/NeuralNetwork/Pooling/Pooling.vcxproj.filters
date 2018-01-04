@@ -46,6 +46,9 @@
     <Filter Include="include\Layer\IO">
       <UniqueIdentifier>{0bc20bfc-5091-4463-9264-6105df934dee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LayerBase">
+      <UniqueIdentifier>{5433d16e-1cbb-46f2-8441-52b287629fcf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -146,6 +149,15 @@
     </ClInclude>
     <ClInclude Include="Pooling_GPU.cuh">
       <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase.h">
+      <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase_GPU.cuh">
+      <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase_CPU.h">
+      <Filter>LayerBase</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

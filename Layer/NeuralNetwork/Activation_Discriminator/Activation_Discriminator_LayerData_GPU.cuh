@@ -34,6 +34,16 @@ namespace NeuralNetwork {
 		/** レイヤーを作成する.
 			@param guid	新規生成するレイヤーのGUID. */
 		ILayerBase* CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager);
+		/** レイヤーを作成する.
+			ホストメモリで結果を返すレイヤー.
+			@param	guid	新規生成するレイヤーのGUID.
+			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要 */
+		ILayerBase* CreateLayer_host(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager);
+		/** レイヤーを作成する.
+			デバイスメモリで結果を返すレイヤー.CPU版では未使用.
+			@param	guid	新規生成するレイヤーのGUID.
+			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要 */
+		ILayerBase* CreateLayer_device(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager);
 	};
 
 } // Gravisbell;

@@ -8,6 +8,8 @@
 #include"Activation_FUNC.hpp"
 #include"Activation_CPU.h"
 
+#include"../_LayerBase/CLayerBase_CPU.h"
+
 using namespace Gravisbell;
 
 namespace Gravisbell {
@@ -37,10 +39,7 @@ namespace NeuralNetwork {
 		@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要 */
 	ILayerBase* Activation_LayerData_CPU::CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
 	{
-		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
-			return NULL;
-
-		return new Activation_CPU(guid, *this, i_lpInputDataStruct[0]);
+		return new CNNSingle2SingleLayerBase_CPU<Activation_CPU, Activation_LayerData_CPU>(guid, *this, i_lpInputDataStruct[0], i_temporaryMemoryManager);
 	}
 
 } // Gravisbell;

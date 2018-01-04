@@ -8,6 +8,8 @@
 #include"Residual_FUNC.hpp"
 #include"Residual_GPU.cuh"
 
+#include"../_LayerBase/CLayerBase_GPU.cuh"
+
 using namespace Gravisbell;
 
 namespace Gravisbell {
@@ -45,7 +47,7 @@ namespace NeuralNetwork {
 			lpInputDataStruct.push_back(i_lpInputDataStruct[i]);
 		}
 
-		return new Residual_GPU(guid, *this, lpInputDataStruct);
+		return new CNNMult2SingleLayerBase_GPU<Residual_GPU,Residual_LayerData_GPU>(guid, *this, lpInputDataStruct, i_temporaryMemoryManager);
 	}
 
 } // Gravisbell;

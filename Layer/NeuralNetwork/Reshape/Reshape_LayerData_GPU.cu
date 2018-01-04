@@ -8,6 +8,8 @@
 #include"Reshape_FUNC.hpp"
 #include"Reshape_GPU.cuh"
 
+#include"../_LayerBase/CLayerBase_GPU.cuh"
+
 using namespace Gravisbell;
 
 namespace Gravisbell {
@@ -39,7 +41,7 @@ namespace NeuralNetwork {
 		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
 			return NULL;
 
-		return new Reshape_GPU(guid, *this, i_lpInputDataStruct[0]);
+		return new CNNSingle2SingleLayerBase_GPU<Reshape_GPU,Reshape_LayerData_GPU>(guid, *this, i_lpInputDataStruct[0], i_temporaryMemoryManager);
 	}
 
 } // Gravisbell;

@@ -8,6 +8,8 @@
 #include"Dropout_FUNC.hpp"
 #include"Dropout_CPU.h"
 
+#include"../_LayerBase/CLayerBase_CPU.h"
+
 using namespace Gravisbell;
 
 namespace Gravisbell {
@@ -33,13 +35,14 @@ namespace NeuralNetwork {
 	// レイヤー作成
 	//===========================
 	/** レイヤーを作成する.
-		@param guid	新規生成するレイヤーのGUID. */
+		@param	guid	新規生成するレイヤーのGUID.
+		@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要 */
 	ILayerBase* Dropout_LayerData_CPU::CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
 	{
 		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
 			return NULL;
 
-		return new Dropout_CPU(guid, *this, i_lpInputDataStruct[0]);
+		return new CNNSingle2SingleLayerBase_CPU<Dropout_CPU,Dropout_LayerData_CPU>(guid, *this, i_lpInputDataStruct[0], i_temporaryMemoryManager);
 	}
 
 } // Gravisbell;

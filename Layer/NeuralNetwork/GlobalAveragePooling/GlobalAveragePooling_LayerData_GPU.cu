@@ -8,6 +8,8 @@
 #include"GlobalAveragePooling_FUNC.hpp"
 #include"GlobalAveragePooling_GPU.cuh"
 
+#include"../_LayerBase/CLayerBase_GPU.cuh"
+
 using namespace Gravisbell;
 
 namespace Gravisbell {
@@ -39,7 +41,7 @@ namespace NeuralNetwork {
 		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
 			return NULL;
 
-		return new GlobalAveragePooling_GPU(guid, *this, i_lpInputDataStruct[0]);
+		return new CNNSingle2SingleLayerBase_GPU<GlobalAveragePooling_GPU,GlobalAveragePooling_LayerData_GPU>(guid, *this, i_lpInputDataStruct[0], i_temporaryMemoryManager);
 	}
 
 } // Gravisbell;

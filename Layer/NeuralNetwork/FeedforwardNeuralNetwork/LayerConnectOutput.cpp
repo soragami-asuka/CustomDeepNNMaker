@@ -92,7 +92,7 @@ namespace NeuralNetwork {
 
 		return this->lppInputFromLayer[0]->GetOutputDataStruct();
 	}
-	/** 出力データバッファを取得する.
+	/** 出力データバッファを取得する.(ホストメモリ)
 		配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
 		@return 出力データ配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER LayerConnectOutput::GetOutputBuffer()const
@@ -102,6 +102,16 @@ namespace NeuralNetwork {
 
 		return this->lppInputFromLayer[0]->GetOutputBuffer();
 	}
+	/** 出力データバッファを取得する.
+		配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
+		@return 出力データ配列の先頭ポインタ */
+	CONST_BATCH_BUFFER_POINTER LayerConnectOutput::GetOutputBuffer_d()const
+	{
+		if(this->lppInputFromLayer.empty())
+			return NULL;
+
+		return this->lppInputFromLayer[0]->GetOutputBuffer_d();
+	}
 
 	/** 入力誤差バッファの位置を入力元レイヤーのGUID指定で取得する */
 	S32 LayerConnectOutput::GetDInputPositionByGUID(const Gravisbell::GUID& i_guid)const
@@ -109,9 +119,9 @@ namespace NeuralNetwork {
 		return 0;
 	}
 	/** 入力誤差バッファを位置指定で取得する */
-	CONST_BATCH_BUFFER_POINTER LayerConnectOutput::GetDInputBufferByNum(S32 num)const
+	CONST_BATCH_BUFFER_POINTER LayerConnectOutput::GetDInputBufferByNum_d(S32 num)const
 	{
-		return this->neuralNetwork.GetDOutputBuffer();
+		return this->neuralNetwork.GetDOutputBuffer_d();
 	}
 
 	/** レイヤーリストを作成する.
@@ -304,6 +314,14 @@ namespace NeuralNetwork {
 	{
 		this->ResetInputLayer();
 		this->ResetBypassLayer();
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+
+	/** レイヤーで使用する出力バッファのIDを登録する */
+	ErrorCode LayerConnectOutput::SetOutputBufferID(S32 i_outputBufferID)
+	{
+		// 出力レイヤーの出力バッファは直前のレイヤーの出力バッファと同一のため、登録不要
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

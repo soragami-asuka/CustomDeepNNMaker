@@ -35,9 +35,6 @@ namespace NeuralNetwork {
 
 		std::list<ILayerConnect*> lpCalculateLayerList;		/**< レイヤーを処理順に並べたリスト.  */
 
-		LayerConnectInput  inputLayer;	/**< 入力信号の代替レイヤーのアドレス. */
-		LayerConnectOutput outputLayer;	/**< 出力信号の代替レイヤーのアドレス. */
-
 		const Gravisbell::GUID guid;			/**< レイヤー識別用のGUID */
 		IODataStruct inputDataStruct;	/**< 入力データ構造 */
 		IODataStruct outputDataStruct;	/**< 出力データ構造 */
@@ -46,14 +43,19 @@ namespace NeuralNetwork {
 
 		U32 batchSize;	/**< バッチサイズ */
 
-		// 演算時の入力データ
-		CONST_BATCH_BUFFER_POINTER m_lppInputBuffer;	/**< 演算時の入力データ */
-		CONST_BATCH_BUFFER_POINTER m_lppDOutputBuffer;	/**< 入力誤差計算時の出力誤差データ */
-
-		BATCH_BUFFER_POINTER m_lppDInputBuffer;		/**< 入力誤差バッファ */
+	protected:
+		LayerConnectInput  inputLayer;	/**< 入力信号の代替レイヤーのアドレス. */
+		LayerConnectOutput outputLayer;	/**< 出力信号の代替レイヤーのアドレス. */
 
 		Gravisbell::Common::ITemporaryMemoryManager* pLocalTemporaryMemoryManager;
 		Gravisbell::Common::ITemporaryMemoryManager& temporaryMemoryManager;
+
+		// 入出力バッファ
+		std::vector<F32>		lpInputBuffer;		/**< 入力バッファ <バッチ数><入力信号数> */
+
+		CONST_BATCH_BUFFER_POINTER	m_lppInputBuffer;	/**< 外部から預かった入力バッファのアドレス(演算デバイス依存) */
+		BATCH_BUFFER_POINTER	m_lppDInputBuffer;	/**< 外部から預かった入力誤差バッファのアドレス(演算デバイス依存) */
+		BATCH_BUFFER_POINTER	m_lppDOutputBuffer;	/**< 外部から預かった出力誤差バッファのアドレス(演算デバイス依存) */
 
 	public:
 		//====================================
@@ -75,11 +77,13 @@ namespace NeuralNetwork {
 			追加したレイヤーの所有権はNeuralNetworkに移るため、メモリの開放処理などは全てINeuralNetwork内で行われる.
 			@param pLayer	追加するレイヤーのアドレス. */
 		ErrorCode AddLayer(ILayerBase* pLayer);
+
 		/** 一時レイヤーを追加する.
 			追加したレイヤーデータの所有権はNeuralNetworkに移るため、メモリの開放処理などは全てINeuralNetwork内で行われる.
 			@param	i_pLayerData	追加するレイヤーデータ.
 			@param	o_player		追加されたレイヤーのアドレス. */
-		ErrorCode AddTemporaryLayer(ILayerData* i_pLayerData, ILayerBase** o_pLayer, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
+		virtual ErrorCode AddTemporaryLayer(ILayerData* i_pLayerData, ILayerBase** o_pLayer, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
+
 		/** レイヤーを削除する.
 			@param i_guid	削除するレイヤーのGUID */
 		ErrorCode EraseLayer(const Gravisbell::GUID& i_guid);
@@ -150,6 +154,10 @@ namespace NeuralNetwork {
 		//====================================
 		// 入力誤差バッファ関連
 		//====================================
+	private:
+		/** 各レイヤーが使用する入力誤差バッファを割り当てる */
+		ErrorCode AllocateDInputBuffer(void);
+
 	protected:
 		/** 入力誤差バッファの総数を設定する */
 		virtual ErrorCode SetDInputBufferCount(U32 i_DInputBufferCount) = 0;
@@ -158,8 +166,48 @@ namespace NeuralNetwork {
 		virtual ErrorCode ResizeDInputBuffer(U32 i_DInputBufferNo, U32 i_bufferSize) = 0;
 
 	public:
-		/** 入力誤差バッファを取得する */
-		virtual BATCH_BUFFER_POINTER GetDInputBuffer(U32 i_DINputBufferNo) = 0;
+		/** 入力誤差バッファを取得する(処理デバイス依存) */
+		virtual BATCH_BUFFER_POINTER GetDInputBuffer_d(U32 i_DINputBufferNo) = 0;
+
+
+		//====================================
+		// 出力バッファ関連
+		//====================================
+	private:
+		/** 各レイヤーが使用する出力バッファを割り当てる */
+		ErrorCode AllocateOutputBuffer(void);
+
+	protected:
+		/** 出力バッファの総数を設定する */
+		virtual ErrorCode SetOutputBufferCount(U32 i_outputBufferCount) = 0;
+
+		/** 出力バッファのサイズを設定する */
+		virtual ErrorCode ResizeOutputBuffer(U32 i_outputBufferNo, U32 i_bufferSize) = 0;
+
+	public:
+		/** 出力バッファの現在の使用者を取得する */
+		virtual GUID GetReservedOutputBufferID(U32 i_i_outputBufferNo) = 0;
+		/** 出力バッファを使用中にして取得する(処理デバイス依存) */
+		virtual BATCH_BUFFER_POINTER ReserveOutputBuffer_d(U32 i_outputBufferNo, GUID i_guid) = 0;
+		/** 出力バッファを使用中にして取得する(処理デバイス依存)
+			@param	i_outputBufferNo	出力バッファ番号
+			@param	i_lppBuffer			バッファの初期化に使用するホストバッファ
+			@param	i_bufferSize		初期化バッファのサイズ. */
+		virtual BATCH_BUFFER_POINTER ReserveOutputBuffer_d(U32 i_outputBufferNo, GUID i_guid, CONST_BATCH_BUFFER_POINTER i_lppBuffer, U32 i_bufferSize) = 0;
+
+
+		//====================================
+		// 外部から預かった入出力バッファ関連
+		//====================================
+	public:
+		/** 入力バッファを取得する(処理デバイス依存) */
+		CONST_BATCH_BUFFER_POINTER GetInputBuffer();
+		/** 入力バッファを取得する(処理デバイス依存) */
+		CONST_BATCH_BUFFER_POINTER GetInputBuffer_d();
+		/** 入力誤差バッファを取得する(処理デバイス依存) */
+		BATCH_BUFFER_POINTER GetDInputBuffer_d();
+		/** 出力誤差バッファを取得する(処理デバイス依存) */
+		BATCH_BUFFER_POINTER GetDOutputBuffer_d();
 
 
 		//====================================
@@ -219,11 +267,6 @@ namespace NeuralNetwork {
 		// 入出力バッファ関連
 		//====================================
 	public:
-		/** 入力バッファを取得する */
-		CONST_BATCH_BUFFER_POINTER GetInputBuffer()const;
-		/** 出力差分バッファを取得する */
-		CONST_BATCH_BUFFER_POINTER GetDOutputBuffer()const;
-		
 		/** 出力データバッファを取得する.
 			配列の要素数はGetOutputBufferCountの戻り値.
 			@return 出力データ配列の先頭ポインタ */
@@ -232,18 +275,6 @@ namespace NeuralNetwork {
 			@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
 			@return 成功した場合0 */
 		virtual ErrorCode GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const = 0;
-
-		/** 学習差分を取得する.
-			配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]
-			@return	誤差差分配列の先頭ポインタ */
-		BATCH_BUFFER_POINTER GetDInputBuffer();
-		/** 学習差分を取得する.
-			配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]
-			@return	誤差差分配列の先頭ポインタ */
-		CONST_BATCH_BUFFER_POINTER GetDInputBuffer()const;
-		/** 学習差分を取得する.
-			@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
-		virtual ErrorCode GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const = 0;
 
 
 		//===========================
@@ -336,7 +367,7 @@ namespace NeuralNetwork {
 		/** 演算処理を実行する.
 			@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 			@return 成功した場合0が返る */
-		ErrorCode Calculate(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer);
+		ErrorCode Calculate_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer);
 
 
 		//================================
@@ -348,13 +379,13 @@ namespace NeuralNetwork {
 			@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
 			@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 			直前の計算結果を使用する */
-		ErrorCode CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer);
+		ErrorCode CalculateDInput_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer);
 
 		/** 学習処理を実行する.
 			入力信号、出力信号は直前のCalculateの値を参照する.
 			@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 			直前の計算結果を使用する */
-		ErrorCode Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer);
+		ErrorCode Training_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer);
 	};
 
 }	// NeuralNetwork

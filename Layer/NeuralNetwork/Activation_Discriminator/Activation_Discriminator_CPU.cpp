@@ -38,7 +38,7 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	Activation_Discriminator_CPU::Activation_Discriminator_CPU(Gravisbell::GUID guid, Activation_Discriminator_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct)
+	Activation_Discriminator_CPU::Activation_Discriminator_CPU(Gravisbell::GUID guid, Activation_Discriminator_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
 		:	Activation_Discriminator_Base	(guid, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount				(0)		/**< 入力バッファ数 */
@@ -97,11 +97,9 @@ namespace NeuralNetwork {
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
 			return errorCode;
 
-		// 出力誤差バッファ受け取り用のアドレス配列を作成する
-		this->m_lppDOutputBufferPrev.resize(this->GetBatchSize());
-
-		// 入力誤差バッファ受け取り用のアドレス配列を作成する
-		this->m_lppDInputBuffer.resize(this->GetBatchSize());
+		// 入力誤差/出力誤差バッファ受け取り用のアドレス配列を作成する
+		this->lppBatchDOutputBuffer.resize(this->GetBatchSize());
+		this->lppBatchDInputBuffer.resize(this->GetBatchSize());
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -123,16 +121,9 @@ namespace NeuralNetwork {
 		if(this->outputBufferCount == 0)
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
-		// 入力バッファ保存用のアドレス配列を作成
-		this->m_lppInputBuffer.resize(this->GetBatchSize(), NULL);
-
-		// 出力バッファを作成
-		this->lpOutputBuffer.resize(this->GetBatchSize() * this->outputBufferCount);
+		// 入力/出力バッファ保存用のアドレス配列を作成
+		this->lppBatchInputBuffer.resize(this->GetBatchSize(), NULL);
 		this->lppBatchOutputBuffer.resize(this->GetBatchSize());
-		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
-		{
-			this->lppBatchOutputBuffer[batchNum] = &this->lpOutputBuffer[batchNum * this->outputBufferCount];
-		}
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -149,12 +140,14 @@ namespace NeuralNetwork {
 	/** 演算処理を実行する.
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 		@return 成功した場合0が返る */
-	ErrorCode Activation_Discriminator_CPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
+	ErrorCode Activation_Discriminator_CPU::Calculate_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer)
 	{
-		// 入力バッファのアドレスを配列に格納
-		this->m_lpInputBuffer = i_lpInputBuffer;
+		// 入力/出力バッファのアドレスを配列に格納
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
-			this->m_lppInputBuffer[batchNum] = &i_lpInputBuffer[batchNum * this->inputBufferCount];
+		{
+			this->lppBatchInputBuffer[batchNum]  = &i_lppInputBuffer[batchNum * this->inputBufferCount];
+			this->lppBatchOutputBuffer[batchNum] = &o_lppOutputBuffer[batchNum * this->outputBufferCount];
+		}
 
 		std::vector<F32> lpOutputBuffer(this->inputBufferCount);
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
@@ -164,7 +157,7 @@ namespace NeuralNetwork {
 			for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
 			{
 				// 活性化
-				lpOutputBuffer[inputNum] = this->func_Activation(this->m_lppInputBuffer[batchNum][inputNum]);
+				lpOutputBuffer[inputNum] = this->func_Activation(this->lppBatchInputBuffer[batchNum][inputNum]);
 				sum += lpOutputBuffer[inputNum];
 			}
 
@@ -172,30 +165,6 @@ namespace NeuralNetwork {
 			this->lppBatchOutputBuffer[batchNum][0] = lpOutputBuffer[0] / sum;
 		}
 
-
-		return ErrorCode::ERROR_CODE_NONE;
-	}
-
-
-	/** 出力データバッファを取得する.
-		配列の要素数はGetOutputBufferCountの戻り値.
-		@return 出力データ配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER Activation_Discriminator_CPU::GetOutputBuffer()const
-	{
-		return &this->lpOutputBuffer[0];
-	}
-	/** 出力データバッファを取得する.
-		@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
-		@return 成功した場合0 */
-	ErrorCode Activation_Discriminator_CPU::GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
-	{
-		if(o_lpOutputBuffer == NULL)
-			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-
-		const U32 batchSize = this->GetBatchSize();
-		const U32 outputBufferCount = this->GetOutputBufferCount();
-
-		memcpy(o_lpOutputBuffer, this->GetOutputBuffer(), sizeof(F32)*outputBufferCount*batchSize);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -209,28 +178,26 @@ namespace NeuralNetwork {
 		@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Activation_Discriminator_CPU::CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode Activation_Discriminator_CPU::CalculateDInput_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
-		// 出力誤差バッファのアドレスを配列に格納
-		this->m_lpDOutputBufferPrev = i_lppDOutputBuffer;
-		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
-			this->m_lppDOutputBufferPrev[batchNum] = &this->m_lpDOutputBufferPrev[batchNum * this->outputBufferCount];
-
 		// 入力誤差計算
-		this->m_lpDInputBuffer = o_lppDInputBuffer;
 		if(o_lppDInputBuffer)
 		{
-			// 入力誤差バッファのアドレスを配列に格納
+			// 入力誤差/出力誤差バッファのアドレスを配列に格納
 			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
-				this->m_lppDInputBuffer[batchNum] = &o_lppDInputBuffer[batchNum * this->inputBufferCount];
+			{
+				this->lppBatchDInputBuffer[batchNum]  = &o_lppDInputBuffer[batchNum * this->inputBufferCount];
+				this->lppBatchDOutputBuffer[batchNum] = &i_lppDOutputBuffer[batchNum * this->outputBufferCount];
+				this->lppBatchOutputBuffer[batchNum]  = const_cast<BATCH_BUFFER_POINTER>(&i_lppOutputBuffer[batchNum * this->outputBufferCount]);
+			}
 
 			// 入力誤差を計算
 			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
-			//	this->m_lppDInputBuffer[batchNum][0] = this->func_dActivation(       this->lppBatchOutputBuffer[batchNum][0]) *  this->m_lppDOutputBufferPrev[batchNum][0];
-			//	this->m_lppDInputBuffer[batchNum][1] = this->func_dActivation(1.0f - this->lppBatchOutputBuffer[batchNum][0]) * -this->m_lppDOutputBufferPrev[batchNum][0];
-				this->m_lppDInputBuffer[batchNum][0] =  this->m_lppDOutputBufferPrev[batchNum][0];
-				this->m_lppDInputBuffer[batchNum][1] = -this->m_lppDOutputBufferPrev[batchNum][0];
+			//	this->lppBatchDInputBuffer[batchNum][0] = this->func_dActivation(       this->lppBatchOutputBuffer[batchNum][0]) *  this->lppBatchDOutputBuffer[batchNum][0];
+			//	this->lppBatchDInputBuffer[batchNum][1] = this->func_dActivation(1.0f - this->lppBatchOutputBuffer[batchNum][0]) * -this->lppBatchDOutputBuffer[batchNum][0];
+				this->lppBatchDInputBuffer[batchNum][0] =  this->lppBatchDOutputBuffer[batchNum][0];
+				this->lppBatchDInputBuffer[batchNum][1] = -this->lppBatchDOutputBuffer[batchNum][0];
 			}
 		}
 
@@ -241,32 +208,9 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Activation_Discriminator_CPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode Activation_Discriminator_CPU::Training_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
-		return this->CalculateDInput(o_lppDInputBuffer, i_lppDOutputBuffer);
-	}
-
-
-	/** 学習差分を取得する.
-		配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]
-		@return	誤差差分配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER Activation_Discriminator_CPU::GetDInputBuffer()const
-	{
-		return this->m_lpDInputBuffer;
-	}
-	/** 学習差分を取得する.
-		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
-	ErrorCode Activation_Discriminator_CPU::GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const
-	{
-		if(o_lpDInputBuffer == NULL)
-			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-
-		const U32 batchSize = this->GetBatchSize();
-		const U32 inputBufferCount = this->GetInputBufferCount();
-
-		memcpy(o_lpDInputBuffer, this->GetDInputBuffer(), sizeof(F32)*inputBufferCount*batchSize);
-
-		return ErrorCode::ERROR_CODE_NONE;
+		return this->CalculateDInput_device(i_lppInputBuffer, o_lppDInputBuffer, i_lppOutputBuffer, i_lppDOutputBuffer);
 	}
 
 

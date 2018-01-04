@@ -55,6 +55,9 @@
     <Filter Include="Layer">
       <UniqueIdentifier>{65317a4e-8411-4853-b7a7-572d9e80e862}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LayerBase">
+      <UniqueIdentifier>{2de2557f-581e-4eb6-938a-0f75ea489e38}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -158,6 +161,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase.h">
+      <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase_GPU.cuh">
+      <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase_CPU.h">
+      <Filter>LayerBase</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

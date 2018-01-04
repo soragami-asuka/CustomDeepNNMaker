@@ -33,6 +33,9 @@ using namespace Gravisbell;
 #define USE_BATCHNORM	1
 #define USE_DROPOUT		1
 
+#define USE_BATCH_SIZE	128
+#define MAX_EPOCH		5
+
 
 /** データファイルをを読み込む
 	@param	o_ppDataLayerTeach	教師データを格納したデータクラスの格納先ポインタアドレス
@@ -137,12 +140,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 
 	// 乱数を固定
-#ifdef _DEBUG
-	Gravisbell::Layer::NeuralNetwork::GetInitializerManager().InitializeRandomParameter(0);
-#endif
+//#ifdef _DEBUG
+//	Gravisbell::Layer::NeuralNetwork::GetInitializerManager().InitializeRandomParameter(0);
+//#endif
 
 	// ニューラルネットワーク作成
-	Gravisbell::Layer::Connect::ILayerConnectData* pNeuralNetworkData = CreateNeuralNetwork_ver03(*pLayerDLLManager, *pLayerDataManager, pDataLayerTeach_Input->GetInputDataStruct(), pDataLayerTeach_Output->GetDataStruct());
+	Gravisbell::Layer::Connect::ILayerConnectData* pNeuralNetworkData = CreateNeuralNetwork_ver05(*pLayerDLLManager, *pLayerDataManager, pDataLayerTeach_Input->GetInputDataStruct(), pDataLayerTeach_Output->GetDataStruct());
 	if(pNeuralNetworkData == NULL)
 	{
 		delete pDataLayerTeach_Input;
@@ -184,7 +187,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	// 学習用ニューラルネットワーク作成
 	Layer::NeuralNetwork::INeuralNetwork* pNeuralNetworkLearn = NULL;
 	{
+#if USE_HOST_MEMORY
 		Layer::ILayerBase* pLayer = pNeuralNetworkData->CreateLayer(boost::uuids::random_generator()().data, &pDataLayerTeach_Input->GetOutputDataStruct(), 1);
+#else
+		Layer::ILayerBase* pLayer = pNeuralNetworkData->CreateLayer_device(boost::uuids::random_generator()().data, &pDataLayerTeach_Input->GetOutputDataStruct(), 1);
+#endif
 		pNeuralNetworkLearn = dynamic_cast<Layer::NeuralNetwork::INeuralNetwork*>(pLayer);
 		if(pNeuralNetworkLearn == NULL)
 		{
@@ -206,7 +213,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	// テスト用ニューラルネットワーク作成
 	Layer::NeuralNetwork::INeuralNetwork* pNeuralNetworkTest = NULL;
 	{
+#if USE_HOST_MEMORY
 		Layer::ILayerBase* pLayer = pNeuralNetworkData->CreateLayer(boost::uuids::random_generator()().data, &pDataLayerTeach_Input->GetOutputDataStruct(), 1);
+#else
+		Layer::ILayerBase* pLayer = pNeuralNetworkData->CreateLayer_device(boost::uuids::random_generator()().data, &pDataLayerTeach_Input->GetOutputDataStruct(), 1);
+#endif
 		pNeuralNetworkTest = dynamic_cast<Layer::NeuralNetwork::INeuralNetwork*>(pLayer);
 		if(pNeuralNetworkTest == NULL)
 		{
@@ -228,8 +239,10 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	// 学習, テスト実行
 	{
+		time_t startTime = time(NULL);
+
 		// 学習
-		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkTest, pDataLayerTeach_Input, pDataLayerTeach_Output, pDataLayerTest_Input, pDataLayerTest_Output, 32, 100) != ErrorCode::ERROR_CODE_NONE)
+		if(::LearnWithCalculateSampleError(pNeuralNetworkLearn, pNeuralNetworkTest, pDataLayerTeach_Input, pDataLayerTeach_Output, pDataLayerTest_Input, pDataLayerTest_Output, USE_BATCH_SIZE, MAX_EPOCH) != ErrorCode::ERROR_CODE_NONE)
 		{
 			delete pNeuralNetworkLearn;
 			delete pNeuralNetworkTest;
@@ -243,6 +256,9 @@ int _tmain(int argc, _TCHAR* argv[])
 			return -1;
 		}
 
+		time_t endTime = time(NULL);
+
+		printf("経過時間(s) : %ld\n", (endTime - startTime));
 	}
 
 
@@ -314,11 +330,13 @@ Gravisbell::ErrorCode LoadSampleData_image(
 
 #if USE_GPU
 #if USE_HOST_MEMORY
+	*o_ppDataLayerTeach = Gravisbell::Layer::IOData::CreateIODataLayerCPU(dataStruct);
+	*o_ppDataLayerTest  = Gravisbell::Layer::IOData::CreateIODataLayerCPU(dataStruct);
+#else
 	*o_ppDataLayerTeach = Gravisbell::Layer::IOData::CreateIODataLayerGPU_host(dataStruct);
 	*o_ppDataLayerTest  = Gravisbell::Layer::IOData::CreateIODataLayerGPU_host(dataStruct);
-#else
-	*o_ppDataLayerTeach = Gravisbell::Layer::IOData::CreateIODataLayerGPU_device(dataStruct);
-	*o_ppDataLayerTest  = Gravisbell::Layer::IOData::CreateIODataLayerGPU_device(dataStruct);
+	//*o_ppDataLayerTeach = Gravisbell::Layer::IOData::CreateIODataLayerGPU_device(dataStruct);
+	//*o_ppDataLayerTest  = Gravisbell::Layer::IOData::CreateIODataLayerGPU_device(dataStruct);
 #endif
 #else
 	*o_ppDataLayerTeach = Gravisbell::Layer::IOData::CreateIODataLayerCPU(dataStruct);
@@ -398,11 +416,13 @@ Gravisbell::ErrorCode LoadSampleData_label(
 
 #if USE_GPU
 #if USE_HOST_MEMORY
+	*o_ppDataLayerTeach = Gravisbell::Layer::IOData::CreateIODataLayerCPU(dataStruct);
+	*o_ppDataLayerTest  = Gravisbell::Layer::IOData::CreateIODataLayerCPU(dataStruct);
+#else
 	*o_ppDataLayerTeach = Gravisbell::Layer::IOData::CreateIODataLayerGPU_host(dataStruct);
 	*o_ppDataLayerTest  = Gravisbell::Layer::IOData::CreateIODataLayerGPU_host(dataStruct);
-#else
-	*o_ppDataLayerTeach = Gravisbell::Layer::IOData::CreateIODataLayerGPU_device(dataStruct);
-	*o_ppDataLayerTest  = Gravisbell::Layer::IOData::CreateIODataLayerGPU_device(dataStruct);
+//	*o_ppDataLayerTeach = Gravisbell::Layer::IOData::CreateIODataLayerGPU_device(dataStruct);
+//	*o_ppDataLayerTest  = Gravisbell::Layer::IOData::CreateIODataLayerGPU_device(dataStruct);
 #endif
 #else
 	*o_ppDataLayerTeach = Gravisbell::Layer::IOData::CreateIODataLayerCPU(dataStruct);
@@ -1164,7 +1184,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver04(const Layer::Neural
 		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_CAD(lastLayerGUID, Vector3D<S32>(5,5,1),  8, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0), L"ReLU", 0.5f);
 		lastLayerGUID = pNetworkMaker->AddPoolingLayer(lastLayerGUID, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1));
 		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_CAD(lastLayerGUID, Vector3D<S32>(5,5,1), 16, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0), L"ReLU", 0.5f);
-		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_CAD(lastLayerGUID, Vector3D<S32>(5,5,1), 32, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0), L"ReLU", 0.5f);
+		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_CBAD(lastLayerGUID, Vector3D<S32>(5,5,1), 32, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0), L"ReLU", 0.5f);
 
 		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_FA(lastLayerGUID, 64, L"ReLU");
 		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_FA(lastLayerGUID, 32, L"ReLU");

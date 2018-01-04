@@ -46,6 +46,9 @@
     <Filter Include="include\Layer\IO">
       <UniqueIdentifier>{0bc20bfc-5091-4463-9264-6105df934dee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LayerBase">
+      <UniqueIdentifier>{25469f19-af7b-41ea-85b0-41cc042477ef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -108,9 +111,6 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayer.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerData.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
@@ -146,6 +146,15 @@
     </ClInclude>
     <ClInclude Include="MergeInput_GPU.cuh">
       <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase.h">
+      <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase_GPU.cuh">
+      <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase_CPU.h">
+      <Filter>LayerBase</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

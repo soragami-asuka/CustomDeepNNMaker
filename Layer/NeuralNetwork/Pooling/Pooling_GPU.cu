@@ -21,13 +21,11 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	Pooling_GPU::Pooling_GPU(Gravisbell::GUID guid, Pooling_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct)
+	Pooling_GPU::Pooling_GPU(Gravisbell::GUID guid, Pooling_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
 		:	Pooling_Base					(guid, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount				(0)				/**< 入力バッファ数 */
 		,	outputBufferCount				(0)				/**< 出力バッファ数 */
-		,	m_lppInputBuffer				(NULL)			/**< 演算時の入力データ */
-		,	m_lppDOutputBufferPrev			(NULL)			/**< 入力誤差計算時の出力誤差データ */
 	{
         cudnnCreate(&this->cudnnHandle);
         cudnnCreateTensorDescriptor(&this->inputTensorDesc);
@@ -109,9 +107,6 @@ namespace NeuralNetwork {
 		this->outputBufferCount = this->GetOutputBufferCount();
 		if(this->outputBufferCount == 0)
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
-
-		// 出力バッファを作成
-		this->lpOutputBuffer.resize(this->GetBatchSize() * this->outputBufferCount);
 
 
 		// 次元数を調べる
@@ -328,11 +323,8 @@ namespace NeuralNetwork {
 	/** 演算処理を実行する.
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 		@return 成功した場合0が返る */
-	ErrorCode Pooling_GPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
+	ErrorCode Pooling_GPU::Calculate_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer)
 	{
-		// 入力バッファのアドレスを格納
-		this->m_lppInputBuffer = i_lpInputBuffer;
-
 		// プーリング処理を実行
 		F32 alpha = 1.0f;
 		F32 beta  = 0.0f;
@@ -341,36 +333,12 @@ namespace NeuralNetwork {
 			this->poolingDesc,
 			&alpha,
 			this->inputTensorDesc,
-			i_lpInputBuffer,
+			i_lppInputBuffer,
 			&beta,
 			this->outputTensorDesc,
-			thrust::raw_pointer_cast(&this->lpOutputBuffer[0]));
+			o_lppOutputBuffer);
 		if(err_cudnn != 0)
 			return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
-
-		return ErrorCode::ERROR_CODE_NONE;
-	}
-
-
-	/** 出力データバッファを取得する.
-		配列の要素数はGetOutputBufferCountの戻り値.
-		@return 出力データ配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER Pooling_GPU::GetOutputBuffer()const
-	{
-		return thrust::raw_pointer_cast(&this->lpOutputBuffer[0]);
-	}
-	/** 出力データバッファを取得する.
-		@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
-		@return 成功した場合0 */
-	ErrorCode Pooling_GPU::GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
-	{
-		if(o_lpOutputBuffer == NULL)
-			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-
-		const U32 batchSize = this->GetBatchSize();
-		const U32 outputBufferCount = this->GetOutputBufferCount();
-
-		cudaMemcpy(o_lpOutputBuffer, this->GetOutputBuffer(), sizeof(F32)*outputBufferCount*batchSize, cudaMemcpyDeviceToHost);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -384,17 +352,11 @@ namespace NeuralNetwork {
 		@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Pooling_GPU::CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode Pooling_GPU::CalculateDInput_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
-		// 出力誤差バッファのアドレスを配列に格納
-		this->m_lppDOutputBufferPrev = i_lppDOutputBuffer;
-
 		// 入力誤差計算
 		if(o_lppDInputBuffer)
 		{
-			// 入力誤差バッファのアドレスを格納
-			this->m_lpDInputBuffer_d = o_lppDInputBuffer;
-
 			F32 alpha = 1.0f;
 			F32 beta  = 0.0f;
 			cudnnStatus_t err_cudnn = cudnnPoolingBackward(
@@ -402,14 +364,14 @@ namespace NeuralNetwork {
 				this->poolingDesc,
 				&alpha,
 				this->outputTensorDesc,
-				thrust::raw_pointer_cast(&this->lpOutputBuffer[0]),
+				i_lppOutputBuffer,
 				this->outputTensorDesc,
-				this->m_lppDOutputBufferPrev,
+				i_lppDOutputBuffer,
 				this->inputTensorDesc,
-				this->m_lppInputBuffer,
+				i_lppInputBuffer,
 				&beta,
 				this->inputTensorDesc,
-				this->m_lpDInputBuffer_d);
+				o_lppDInputBuffer);
 			if(err_cudnn != 0)
 				return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
 		}
@@ -421,32 +383,9 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Pooling_GPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode Pooling_GPU::Training_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
-		return this->CalculateDInput(o_lppDInputBuffer, i_lppDOutputBuffer);
-	}
-
-
-	/** 学習差分を取得する.
-		配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]
-		@return	誤差差分配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER Pooling_GPU::GetDInputBuffer()const
-	{
-		return this->m_lpDInputBuffer_d;
-	}
-	/** 学習差分を取得する.
-		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
-	ErrorCode Pooling_GPU::GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const
-	{
-		if(o_lpDInputBuffer == NULL)
-			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-
-		const U32 batchSize = this->GetBatchSize();
-		const U32 inputBufferCount = this->GetInputBufferCount();
-
-		cudaMemcpy(o_lpDInputBuffer, this->GetDInputBuffer(), sizeof(F32)*inputBufferCount*batchSize, cudaMemcpyDeviceToHost);
-
-		return ErrorCode::ERROR_CODE_NONE;
+		return this->CalculateDInput_device(i_lppInputBuffer, o_lppDInputBuffer, i_lppOutputBuffer, i_lppDOutputBuffer);
 	}
 
 

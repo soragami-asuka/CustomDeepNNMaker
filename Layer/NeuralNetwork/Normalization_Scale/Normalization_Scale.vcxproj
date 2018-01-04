@@ -409,6 +409,8 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
     <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h" />
     <ClInclude Include="..\_LayerBase\CLayerBase.h" />
+    <ClInclude Include="..\_LayerBase\CLayerBase_CPU.h" />
+    <ClInclude Include="..\_LayerBase\CLayerBase_GPU.cuh" />
     <ClInclude Include="Normalization_Scale_Base.h" />
     <ClInclude Include="Normalization_Scale_CPU.h" />
     <ClInclude Include="Normalization_Scale_DATA.hpp" />

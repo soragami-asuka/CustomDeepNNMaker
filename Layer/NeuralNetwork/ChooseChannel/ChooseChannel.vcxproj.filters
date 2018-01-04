@@ -58,6 +58,9 @@
     <Filter Include="LayerData">
       <UniqueIdentifier>{cd5d976b-d114-49ab-8765-63e8cddad9e5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LayerBase">
+      <UniqueIdentifier>{ccd263cb-177c-4b34-8857-7f882a379bd3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -197,6 +200,15 @@
     </ClInclude>
     <ClInclude Include="ChooseChannel_GPU.cuh">
       <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase.h">
+      <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase_CPU.h">
+      <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase_GPU.cuh">
+      <Filter>LayerBase</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

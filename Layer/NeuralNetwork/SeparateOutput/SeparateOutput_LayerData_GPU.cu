@@ -8,6 +8,8 @@
 #include"SeparateOutput_FUNC.hpp"
 #include"SeparateOutput_GPU.cuh"
 
+#include"../_LayerBase/CLayerBase_GPU.cuh"
+
 using namespace Gravisbell;
 
 namespace Gravisbell {
@@ -39,7 +41,7 @@ namespace NeuralNetwork {
 		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
 			return NULL;
 
-		return new SeparateOutput_GPU(guid, *this, i_lpInputDataStruct[0]);
+		return new CNNSingle2MultLayerBase_GPU<SeparateOutput_GPU, SeparateOutput_LayerData_GPU>(guid, *this, i_lpInputDataStruct[0], i_temporaryMemoryManager);
 	}
 
 } // Gravisbell;

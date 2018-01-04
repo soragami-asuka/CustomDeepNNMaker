@@ -33,22 +33,15 @@ private:
 	std::vector<U32*>						m_lppConvertTable;		/**< 変換テーブル<sqrt(x-1)*2+1><sqrt(x-1)*2+1> */
 
 	// 入出力バッファ
-	CONST_BATCH_BUFFER_POINTER				m_lpInputBuffer;		/**< 入力バッファ <バッチ数 * 入力信号数> */
-	std::vector<CONST_BATCH_BUFFER_POINTER> m_lppInputBuffer;		/**< 入力バッファ <バッチ数><入力信号数>  */
-
-	std::vector<F32>						m_lpOutputBuffer;		/**< 出力バッファ <バッチ数 * 出力信号数> */
-	std::vector<BATCH_BUFFER_POINTER>		m_lppOutputBuffer;		/**< 出力バッファ <バッチ数><出力信号数> */
-
-	CONST_BATCH_BUFFER_POINTER				m_lpDOutputBuffer;		/**< 出力誤差バッファ <バッチ数 * 出力信号数> */
-	std::vector<CONST_BATCH_BUFFER_POINTER> m_lppDOutputBuffer;		/**< 出力誤差バッファ <バッチ数><出力信号数> */
-
-	BATCH_BUFFER_POINTER					m_lpDInputBuffer;		/**< 入力誤差バッファ <バッチ数 * 入力信号数> */
-	std::vector<BATCH_BUFFER_POINTER>		m_lppDInputBuffer;		/**< 入力誤差バッファ <バッチ数><入力信号数> */
+	std::vector<CONST_BATCH_BUFFER_POINTER> lppBatchInputBuffer;	/**< 演算時の入力データ */
+	std::vector<BATCH_BUFFER_POINTER>		lppBatchOutputBuffer;	/**< バッチ処理用出力バッファ <バッチ数> */
+	std::vector<BATCH_BUFFER_POINTER>		lppBatchDInputBuffer;	/**< 入力誤差計算時の出力誤差データ */
+	std::vector<CONST_BATCH_BUFFER_POINTER> lppBatchDOutputBuffer;	/**< 入力誤差計算時の出力誤差データ */
 
 
 public:
 	/** コンストラクタ */
-	Reshape_SquaresCenterCross_CPU(Gravisbell::GUID guid, class Reshape_SquaresCenterCross_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct);
+	Reshape_SquaresCenterCross_CPU(Gravisbell::GUID guid, class Reshape_SquaresCenterCross_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager);
 	/** デストラクタ */
 	virtual ~Reshape_SquaresCenterCross_CPU();
 
@@ -74,7 +67,7 @@ public:
 
 public:
 	//================================
-	// 演算処理
+	// 事前処理
 	//================================
 	/** 演算前処理を実行する.(学習用)
 		@param batchSize	同時に演算を行うバッチのサイズ.
@@ -95,19 +88,14 @@ public:
 
 
 
+public:
+	//================================
+	// 演算処理
+	//================================
 	/** 演算処理を実行する.
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 		@return 成功した場合0が返る */
-	ErrorCode Calculate(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer);
-
-	/** 出力データバッファを取得する.
-		配列の要素数はGetOutputBufferCountの戻り値.
-		@return 出力データ配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER GetOutputBuffer()const;
-	/** 出力データバッファを取得する.
-		@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
-		@return 成功した場合0 */
-	ErrorCode GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const;
+	ErrorCode Calculate_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer);
 
 public:
 	//================================
@@ -118,22 +106,13 @@ public:
 		@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要な配列の[GetOutputDataCount()]配列
 		直前の計算結果を使用する */
-	ErrorCode CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer);
+	ErrorCode CalculateDInput_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer);
 
 	/** 学習処理を実行する.
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer);
-
-	/** 学習差分を取得する.
-		配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]
-		@return	誤差差分配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER GetDInputBuffer()const;
-	/** 学習差分を取得する.
-		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
-	ErrorCode GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const;
-
+	ErrorCode Training_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer);
 };
 
 

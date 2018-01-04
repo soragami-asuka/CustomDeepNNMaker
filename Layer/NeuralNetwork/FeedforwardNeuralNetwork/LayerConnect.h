@@ -19,6 +19,7 @@ namespace Layer {
 namespace NeuralNetwork {
 
 	static const S32 INVALID_DINPUTBUFFER_ID = 0xFFFF;
+	static const S32 INVALID_OUTPUTBUFFER_ID = 0xFFFF;
 
 	/** レイヤーのポインタと接続位置の情報 */
 	struct LayerPosition
@@ -91,15 +92,19 @@ namespace NeuralNetwork {
 		/** 出力データ構造を取得する.
 			@return	出力データ構造 */
 		virtual IODataStruct GetOutputDataStruct()const = 0;
-		/** 出力データバッファを取得する.
+		/** 出力データバッファを取得する.(ホストメモリ)
 			配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
 			@return 出力データ配列の先頭ポインタ */
 		virtual CONST_BATCH_BUFFER_POINTER GetOutputBuffer()const = 0;
+		/** 出力データバッファを取得する.
+			配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
+			@return 出力データ配列の先頭ポインタ */
+		virtual CONST_BATCH_BUFFER_POINTER GetOutputBuffer_d()const = 0;
 
 		/** 入力誤差バッファの位置を入力元レイヤーのGUID指定で取得する */
 		virtual S32 GetDInputPositionByGUID(const Gravisbell::GUID& i_guid)const = 0;
 		/** 入力誤差バッファを位置指定で取得する */
-		virtual CONST_BATCH_BUFFER_POINTER GetDInputBufferByNum(S32 num)const = 0;
+		virtual CONST_BATCH_BUFFER_POINTER GetDInputBufferByNum_d(S32 num)const = 0;
 
 		/** レイヤーリストを作成する.
 			@param	i_lpLayerGUID	接続しているGUIDのリスト.入力方向に確認する. */
@@ -145,6 +150,8 @@ namespace NeuralNetwork {
 		/** レイヤーの接続を解除 */
 		virtual ErrorCode Disconnect(void) = 0;
 
+		/** レイヤーで使用する出力バッファのIDを登録する */
+		virtual ErrorCode SetOutputBufferID(S32 i_outputBufferID) = 0;
 
 		/** レイヤーで使用する入力誤差バッファのIDを取得する
 			@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */

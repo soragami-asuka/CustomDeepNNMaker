@@ -576,8 +576,9 @@ namespace NeuralNetwork {
 			{
 				lpInputDataStruct.push_back(this->GetOutputDataStruct(inputGUID, i_lpInputDataStruct, i_inputLayerCount));
 			}
-
+			
 			err = neuralNetwork.AddLayer(it.pLayerData->CreateLayer(it.guid, &lpInputDataStruct[0], (U32)lpInputDataStruct.size(), neuralNetwork.GetTemporaryMemoryManager()));
+
 			if(err != ErrorCode::ERROR_CODE_NONE)
 				return err;
 		}

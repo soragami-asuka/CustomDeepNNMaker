@@ -58,7 +58,7 @@ namespace Common {
 		}
 
 		/** バッファを取得する */
-		BYTE* GetBufer(GUID i_layerGUID, const wchar_t i_szCode[])
+		BYTE* GetBuffer(GUID i_layerGUID, const wchar_t i_szCode[])
 		{
 			U32 bufferSize = lpBufferSize[i_layerGUID][i_szCode];
 			std::vector<BYTE>& buffer = this->lpBuffer[i_szCode];

@@ -460,17 +460,14 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingle2SingleLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h" />
     <ClInclude Include="..\..\..\include\SettingData\Standard\IData.h" />
+    <ClInclude Include="..\_LayerBase\CLayerBase.h" />
+    <ClInclude Include="..\_LayerBase\CLayerBase_CPU.h" />
+    <ClInclude Include="..\_LayerBase\CLayerBase_GPU.cuh" />
     <ClInclude Include="FeedforwardNeuralNetwork_Base.h" />
     <ClInclude Include="FeedforwardNeuralNetwork_CPU.h" />
     <ClInclude Include="FeedforwardNeuralNetwork_DATA.hpp" />
     <ClInclude Include="FeedforwardNeuralNetwork_FUNC.hpp" />
-    <ClInclude Include="FeedforwardNeuralNetwork_GPU.cuh">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Maxwell|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Kepler|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Kepler|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="FeedforwardNeuralNetwork_GPU.cuh" />
     <ClInclude Include="FeedforwardNeuralNetwork_LayerData_Base.h" />
     <ClInclude Include="LayerConnect.h" />
     <ClInclude Include="LayerConnectInput.h" />
@@ -542,13 +539,7 @@
     <Xml Include="Config.xml" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="FeedforwardNeuralNetwork_GPU.cu">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Maxwell|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Kepler|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Kepler|Win32'">true</ExcludedFromBuild>
-    </CudaCompile>
+    <CudaCompile Include="FeedforwardNeuralNetwork_GPU.cu" />
     <CudaCompile Include="FeedforwardNeuralNetwork_LayerData_GPU.cu">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Maxwell|Win32'">true</ExcludedFromBuild>

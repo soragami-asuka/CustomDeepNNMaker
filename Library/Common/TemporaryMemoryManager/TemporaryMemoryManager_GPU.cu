@@ -6,6 +6,7 @@
 #include"Library/Common/TemporaryMemoryManager.h"
 
 #include<map>
+#include<list>
 
 #include<thrust/device_vector.h>
 
@@ -13,21 +14,50 @@
 namespace Gravisbell {
 namespace Common {
 
-	class TemporaryMemoryManager_GPU : public ITemporaryMemoryManager
+	template<class BufferType>
+	class TemporaryMemoryManager : public ITemporaryMemoryManager
 	{
 	private:
-		std::map<GUID, std::map<std::wstring, U32>>	lpBufferSize;	/**< バッファのサイズ一覧 */
-		std::map<std::wstring, thrust::device_vector<BYTE>>	lpBuffer;		/**< バッファ本体 */
+		struct BufferInfo
+		{
+			bool onReserved;						/**< 使用予約がされているか */
+			GUID guid;								/**< 予約しているレイヤーのGUID */
+			BufferType lpBuffer;	/**< バッファ本体 */
+
+			BufferInfo()
+				:	onReserved	(false)
+				,	guid		()
+				,	lpBuffer()
+			{
+			}
+			BufferInfo(BufferInfo& info)
+				:	onReserved	(info.onReserved)
+				,	guid		(info.guid)
+				,	lpBuffer	(info.lpBuffer)
+			{
+			}
+			BufferInfo(bool i_onReserved, GUID i_guid, U32 i_bufferSize)
+				:	onReserved	(i_onReserved)
+				,	guid		(i_guid)
+				,	lpBuffer	(i_bufferSize)
+			{
+			}
+		};
+
+		std::map<GUID, std::map<std::wstring, U32>>	lpBufferSize;				/**< バッファのサイズ一覧 */
+		std::map<std::wstring, BufferType>	lpShareBuffer;		/**< 共有バッファ本体 */
+		std::map<std::wstring, std::list<BufferInfo>>		lpReserveBuffer;	/**< 予約バッファ本体 */
+
 
 	public:
 		/** コンストラクタ */
-		TemporaryMemoryManager_GPU()
+		TemporaryMemoryManager()
 			:	ITemporaryMemoryManager()
 		{
 		}
 
 		/** デストラクタ */
-		virtual ~TemporaryMemoryManager_GPU()
+		virtual ~TemporaryMemoryManager()
 		{
 		}
 
@@ -60,22 +90,80 @@ namespace Common {
 		}
 
 		/** バッファを取得する */
-		BYTE* GetBufer(GUID i_layerGUID, const wchar_t i_szCode[])
+		BYTE* GetBuffer(GUID i_layerGUID, const wchar_t i_szCode[])
 		{
 			U32 bufferSize = lpBufferSize[i_layerGUID][i_szCode];
-			thrust::device_vector<BYTE>& buffer = this->lpBuffer[i_szCode];
+			thrust::device_vector<BYTE>& buffer = this->lpShareBuffer[i_szCode];
 
 			if(buffer.size() < bufferSize)
 				buffer.resize(bufferSize);
 
 			return thrust::raw_pointer_cast(&buffer[0]);
 		}
+
+		/** バッファを予約して取得する */
+		BYTE* ReserveBuffer(GUID i_layerGUID, const wchar_t i_szCode[])
+		{
+			// バッファサイズを取得
+			U32 bufferSize = lpBufferSize[i_layerGUID][i_szCode];
+
+			// 同一コードの空きバッファを検索
+			auto& bufferList = this->lpReserveBuffer[i_szCode];
+			auto it = bufferList.begin();
+			while(it != bufferList.end())
+			{
+				if(!it->onReserved)
+					break;
+				if(it->guid == i_layerGUID)
+					return thrust::raw_pointer_cast(&it->lpBuffer[0]);	// 予約済みで同一GUIDの場合終了
+
+				it++;
+			}
+
+			if(it == bufferList.end())
+			{
+				// 空きがない場合は強制的に追加
+				it = bufferList.insert(bufferList.end(), BufferInfo(true, i_layerGUID, bufferSize));
+			}
+			else
+			{
+				// バッファのサイズを確認して、必要なら拡張
+				if(it->lpBuffer.size() < bufferSize)
+					it->lpBuffer.resize(bufferSize);
+			}
+
+			it->onReserved = true;
+			it->guid = i_layerGUID;
+
+			return thrust::raw_pointer_cast(&it->lpBuffer[0]);
+		}
+		/** 予約済みバッファを開放する */
+		void RestoreBuffer(GUID i_layerGUID, const wchar_t i_szCode[])
+		{
+			// 同一コードの予約済みバッファを検索
+			auto& bufferList = this->lpReserveBuffer[i_szCode];
+			auto it = bufferList.begin();
+			while(it != bufferList.end())
+			{
+				if(it->guid == i_layerGUID)
+				{
+					it->onReserved = false;
+					return;
+				}
+
+				it++;
+			}
+		}
 	};
 
 
 	TemporaryMemoryManager_API ITemporaryMemoryManager* CreateTemporaryMemoryManagerGPU()
 	{
-		return new TemporaryMemoryManager_GPU();
+		return new TemporaryMemoryManager<thrust::device_vector<BYTE>>();
+	}
+	TemporaryMemoryManager_API ITemporaryMemoryManager* CreateTemporaryMemoryManagerCPU()
+	{
+		return new TemporaryMemoryManager<thrust::host_vector<BYTE>>();
 	}
 
 }	// Common

@@ -76,15 +76,19 @@ namespace NeuralNetwork {
 		/** 出力データ構造を取得する.
 			@return	出力データ構造 */
 		IODataStruct GetOutputDataStruct()const;
-		/** 出力データバッファを取得する.
+		/** 出力データバッファを取得する.(ホストメモリ)
 			配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
 			@return 出力データ配列の先頭ポインタ */
 		CONST_BATCH_BUFFER_POINTER GetOutputBuffer()const;
+		/** 出力データバッファを取得する.
+			配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
+			@return 出力データ配列の先頭ポインタ */
+		CONST_BATCH_BUFFER_POINTER GetOutputBuffer_d()const;
 
 		/** 入力誤差バッファの位置を入力元レイヤーのGUID指定で取得する */
 		S32 GetDInputPositionByGUID(const Gravisbell::GUID& i_guid)const;
 		/** 入力誤差バッファを位置指定で取得する */
-		CONST_BATCH_BUFFER_POINTER GetDInputBufferByNum(S32 num)const;
+		CONST_BATCH_BUFFER_POINTER GetDInputBufferByNum_d(S32 num)const;
 
 		/** レイヤーリストを作成する.
 			@param	i_lpLayerGUID	接続しているGUIDのリスト.入力方向に確認する. */
@@ -130,6 +134,8 @@ namespace NeuralNetwork {
 		/** レイヤーの接続を解除 */
 		ErrorCode Disconnect(void);
 
+		/** レイヤーで使用する出力バッファのIDを登録する */
+		ErrorCode SetOutputBufferID(S32 i_outputBufferID);
 
 		/** レイヤーで使用する入力誤差バッファのIDを取得する
 			@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */

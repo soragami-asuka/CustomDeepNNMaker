@@ -10,6 +10,7 @@
 
 #include"Library/NeuralNetwork/Optimizer.h"
 
+#include"../_LayerBase/CLayerBase_CPU.h"
 
 using namespace Gravisbell;
 
@@ -183,9 +184,9 @@ namespace NeuralNetwork {
 		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
 			return NULL;
 
-		return new BatchNormalization_CPU(guid, *this, i_lpInputDataStruct[0]);
+		return new CNNSingle2SingleLayerBase_CPU<BatchNormalization_CPU, BatchNormalization_LayerData_CPU>(guid, *this, i_lpInputDataStruct[0], i_temporaryMemoryManager);
 	}
-	
+
 
 	//===========================
 	// オプティマイザー設定

@@ -23,7 +23,7 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	Dropout_GPU::Dropout_GPU(Gravisbell::GUID guid, Dropout_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct)
+	Dropout_GPU::Dropout_GPU(Gravisbell::GUID guid, Dropout_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
 		:	Dropout_Base					(guid, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount				(0)				/**< 入力バッファ数 */
@@ -145,8 +145,6 @@ namespace NeuralNetwork {
 
 			if(err != 0)
 				return ErrorCode::ERROR_CODE_CUDA_INITIALIZE;
-
-			this->lpOutputBuffer_d.resize(this->GetBatchSize() * this->inputBufferCount);
 		}
 
 		// ドロップアウト設定を作成
@@ -215,60 +213,31 @@ namespace NeuralNetwork {
 	/** 演算処理を実行する.
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 		@return 成功した場合0が返る */
-	ErrorCode Dropout_GPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
+	ErrorCode Dropout_GPU::Calculate_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer)
 	{
-		// 入力バッファのアドレスを配列に格納
-		this->m_lpInputBuffer_d = i_lpInputBuffer;
-
 		if(this->GetRuntimeParameterByStructure().UseDropOut)
 		{
 			cudnnStatus_t err = cudnnDropoutForward(
 				this->cudnnHandle,
 				this->dropoutDesc,
 				this->inputTensorDesc,
-				this->m_lpInputBuffer_d,
+				i_lppInputBuffer,
 				this->outputTensorDesc,
-				thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]),
+				o_lppOutputBuffer,
 				this->m_pReserve,
 				this->reserveSize);
 
 			if(err != 0)
 				return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
 		}
-
-		return ErrorCode::ERROR_CODE_NONE;
-	}
-
-
-	/** 出力データバッファを取得する.
-		配列の要素数はGetOutputBufferCountの戻り値.
-		@return 出力データ配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER Dropout_GPU::GetOutputBuffer()const
-	{
-		if(this->GetRuntimeParameterByStructure().UseDropOut)
-		{
-			return thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]);
-		}
 		else
 		{
-			return this->m_lpInputBuffer_d;
+			cudaMemcpy(o_lppOutputBuffer, i_lppInputBuffer, sizeof(F32)*this->outputBufferCount*this->GetBatchSize(), cudaMemcpyDeviceToDevice);
 		}
-	}
-	/** 出力データバッファを取得する.
-		@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
-		@return 成功した場合0 */
-	ErrorCode Dropout_GPU::GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
-	{
-		if(o_lpOutputBuffer == NULL)
-			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-
-		const U32 batchSize = this->GetBatchSize();
-		const U32 outputBufferCount = this->GetOutputBufferCount();
-
-		cudaMemcpy(o_lpOutputBuffer, this->GetOutputBuffer(), sizeof(F32)*outputBufferCount*batchSize, cudaMemcpyDeviceToHost);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
+
 
 
 	//================================
@@ -279,14 +248,9 @@ namespace NeuralNetwork {
 		@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Dropout_GPU::CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode Dropout_GPU::CalculateDInput_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
-		// 出力誤差バッファのアドレスを格納
-		this->m_lpDOutputBufferPrev_d = i_lppDOutputBuffer;
-		// 出力誤差バッファのアドレスを格納
-		this->m_lpDInputBuffer_d = o_lppDInputBuffer;
-
-		if(this->m_lpDInputBuffer_d)
+		if(o_lppDInputBuffer)
 		{
 			if(this->GetRuntimeParameterByStructure().UseDropOut)
 			{
@@ -294,9 +258,9 @@ namespace NeuralNetwork {
 					this->cudnnHandle,
 					this->dropoutDesc,
 					this->outputTensorDesc,
-					this->m_lpDOutputBufferPrev_d,
+					i_lppDOutputBuffer,
 					this->inputTensorDesc,
-					this->m_lpDInputBuffer_d,
+					o_lppDInputBuffer,
 					this->m_pReserve,
 					this->reserveSize);
 
@@ -305,7 +269,7 @@ namespace NeuralNetwork {
 			}
 			else
 			{
-				cudaMemcpy(this->m_lpDInputBuffer_d, this->m_lpDOutputBufferPrev_d, sizeof(F32)*this->inputBufferCount*this->GetBatchSize(), cudaMemcpyDeviceToDevice);
+				cudaMemcpy(o_lppDInputBuffer, i_lppDOutputBuffer, sizeof(F32)*this->inputBufferCount*this->GetBatchSize(), cudaMemcpyDeviceToDevice);
 			}
 		}
 
@@ -316,33 +280,12 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Dropout_GPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode Dropout_GPU::Training_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
-		return this->CalculateDInput(o_lppDInputBuffer, i_lppDOutputBuffer);
+		return this->CalculateDInput_device(i_lppInputBuffer, o_lppDInputBuffer, i_lppOutputBuffer, i_lppDOutputBuffer);
 	}
 
 
-	/** 学習差分を取得する.
-		配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]
-		@return	誤差差分配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER Dropout_GPU::GetDInputBuffer()const
-	{
-		return this->m_lpDInputBuffer_d;
-	}
-	/** 学習差分を取得する.
-		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
-	ErrorCode Dropout_GPU::GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const
-	{
-		if(o_lpDInputBuffer == NULL)
-			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-
-		const U32 batchSize = this->GetBatchSize();
-		const U32 inputBufferCount = this->GetInputBufferCount();
-
-		cudaMemcpy(o_lpDInputBuffer, this->GetDInputBuffer(), sizeof(F32)*inputBufferCount*batchSize, cudaMemcpyDeviceToHost);
-
-		return ErrorCode::ERROR_CODE_NONE;
-	}
 
 
 } // Gravisbell;

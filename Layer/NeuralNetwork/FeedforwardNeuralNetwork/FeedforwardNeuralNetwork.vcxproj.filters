@@ -61,6 +61,9 @@
     <Filter Include="include\Layer\Connect">
       <UniqueIdentifier>{e979b000-9d2b-4852-a297-475409d963eb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LayerBase">
+      <UniqueIdentifier>{170576f8-0aa4-4772-8a93-e736b6cadd88}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -153,9 +156,6 @@
     <ClInclude Include="FeedforwardNeuralNetwork_CPU.h">
       <Filter>Layer</Filter>
     </ClInclude>
-    <ClInclude Include="FeedforwardNeuralNetwork_GPU.cuh">
-      <Filter>Layer</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\ILayerData.h">
       <Filter>include\Layer</Filter>
     </ClInclude>
@@ -206,6 +206,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\Connect\ILayerConnectData.h">
       <Filter>include\Layer\Connect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase.h">
+      <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase_GPU.cuh">
+      <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedforwardNeuralNetwork_GPU.cuh">
+      <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase_CPU.h">
+      <Filter>LayerBase</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

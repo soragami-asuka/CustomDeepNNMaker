@@ -47,7 +47,7 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	Activation_GPU::Activation_GPU(Gravisbell::GUID guid, Activation_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct)
+	Activation_GPU::Activation_GPU(Gravisbell::GUID guid, Activation_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
 		:	Activation_Base	(guid, i_inputDataStruct, i_layerData.GetOutputDataStruct(&i_inputDataStruct, 1))
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	inputBufferCount				(0)		/**< 入力バッファ数 */
@@ -144,7 +144,6 @@ namespace NeuralNetwork {
 			break;
 
 		default:
-			this->lpOutputBuffer_d.resize(this->GetBatchSize() * this->outputBufferCount);
 			{
 				int n = this->GetBatchSize();
 				int c = this->GetOutputDataStruct().ch;
@@ -238,16 +237,13 @@ namespace NeuralNetwork {
 	/** 演算処理を実行する.
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 		@return 成功した場合0が返る */
-	ErrorCode Activation_GPU::Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
+	ErrorCode Activation_GPU::Calculate_device(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer)
 	{
-		// 入力バッファのアドレスを配列に格納
-		this->m_lpInputBuffer_d = i_lpInputBuffer;
-
-
 		switch(this->layerData.layerStructure.ActivationType)
 		{
 			// lenear
 		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_lenear:
+			cudaMemcpy(o_lppOutputBuffer, i_lpInputBuffer, sizeof(F32)*this->inputBufferCount*this->GetBatchSize(), cudaMemcpyDeviceToDevice);
 			break;
 
 		default:
@@ -266,10 +262,10 @@ namespace NeuralNetwork {
 					this->activDesc,
 					&alpha,
 					inputTensorDesc,
-					this->m_lpInputBuffer_d,
+					i_lpInputBuffer,
 					&beta,
 					outputTensorDesc,
-					thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]));
+					&o_lppOutputBuffer[0]);
 			}
 			break;
 
@@ -289,7 +285,7 @@ namespace NeuralNetwork {
 					
 					cuda_func_activation_LeakyReLU<<<grid, block>>>(
 						&i_lpInputBuffer[offset],
-						thrust::raw_pointer_cast(&this->lpOutputBuffer_d[offset]),
+						&o_lppOutputBuffer[offset],
 						this->layerData.layerStructure.LeakyReLU_alpha,
 						bufferCount);
 
@@ -310,10 +306,10 @@ namespace NeuralNetwork {
 					CUDNN_SOFTMAX_MODE_INSTANCE,
 					&alpha,
 					this->inputTensorDesc,
-					this->m_lpInputBuffer_d,
+					i_lpInputBuffer,
 					&beta,
 					this->outputTensorDesc,
-					thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]));
+					&o_lppOutputBuffer[0]);
 			}
 			break;
 		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_CH:
@@ -327,45 +323,13 @@ namespace NeuralNetwork {
 					CUDNN_SOFTMAX_MODE_CHANNEL,
 					&alpha,
 					this->inputTensorDesc,
-					this->m_lpInputBuffer_d,
+					i_lpInputBuffer,
 					&beta,
 					this->outputTensorDesc,
-					thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]));
+					&o_lppOutputBuffer[0]);
 			}
 			break;
 		}
-
-		return ErrorCode::ERROR_CODE_NONE;
-	}
-
-
-	/** 出力データバッファを取得する.
-		配列の要素数はGetOutputBufferCountの戻り値.
-		@return 出力データ配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER Activation_GPU::GetOutputBuffer()const
-	{
-		switch(this->layerData.layerStructure.ActivationType)
-		{
-			// lenear
-		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_lenear:
-			return this->m_lpInputBuffer_d;
-
-		default:
-			return thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]);
-		}
-	}
-	/** 出力データバッファを取得する.
-		@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
-		@return 成功した場合0 */
-	ErrorCode Activation_GPU::GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
-	{
-		if(o_lpOutputBuffer == NULL)
-			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-
-		const U32 batchSize = this->GetBatchSize();
-		const U32 outputBufferCount = this->GetOutputBufferCount();
-
-		cudaMemcpy(o_lpOutputBuffer, this->GetOutputBuffer(), sizeof(F32)*outputBufferCount*batchSize, cudaMemcpyDeviceToHost);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -379,23 +343,16 @@ namespace NeuralNetwork {
 		@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要な配列
 		直前の計算結果を使用する */
-	ErrorCode Activation_GPU::CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode Activation_GPU::CalculateDInput_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
-		// 出力誤差バッファのアドレスを配列に格納
-		this->m_lpDOutputBufferPrev_d = i_lppDOutputBuffer;
-
-
 		// 入力誤差計算
 		if(o_lppDInputBuffer)
 		{
-			// 入力誤差バッファのアドレスを格納
-			this->m_lpDInputBuffer_d = o_lppDInputBuffer;
-
 			switch(this->layerData.layerStructure.ActivationType)
 			{
 				// lenear
 			case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_lenear:
-				cudaMemcpy(this->m_lpDInputBuffer_d, this->m_lpDOutputBufferPrev_d, sizeof(F32)*this->inputBufferCount*this->GetBatchSize(), cudaMemcpyDeviceToDevice);
+				cudaMemcpy(o_lppDInputBuffer, i_lppDOutputBuffer, sizeof(F32)*this->inputBufferCount*this->GetBatchSize(), cudaMemcpyDeviceToDevice);
 				break;
 
 			default:
@@ -413,14 +370,14 @@ namespace NeuralNetwork {
 						this->activDesc,
 						&alpha,
 						this->outputTensorDesc,	// 出力データ構造
-						thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]),	// 出力データ
+						i_lppOutputBuffer,	// 出力データ
 						this->outputTensorDesc,
-						this->m_lpDOutputBufferPrev_d,	// 出力誤差
+						i_lppDOutputBuffer,	// 出力誤差
 						this->inputTensorDesc,
-						this->m_lpInputBuffer_d,	// 入力
+						i_lppInputBuffer,	// 入力
 						&beta,
 						this->inputTensorDesc,
-						this->m_lpDInputBuffer_d	// 入力誤差
+						o_lppDInputBuffer	// 入力誤差
 						);
 				}
 				break;
@@ -440,7 +397,7 @@ namespace NeuralNetwork {
 							U32 offset = bufferSize - remainingSize;
 
 							cuda_func_dactivation_LeakyReLU<<<grid, block>>>(
-								thrust::raw_pointer_cast(&this->lpOutputBuffer_d[offset]),
+								&i_lppOutputBuffer[offset],
 								&i_lppDOutputBuffer[offset],
 								&o_lppDInputBuffer[offset],
 								this->layerData.layerStructure.LeakyReLU_alpha,
@@ -462,12 +419,12 @@ namespace NeuralNetwork {
 							CUDNN_SOFTMAX_MODE_INSTANCE,
 							&alpha,
 							this->outputTensorDesc,
-							thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]),
+							i_lppOutputBuffer,
 							this->outputTensorDesc,
-							this->m_lpDOutputBufferPrev_d,
+							i_lppDOutputBuffer,
 							&beta,
 							this->inputTensorDesc,
-							this->m_lpDInputBuffer_d
+							o_lppDInputBuffer
 							);
 					}
 					break;
@@ -481,12 +438,12 @@ namespace NeuralNetwork {
 							CUDNN_SOFTMAX_MODE_CHANNEL,
 							&alpha,
 							this->outputTensorDesc,
-							thrust::raw_pointer_cast(&this->lpOutputBuffer_d[0]),
+							i_lppOutputBuffer,
 							this->outputTensorDesc,
-							this->m_lpDOutputBufferPrev_d,
+							i_lppDOutputBuffer,
 							&beta,
 							this->inputTensorDesc,
-							this->m_lpDInputBuffer_d
+							o_lppDInputBuffer
 							);
 					}
 					break;
@@ -494,7 +451,7 @@ namespace NeuralNetwork {
 				case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_sigmoid_crossEntropy:
 				case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_ALL_crossEntropy:
 				case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_softmax_CH_crossEntropy:
-					cudaMemcpy(this->m_lpDInputBuffer_d, this->m_lpDOutputBufferPrev_d, sizeof(F32)*this->inputBufferCount*this->GetBatchSize(), cudaMemcpyDeviceToDevice);
+					cudaMemcpy(o_lppDInputBuffer, i_lppDOutputBuffer, sizeof(F32)*this->inputBufferCount*this->GetBatchSize(), cudaMemcpyDeviceToDevice);
 					break;
 			}
 		}
@@ -506,32 +463,9 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Activation_GPU::Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode Activation_GPU::Training_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
-		return this->CalculateDInput(o_lppDInputBuffer, i_lppDOutputBuffer);
-	}
-
-
-	/** 学習差分を取得する.
-		配列の要素数は[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]
-		@return	誤差差分配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER Activation_GPU::GetDInputBuffer()const
-	{
-		return this->m_lpDInputBuffer_d;
-	}
-	/** 学習差分を取得する.
-		@param lpDInputBuffer	学習差分を格納する配列.[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の配列が必要 */
-	ErrorCode Activation_GPU::GetDInputBuffer(BATCH_BUFFER_POINTER o_lpDInputBuffer)const
-	{
-		if(o_lpDInputBuffer == NULL)
-			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-
-		const U32 batchSize = this->GetBatchSize();
-		const U32 inputBufferCount = this->GetInputBufferCount();
-
-		cudaMemcpy(o_lpDInputBuffer, this->GetDInputBuffer(), sizeof(F32)*inputBufferCount*batchSize, cudaMemcpyDeviceToHost);
-
-		return ErrorCode::ERROR_CODE_NONE;
+		return this->CalculateDInput_device(i_lppInputBuffer, o_lppDInputBuffer, i_lppOutputBuffer, i_lppDOutputBuffer);
 	}
 
 
