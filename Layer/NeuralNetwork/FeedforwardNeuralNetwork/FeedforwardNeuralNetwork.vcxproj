@@ -441,15 +441,15 @@
     <ClInclude Include="..\..\..\include\Layer\ILayerData.h" />
     <ClInclude Include="..\..\..\include\Layer\IOData\IDataLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer.h" />
+    <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer_base.h" />
+    <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer_image.h" />
+    <ClInclude Include="..\..\..\include\Layer\IOData\IIODataSequentialLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\IO\IInputLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\IO\IMultInputLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\IO\IMultInputLayerData.h" />
-    <ClInclude Include="..\..\..\include\Layer\IO\IMultOutputLayerData.h" />
+    <ClInclude Include="..\..\..\include\Layer\IO\IMultOutputLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\IO\IOutputLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\IO\ISingleInputLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\IO\ISingleInputLayerData.h" />
     <ClInclude Include="..\..\..\include\Layer\IO\ISingleOutputLayer.h" />
-    <ClInclude Include="..\..\..\include\Layer\IO\ISingleOutputLayerData.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDataManager.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h" />
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h" />
@@ -467,7 +467,9 @@
     <ClInclude Include="FeedforwardNeuralNetwork_CPU.h" />
     <ClInclude Include="FeedforwardNeuralNetwork_DATA.hpp" />
     <ClInclude Include="FeedforwardNeuralNetwork_FUNC.hpp" />
-    <ClInclude Include="FeedforwardNeuralNetwork_GPU.cuh" />
+    <ClInclude Include="FeedforwardNeuralNetwork_GPU_base.cuh" />
+    <ClInclude Include="FeedforwardNeuralNetwork_GPU_d.cuh" />
+    <ClInclude Include="FeedforwardNeuralNetwork_GPU_h.cuh" />
     <ClInclude Include="FeedforwardNeuralNetwork_LayerData_Base.h" />
     <ClInclude Include="LayerConnect.h" />
     <ClInclude Include="LayerConnectInput.h" />
@@ -539,7 +541,9 @@
     <Xml Include="Config.xml" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="FeedforwardNeuralNetwork_GPU.cu" />
+    <CudaCompile Include="FeedforwardNeuralNetwork_GPU_base.cu" />
+    <CudaCompile Include="FeedforwardNeuralNetwork_GPU_d.cu" />
+    <CudaCompile Include="FeedforwardNeuralNetwork_GPU_h.cu" />
     <CudaCompile Include="FeedforwardNeuralNetwork_LayerData_GPU.cu">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Maxwell|Win32'">true</ExcludedFromBuild>

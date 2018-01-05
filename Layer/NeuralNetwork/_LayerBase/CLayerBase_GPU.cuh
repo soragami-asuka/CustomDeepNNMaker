@@ -34,9 +34,6 @@ namespace NeuralNetwork {
 	class CNNSingle2SingleLayerBase_GPU : public Layer
 	{
 	protected:
-		// 入出力バッファ
-		std::vector<F32>				lpInputBuffer_h;		/**< 入力バッファ <バッチ数><入力信号数> */
-		std::vector<F32>				lpOutputBuffer_h;		/**< 出力バッファ <バッチ数><出力信号数> */
 
 		Gravisbell::Common::ITemporaryMemoryManager& temporaryMemoryManager;
 
@@ -61,9 +58,6 @@ namespace NeuralNetwork {
 			this->temporaryMemoryManager.SetBufferSize(this->GetGUID(), L"output[0]",  sizeof(F32) * this->GetOutputBufferCount() * this->GetBatchSize());
 			this->temporaryMemoryManager.SetBufferSize(this->GetGUID(), L"dinput[0]",  sizeof(F32) * this->GetInputBufferCount()  * this->GetBatchSize());
 			this->temporaryMemoryManager.SetBufferSize(this->GetGUID(), L"doutput[0]", sizeof(F32) * this->GetOutputBufferCount() * this->GetBatchSize());
-
-			// 出力バッファを確保
-			this->lpOutputBuffer_h.resize(this->GetOutputBufferCount() * this->GetBatchSize());
 
 			return ErrorCode::ERROR_CODE_NONE;
 		}
@@ -99,21 +93,19 @@ namespace NeuralNetwork {
 		/** 演算処理を実行する.
 			@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 			@return 成功した場合0が返る */
-		ErrorCode Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
+		ErrorCode Calculate(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer)
 		{
-			// 入力バッファをコピー
-			if(this->lpInputBuffer_h.empty())
-				this->lpInputBuffer_h.resize(this->GetInputBufferCount() * this->GetBatchSize());
-			memcpy(&this->lpInputBuffer_h[0], i_lpInputBuffer, sizeof(F32)*this->lpInputBuffer_h.size());
-
 			// 入力バッファをデバイスにコピー
 			F32* lppInputBuffer = (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), L"input[0]");
-			cudaMemcpy(lppInputBuffer, &this->lpInputBuffer_h[0], sizeof(F32)*this->GetInputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
+			cudaMemcpy(lppInputBuffer, i_lppInputBuffer, sizeof(F32)*this->GetInputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
 
 			// 出力バッファを確保
 			F32* lppOutputBuffer = (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), L"output[0]");
 
 			Gravisbell::ErrorCode err = this->Calculate_device(lppInputBuffer, lppOutputBuffer);
+
+			// 出力バッファをホストにコピー
+			cudaMemcpy(o_lppOutputBuffer, lppOutputBuffer, sizeof(F32)*this->GetOutputBufferCount()*this->GetBatchSize(), cudaMemcpyDeviceToHost);
 
 			// バッファを開放
 			this->temporaryMemoryManager.RestoreBuffer(this->GetGUID(), L"input[0]");
@@ -121,45 +113,6 @@ namespace NeuralNetwork {
 
 			return err;
 		}
-		/** 演算処理を実行する.
-			@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
-			@return 成功した場合0が返る */
-		ErrorCode Calculate_device(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer)
-		{
-			// 演算
-			ErrorCode err = Layer::Calculate_device(i_lpInputBuffer, o_lppOutputBuffer);
-
-			// 出力バッファをホストにコピー
-			cudaMemcpy(&this->lpOutputBuffer_h[0], o_lppOutputBuffer, sizeof(F32)*this->GetOutputBufferCount()*this->GetBatchSize(), cudaMemcpyDeviceToHost);
-
-
-			return err;
-		}
-
-
-		/** 出力データバッファを取得する.
-			配列の要素数はGetOutputBufferCountの戻り値.
-			@return 出力データ配列の先頭ポインタ */
-		CONST_BATCH_BUFFER_POINTER GetOutputBuffer()const
-		{
-			return &this->lpOutputBuffer_h[0];
-		}
-		/** 出力データバッファを取得する.
-			@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
-			@return 成功した場合0 */
-		ErrorCode GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
-		{
-			if(o_lpOutputBuffer == NULL)
-				return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-
-			const U32 batchSize = this->GetBatchSize();
-			const U32 outputBufferCount = this->GetOutputBufferCount();
-
-			cudaMemcpy(o_lpOutputBuffer, this->GetOutputBuffer(), sizeof(F32)*outputBufferCount*batchSize, cudaMemcpyHostToHost);
-
-			return ErrorCode::ERROR_CODE_NONE;
-		}
-
 
 	public:
 		//================================
@@ -170,7 +123,7 @@ namespace NeuralNetwork {
 			@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
 			@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要な配列
 			直前の計算結果を使用する */
-		ErrorCode CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+		ErrorCode CalculateDInput(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 		{
 			// 出力誤差バッファをデバイスにコピー
 			F32* lppDOutputBuffer = (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), L"doutput[0]");
@@ -178,11 +131,11 @@ namespace NeuralNetwork {
 
 			// 出力バッファをデバイスにコピー
 			F32* lppOutputBuffer =  (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), L"output[0]");
-			cudaMemcpyAsync(lppOutputBuffer, &this->lpOutputBuffer_h[0], sizeof(F32)*this->GetOutputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
+			cudaMemcpyAsync(lppOutputBuffer, i_lppOutputBuffer, sizeof(F32)*this->GetOutputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
 
 			// 入力バッファをデバイスにコピー
 			F32* lppInputBuffer = (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), L"input[0]");
-			cudaMemcpyAsync(lppInputBuffer, &this->lpInputBuffer_h[0], sizeof(F32)*this->GetInputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
+			cudaMemcpyAsync(lppInputBuffer, i_lppInputBuffer, sizeof(F32)*this->GetInputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
 
 			// 入力誤差バッファを確保
 			F32* lppDInputBuffer = NULL;
@@ -196,7 +149,7 @@ namespace NeuralNetwork {
 			ErrorCode err = CalculateDInput_device(lppInputBuffer, lppDInputBuffer, lppOutputBuffer, lppDOutputBuffer);
 
 
-			// 入力誤差バッファをデバイスにコピー
+			// 入力誤差バッファをホストにコピー
 			if(o_lppDInputBuffer)
 			{
 				cudaMemcpy(o_lppDInputBuffer, lppDInputBuffer, sizeof(F32)*this->GetInputBufferCount()*this->GetBatchSize(), cudaMemcpyDeviceToHost);
@@ -215,7 +168,7 @@ namespace NeuralNetwork {
 			入力信号、出力信号は直前のCalculateの値を参照する.
 			@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 			直前の計算結果を使用する */
-		ErrorCode Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+		ErrorCode Training(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 		{
 			// 出力誤差バッファをデバイスにコピー
 			F32* lppDOutputBuffer = (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), L"doutput[0]");
@@ -223,11 +176,11 @@ namespace NeuralNetwork {
 
 			// 出力バッファをデバイスにコピー
 			F32* lppOutputBuffer = (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), L"output[0]");
-			cudaMemcpyAsync(lppOutputBuffer, &this->lpOutputBuffer_h[0], sizeof(F32)*this->GetOutputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
+			cudaMemcpyAsync(lppOutputBuffer, i_lppOutputBuffer, sizeof(F32)*this->GetOutputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
 
 			// 入力バッファをデバイスにコピー
 			F32* lppInputBuffer = (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), L"input[0]");
-			cudaMemcpyAsync(lppInputBuffer, &this->lpInputBuffer_h[0], sizeof(F32)*this->GetInputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
+			cudaMemcpyAsync(lppInputBuffer, i_lppInputBuffer, sizeof(F32)*this->GetInputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
 
 			// 入力誤差バッファを確保
 			F32* lppDInputBuffer = NULL;
@@ -264,14 +217,9 @@ namespace NeuralNetwork {
 	class CNNSingle2MultLayerBase_GPU : public Layer
 	{
 	protected:
-		// 入出力バッファ
-		std::vector<F32>				lpInputBuffer_h;		/**< 入力バッファ <バッチ数><入力信号数> */
-		std::vector<F32>				lpOutputBuffer_h;		/**< 出力バッファ <バッチ数><出力信号数> */
-
-		std::vector<BATCH_BUFFER_POINTER>	lppDOutputBuffer_d;	/**< 出力誤差バッファの配列(デバイスメモリ). <出力先レイヤー数> */
-
 		Gravisbell::Common::ITemporaryMemoryManager& temporaryMemoryManager;
-
+		
+		std::vector<BATCH_BUFFER_POINTER>	lppDOutputBuffer_d;	/**< 出力誤差バッファの配列(デバイスメモリ). <出力先レイヤー数> */
 		std::vector<std::wstring>		lpDOutputBufferID;		/**< 出力誤差バッファに付けられたID */
 
 	public:
@@ -305,9 +253,6 @@ namespace NeuralNetwork {
 				this->temporaryMemoryManager.SetBufferSize(this->GetGUID(), szID, sizeof(F32) * this->GetOutputBufferCount() * this->GetBatchSize());
 				this->lpDOutputBufferID.push_back(szID);
 			}
-
-			// 出力バッファを確保
-			this->lpOutputBuffer_h.resize(this->GetOutputBufferCount() * this->GetBatchSize());
 
 			// 出力誤差バッファ配列を確保
 			this->lppDOutputBuffer_d.resize(this->GetOutputToLayerCount());
@@ -346,65 +291,25 @@ namespace NeuralNetwork {
 		/** 演算処理を実行する.
 			@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 			@return 成功した場合0が返る */
-		ErrorCode Calculate(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer)
+		ErrorCode Calculate(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer)
 		{
-			// 入力バッファをコピー
-			if(this->lpInputBuffer_h.empty())
-				this->lpInputBuffer_h.resize(this->GetInputBufferCount() * this->GetBatchSize());
-			memcpy(&this->lpInputBuffer_h[0], i_lpInputBuffer, sizeof(F32)*this->lpInputBuffer_h.size());
-
 			// 入力バッファをデバイスにコピー
 			F32* lppInputBuffer = (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), L"input[0]");
-			cudaMemcpy(lppInputBuffer, &this->lpInputBuffer_h[0], sizeof(F32)*this->GetInputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
+			cudaMemcpy(lppInputBuffer, i_lppInputBuffer, sizeof(F32)*this->GetInputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
 
 			// 出力バッファを確保
 			F32* lppOutputBuffer = (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), L"output[0]");
 
 			Gravisbell::ErrorCode err = this->Calculate_device(lppInputBuffer, lppOutputBuffer);
 
+			// 出力バッファをホストにコピー
+			cudaMemcpy(o_lppOutputBuffer, lppOutputBuffer, sizeof(F32)*this->GetOutputBufferCount()*this->GetBatchSize(), cudaMemcpyDeviceToHost);
+
 			// バッファを開放
 			this->temporaryMemoryManager.RestoreBuffer(this->GetGUID(), L"input[0]");
 			this->temporaryMemoryManager.RestoreBuffer(this->GetGUID(), L"output[0]");
 
 			return err;
-		}
-		/** 演算処理を実行する.
-			@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
-			@return 成功した場合0が返る */
-		ErrorCode Calculate_device(CONST_BATCH_BUFFER_POINTER i_lpInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer)
-		{
-			// 演算
-			ErrorCode err = Layer::Calculate_device(i_lpInputBuffer, o_lppOutputBuffer);
-
-			// 出力バッファをデバイスにコピー
-			cudaMemcpy(&this->lpOutputBuffer_h[0], o_lppOutputBuffer, sizeof(F32)*this->GetOutputBufferCount()*this->GetBatchSize(), cudaMemcpyDeviceToHost);
-
-
-			return err;
-		}
-
-
-		/** 出力データバッファを取得する.
-			配列の要素数はGetOutputBufferCountの戻り値.
-			@return 出力データ配列の先頭ポインタ */
-		CONST_BATCH_BUFFER_POINTER GetOutputBuffer()const
-		{
-			return &this->lpOutputBuffer_h[0];
-		}
-		/** 出力データバッファを取得する.
-			@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
-			@return 成功した場合0 */
-		ErrorCode GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
-		{
-			if(o_lpOutputBuffer == NULL)
-				return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-
-			const U32 batchSize = this->GetBatchSize();
-			const U32 outputBufferCount = this->GetOutputBufferCount();
-
-			cudaMemcpy(o_lpOutputBuffer, this->GetOutputBuffer(), sizeof(F32)*outputBufferCount*batchSize, cudaMemcpyHostToHost);
-
-			return ErrorCode::ERROR_CODE_NONE;
 		}
 
 
@@ -417,7 +322,7 @@ namespace NeuralNetwork {
 			@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
 			@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要な配列
 			直前の計算結果を使用する */
-		ErrorCode CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer[])
+		ErrorCode CalculateDInput(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer[])
 		{
 			// 出力誤差バッファ配列を作成
 			for(U32 outputNo=0; outputNo<this->GetOutputToLayerCount(); outputNo++)
@@ -431,11 +336,11 @@ namespace NeuralNetwork {
 
 			// 出力バッファをデバイスにコピー
 			F32* lppOutputBuffer =  (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), L"output[0]");
-			cudaMemcpyAsync(lppOutputBuffer, &this->lpOutputBuffer_h[0], sizeof(F32)*this->GetOutputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
+			cudaMemcpyAsync(lppOutputBuffer, i_lppOutputBuffer, sizeof(F32)*this->GetOutputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
 
 			// 入力バッファをデバイスにコピー
 			F32* lppInputBuffer = (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), L"input[0]");
-			cudaMemcpyAsync(lppInputBuffer, &this->lpInputBuffer_h[0], sizeof(F32)*this->GetInputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
+			cudaMemcpyAsync(lppInputBuffer, i_lppInputBuffer, sizeof(F32)*this->GetInputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
 
 			// 入力誤差バッファを確保
 			F32* lppDInputBuffer = NULL;
@@ -449,7 +354,7 @@ namespace NeuralNetwork {
 			ErrorCode err = CalculateDInput_device(lppInputBuffer, lppDInputBuffer, lppOutputBuffer, (const float**)&this->lppDOutputBuffer_d[0]);
 
 
-			// 入力誤差バッファをデバイスにコピー
+			// 入力誤差バッファをホストにコピー
 			if(o_lppDInputBuffer)
 			{
 				cudaMemcpy(o_lppDInputBuffer, lppDInputBuffer, sizeof(F32)*this->GetInputBufferCount()*this->GetBatchSize(), cudaMemcpyDeviceToHost);
@@ -469,7 +374,7 @@ namespace NeuralNetwork {
 			入力信号、出力信号は直前のCalculateの値を参照する.
 			@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 			直前の計算結果を使用する */
-		ErrorCode Training(BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer[])
+		ErrorCode Training(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer[])
 		{
 			// 出力誤差バッファ配列を作成
 			for(U32 outputNo=0; outputNo<this->GetOutputToLayerCount(); outputNo++)
@@ -483,11 +388,11 @@ namespace NeuralNetwork {
 
 			// 出力バッファをデバイスにコピー
 			F32* lppOutputBuffer = (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), L"output[0]");
-			cudaMemcpyAsync(lppOutputBuffer, &this->lpOutputBuffer_h[0], sizeof(F32)*this->GetOutputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
+			cudaMemcpyAsync(lppOutputBuffer, i_lppOutputBuffer, sizeof(F32)*this->GetOutputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
 
 			// 入力バッファをデバイスにコピー
 			F32* lppInputBuffer = (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), L"input[0]");
-			cudaMemcpyAsync(lppInputBuffer, &this->lpInputBuffer_h[0], sizeof(F32)*this->GetInputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
+			cudaMemcpyAsync(lppInputBuffer, i_lppInputBuffer, sizeof(F32)*this->GetInputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
 
 			// 入力誤差バッファを確保
 			F32* lppDInputBuffer = NULL;
@@ -525,10 +430,6 @@ namespace NeuralNetwork {
 	class CNNMult2SingleLayerBase_GPU : public Layer
 	{
 	protected:
-		// 入出力バッファ
-		std::vector<std::vector<F32>>	lppInputBuffer_h;		/**< 入力バッファ <入力レイヤー数><バッチ数><入力信号数> */
-		std::vector<F32>				lpOutputBuffer_h;		/**< 出力バッファ <バッチ数><出力信号数> */
-
 		std::vector<std::wstring>		lpInputBufferID;		/**< 入力バッファに付けられたID */
 		std::vector<std::wstring>		lpDInputBufferID;		/**< 入力誤差バッファに付けられたID */
 
@@ -573,9 +474,6 @@ namespace NeuralNetwork {
 			this->temporaryMemoryManager.SetBufferSize(this->GetGUID(), L"output[0]",  sizeof(F32) * this->GetOutputBufferCount() * this->GetBatchSize());
 			this->temporaryMemoryManager.SetBufferSize(this->GetGUID(), L"doutput[0]", sizeof(F32) * this->GetOutputBufferCount() * this->GetBatchSize());
 
-			// 出力バッファを確保
-			this->lpOutputBuffer_h.resize(this->GetOutputBufferCount() * this->GetBatchSize());
-
 			// 入力/入力誤差バッファのアドレス配列を作成
 			this->lppInputBuffer_d.resize(this->GetInputDataCount());
 			this->lppDInputBuffer_d.resize(this->GetInputDataCount());
@@ -614,19 +512,8 @@ namespace NeuralNetwork {
 		/** 演算処理を実行する.
 			@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 			@return 成功した場合0が返る */
-		ErrorCode Calculate(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[])
+		ErrorCode Calculate(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppOutputBuffer)
 		{
-			// 入力バッファをコピー
-			if(this->lppInputBuffer_h.empty())
-			{
-				this->lppInputBuffer_h.resize(this->GetInputDataCount());
-
-				for(U32 inputNo=0; inputNo<this->GetInputDataCount(); inputNo++)
-					this->lppInputBuffer_h[inputNo].resize(this->GetInputBufferCount(inputNo) * this->GetBatchSize());
-			}
-			for(U32 inputNo=0; inputNo<this->GetInputDataCount(); inputNo++)
-				memcpy(&this->lppInputBuffer_h[inputNo][0], i_lppInputBuffer[inputNo], sizeof(F32)*this->lppInputBuffer_h[inputNo].size());
-
 			// 入力バッファをデバイスにコピー
 			for(U32 inputNo=0; inputNo<this->GetInputDataCount(); inputNo++)
 			{
@@ -639,50 +526,15 @@ namespace NeuralNetwork {
 
 			Gravisbell::ErrorCode err = this->Calculate_device((const F32**)&this->lppInputBuffer_d[0], lppOutputBuffer);
 
+			// 出力バッファをホストにコピー
+			cudaMemcpy(o_lppOutputBuffer, lppOutputBuffer, sizeof(F32)*this->GetOutputBufferCount()*this->GetBatchSize(), cudaMemcpyDeviceToHost);
+
 			// バッファを開放
 			for(U32 inputNo=0; inputNo<this->GetInputDataCount(); inputNo++)
 				this->temporaryMemoryManager.RestoreBuffer(this->GetGUID(), this->lpInputBufferID[inputNo].c_str());
 			this->temporaryMemoryManager.RestoreBuffer(this->GetGUID(), L"output[0]");
 
 			return err;
-		}
-		/** 演算処理を実行する.
-			@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
-			@return 成功した場合0が返る */
-		ErrorCode Calculate_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppOutputBuffer)
-		{
-			// 演算
-			ErrorCode err = Layer::Calculate_device(i_lppInputBuffer, o_lppOutputBuffer);
-
-			// 出力バッファをデバイスにコピー
-			cudaMemcpy(&this->lpOutputBuffer_h[0], o_lppOutputBuffer, sizeof(F32)*this->GetOutputBufferCount()*this->GetBatchSize(), cudaMemcpyDeviceToHost);
-
-
-			return err;
-		}
-
-
-		/** 出力データバッファを取得する.
-			配列の要素数はGetOutputBufferCountの戻り値.
-			@return 出力データ配列の先頭ポインタ */
-		CONST_BATCH_BUFFER_POINTER GetOutputBuffer()const
-		{
-			return &this->lpOutputBuffer_h[0];
-		}
-		/** 出力データバッファを取得する.
-			@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
-			@return 成功した場合0 */
-		ErrorCode GetOutputBuffer(BATCH_BUFFER_POINTER o_lpOutputBuffer)const
-		{
-			if(o_lpOutputBuffer == NULL)
-				return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
-
-			const U32 batchSize = this->GetBatchSize();
-			const U32 outputBufferCount = this->GetOutputBufferCount();
-
-			cudaMemcpy(o_lpOutputBuffer, this->GetOutputBuffer(), sizeof(F32)*outputBufferCount*batchSize, cudaMemcpyHostToHost);
-
-			return ErrorCode::ERROR_CODE_NONE;
 		}
 
 
@@ -695,7 +547,7 @@ namespace NeuralNetwork {
 			@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
 			@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要な配列
 			直前の計算結果を使用する */
-		ErrorCode CalculateDInput(BATCH_BUFFER_POINTER o_lppDInputBuffer[], CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+		ErrorCode CalculateDInput(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppDInputBuffer[], CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 		{
 			// 出力誤差バッファをデバイスにコピー
 			F32* lppDOutputBuffer = (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), L"doutput[0]");
@@ -703,13 +555,13 @@ namespace NeuralNetwork {
 
 			// 出力バッファをデバイスにコピー
 			F32* lppOutputBuffer =  (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), L"output[0]");
-			cudaMemcpyAsync(lppOutputBuffer, &this->lpOutputBuffer_h[0], sizeof(F32)*this->GetOutputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
+			cudaMemcpyAsync(lppOutputBuffer, i_lppOutputBuffer, sizeof(F32)*this->GetOutputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
 
 			// 入力バッファをデバイスにコピー
 			for(U32 inputNo=0; inputNo<this->GetInputDataCount(); inputNo++)
 			{
 				this->lppInputBuffer_d[inputNo] = (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), this->lpInputBufferID[inputNo].c_str());
-				cudaMemcpyAsync(this->lppInputBuffer_d[inputNo], &this->lppInputBuffer_h[inputNo][0], sizeof(F32)*this->GetInputBufferCount(inputNo)*this->GetBatchSize(), cudaMemcpyHostToDevice);
+				cudaMemcpyAsync(this->lppInputBuffer_d[inputNo], i_lppInputBuffer[inputNo], sizeof(F32)*this->GetInputBufferCount(inputNo)*this->GetBatchSize(), cudaMemcpyHostToDevice);
 			}
 
 			// 入力誤差バッファを確保
@@ -753,7 +605,7 @@ namespace NeuralNetwork {
 			入力信号、出力信号は直前のCalculateの値を参照する.
 			@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 			直前の計算結果を使用する */
-		ErrorCode Training(BATCH_BUFFER_POINTER o_lppDInputBuffer[], CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+		ErrorCode Training(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppDInputBuffer[], CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 		{
 			// 出力誤差バッファをデバイスにコピー
 			F32* lppDOutputBuffer = (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), L"doutput[0]");
@@ -761,13 +613,13 @@ namespace NeuralNetwork {
 
 			// 出力バッファをデバイスにコピー
 			F32* lppOutputBuffer =  (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), L"output[0]");
-			cudaMemcpyAsync(lppOutputBuffer, &this->lpOutputBuffer_h[0], sizeof(F32)*this->GetOutputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
+			cudaMemcpyAsync(lppOutputBuffer, i_lppOutputBuffer, sizeof(F32)*this->GetOutputBufferCount()*this->GetBatchSize(), cudaMemcpyHostToDevice);
 
 			// 入力バッファをデバイスにコピー
 			for(U32 inputNo=0; inputNo<this->GetInputDataCount(); inputNo++)
 			{
 				this->lppInputBuffer_d[inputNo] = (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), this->lpInputBufferID[inputNo].c_str());
-				cudaMemcpyAsync(this->lppInputBuffer_d[inputNo], &this->lppInputBuffer_h[inputNo][0], sizeof(F32)*this->GetInputBufferCount(inputNo)*this->GetBatchSize(), cudaMemcpyHostToDevice);
+				cudaMemcpyAsync(this->lppInputBuffer_d[inputNo], i_lppInputBuffer[inputNo], sizeof(F32)*this->GetInputBufferCount(inputNo)*this->GetBatchSize(), cudaMemcpyHostToDevice);
 			}
 
 			// 入力誤差バッファを確保

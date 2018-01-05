@@ -76,10 +76,6 @@ namespace NeuralNetwork {
 		/** 出力データ構造を取得する.
 			@return	出力データ構造 */
 		IODataStruct GetOutputDataStruct()const;
-		/** 出力データバッファを取得する.(ホストメモリ)
-			配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
-			@return 出力データ配列の先頭ポインタ */
-		CONST_BATCH_BUFFER_POINTER GetOutputBuffer()const;
 		/** 出力データバッファを取得する.
 			配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
 			@return 出力データ配列の先頭ポインタ */

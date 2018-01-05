@@ -775,17 +775,6 @@ namespace NeuralNetwork {
 	}
 
 
-	//====================================
-	// 入出力バッファ関連
-	//====================================
-	/** 出力データバッファを取得する.
-		配列の要素数はGetOutputBufferCountの戻り値.
-		@return 出力データ配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER FeedforwardNeuralNetwork_Base::GetOutputBuffer()const
-	{
-		return this->outputLayer.GetOutputBuffer();
-	}
-
 
 	//===========================
 	// レイヤー共通
@@ -878,6 +867,14 @@ namespace NeuralNetwork {
 	IODataStruct FeedforwardNeuralNetwork_Base::GetOutputDataStruct()const
 	{
 		return this->outputDataStruct;
+	}
+	IODataStruct FeedforwardNeuralNetwork_Base::GetOutputDataStruct(const GUID& i_layerGUID)const
+	{
+		auto it_connect = this->lpLayerInfo.find(i_layerGUID);
+		if(it_connect == this->lpLayerInfo.end())
+			return IODataStruct();
+
+		return it_connect->second->GetOutputDataStruct();
 	}
 
 	/** 出力バッファ数を取得する */

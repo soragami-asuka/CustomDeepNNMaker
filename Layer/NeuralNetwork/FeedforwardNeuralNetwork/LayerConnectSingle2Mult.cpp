@@ -94,29 +94,12 @@ namespace NeuralNetwork {
 	{
 		return this->pLayer_io->GetOutputDataStruct();
 	}
-	/** 出力データバッファを取得する.(ホストメモリ)
-		配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
-		@return 出力データ配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER LayerConnectSingle2Mult::GetOutputBuffer()const
-	{
-		return this->pLayer_io->GetOutputBuffer();
-	}
 	/** 出力データバッファを取得する.
 		配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
 		@return 出力データ配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER LayerConnectSingle2Mult::GetOutputBuffer_d()const
 	{
-		if(this->neuralNetwork.GetLayerKind() & LAYER_KIND_CPU)
-		{
-			return this->pLayer_io->GetOutputBuffer();
-		}
-		else
-		{
-			return this->neuralNetwork.ReserveOutputBuffer_d(
-				this->outputBufferID, this->GetGUID(),
-				this->pLayer_io->GetOutputBuffer(),
-				this->GetOutputDataStruct().GetDataCount() * this->neuralNetwork.GetBatchSize());
-		}
+		return this->neuralNetwork.ReserveOutputBuffer_d(this->outputBufferID, this->GetGUID());
 	}
 
 	/** 入力誤差バッファの位置を入力元レイヤーのGUID指定で取得する */

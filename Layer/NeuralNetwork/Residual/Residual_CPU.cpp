@@ -210,12 +210,12 @@ namespace NeuralNetwork {
 
 #ifdef _DEBUG
 		std::vector<float> lpTmpInputBuffer0(this->GetBatchSize() * this->lpInputBufferCount[0]);
-		memcpy(&lpTmpInputBuffer0[0], this->m_lppInputBuffer[0][0], sizeof(float)*lpTmpInputBuffer0.size());
+		memcpy(&lpTmpInputBuffer0[0], i_lppInputBuffer[0], sizeof(float)*lpTmpInputBuffer0.size());
 		std::vector<float> lpTmpInputBuffer1(this->GetBatchSize() * this->lpInputBufferCount[1]);
-		memcpy(&lpTmpInputBuffer1[0], this->m_lppInputBuffer[1][0], sizeof(float)*lpTmpInputBuffer1.size());
+		memcpy(&lpTmpInputBuffer1[0], i_lppInputBuffer[1], sizeof(float)*lpTmpInputBuffer1.size());
 
 		std::vector<float> lpTmpOutputBuffer(this->GetBatchSize() * this->outputBufferCount);
-		memcpy(&lpTmpOutputBuffer[0], &this->lpOutputBuffer[0], sizeof(float)*lpTmpOutputBuffer.size());
+		memcpy(&lpTmpOutputBuffer[0], i_lppOutputBuffer, sizeof(float)*lpTmpOutputBuffer.size());
 
 		std::vector<float> lpTmpDOutputBuffer(this->GetBatchSize() * this->outputBufferCount);
 		memcpy(&lpTmpDOutputBuffer[0], i_lppDOutputBuffer, sizeof(float)*lpTmpDOutputBuffer.size());

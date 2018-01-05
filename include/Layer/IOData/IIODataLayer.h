@@ -42,6 +42,7 @@ namespace IOData {
 			設定された値を元にGetDInputBuffer(),GetOutputBuffer()の戻り値が決定する.
 			@param i_lpBatchDataNoList	設定するデータ番号リスト. [GetBatchSize()の戻り値]の要素数が必要 */
 		virtual ErrorCode SetBatchDataNoList(const unsigned int i_lpBatchDataNoList[]) = 0;
+
 	};
 
 }	// IOData

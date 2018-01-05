@@ -449,10 +449,10 @@ namespace NeuralNetwork {
 
 #ifdef _DEBUG
 		std::vector<F32> lpDebugInputBuffer(this->GetBatchSize() * this->inputBufferCount);
-		cudaMemcpy(&lpDebugInputBuffer[0], this->m_lppInputBuffer_d, sizeof(F32)*lpDebugInputBuffer.size(), cudaMemcpyDeviceToHost);
+		cudaMemcpy(&lpDebugInputBuffer[0], i_lppInputBuffer, sizeof(F32)*lpDebugInputBuffer.size(), cudaMemcpyDeviceToHost);
 
-		std::vector<F32> lpDebugOutputBuffer(this->lpOutputBuffer.size());
-		cudaMemcpy(&lpDebugOutputBuffer[0], thrust::raw_pointer_cast(&this->lpOutputBuffer[0]), sizeof(F32)*lpDebugOutputBuffer.size(), cudaMemcpyDeviceToHost);
+		std::vector<F32> lpDebugOutputBuffer(this->GetBatchSize() * this->outputBufferCount);
+		cudaMemcpy(&lpDebugOutputBuffer[0], o_lppOutputBuffer, sizeof(F32)*lpDebugOutputBuffer.size(), cudaMemcpyDeviceToHost);
 #endif
 
 

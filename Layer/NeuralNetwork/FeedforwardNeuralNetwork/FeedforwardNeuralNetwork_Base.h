@@ -189,11 +189,6 @@ namespace NeuralNetwork {
 		virtual GUID GetReservedOutputBufferID(U32 i_i_outputBufferNo) = 0;
 		/** 出力バッファを使用中にして取得する(処理デバイス依存) */
 		virtual BATCH_BUFFER_POINTER ReserveOutputBuffer_d(U32 i_outputBufferNo, GUID i_guid) = 0;
-		/** 出力バッファを使用中にして取得する(処理デバイス依存)
-			@param	i_outputBufferNo	出力バッファ番号
-			@param	i_lppBuffer			バッファの初期化に使用するホストバッファ
-			@param	i_bufferSize		初期化バッファのサイズ. */
-		virtual BATCH_BUFFER_POINTER ReserveOutputBuffer_d(U32 i_outputBufferNo, GUID i_guid, CONST_BATCH_BUFFER_POINTER i_lppBuffer, U32 i_bufferSize) = 0;
 
 
 		//====================================
@@ -270,7 +265,7 @@ namespace NeuralNetwork {
 		/** 出力データバッファを取得する.
 			配列の要素数はGetOutputBufferCountの戻り値.
 			@return 出力データ配列の先頭ポインタ */
-		CONST_BATCH_BUFFER_POINTER GetOutputBuffer()const;
+		virtual CONST_BATCH_BUFFER_POINTER GetOutputBuffer()const = 0;
 		/** 出力データバッファを取得する.
 			@param o_lpOutputBuffer	出力データ格納先配列. [GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要
 			@return 成功した場合0 */
@@ -335,6 +330,7 @@ namespace NeuralNetwork {
 	public:
 		/** 出力データ構造を取得する */
 		IODataStruct GetOutputDataStruct()const;
+		IODataStruct GetOutputDataStruct(const GUID& i_layerGUID)const;
 
 		/** 出力バッファ数を取得する */
 		U32 GetOutputBufferCount()const;

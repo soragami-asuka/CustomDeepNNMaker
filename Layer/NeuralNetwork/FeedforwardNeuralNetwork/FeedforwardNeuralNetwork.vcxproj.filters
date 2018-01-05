@@ -159,18 +159,6 @@
     <ClInclude Include="..\..\..\include\Layer\ILayerData.h">
       <Filter>include\Layer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\IO\ISingleInputLayerData.h">
-      <Filter>include\Layer\IO</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\IO\ISingleOutputLayerData.h">
-      <Filter>include\Layer\IO</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\IO\IMultInputLayerData.h">
-      <Filter>include\Layer\IO</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\IO\IMultOutputLayerData.h">
-      <Filter>include\Layer\IO</Filter>
-    </ClInclude>
     <ClInclude Include="LayerConnectSingle2Mult.h">
       <Filter>LayerConnect</Filter>
     </ClInclude>
@@ -213,11 +201,29 @@
     <ClInclude Include="..\_LayerBase\CLayerBase_GPU.cuh">
       <Filter>LayerBase</Filter>
     </ClInclude>
-    <ClInclude Include="FeedforwardNeuralNetwork_GPU.cuh">
-      <Filter>Layer</Filter>
-    </ClInclude>
     <ClInclude Include="..\_LayerBase\CLayerBase_CPU.h">
       <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IO\IMultOutputLayer.h">
+      <Filter>include\Layer\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer_base.h">
+      <Filter>include\Layer\IOData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IOData\IIODataSequentialLayer.h">
+      <Filter>include\Layer\IOData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer_image.h">
+      <Filter>include\Layer\IOData</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedforwardNeuralNetwork_GPU_d.cuh">
+      <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedforwardNeuralNetwork_GPU_h.cuh">
+      <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedforwardNeuralNetwork_GPU_base.cuh">
+      <Filter>Layer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -268,7 +274,13 @@
     <CudaCompile Include="FeedforwardNeuralNetwork_LayerData_GPU.cu">
       <Filter>LayerData</Filter>
     </CudaCompile>
-    <CudaCompile Include="FeedforwardNeuralNetwork_GPU.cu">
+    <CudaCompile Include="FeedforwardNeuralNetwork_GPU_d.cu">
+      <Filter>Layer</Filter>
+    </CudaCompile>
+    <CudaCompile Include="FeedforwardNeuralNetwork_GPU_h.cu">
+      <Filter>Layer</Filter>
+    </CudaCompile>
+    <CudaCompile Include="FeedforwardNeuralNetwork_GPU_base.cu">
       <Filter>Layer</Filter>
     </CudaCompile>
   </ItemGroup>

@@ -89,13 +89,6 @@ namespace NeuralNetwork {
 	{
 		return this->neuralNetwork.GetInputDataStruct();
 	}
-	/** 出力データバッファを取得する.(ホストメモリ)
-		配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
-		@return 出力データ配列の先頭ポインタ */
-	CONST_BATCH_BUFFER_POINTER LayerConnectInput::GetOutputBuffer()const
-	{
-		return this->neuralNetwork.GetInputBuffer();
-	}
 	/** 出力データバッファを取得する.
 		配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
 		@return 出力データ配列の先頭ポインタ */

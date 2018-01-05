@@ -92,11 +92,7 @@ namespace NeuralNetwork {
 		/** 出力データ構造を取得する.
 			@return	出力データ構造 */
 		virtual IODataStruct GetOutputDataStruct()const = 0;
-		/** 出力データバッファを取得する.(ホストメモリ)
-			配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
-			@return 出力データ配列の先頭ポインタ */
-		virtual CONST_BATCH_BUFFER_POINTER GetOutputBuffer()const = 0;
-		/** 出力データバッファを取得する.
+		/** 出力データバッファを取得する.(デバイスメモリ)
 			配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
 			@return 出力データ配列の先頭ポインタ */
 		virtual CONST_BATCH_BUFFER_POINTER GetOutputBuffer_d()const = 0;
