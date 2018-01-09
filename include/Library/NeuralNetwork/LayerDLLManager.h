@@ -13,10 +13,10 @@
 #endif
 #endif
 
-#include"Common/ErrorCode.h"
-#include"Common/VersionCode.h"
+#include"../../Common/ErrorCode.h"
+#include"../../Common/VersionCode.h"
 
-#include"Layer/NeuralNetwork/ILayerDLLManager.h"
+#include"../../Layer/NeuralNetwork/ILayerDLLManager.h"
 
 
 namespace Gravisbell {
