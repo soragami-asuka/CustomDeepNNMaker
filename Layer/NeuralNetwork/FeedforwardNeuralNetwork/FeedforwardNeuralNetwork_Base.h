@@ -257,6 +257,11 @@ namespace NeuralNetwork {
 		ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, const wchar_t* i_param);
 		ErrorCode SetRuntimeParameter(const Gravisbell::GUID& guid, const wchar_t* i_dataID, const wchar_t* i_param);
 
+		/** レイヤーに学習禁止を設定する.
+			@param	guid		設定対象レイヤーのGUID.
+			@param	i_fixFlag	固定化フラグ.true=学習しない. */
+		ErrorCode SetLayerFixFlag(const Gravisbell::GUID& guid, bool i_fixFlag);
+
 
 		//====================================
 		// 入出力バッファ関連

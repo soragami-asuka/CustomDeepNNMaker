@@ -77,6 +77,19 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
 	}
 
+	/** レイヤーの学習禁止設定を取得する */
+	bool LayerConnectInput::GetLayerFixFlag()
+	{
+		return false;
+	}
+
+	/** レイヤーに学習禁止を設定する.
+		@param	guid		設定対象レイヤーのGUID.
+		@param	i_fixFlag	固定化フラグ.true=学習しない. */
+	ErrorCode LayerConnectInput::SetLayerFixFlag(bool i_fixFlag)
+	{
+		return ErrorCode::ERROR_CODE_NONE;
+	}
 
 		
 	//====================================

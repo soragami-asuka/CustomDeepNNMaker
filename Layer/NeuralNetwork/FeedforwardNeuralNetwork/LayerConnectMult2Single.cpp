@@ -18,6 +18,7 @@ namespace NeuralNetwork {
 		,	pLayer				(pLayer)
 		,	pLayer_io			(dynamic_cast<INNMult2SingleLayer*>(pLayer))
 		,	outputBufferID		(INVALID_OUTPUTBUFFER_ID)	/**< 出力バッファID */
+		,	onLayerFix			(false)						/**< レイヤー固定化フラグ */
 	{
 	}
 	/** デストラクタ */
@@ -82,6 +83,22 @@ namespace NeuralNetwork {
 		return this->pLayer->SetRuntimeParameter(i_dataID, i_param);
 	}
 
+
+	/** レイヤーの学習禁止設定を取得する */
+	bool LayerConnectMult2Single::GetLayerFixFlag()
+	{
+		return this->onLayerFix;
+	}
+
+	/** レイヤーに学習禁止を設定する.
+		@param	guid		設定対象レイヤーのGUID.
+		@param	i_fixFlag	固定化フラグ.true=学習しない. */
+	ErrorCode LayerConnectMult2Single::SetLayerFixFlag(bool i_fixFlag)
+	{
+		this->onLayerFix = i_fixFlag;
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
 
 		
 	//====================================
@@ -479,6 +496,9 @@ namespace NeuralNetwork {
 	/** 学習誤差を計算する. */
 	ErrorCode LayerConnectMult2Single::Training(void)
 	{
+		if(this->onLayerFix)
+			return this->CalculateDInput();
+
 		// 入力/入力誤差配列を作成
 		for(U32 inputNum=0; inputNum<this->lppInputFromLayer.size(); inputNum++)
 		{

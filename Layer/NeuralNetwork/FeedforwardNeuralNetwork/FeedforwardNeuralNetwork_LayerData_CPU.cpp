@@ -35,52 +35,15 @@ namespace NeuralNetwork {
 		//===========================
 		/** レイヤーを作成する.
 			@param guid	新規生成するレイヤーのGUID. */
-		ILayerBase* CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
-		{
-			return this->CreateLayer_host(guid, i_lpInputDataStruct, i_inputLayerCount);
-		}
-		/** レイヤーを作成する.
-			ホストメモリで結果を返すレイヤー.
-			@param	guid	新規生成するレイヤーのGUID.
-			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要 */
-		ILayerBase* CreateLayer_host(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
-		{
-			if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
-				return NULL;
-
-			FeedforwardNeuralNetwork_Base* pNeuralNetwork = new FeedforwardNeuralNetwork_CPU(guid, *this, i_lpInputDataStruct[0]);
-
-			// ニューラルネットワークにレイヤーを追加
-			ErrorCode err = AddConnectionLayersToNeuralNetwork(*pNeuralNetwork, i_lpInputDataStruct, i_inputLayerCount);
-			if(err != ErrorCode::ERROR_CODE_NONE)
-			{
-				delete pNeuralNetwork;
-				return NULL;
-			}
-
-			return pNeuralNetwork;
-		}
-		/** レイヤーを作成する.
-			デバイスメモリで結果を返すレイヤー.CPU版では未使用.
-			@param	guid	新規生成するレイヤーのGUID.
-			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要 */
-		ILayerBase* CreateLayer_device(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
-		{
-			return NULL;
-		}
-
-
-		/** レイヤーを作成する.
-			@param guid	新規生成するレイヤーのGUID. */
 		ILayerBase* CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
 		{
-			return this->CreateLayer_host(guid, i_lpInputDataStruct, i_inputLayerCount, i_temporaryMemoryManager);
+			return this->CreateLayer(guid, i_lpInputDataStruct, i_inputLayerCount, i_temporaryMemoryManager, false);
 		}
 		/** レイヤーを作成する.
-			ホストメモリで結果を返すレイヤー.
 			@param	guid	新規生成するレイヤーのGUID.
-			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要 */
-		ILayerBase* CreateLayer_host(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
+			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+			@param	i_useHostMemory		内部的にホストメモリを使用する. */
+		ILayerBase* CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager, bool i_useHostMemory)
 		{
 			if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
 				return NULL;
@@ -97,13 +60,33 @@ namespace NeuralNetwork {
 
 			return pNeuralNetwork;
 		}
+		
 		/** レイヤーを作成する.
-			デバイスメモリで結果を返すレイヤー.CPU版では未使用.
-			@param	guid	新規生成するレイヤーのGUID.
-			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要 */
-		ILayerBase* CreateLayer_device(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
+			@param guid	新規生成するレイヤーのGUID. */
+		ILayerBase* CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
 		{
-			return NULL;
+			return this->CreateLayer(guid, i_lpInputDataStruct, i_inputLayerCount, false);
+		}
+		/** レイヤーを作成する.
+			@param	guid	新規生成するレイヤーのGUID.
+			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+			@param	i_useHostMemory		内部的にホストメモリを使用する. */
+		virtual ILayerBase* CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, bool i_useHostMemory)
+		{
+			if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
+				return NULL;
+
+			FeedforwardNeuralNetwork_Base* pNeuralNetwork = new FeedforwardNeuralNetwork_CPU(guid, *this, i_lpInputDataStruct[0]);
+
+			// ニューラルネットワークにレイヤーを追加
+			ErrorCode err = AddConnectionLayersToNeuralNetwork(*pNeuralNetwork, i_lpInputDataStruct, i_inputLayerCount);
+			if(err != ErrorCode::ERROR_CODE_NONE)
+			{
+				delete pNeuralNetwork;
+				return NULL;
+			}
+
+			return pNeuralNetwork;
 		}
 	};
 

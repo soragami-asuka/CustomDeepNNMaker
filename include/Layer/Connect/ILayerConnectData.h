@@ -6,6 +6,7 @@
 #define __GRAVISBELL_I_LAYER_CONNECT_DATA_H__
 
 #include"../ILayerData.h"
+#include"../NeuralNetwork/INeuralNetwork.h"
 
 namespace Gravisbell {
 namespace Layer {
@@ -131,11 +132,21 @@ namespace Connect {
 			@param	guid	新規生成するレイヤーのGUID.
 			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要 */
 		virtual ILayerBase* CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager) = 0;
+		/** レイヤーを作成する.
+			@param	guid	新規生成するレイヤーのGUID.
+			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+			@param	i_useHostMemory		内部的にホストメモリを使用する. */
+		virtual ILayerBase* CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager, bool i_useHostMemory) = 0;
 
 		/** レイヤーを作成する.
 			@param	guid	新規生成するレイヤーのGUID.
 			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要 */
 		virtual ILayerBase* CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount) = 0;
+		/** レイヤーを作成する.
+			@param	guid	新規生成するレイヤーのGUID.
+			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+			@param	i_useHostMemory		内部的にホストメモリを使用する. */
+		virtual ILayerBase* CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, bool i_useHostMemory) = 0;
 	};
 
 }	// Connect

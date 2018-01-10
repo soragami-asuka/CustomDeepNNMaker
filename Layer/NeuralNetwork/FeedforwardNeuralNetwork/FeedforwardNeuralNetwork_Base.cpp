@@ -775,6 +775,19 @@ namespace NeuralNetwork {
 	}
 
 
+	/** レイヤーに学習禁止を設定する.
+		@param	guid		設定対象レイヤーのGUID.
+		@param	i_fixFlag	固定化フラグ.true=学習しない. */
+	ErrorCode FeedforwardNeuralNetwork_Base::SetLayerFixFlag(const Gravisbell::GUID& guid, bool i_fixFlag)
+	{
+		// 指定レイヤーが存在することを確認する
+		auto it_layer = this->lpLayerInfo.find(guid);
+		if(it_layer == this->lpLayerInfo.end())
+			return ErrorCode::ERROR_CODE_COMMON_NOT_EXIST;
+
+		return it_layer->second->SetLayerFixFlag(i_fixFlag);
+	}
+
 
 	//===========================
 	// レイヤー共通
