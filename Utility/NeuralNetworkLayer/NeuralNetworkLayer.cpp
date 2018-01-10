@@ -798,14 +798,14 @@ Layer::ILayerData* CreateResidualLayer(
 /** レイヤーをネットワークの末尾に追加する.GUIDは自動割り当て.入力データ構造、最終GUIDも更新する. */
 Gravisbell::ErrorCode AddLayerToNetworkLast(
 	Layer::Connect::ILayerConnectData& neuralNetwork,
-	Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddlayer)
+	Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddlayer, bool onLayerFix)
 {
 	if(pAddlayer)
 	{
 		// GUID生成
 		Gravisbell::GUID guid = boost::uuids::random_generator()().data;
 
-		neuralNetwork.AddLayer(guid, pAddlayer);
+		neuralNetwork.AddLayer(guid, pAddlayer, onLayerFix);
 
 		// 接続
 		neuralNetwork.AddInputLayerToLayer(guid, lastLayerGUID);
@@ -821,7 +821,7 @@ Gravisbell::ErrorCode AddLayerToNetworkLast(
 
 Gravisbell::ErrorCode AddLayerToNetworkLast(
 	Layer::Connect::ILayerConnectData& neuralNetwork,
-	Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddLayer,
+	Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddLayer, bool onLayerFix,
 	const Gravisbell::GUID lpInputLayerGUID[], U32 inputLayerCount)
 {
 	if(pAddLayer)
@@ -829,7 +829,7 @@ Gravisbell::ErrorCode AddLayerToNetworkLast(
 		// GUID生成
 		Gravisbell::GUID guid = boost::uuids::random_generator()().data;
 
-		neuralNetwork.AddLayer(guid, pAddLayer);
+		neuralNetwork.AddLayer(guid, pAddLayer, onLayerFix);
 
 		// 接続
 		for(U32 inputNum=0; inputNum<inputLayerCount; inputNum++)

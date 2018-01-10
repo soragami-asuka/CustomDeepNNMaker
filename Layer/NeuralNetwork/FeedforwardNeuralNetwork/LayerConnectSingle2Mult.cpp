@@ -13,13 +13,13 @@ namespace NeuralNetwork {
 
 	
 	/** コンストラクタ */
-	LayerConnectSingle2Mult::LayerConnectSingle2Mult(class FeedforwardNeuralNetwork_Base& neuralNetwork, ILayerBase* pLayer)
+	LayerConnectSingle2Mult::LayerConnectSingle2Mult(class FeedforwardNeuralNetwork_Base& neuralNetwork, ILayerBase* pLayer, bool onFixFlag)
 		:	neuralNetwork		(neuralNetwork)
 		,	pLayer				(pLayer)
 		,	pLayer_io			(dynamic_cast<INNSingle2MultLayer*>(pLayer))
 		,	outputBufferID		(INVALID_OUTPUTBUFFER_ID)	/**< 出力バッファID */
 		,	dInputBufferID		(INVALID_DINPUTBUFFER_ID)
-		,	onLayerFix			(false)		/**< レイヤー固定化フラグ */
+		,	onLayerFix			(onFixFlag)		/**< レイヤー固定化フラグ */
 	{
 	}
 	/** デストラクタ */
@@ -82,23 +82,6 @@ namespace NeuralNetwork {
 	ErrorCode LayerConnectSingle2Mult::SetRuntimeParameter(const wchar_t* i_dataID, const wchar_t* i_param)
 	{
 		return this->pLayer->SetRuntimeParameter(i_dataID, i_param);
-	}
-
-
-	/** レイヤーの学習禁止設定を取得する */
-	bool LayerConnectSingle2Mult::GetLayerFixFlag()
-	{
-		return this->onLayerFix;
-	}
-
-	/** レイヤーに学習禁止を設定する.
-		@param	guid		設定対象レイヤーのGUID.
-		@param	i_fixFlag	固定化フラグ.true=学習しない. */
-	ErrorCode LayerConnectSingle2Mult::SetLayerFixFlag(bool i_fixFlag)
-	{
-		this->onLayerFix = i_fixFlag;
-
-		return ErrorCode::ERROR_CODE_NONE;
 	}
 
 		

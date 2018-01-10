@@ -124,8 +124,9 @@ namespace NeuralNetwork {
 	//====================================
 	/** レイヤーを追加する.
 		追加したレイヤーの所有権はNeuralNetworkに移るため、メモリの開放処理などは全てINeuralNetwork内で行われる.
-		@param pLayer	追加するレイヤーのアドレス. */
-	ErrorCode FeedforwardNeuralNetwork_Base::AddLayer(ILayerBase* pLayer)
+			@param	pLayer				追加するレイヤーのアドレス.
+			@param	i_onLayerFixFlag	レイヤー固定化フラグ. */
+	ErrorCode FeedforwardNeuralNetwork_Base::AddLayer(ILayerBase* pLayer, bool i_onLayerFixFLag)
 	{
 		// NULLチェック
 		if(pLayer == NULL)
@@ -145,17 +146,17 @@ namespace NeuralNetwork {
 			if(pSingle2SingleLayer)
 			{
 				// 単一入力, 単一出力
-				this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectSingle2Single(*this, pLayer);
+				this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectSingle2Single(*this, pLayer, i_onLayerFixFLag);
 			}
 			else if(pSingle2MultLayer)
 			{
 				// 単一入力, 複数出力
-				this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectSingle2Mult(*this, pLayer);
+				this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectSingle2Mult(*this, pLayer, i_onLayerFixFLag);
 			}
 			else if(pMult2SingleLayer)
 			{
 				// 複数入力, 単一出力
-				this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectMult2Single(*this, pLayer);
+				this->lpLayerInfo[pLayer->GetGUID()] = new LayerConnectMult2Single(*this, pLayer, i_onLayerFixFLag);
 			}
 			else
 			{
@@ -186,7 +187,7 @@ namespace NeuralNetwork {
 		if(pLayer == NULL)
 			return ErrorCode::ERROR_CODE_LAYER_CREATE;
 
-		ErrorCode err = this->AddLayer(pLayer);
+		ErrorCode err = this->AddLayer(pLayer, false);
 		if(err != ErrorCode::ERROR_CODE_NONE)
 		{
 			delete pLayer;
@@ -774,19 +775,6 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
-
-	/** レイヤーに学習禁止を設定する.
-		@param	guid		設定対象レイヤーのGUID.
-		@param	i_fixFlag	固定化フラグ.true=学習しない. */
-	ErrorCode FeedforwardNeuralNetwork_Base::SetLayerFixFlag(const Gravisbell::GUID& guid, bool i_fixFlag)
-	{
-		// 指定レイヤーが存在することを確認する
-		auto it_layer = this->lpLayerInfo.find(guid);
-		if(it_layer == this->lpLayerInfo.end())
-			return ErrorCode::ERROR_CODE_COMMON_NOT_EXIST;
-
-		return it_layer->second->SetLayerFixFlag(i_fixFlag);
-	}
 
 
 	//===========================

@@ -45,8 +45,9 @@ namespace Connect {
 	public:
 		/** レイヤーデータを追加する.
 			@param	i_guid			追加するレイヤーに割り当てられるGUID.
-			@param	i_pLayerData	追加するレイヤーデータのアドレス. */
-		virtual ErrorCode AddLayer(const Gravisbell::GUID& i_guid, ILayerData* i_pLayerData) = 0;
+			@param	i_pLayerData	追加するレイヤーデータのアドレス.
+			@param	i_onFixFlag		レイヤーを固定化するフラグ. */
+		virtual ErrorCode AddLayer(const Gravisbell::GUID& i_guid, ILayerData* i_pLayerData, bool i_onFixFlag) = 0;
 		/** レイヤーデータを削除する.
 			@param i_guid	削除するレイヤーのGUID */
 		virtual ErrorCode EraseLayer(const Gravisbell::GUID& i_guid) = 0;
@@ -63,6 +64,8 @@ namespace Connect {
 		/** 登録されているレイヤーデータをGUID指定で取得する */
 		virtual ILayerData* GetLayerDataByGUID(const Gravisbell::GUID& i_guid) = 0;
 
+		/** レイヤーの固定化フラグを取得する */
+		virtual bool GetLayerFixFlagByGUID(const Gravisbell::GUID& i_guid) = 0;
 
 		//====================================
 		// 入出力レイヤー

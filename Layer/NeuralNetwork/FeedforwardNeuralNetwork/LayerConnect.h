@@ -84,15 +84,6 @@ namespace NeuralNetwork {
 		virtual ErrorCode SetRuntimeParameter(const wchar_t* i_dataID, const wchar_t* i_param) = 0;
 
 
-		/** レイヤーの学習禁止設定を取得する */
-		virtual bool GetLayerFixFlag() = 0;
-
-		/** レイヤーに学習禁止を設定する.
-			@param	guid		設定対象レイヤーのGUID.
-			@param	i_fixFlag	固定化フラグ.true=学習しない. */
-		virtual ErrorCode SetLayerFixFlag(bool i_fixFlag) = 0;
-
-
 		//====================================
 		// 入出力データ構造
 		//====================================

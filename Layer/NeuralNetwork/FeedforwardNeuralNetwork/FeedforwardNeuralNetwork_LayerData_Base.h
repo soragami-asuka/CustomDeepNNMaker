@@ -28,14 +28,16 @@ namespace NeuralNetwork {
 			ILayerData* pLayerData;	/**< レイヤーデータ本体 */
 			std::vector<Gravisbell::GUID> lpInputLayerGUID;	/**< 入力レイヤーのGUID一覧 */
 			std::vector<Gravisbell::GUID> lpBypassLayerGUID;	/**< バイパスレイヤーのGUID一覧 */
+			bool onFixFlag;	/**< 固定レイヤーフラグ */
 
 			LayerConnect()
 				:	pLayerData	(NULL)
 			{
 			}
-			LayerConnect(const Gravisbell::GUID guid, ILayerData* pLayerData)
+			LayerConnect(const Gravisbell::GUID guid, ILayerData* pLayerData, bool onFixFlag)
 				:	guid		(guid)
 				,	pLayerData	(pLayerData)
+				,	onFixFlag	(onFixFlag)
 			{
 			}
 			LayerConnect(const LayerConnect& data)
@@ -43,6 +45,7 @@ namespace NeuralNetwork {
 				,	pLayerData			(data.pLayerData)
 				,	lpInputLayerGUID	(data.lpInputLayerGUID)
 				,	lpBypassLayerGUID	(data.lpBypassLayerGUID)
+				,	onFixFlag			(data.onFixFlag)
 			{
 			}
 			const LayerConnect& operator=(const LayerConnect& data)
@@ -51,6 +54,7 @@ namespace NeuralNetwork {
 				this->pLayerData = data.pLayerData;
 				this->lpInputLayerGUID = data.lpInputLayerGUID;
 				this->lpBypassLayerGUID = data.lpBypassLayerGUID;
+				this->onFixFlag = data.onFixFlag;
 
 				return *this;
 			}
@@ -179,8 +183,9 @@ namespace NeuralNetwork {
 	public:
 		/** レイヤーデータを追加する.
 			@param	i_guid			追加するレイヤーに割り当てられるGUID.
-			@param	i_pLayerData	追加するレイヤーデータのアドレス. */
-		ErrorCode AddLayer(const Gravisbell::GUID& i_guid, ILayerData* i_pLayerData);
+			@param	i_pLayerData	追加するレイヤーデータのアドレス.
+			@param	i_onFixFlag		レイヤーを固定化するフラグ. */
+		ErrorCode AddLayer(const Gravisbell::GUID& i_guid, ILayerData* i_pLayerData, bool i_onFixFlag);
 		/** レイヤーデータを削除する.
 			@param i_guid	削除するレイヤーのGUID */
 		ErrorCode EraseLayer(const Gravisbell::GUID& i_guid);
@@ -203,6 +208,8 @@ namespace NeuralNetwork {
 		/** 登録されているレイヤーデータをGUID指定で取得する */
 		ILayerData* GetLayerDataByGUID(const Gravisbell::GUID& i_guid);
 
+		/** レイヤーの固定化フラグを取得する */
+		bool GetLayerFixFlagByGUID(const Gravisbell::GUID& i_guid);
 
 		//====================================
 		// 入出力レイヤー

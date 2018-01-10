@@ -138,6 +138,11 @@ namespace NeuralNetwork {
 				memcpy(&layerGUID, &i_lpBuffer[readBufferByte], sizeof(Gravisbell::GUID));
 				readBufferByte += sizeof(Gravisbell::GUID);
 
+				// レイヤーの固定フラグ
+				bool onFixFlag = false;
+				memcpy(&onFixFlag, &i_lpBuffer[readBufferByte], sizeof(onFixFlag));
+				readBufferByte += sizeof(onFixFlag);
+
 				// レイヤーデータのGUID
 				Gravisbell::GUID layerDataGUID;
 				memcpy(&layerDataGUID, &i_lpBuffer[readBufferByte], sizeof(Gravisbell::GUID));
@@ -149,7 +154,7 @@ namespace NeuralNetwork {
 					return ErrorCode::ERROR_CODE_LAYER_CREATE;
 
 				// レイヤー接続情報を作成
-				LayerConnect layerConnect(layerGUID, pLayerData);
+				LayerConnect layerConnect(layerGUID, pLayerData, onFixFlag);
 
 				// 入力レイヤーの数
 				U32 inputLayerCount = 0;
@@ -276,6 +281,9 @@ namespace NeuralNetwork {
 				// レイヤーのGUID
 				bufferSize += sizeof(Gravisbell::GUID);
 
+				// レイヤーの固定フラグ
+				bufferSize += sizeof(bool);
+
 				// レイヤーデータのGUID
 				bufferSize += sizeof(Gravisbell::GUID);
 
@@ -374,6 +382,10 @@ namespace NeuralNetwork {
 				tmpGUID = it.guid;
 				memcpy(&o_lpBuffer[writeBufferByte], &tmpGUID, sizeof(Gravisbell::GUID));
 				writeBufferByte += sizeof(Gravisbell::GUID);
+
+				// レイヤーの固定フラグ
+				memcpy(&o_lpBuffer[writeBufferByte], &it.onFixFlag, sizeof(it.onFixFlag));
+				writeBufferByte += sizeof(it.onFixFlag);
 
 				// レイヤーデータのGUID
 				tmpGUID = it.pLayerData->GetGUID();
@@ -577,7 +589,7 @@ namespace NeuralNetwork {
 				lpInputDataStruct.push_back(this->GetOutputDataStruct(inputGUID, i_lpInputDataStruct, i_inputLayerCount));
 			}
 			
-			err = neuralNetwork.AddLayer(it.pLayerData->CreateLayer(it.guid, &lpInputDataStruct[0], (U32)lpInputDataStruct.size(), neuralNetwork.GetTemporaryMemoryManager()));
+			err = neuralNetwork.AddLayer(it.pLayerData->CreateLayer(it.guid, &lpInputDataStruct[0], (U32)lpInputDataStruct.size(), neuralNetwork.GetTemporaryMemoryManager()), it.onFixFlag);
 
 			if(err != ErrorCode::ERROR_CODE_NONE)
 				return err;
@@ -710,15 +722,16 @@ namespace NeuralNetwork {
 	//====================================
 	/** レイヤーデータを追加する.
 		@param	i_guid			追加するレイヤーに割り当てられるGUID.
-		@param	i_pLayerData	追加するレイヤーデータのアドレス. */
-	ErrorCode FeedforwardNeuralNetwork_LayerData_Base::AddLayer(const Gravisbell::GUID& i_guid, ILayerData* i_pLayerData)
+		@param	i_pLayerData	追加するレイヤーデータのアドレス.
+		@param	i_onFixFlag		レイヤーを固定化するフラグ. */
+	ErrorCode FeedforwardNeuralNetwork_LayerData_Base::AddLayer(const Gravisbell::GUID& i_guid, ILayerData* i_pLayerData, bool i_onFixFlag)
 	{
 		// レイヤーを検索
 		if(this->GetLayerByGUID(i_guid))
 			return ErrorCode::ERROR_CODE_ADDLAYER_ALREADY_SAMEID;
 
 		// 追加
-		this->lpConnectInfo.push_back(LayerConnect(i_guid, i_pLayerData));
+		this->lpConnectInfo.push_back(LayerConnect(i_guid, i_pLayerData, i_onFixFlag));
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -860,6 +873,16 @@ namespace NeuralNetwork {
 			return NULL;
 
 		return pLayerConnet->pLayerData;
+	}
+
+	/** レイヤーの固定化フラグを取得する */
+	bool FeedforwardNeuralNetwork_LayerData_Base::GetLayerFixFlagByGUID(const Gravisbell::GUID& i_guid)
+	{
+		auto pLayerConnet = this->GetLayerByGUID(i_guid);
+		if(pLayerConnet == NULL)
+			return false;
+
+		return pLayerConnet->onFixFlag;
 	}
 
 

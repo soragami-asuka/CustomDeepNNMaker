@@ -133,7 +133,7 @@ namespace Standard {
 			unsigned int byteCount = 0;
 
 			byteCount += sizeof(unsigned int);		// 値のバッファサイズ
-			byteCount += (U32)this->value.size();		// 値
+			byteCount += (U32)this->value.size() * sizeof(wchar_t);		// 値
 
 			return byteCount;
 		}
@@ -159,7 +159,9 @@ namespace Standard {
 				std::vector<wchar_t> szBuf(bufferSize+1, NULL);
 				for(unsigned int i=0; i<bufferSize; i++)
 				{
-					szBuf[i] = i_lpBuffer[bufferPos++];
+					szBuf[i] = *(wchar_t*)&i_lpBuffer[bufferPos];
+
+					bufferPos += sizeof(wchar_t);
 				}
 				this->value = &szBuf[0];
 			}
@@ -177,13 +179,13 @@ namespace Standard {
 			// 値
 			{
 				// バッファサイズ
-				unsigned int bufferSize = (U32)this->value.size();;
+				unsigned int bufferSize = (U32)this->value.size();
 				*(unsigned int*)&o_lpBuffer[bufferPos] = bufferSize;
 				bufferPos += sizeof(unsigned int);
 
 				// 値
-				memcpy(&o_lpBuffer[bufferPos], this->value.c_str(), bufferSize);
-				bufferPos += bufferSize;
+				memcpy(&o_lpBuffer[bufferPos], this->value.c_str(), bufferSize * sizeof(wchar_t));
+				bufferPos += bufferSize * sizeof(wchar_t);
 			}
 
 

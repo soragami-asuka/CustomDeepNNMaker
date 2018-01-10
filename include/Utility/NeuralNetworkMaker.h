@@ -27,6 +27,14 @@ namespace NeuralNetworkLayer {
 
 	public:
 		//==================================
+		// レイヤー追加処理
+		//==================================
+		virtual Gravisbell::GUID AddLayer(
+			const Gravisbell::GUID& i_inputLayerGUID,
+			Gravisbell::Layer::ILayerData* i_pLayerData, bool onLayerFix=false) = 0;
+
+	public:
+		//==================================
 		// 基本レイヤー
 		//==================================
 		/** 畳込みニューラルネットワークレイヤー.

@@ -378,41 +378,41 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(
 		AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lastLayerGUID,
-			CreateFullyConnectLayer(layerDLLManager, layerDataManager, inputDataStruct.GetDataCount(), 256));
+			CreateFullyConnectLayer(layerDLLManager, layerDataManager, inputDataStruct.GetDataCount(), 256), false);
 		AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lastLayerGUID,
-			CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"));
+			CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"), false);
 		inputDataStruct = pNeuralNetwork->GetOutputDataStruct(lastLayerGUID, &i_inputDataStruct, 1);
 		AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lastLayerGUID,
-			CreateDropoutLayer(layerDLLManager, layerDataManager, 0.2f));
+			CreateDropoutLayer(layerDLLManager, layerDataManager, 0.2f), false);
 
 		// 2‘w–Ú
 		AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lastLayerGUID,
-			CreateFullyConnectLayer(layerDLLManager, layerDataManager, inputDataStruct.GetDataCount(), 256));
+			CreateFullyConnectLayer(layerDLLManager, layerDataManager, inputDataStruct.GetDataCount(), 256), false);
 		AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lastLayerGUID,
-			CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"));
+			CreateActivationLayer(layerDLLManager, layerDataManager, L"ReLU"), false);
 		inputDataStruct = pNeuralNetwork->GetOutputDataStruct(lastLayerGUID, &i_inputDataStruct, 1);
 		AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lastLayerGUID,
-			CreateDropoutLayer(layerDLLManager, layerDataManager, 0.5f));
+			CreateDropoutLayer(layerDLLManager, layerDataManager, 0.5f), false);
 
 		// 3‘w–Ú(o—Í‘w)
 		AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lastLayerGUID,
-			CreateFullyConnectLayer(layerDLLManager, layerDataManager, inputDataStruct.GetDataCount(), i_outputDataStruct.GetDataCount()));
+			CreateFullyConnectLayer(layerDLLManager, layerDataManager, inputDataStruct.GetDataCount(), i_outputDataStruct.GetDataCount()), false);
 		AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lastLayerGUID,
-			CreateActivationLayer(layerDLLManager, layerDataManager, L"softmax_ALL_crossEntropy"));
+			CreateActivationLayer(layerDLLManager, layerDataManager, L"softmax_ALL_crossEntropy"), false);
 
 		// o—ÍƒŒƒCƒ„[Ý’è
 		pNeuralNetwork->SetOutputLayerGUID(lastLayerGUID);

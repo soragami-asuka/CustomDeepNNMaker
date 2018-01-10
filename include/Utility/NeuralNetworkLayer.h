@@ -213,43 +213,43 @@ namespace NeuralNetworkLayer {
 	/** レイヤーをネットワークの末尾に追加する.GUIDは自動割り当て.入力データ構造、最終GUIDも更新する. */
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API Gravisbell::ErrorCode AddLayerToNetworkLast(
 		Layer::Connect::ILayerConnectData& neuralNetwork,
-		Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddlayer);
+		Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddlayer, bool onLayerFix);
 
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API Gravisbell::ErrorCode AddLayerToNetworkLast(
 		Layer::Connect::ILayerConnectData& neuralNetwork,
-		Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddLayer,
+		Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddLayer, bool onLayerFix,
 		const Gravisbell::GUID lpInputLayerGUID[], U32 inputLayerCount);
 
 	
 	inline Gravisbell::ErrorCode AddLayerToNetworkLast(
 		Layer::Connect::ILayerConnectData& neuralNetwork,
-		Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddLayer,
+		Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddLayer, bool onLayerFix,
 		const std::vector<Gravisbell::GUID>& lpInputLayerGUID)
 	{
-		return AddLayerToNetworkLast(neuralNetwork, lastLayerGUID, pAddLayer, &lpInputLayerGUID[0], (U32)lpInputLayerGUID.size());
+		return AddLayerToNetworkLast(neuralNetwork, lastLayerGUID, pAddLayer, onLayerFix, &lpInputLayerGUID[0], (U32)lpInputLayerGUID.size());
 	}
 
 	template<typename... Rest>
 	Gravisbell::ErrorCode AddLayerToNetworkLast(
 		Layer::Connect::ILayerConnectData& neuralNetwork,
-		Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddlayer,
+		Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddlayer, bool onLayerFix,
 		std::vector<Gravisbell::GUID>& lpInputLayerGUID,
 		const Gravisbell::GUID& lastLayerGUID_first, const Rest&... lpLastLayerGUID_rest)
 	{
 		lpInputLayerGUID.push_back(lastLayerGUID_first);
-	
-		return AddLayerToNetworkLast(neuralNetwork, lastLayerGUID, pAddlayer, lpInputLayerGUID, lpLastLayerGUID_rest...);
+
+		return AddLayerToNetworkLast(neuralNetwork, lastLayerGUID, pAddlayer, onLayerFix, lpInputLayerGUID, lpLastLayerGUID_rest...);
 	}
 	template<typename... Rest>
 	Gravisbell::ErrorCode AddLayerToNetworkLast(
 		Layer::Connect::ILayerConnectData& neuralNetwork,
-		Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddlayer,
+		Gravisbell::GUID& lastLayerGUID, Layer::ILayerData* pAddlayer, bool onLayerFix,
 		const Gravisbell::GUID& lastLayerGUID_first, const Rest&... lpLastLayerGUID_rest)
 	{
 		std::vector<Gravisbell::GUID> lpInputLayerGUID;
 		lpInputLayerGUID.push_back(lastLayerGUID_first);
 
-		return AddLayerToNetworkLast(neuralNetwork, lastLayerGUID, pAddlayer, lpInputLayerGUID, lpLastLayerGUID_rest...);
+		return AddLayerToNetworkLast(neuralNetwork, lastLayerGUID, pAddlayer, onLayerFix, lpInputLayerGUID, lpLastLayerGUID_rest...);
 	}
 
 

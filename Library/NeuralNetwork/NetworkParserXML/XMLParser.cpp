@@ -139,6 +139,7 @@ namespace Parser {
 					ptree_layer.put("<xmlattr>.guid", ::GUID2String(layerGUID));
 					ptree_layer.put("<xmlattr>.layerCode", ::GUID2String(pLayerData->GetLayerCode()));
 					ptree_layer.put("<xmlattr>.layerData", ::GUID2String(pLayerData->GetGUID()));
+					ptree_layer.put("<xmlattr>.onLayerFix", pConnectLayerData->GetLayerFixFlagByGUID(layerGUID));
 
 					// 入力レイヤーを記載
 					for(U32 inputNum=0; inputNum<pConnectLayerData->GetInputLayerCount(layerGUID); inputNum++)
@@ -321,6 +322,14 @@ namespace Parser {
 									else
 										return NULL;
 								}
+								bool onLayerFix = false;
+								{
+									auto pValue = it.second.get_optional<bool>("<xmlattr>.onLayerFix");
+									if(pValue != NULL)
+										onLayerFix = pValue.get();
+									else
+										return NULL;
+								}
 
 								ILayerData* pLayerData = io_layerDataManager.GetLayerData(layerDataGUID);
 								if(pLayerData == NULL)
@@ -346,7 +355,7 @@ namespace Parser {
 								}
 
 								// レイヤーに追加
-								pLayerConnect->AddLayer(layerGUID, pLayerData);
+								pLayerConnect->AddLayer(layerGUID, pLayerData, onLayerFix);
 							}
 						}
 

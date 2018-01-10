@@ -58,6 +58,30 @@ namespace NeuralNetworkLayer {
 
 	public:
 		//==================================
+		// レイヤー追加処理
+		//==================================
+		Gravisbell::GUID AddLayer(
+			const Gravisbell::GUID& i_inputLayerGUID,
+			Gravisbell::Layer::ILayerData* i_pLayerData, bool onLayerFix=false)
+		{
+			Gravisbell::GUID layerGUID = i_inputLayerGUID;
+
+			if(i_pLayerData == NULL)
+				return Gravisbell::GUID();
+
+			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
+				*this->pLayerConnectData,
+				layerGUID,
+				i_pLayerData,
+				onLayerFix);
+			if(err != ErrorCode::ERROR_CODE_NONE)
+				return Gravisbell::GUID();
+
+			return layerGUID;
+		}
+
+	public:
+		//==================================
 		// 基本レイヤー
 		//==================================
 		/** 畳込みニューラルネットワークレイヤー.
@@ -68,16 +92,10 @@ namespace NeuralNetworkLayer {
 			@param	i_paddingSize			パディングサイズ. */
 		Gravisbell::GUID AddConvolutionLayer(const Gravisbell::GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize, const wchar_t i_szInitializerID[] = L"glorot_uniform")
 		{
-			Gravisbell::GUID layerGUID = i_inputLayerGUID;
-
-			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
-				*this->pLayerConnectData,
-				layerGUID,
-				CreateConvolutionLayer(layerDLLManager, layerDataManager, this->GetOutputDataStruct(i_inputLayerGUID).ch, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize, i_szInitializerID));
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return Gravisbell::GUID();
-
-			return layerGUID;
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateConvolutionLayer(layerDLLManager, layerDataManager, this->GetOutputDataStruct(i_inputLayerGUID).ch, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize, i_szInitializerID),
+				false);
 		}
 
 		/** 全結合ニューラルネットワークレイヤー.
@@ -85,16 +103,10 @@ namespace NeuralNetworkLayer {
 			@param	i_neuronCount			ニューロン数. */
 		Gravisbell::GUID AddFullyConnectLayer(const Gravisbell::GUID& i_inputLayerGUID, U32 i_neuronCount, const wchar_t i_szInitializerID[] = L"glorot_uniform")
 		{
-			Gravisbell::GUID layerGUID = i_inputLayerGUID;
-
-			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
-				*this->pLayerConnectData,
-				layerGUID,
-				CreateFullyConnectLayer(layerDLLManager, layerDataManager, this->GetOutputDataStruct(i_inputLayerGUID).GetDataCount(), i_neuronCount, i_szInitializerID) );
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return Gravisbell::GUID();
-
-			return layerGUID;
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateFullyConnectLayer(layerDLLManager, layerDataManager, this->GetOutputDataStruct(i_inputLayerGUID).GetDataCount(), i_neuronCount, i_szInitializerID),
+				false);
 		}
 
 		/** 活性化レイヤー.
@@ -102,16 +114,10 @@ namespace NeuralNetworkLayer {
 			@param	i_activationType		活性化種別. */
 		Gravisbell::GUID AddActivationLayer(const Gravisbell::GUID& i_inputLayerGUID, const wchar_t activationType[])
 		{
-			Gravisbell::GUID layerGUID = i_inputLayerGUID;
-
-			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
-				*this->pLayerConnectData,
-				layerGUID,
-				CreateActivationLayer(layerDLLManager, layerDataManager, activationType) );
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return Gravisbell::GUID();
-
-			return layerGUID;
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateActivationLayer(layerDLLManager, layerDataManager, activationType),
+				false);
 		}
 
 		/** ドロップアウトレイヤー.
@@ -119,16 +125,10 @@ namespace NeuralNetworkLayer {
 			@param	i_rate				ドロップアウト率.(0.0～1.0).(0.0＝ドロップアウトなし,1.0=全入力無視) */
 		Gravisbell::GUID AddDropoutLayer(const Gravisbell::GUID& i_inputLayerGUID, F32 i_rate)
 		{
-			Gravisbell::GUID layerGUID = i_inputLayerGUID;
-
-			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
-				*this->pLayerConnectData,
-				layerGUID,
-				CreateDropoutLayer(layerDLLManager, layerDataManager, i_rate) );
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return Gravisbell::GUID();
-
-			return layerGUID;
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateDropoutLayer(layerDLLManager, layerDataManager, i_rate),
+				false);
 		}
 
 		/** ガウスノイズレイヤー.
@@ -137,16 +137,10 @@ namespace NeuralNetworkLayer {
 			@param	i_variance			発生する乱数の分散 */
 		Gravisbell::GUID AddGaussianNoiseLayer(const Gravisbell::GUID& i_inputLayerGUID, F32 i_average, F32 i_variance)
 		{
-			Gravisbell::GUID layerGUID = i_inputLayerGUID;
-
-			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
-				*this->pLayerConnectData,
-				layerGUID,
-				CreateGaussianNoiseLayer(layerDLLManager, layerDataManager, i_average, i_variance) );
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return Gravisbell::GUID();
-
-			return layerGUID;
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateGaussianNoiseLayer(layerDLLManager, layerDataManager, i_average, i_variance),
+				false);
 		}
 
 		/** プーリングレイヤー.
@@ -155,96 +149,60 @@ namespace NeuralNetworkLayer {
 			@param	i_stride				フィルタ移動量. */
 		Gravisbell::GUID AddPoolingLayer(const Gravisbell::GUID& i_inputLayerGUID, Vector3D<S32> i_filterSize, Vector3D<S32> i_stride)
 		{
-			Gravisbell::GUID layerGUID = i_inputLayerGUID;
-
-			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
-				*this->pLayerConnectData,
-				layerGUID,
-				CreatePoolingLayer(layerDLLManager, layerDataManager, i_filterSize, i_stride) );
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return Gravisbell::GUID();
-
-			return layerGUID;
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreatePoolingLayer(layerDLLManager, layerDataManager, i_filterSize, i_stride),
+				false);
 		}
 
 		/** バッチ正規化レイヤー.
 			@param	i_inputLayerGUID		追加レイヤーの入力先レイヤーのGUID. */
 		Gravisbell::GUID AddBatchNormalizationLayer(const Gravisbell::GUID& i_inputLayerGUID)
 		{
-			Gravisbell::GUID layerGUID = i_inputLayerGUID;
-
-			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
-				*this->pLayerConnectData,
-				layerGUID,
-				CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, this->GetOutputDataStruct(i_inputLayerGUID).ch) );
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return Gravisbell::GUID();
-
-			return layerGUID;
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateBatchNormalizationLayer(layerDLLManager, layerDataManager, this->GetOutputDataStruct(i_inputLayerGUID).ch),
+				false);
 		}
 
 		/** バッチ正規化レイヤー(チャンネル区別なし)
 			@param	i_inputLayerGUID		追加レイヤーの入力先レイヤーのGUID. */
 		Gravisbell::GUID AddBatchNormalizationAllLayer(const Gravisbell::GUID& i_inputLayerGUID)
 		{
-			Gravisbell::GUID layerGUID = i_inputLayerGUID;
-
-			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
-				*this->pLayerConnectData,
-				layerGUID,
-				CreateBatchNormalizationAllLayer(layerDLLManager, layerDataManager) );
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return Gravisbell::GUID();
-
-			return layerGUID;
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateBatchNormalizationAllLayer(layerDLLManager, layerDataManager),
+				false);
 		}
 
 		/** スケール正規化レイヤー
 			@param	i_inputLayerGUID		追加レイヤーの入力先レイヤーのGUID. */
 		Gravisbell::GUID AddNormalizationScaleLayer(const Gravisbell::GUID& i_inputLayerGUID)
 		{
-			Gravisbell::GUID layerGUID = i_inputLayerGUID;
-
-			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
-				*this->pLayerConnectData,
-				layerGUID,
-				CreateNormalizationScaleLayer(layerDLLManager, layerDataManager) );
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return Gravisbell::GUID();
-
-			return layerGUID;
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateNormalizationScaleLayer(layerDLLManager, layerDataManager),
+				false);
 		}
 
 		/** 広域平均プーリングレイヤー
 			@param	i_inputLayerGUID		追加レイヤーの入力先レイヤーのGUID. */
 		Gravisbell::GUID AddGlobalAveragePoolingLayer(const Gravisbell::GUID& i_inputLayerGUID)
 		{
-			Gravisbell::GUID layerGUID = i_inputLayerGUID;
-
-			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
-				*this->pLayerConnectData,
-				layerGUID,
-				CreateGlobalAveragePoolingLayer(layerDLLManager, layerDataManager) );
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return Gravisbell::GUID();
-
-			return layerGUID;
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateGlobalAveragePoolingLayer(layerDLLManager, layerDataManager),
+				false);
 		}
 
 		/** GANにおけるDiscriminatorの出力レイヤー
 			@param	i_inputLayerGUID		追加レイヤーの入力先レイヤーのGUID. */
 		Gravisbell::GUID AddActivationDiscriminatorLayer(const Gravisbell::GUID& i_inputLayerGUID)
 		{
-			Gravisbell::GUID layerGUID = i_inputLayerGUID;
-
-			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
-				*this->pLayerConnectData,
-				layerGUID,
-				CreateActivationDiscriminatorLayer(layerDLLManager, layerDataManager) );
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return Gravisbell::GUID();
-
-			return layerGUID;
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateActivationDiscriminatorLayer(layerDLLManager, layerDataManager),
+				false);
 		}
 
 		/** アップサンプリングレイヤー
@@ -253,16 +211,10 @@ namespace NeuralNetworkLayer {
 			@param	i_paddingUseValue		拡張部分の穴埋めに隣接する値を使用するフラグ. (true=UpConvolution, false=TransposeConvolution) */
 		Gravisbell::GUID AddUpSamplingLayer(const Gravisbell::GUID& i_inputLayerGUID, Vector3D<S32> i_upScale, bool i_paddingUseValue)
 		{
-			Gravisbell::GUID layerGUID = i_inputLayerGUID;
-
-			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
-				*this->pLayerConnectData,
-				layerGUID,
-				CreateUpSamplingLayer(layerDLLManager, layerDataManager, i_upScale, i_paddingUseValue) );
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return Gravisbell::GUID();
-
-			return layerGUID;
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateUpSamplingLayer(layerDLLManager, layerDataManager, i_upScale, i_paddingUseValue),
+				false);
 		}
 
 		/** チャンネル抽出レイヤー. 入力されたレイヤーの特定チャンネルを抽出する. 入力/出力データ構造でX,Y,Zは同じサイズ.
@@ -271,16 +223,10 @@ namespace NeuralNetworkLayer {
 			@param	i_channelCount		抽出チャンネル数. */
 		Gravisbell::GUID AddChooseChannelLayer(const Gravisbell::GUID& i_inputLayerGUID, U32 i_startChannelNo, U32 i_channelCount)
 		{
-			Gravisbell::GUID layerGUID = i_inputLayerGUID;
-
-			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
-				*this->pLayerConnectData,
-				layerGUID,
-				CreateChooseChannelLayer(layerDLLManager, layerDataManager, i_startChannelNo, i_channelCount) );
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return Gravisbell::GUID();
-
-			return layerGUID;
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateChooseChannelLayer(layerDLLManager, layerDataManager, i_startChannelNo, i_channelCount),
+				false);
 		}
 
 		/** 出力データ構造変換レイヤー.
@@ -290,16 +236,10 @@ namespace NeuralNetworkLayer {
 			@param	z	Z軸. */
 		Gravisbell::GUID AddReshapeLayer(const Gravisbell::GUID& i_inputLayerGUID, U32 ch, U32 x, U32 y, U32 z)
 		{
-			Gravisbell::GUID layerGUID = i_inputLayerGUID;
-
-			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
-				*this->pLayerConnectData,
-				layerGUID,
-				CreateReshapeLayer(layerDLLManager, layerDataManager, ch, x, y, z) );
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return Gravisbell::GUID();
-
-			return layerGUID;
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateReshapeLayer(layerDLLManager, layerDataManager, ch, x, y, z),
+				false);
 		}
 		/** 出力データ構造変換レイヤー.
 			@param	outputDataStruct 出力データ構造 */
@@ -311,30 +251,18 @@ namespace NeuralNetworkLayer {
 		/** X=0でミラー化する */
 		Gravisbell::GUID AddReshapeMirrorXLayer(const Gravisbell::GUID& i_inputLayerGUID)
 		{
-			Gravisbell::GUID layerGUID = i_inputLayerGUID;
-
-			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
-				*this->pLayerConnectData,
-				layerGUID,
-				CreateReshapeMirrorXLayer(layerDLLManager, layerDataManager) );
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return Gravisbell::GUID();
-
-			return layerGUID;
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateReshapeMirrorXLayer(layerDLLManager, layerDataManager),
+				false);
 		}
 		/** X=0で平方化する */
 		Gravisbell::GUID AddReshapeSquareCenterCrossLayer(const Gravisbell::GUID& i_inputLayerGUID)
 		{
-			Gravisbell::GUID layerGUID = i_inputLayerGUID;
-
-			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
-				*this->pLayerConnectData,
-				layerGUID,
-				CreateReshapeSquareCenterCrossLayer(layerDLLManager, layerDataManager) );
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return Gravisbell::GUID();
-
-			return layerGUID;
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateReshapeSquareCenterCrossLayer(layerDLLManager, layerDataManager),
+				false);
 		}
 		/** X=0で平方化する.
 			入力信号数は1次元配列で(x-1)*(y-1)+1以上の要素数が必要.
@@ -342,16 +270,10 @@ namespace NeuralNetworkLayer {
 			@param	y	Y軸. */
 		Gravisbell::GUID AddReshapeSquareZeroSideLeftTopLayer(const Gravisbell::GUID& i_inputLayerGUID, U32 x, U32 y)
 		{
-			Gravisbell::GUID layerGUID = i_inputLayerGUID;
-
-			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
-				*this->pLayerConnectData,
-				layerGUID,
-				CreateReshapeSquareZeroSideLeftTopLayer(layerDLLManager, layerDataManager, x, y) );
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return Gravisbell::GUID();
-
-			return layerGUID;
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateReshapeSquareZeroSideLeftTopLayer(layerDLLManager, layerDataManager, x, y),
+				false);
 		}
 
 	protected:
@@ -363,7 +285,7 @@ namespace NeuralNetworkLayer {
 			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
 				*this->pLayerConnectData,
 				layerGUID,
-				CreateMergeInputLayer(layerDLLManager, layerDataManager),
+				CreateMergeInputLayer(layerDLLManager, layerDataManager), false,
 				lpInputLayerGUID, inputLayerCount);
 
 			return layerGUID;
@@ -377,7 +299,7 @@ namespace NeuralNetworkLayer {
 			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
 				*this->pLayerConnectData,
 				layerGUID,
-				CreateResidualLayer(layerDLLManager, layerDataManager),
+				CreateResidualLayer(layerDLLManager, layerDataManager), false,
 				lpInputLayerGUID, inputLayerCount);
 
 			return layerGUID;
