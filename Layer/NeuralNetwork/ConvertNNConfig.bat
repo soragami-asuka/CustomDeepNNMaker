@@ -21,6 +21,7 @@ call ConvertNNConfigToSource.exe "./Reshape_MirrorX/Config.xml" "./Reshape_Mirro
 call ConvertNNConfigToSource.exe "./Reshape_SquaresCenterCross/Config.xml" "./Reshape_SquaresCenterCross/" "Reshape_SquaresCenterCross"
 call ConvertNNConfigToSource.exe "./Reshape_SquaresZeroSideLeftTop/Config.xml" "./Reshape_SquaresZeroSideLeftTop/" "Reshape_SquaresZeroSideLeftTop"
 call ConvertNNConfigToSource.exe "./MergeInput/Config.xml" "./MergeInput/" "MergeInput"
+call ConvertNNConfigToSource.exe "./MergeAdd/Config.xml" "./MergeAdd/" "MergeAdd"
 call ConvertNNConfigToSource.exe "./Residual/Config.xml" "./Residual/" "Residual"
 call ConvertNNConfigToSource.exe "./GaussianNoise/Config.xml" "./GaussianNoise/" "GaussianNoise"
 
