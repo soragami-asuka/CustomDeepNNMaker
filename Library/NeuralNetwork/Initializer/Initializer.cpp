@@ -6,6 +6,7 @@
 #include<map>
 #include<string>
 #include<algorithm>
+#include<time.h>
 
 #include"Library/NeuralNetwork/Initializer.h"
 #include"RandomUtility.h"

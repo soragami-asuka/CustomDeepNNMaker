@@ -37,4 +37,7 @@
     <Xml Include="DataFormat.xml" />
     <Xml Include="LearningData\LearningData.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>

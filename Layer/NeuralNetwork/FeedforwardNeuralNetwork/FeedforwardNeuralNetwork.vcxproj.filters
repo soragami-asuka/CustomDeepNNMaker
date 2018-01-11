@@ -284,4 +284,7 @@
       <Filter>Layer</Filter>
     </CudaCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>

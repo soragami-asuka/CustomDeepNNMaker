@@ -8,8 +8,6 @@
 #include"UpSampling_FUNC.hpp"
 #include"UpSampling_CPU.h"
 
-#include"RandomUtility.h"
-
 #include"../_LayerBase/CLayerBase_CPU.h"
 
 namespace Gravisbell {

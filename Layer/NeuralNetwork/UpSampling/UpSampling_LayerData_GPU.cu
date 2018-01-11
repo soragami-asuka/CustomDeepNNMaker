@@ -8,8 +8,6 @@
 #include"UpSampling_FUNC.hpp"
 #include"UpSampling_GPU.cuh"
 
-#include"RandomUtility.h"
-
 #include"../_LayerBase/CLayerBase_GPU.cuh"
 
 namespace Gravisbell {

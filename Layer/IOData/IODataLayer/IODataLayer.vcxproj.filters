@@ -161,4 +161,7 @@
       <Filter>ソース ファイル</Filter>
     </CudaCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>

@@ -469,7 +469,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_Kepler|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="RandomUtility.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_Maxwell|Win32'">Create</PrecompiledHeader>

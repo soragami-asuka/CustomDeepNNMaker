@@ -3,6 +3,8 @@
 //===================================
 #include"stdafx.h"
 
+#include<time.h>
+
 #include"RandomUtility.h"
 
 using namespace Gravisbell;

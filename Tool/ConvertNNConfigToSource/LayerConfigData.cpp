@@ -45,7 +45,7 @@ namespace
 	Vector3D<S32> GetTreeValue<Vector3D<S32>>(const boost::property_tree::ptree& pXmlTree, const std::string& id)
 	{
 		auto pTree = pXmlTree.get_child_optional(id);
-		if(pTree == NULL)
+		if(pTree)
 			return Vector3D<S32>();
 
 		Vector3D<S32> value;
@@ -60,7 +60,7 @@ namespace
 	Vector3D<F32> GetTreeValue<Vector3D<F32>>(const boost::property_tree::ptree& pXmlTree, const std::string& id)
 	{
 		auto pTree = pXmlTree.get_child_optional(id);
-		if(pTree == NULL)
+		if(pTree)
 			return Vector3D<F32>();
 
 		Vector3D<F32> value;

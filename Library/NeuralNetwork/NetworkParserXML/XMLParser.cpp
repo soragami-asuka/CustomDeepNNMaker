@@ -167,7 +167,7 @@ namespace Parser {
 					layerFilePath.generic_string(),
 					ptree,
 					std::locale(),
-					boost::property_tree::xml_parser::xml_writer_make_settings(' ', indent, boost::property_tree::xml_parser::widen<char>("utf-8")));
+					boost::property_tree::xml_parser::xml_writer_make_settings<std::string>(' ', indent, "utf-8"));
 
 			}
 			else
@@ -248,7 +248,7 @@ namespace Parser {
 					Gravisbell::GUID layerCode_root;
 					{
 						auto pValue = pTree_root.get_optional<std::string>("<xmlattr>.layerCode");
-						if(pValue != NULL)
+						if(pValue)
 							layerCode_root = String2GUID(pValue.get());
 						else
 							return NULL;
@@ -256,7 +256,7 @@ namespace Parser {
 					Gravisbell::GUID layerGUID_root;
 					{
 						auto pValue = pTree_root.get_optional<std::string>("<xmlattr>.guid");
-						if(pValue != NULL)
+						if(pValue)
 							layerGUID_root = String2GUID(pValue.get());
 						else
 							return NULL;
@@ -264,7 +264,7 @@ namespace Parser {
 					Gravisbell::GUID outputLayerGUID_root;
 					{
 						auto pValue = pTree_root.get_optional<std::string>("<xmlattr>.outputLayerGUID");
-						if(pValue != NULL)
+						if(pValue)
 							outputLayerGUID_root = String2GUID(pValue.get());
 						else
 							return NULL;
@@ -301,7 +301,7 @@ namespace Parser {
 								Gravisbell::GUID layerCode;
 								{
 									auto pValue = it.second.get_optional<std::string>("<xmlattr>.layerCode");
-									if(pValue != NULL)
+									if(pValue)
 										layerCode = String2GUID(pValue.get());
 									else
 										return NULL;
@@ -309,7 +309,7 @@ namespace Parser {
 								Gravisbell::GUID layerGUID;
 								{
 									auto pValue = it.second.get_optional<std::string>("<xmlattr>.guid");
-									if(pValue != NULL)
+									if(pValue)
 										layerGUID = String2GUID(pValue.get());
 									else
 										return NULL;
@@ -317,7 +317,7 @@ namespace Parser {
 								Gravisbell::GUID layerDataGUID;
 								{
 									auto pValue = it.second.get_optional<std::string>("<xmlattr>.layerData");
-									if(pValue != NULL)
+									if(pValue)
 										layerDataGUID = String2GUID(pValue.get());
 									else
 										return NULL;
@@ -325,7 +325,7 @@ namespace Parser {
 								bool onLayerFix = false;
 								{
 									auto pValue = it.second.get_optional<bool>("<xmlattr>.onLayerFix");
-									if(pValue != NULL)
+									if(pValue)
 										onLayerFix = pValue.get();
 									else
 										return NULL;
@@ -367,7 +367,7 @@ namespace Parser {
 								Gravisbell::GUID layerGUID;
 								{
 									auto pValue = it_layer.second.get_optional<std::string>("<xmlattr>.guid");
-									if(pValue != NULL)
+									if(pValue)
 										layerGUID = String2GUID(pValue.get());
 									else
 									{
