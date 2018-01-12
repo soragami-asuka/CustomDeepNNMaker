@@ -145,7 +145,7 @@ int _tmain(int argc, _TCHAR* argv[])
 //#endif
 
 	// ニューラルネットワーク作成
-	Gravisbell::Layer::Connect::ILayerConnectData* pNeuralNetworkData = CreateNeuralNetwork_ver04(*pLayerDLLManager, *pLayerDataManager, pDataLayerTeach_Input->GetInputDataStruct(), pDataLayerTeach_Output->GetDataStruct());
+	Gravisbell::Layer::Connect::ILayerConnectData* pNeuralNetworkData = CreateNeuralNetwork_ver03(*pLayerDLLManager, *pLayerDataManager, pDataLayerTeach_Input->GetInputDataStruct(), pDataLayerTeach_Output->GetDataStruct());
 	if(pNeuralNetworkData == NULL)
 	{
 		delete pDataLayerTeach_Input;
@@ -1015,7 +1015,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver02(const Layer::Neural
 		err = AddLayerToNetworkLast(
 			*pNeuralNetwork,
 			lastLayerGUID,
-			CreateMergeInputLayer(layerDLLManager, layerDataManager), false,
+			CreateMergeAverageLayer(layerDLLManager, layerDataManager, LayerMergeType::LYAERMERGETYPE_MIN), false,
 			lastLayerGUID_chA, lastLayerGUID_chB, lastLayerGUID_chC);
 		if(err != ErrorCode::ERROR_CODE_NONE)	return NULL;
 
@@ -1133,7 +1133,9 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver03(const Layer::Neural
 		}
 
 		// マージ
-		lastLayerGUID = pNetworkMaker->AddMergeInputLayer(lastLayerGUID_chA, lastLayerGUID_chB, lastLayerGUID_chC);
+		lastLayerGUID = pNetworkMaker->AddMergeAverageLayer(
+			Gravisbell::Utility::NeuralNetworkLayer::LayerMergeType::LYAERMERGETYPE_MIN,
+			lastLayerGUID_chA, lastLayerGUID_chB, lastLayerGUID_chC);
 
 		// 4層目
 		lastLayerGUID = pNetworkMaker->AddConvolutionLayer(lastLayerGUID, Vector3D<S32>(5,5,1), 32, Vector3D<S32>(1,1,1), Vector3D<S32>(2,2,0), L"he_normal");

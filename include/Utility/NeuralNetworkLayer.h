@@ -27,6 +27,16 @@ namespace Gravisbell {
 namespace Utility {
 namespace NeuralNetworkLayer {
 
+	/** レイヤーをマージさせる方法 */
+	enum LayerMergeType
+	{
+		LYAERMERGETYPE_MAX,		// 最大に併せる
+		LYAERMERGETYPE_MIN,		// 最小に併せる
+		LYAERMERGETYPE_LAYER0,	// 先頭レイヤーに併せる
+
+		LAYERMERGETYPE_COUNT
+	};
+
 	
 	/** レイヤーDLL管理クラスの作成(CPU用) */
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
@@ -198,6 +208,24 @@ namespace NeuralNetworkLayer {
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 	Layer::ILayerData* CreateMergeInputLayer(
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager);
+
+
+	/** 入力結合レイヤー(加算). 入力されたレイヤーの値を合算する. 入力データ構造はX,Y,Zで同じサイズである必要がある.
+		@param	layerDLLManager		レイヤーDLL管理クラス
+		@param	i_mergeType			ch数をマージさせる方法. */
+	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+	Layer::ILayerData* CreateMergeAddLayer(
+		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+		LayerMergeType i_mergeType);
+
+
+	/** 入力結合レイヤー(平均). 入力されたレイヤーの値の平均をとる. 入力データ構造はX,Y,Zで同じサイズである必要がある.
+		@param	layerDLLManager		レイヤーDLL管理クラス
+		@param	i_mergeType			ch数をマージさせる方法. */
+	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+	Layer::ILayerData* CreateMergeAverageLayer(
+		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+		LayerMergeType i_mergeType);
 
 
 	/** 入力結合レイヤー. 入力されたレイヤーの値を合算する. 出力されるレイヤーのサイズは全サイズのうちの最大値になる.

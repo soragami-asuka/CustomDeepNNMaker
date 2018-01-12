@@ -102,6 +102,11 @@ namespace NeuralNetwork {
 				return ErrorCode::ERROR_CODE_FRAUD_INPUT_COUNT;
 		}
 
+		// 出力バッファ数を確認
+		this->outputBufferCount = this->GetOutputBufferCount();
+		if(this->outputBufferCount == 0)
+			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
+
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

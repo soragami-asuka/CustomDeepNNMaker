@@ -5,12 +5,12 @@
 //======================================
 #include"stdafx.h"
 
-#include"MergeAdd_DATA.hpp"
-#include"MergeAdd_FUNC.hpp"
-#include"MergeAdd_Base.h"
+#include"MergeAverage_DATA.hpp"
+#include"MergeAverage_FUNC.hpp"
+#include"MergeAverage_Base.h"
 
-#include"MergeAdd_GPU.cuh"
-#include"MergeAdd_LayerData_GPU.cuh"
+#include"MergeAverage_GPU.cuh"
+#include"MergeAverage_LayerData_GPU.cuh"
 
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
@@ -21,15 +21,15 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	MergeAdd_GPU::MergeAdd_GPU(Gravisbell::GUID guid, MergeAdd_LayerData_GPU& i_layerData, const std::vector<IODataStruct>& i_lpInputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
-		:	MergeAdd_Base					(guid, i_lpInputDataStruct, i_layerData.GetOutputDataStruct(&i_lpInputDataStruct[0], (U32)i_lpInputDataStruct.size()))
+	MergeAverage_GPU::MergeAverage_GPU(Gravisbell::GUID guid, MergeAverage_LayerData_GPU& i_layerData, const std::vector<IODataStruct>& i_lpInputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
+		:	MergeAverage_Base					(guid, i_lpInputDataStruct, i_layerData.GetOutputDataStruct(&i_lpInputDataStruct[0], (U32)i_lpInputDataStruct.size()))
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	outputBufferCount				(0)				/**< 出力バッファ数 */
 	{
 		cublasCreate(&cublasHandle);
 	}
 	/** デストラクタ */
-	MergeAdd_GPU::~MergeAdd_GPU()
+	MergeAverage_GPU::~MergeAverage_GPU()
 	{
 		cublasDestroy(cublasHandle);
 	}
@@ -39,14 +39,14 @@ namespace NeuralNetwork {
 	// 基本処理
 	//================================
 	/** レイヤー種別の取得 */
-	U32 MergeAdd_GPU::GetLayerKind()const
+	U32 MergeAverage_GPU::GetLayerKind()const
 	{
 		return Layer::ELayerKind::LAYER_KIND_GPU | GetLayerKindBase();
 	}
 
 	/** 初期化. 各ニューロンの値をランダムに初期化
 		@return	成功した場合0 */
-	ErrorCode MergeAdd_GPU::Initialize(void)
+	ErrorCode MergeAverage_GPU::Initialize(void)
 	{
 		return this->layerData.Initialize();
 	}
@@ -56,11 +56,11 @@ namespace NeuralNetwork {
 	// レイヤーデータ関連
 	//===========================
 	/** レイヤーデータを取得する */
-	MergeAdd_LayerData_Base& MergeAdd_GPU::GetLayerData()
+	MergeAverage_LayerData_Base& MergeAverage_GPU::GetLayerData()
 	{
 		return this->layerData;
 	}
-	const MergeAdd_LayerData_Base& MergeAdd_GPU::GetLayerData()const
+	const MergeAverage_LayerData_Base& MergeAverage_GPU::GetLayerData()const
 	{
 		return this->layerData;
 	}
@@ -73,7 +73,7 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode MergeAdd_GPU::PreProcessLearn()
+	ErrorCode MergeAverage_GPU::PreProcessLearn()
 	{
 		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
@@ -87,7 +87,7 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode MergeAdd_GPU::PreProcessCalculate()
+	ErrorCode MergeAverage_GPU::PreProcessCalculate()
 	{
 		// 入力バッファ数を確認
 		this->lpInputBufferCount.resize(this->GetInputDataCount());
@@ -110,7 +110,7 @@ namespace NeuralNetwork {
 
 	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode MergeAdd_GPU::PreProcessLoop()
+	ErrorCode MergeAverage_GPU::PreProcessLoop()
 	{
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -122,12 +122,12 @@ namespace NeuralNetwork {
 	/** 演算処理を実行する.
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 		@return 成功した場合0が返る */
-	ErrorCode MergeAdd_GPU::Calculate_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppOutputBuffer)
+	ErrorCode MergeAverage_GPU::Calculate_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppOutputBuffer)
 	{
 		// 出力バッファを初期化
 		cudaMemset(&o_lppOutputBuffer[0], 0, sizeof(F32)*this->outputBufferCount*this->GetBatchSize());
 
-		F32 alpha = 1.0f;
+		F32 alpha = 1.0f / this->GetInputDataCount();
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
 			for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
@@ -159,7 +159,7 @@ namespace NeuralNetwork {
 		@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode MergeAdd_GPU::CalculateDInput_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppDInputBuffer[], CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode MergeAverage_GPU::CalculateDInput_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppDInputBuffer[], CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		if(o_lppDInputBuffer)
 		{
@@ -169,15 +169,19 @@ namespace NeuralNetwork {
 				cudaMemset(o_lppDInputBuffer[inputNum], 0, sizeof(F32)*this->lpInputBufferCount[inputNum]*this->GetBatchSize());
 			}
 
+			F32 alpha = 1.0f / this->GetInputDataCount();
 			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
 				for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
 				{
-					cudaError_t err = cudaMemcpyAsync(
-						&o_lppDInputBuffer[inputNum][batchNum*this->lpInputBufferCount[inputNum]],
+					cublasStatus_t err = cublasSaxpy_v2(
+						this->cublasHandle,
+						min(this->lpInputBufferCount[inputNum], outputBufferCount),
+						&alpha,
 						&i_lppDOutputBuffer[batchNum*this->outputBufferCount],
-						sizeof(F32) * min(this->lpInputBufferCount[inputNum], this->outputBufferCount),
-						cudaMemcpyDeviceToDevice);
+						1,
+						&o_lppDInputBuffer[inputNum][batchNum * this->lpInputBufferCount[inputNum]],
+						1);
 					if(err != 0)
 						return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
 				}
@@ -216,7 +220,7 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode MergeAdd_GPU::Training_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppDInputBuffer[], CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode MergeAverage_GPU::Training_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppDInputBuffer[], CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		return this->CalculateDInput_device(i_lppInputBuffer, o_lppDInputBuffer, i_lppOutputBuffer, i_lppDOutputBuffer);
 	}
