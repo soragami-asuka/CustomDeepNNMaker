@@ -23,6 +23,8 @@ call ConvertNNConfigToSource.exe "./Reshape_SquaresZeroSideLeftTop/Config.xml" "
 call ConvertNNConfigToSource.exe "./MergeInput/Config.xml" "./MergeInput/" "MergeInput"
 call ConvertNNConfigToSource.exe "./MergeAdd/Config.xml" "./MergeAdd/" "MergeAdd"
 call ConvertNNConfigToSource.exe "./MergeAverage/Config.xml" "./MergeAverage/" "MergeAverage"
+call ConvertNNConfigToSource.exe "./MergeMax/Config.xml" "./MergeMax/" "MergeMax"
+call ConvertNNConfigToSource.exe "./MergeMultiply/Config.xml" "./MergeMultiply/" "MergeMultiply"
 call ConvertNNConfigToSource.exe "./Residual/Config.xml" "./Residual/" "Residual"
 call ConvertNNConfigToSource.exe "./GaussianNoise/Config.xml" "./GaussianNoise/" "GaussianNoise"
 

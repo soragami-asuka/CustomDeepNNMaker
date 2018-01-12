@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="3F015946-7E88-4DB0-91BD-F4013F2190D4" version="1.0.0.0" default-language="ja" mult-input="true">
+
+  <SourceName>MergeMax</SourceName>
+  <Name>レイヤーのマージ(最大値)</Name>
+  <Text>入力信号のCHの最大値を出力する.各入力のX,Y,Zはすべて同一である必要がある</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+    <Enum id="MergeType">
+      <Name>マージ種別</Name>
+      <Text>マージする際にCH数をどのように決定するか</Text>
+      <Items>
+        <Item id="max">
+          <Name>最大</Name>
+          <Text>入力レイヤーの最大数に併せる</Text>
+        </Item>
+        <Item id="min">
+          <Name>最小</Name>
+          <Text>入力レイヤーの最小数に併せる</Text>
+        </Item>
+        <Item id="layer0">
+          <Name>先頭レイヤー</Name>
+          <Text>先頭レイヤーの数に併せる</Text>
+        </Item>
+      </Items>
+      <Default>max</Default>
+    </Enum>
+
+  </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <Learn>
+  </Learn>
+
+</Config>

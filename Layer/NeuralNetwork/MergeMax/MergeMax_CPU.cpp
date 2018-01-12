@@ -5,12 +5,12 @@
 //======================================
 #include"stdafx.h"
 
-#include"MergeAverage_DATA.hpp"
-#include"MergeAverage_FUNC.hpp"
-#include"MergeAverage_Base.h"
+#include"MergeMax_DATA.hpp"
+#include"MergeMax_FUNC.hpp"
+#include"MergeMax_Base.h"
 
-#include"MergeAverage_CPU.h"
-#include"MergeAverage_LayerData_CPU.h"
+#include"MergeMax_CPU.h"
+#include"MergeMax_LayerData_CPU.h"
 
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
@@ -24,14 +24,14 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	MergeAverage_CPU::MergeAverage_CPU(Gravisbell::GUID guid, MergeAverage_LayerData_CPU& i_layerData, const std::vector<IODataStruct>& i_lpInputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
-		:	MergeAverage_Base					(guid, i_lpInputDataStruct, i_layerData.GetOutputDataStruct(&i_lpInputDataStruct[0], (U32)i_lpInputDataStruct.size()))
+	MergeMax_CPU::MergeMax_CPU(Gravisbell::GUID guid, MergeMax_LayerData_CPU& i_layerData, const std::vector<IODataStruct>& i_lpInputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
+		:	MergeMax_Base					(guid, i_lpInputDataStruct, i_layerData.GetOutputDataStruct(&i_lpInputDataStruct[0], (U32)i_lpInputDataStruct.size()))
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	outputBufferCount				(0)		/**< 出力バッファ数 */
 	{
 	}
 	/** デストラクタ */
-	MergeAverage_CPU::~MergeAverage_CPU()
+	MergeMax_CPU::~MergeMax_CPU()
 	{
 	}
 
@@ -40,14 +40,14 @@ namespace NeuralNetwork {
 	// 基本処理
 	//================================
 	/** レイヤー種別の取得 */
-	U32 MergeAverage_CPU::GetLayerKind()const
+	U32 MergeMax_CPU::GetLayerKind()const
 	{
 		return Layer::ELayerKind::LAYER_KIND_CPU | GetLayerKindBase();
 	}
 
 	/** 初期化. 各ニューロンの値をランダムに初期化
 		@return	成功した場合0 */
-	ErrorCode MergeAverage_CPU::Initialize(void)
+	ErrorCode MergeMax_CPU::Initialize(void)
 	{
 		return this->layerData.Initialize();
 	}
@@ -57,11 +57,11 @@ namespace NeuralNetwork {
 	// レイヤーデータ関連
 	//===========================
 	/** レイヤーデータを取得する */
-	MergeAverage_LayerData_Base& MergeAverage_CPU::GetLayerData()
+	MergeMax_LayerData_Base& MergeMax_CPU::GetLayerData()
 	{
 		return this->layerData;
 	}
-	const MergeAverage_LayerData_Base& MergeAverage_CPU::GetLayerData()const
+	const MergeMax_LayerData_Base& MergeMax_CPU::GetLayerData()const
 	{
 		return this->layerData;
 	}
@@ -74,7 +74,7 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode MergeAverage_CPU::PreProcessLearn()
+	ErrorCode MergeMax_CPU::PreProcessLearn()
 	{
 		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
@@ -98,7 +98,7 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode MergeAverage_CPU::PreProcessCalculate()
+	ErrorCode MergeMax_CPU::PreProcessCalculate()
 	{
 		// 入力バッファ数を確認
 		this->lpInputBufferCount.resize(this->GetInputDataCount());
@@ -128,7 +128,7 @@ namespace NeuralNetwork {
 
 	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode MergeAverage_CPU::PreProcessLoop()
+	ErrorCode MergeMax_CPU::PreProcessLoop()
 	{
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -138,7 +138,7 @@ namespace NeuralNetwork {
 	/** 演算処理を実行する.
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 		@return 成功した場合0が返る */
-	ErrorCode MergeAverage_CPU::Calculate_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppOutputBuffer)
+	ErrorCode MergeMax_CPU::Calculate_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppOutputBuffer)
 	{
 		// 入力バッファのアドレスを配列に格納
 		for(U32 inputNum=0; inputNum<this->GetInputDataCount(); inputNum++)
@@ -150,9 +150,16 @@ namespace NeuralNetwork {
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			this->lppBatchOutputBuffer[batchNum] = &o_lppOutputBuffer[batchNum * this->outputBufferCount];
 
-		// 出力バッファを0クリア
-		memset(o_lppOutputBuffer, 0, sizeof(F32)*this->outputBufferCount*this->GetBatchSize());
+		// 出力バッファを-FLT_MAXでクリア
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
+		{
+			for(U32 bufNum=0; bufNum<this->outputBufferCount; bufNum++)
+			{
+				this->lppBatchOutputBuffer[batchNum][bufNum] = -FLT_MAX;
+			}
+		}
 
+		// 最大値を計算
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
 			for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
@@ -161,17 +168,8 @@ namespace NeuralNetwork {
 
 				for(U32 bufNum=0; bufNum<bufferSize; bufNum++)
 				{
-					this->lppBatchOutputBuffer[batchNum][bufNum] += this->lppBatchInputBuffer[inputNum][batchNum][bufNum];
+					this->lppBatchOutputBuffer[batchNum][bufNum] = max(this->lppBatchOutputBuffer[batchNum][bufNum], this->lppBatchInputBuffer[inputNum][batchNum][bufNum]);
 				}
-			}
-		}
-
-		// 平均化
-		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
-		{
-			for(U32 bufNum=0; bufNum<this->outputBufferCount; bufNum++)
-			{
-				this->lppBatchOutputBuffer[batchNum][bufNum] /= this->GetInputDataCount();
 			}
 		}
 
@@ -188,7 +186,7 @@ namespace NeuralNetwork {
 		@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode MergeAverage_CPU::CalculateDInput_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppDInputBuffer[], CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode MergeMax_CPU::CalculateDInput_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppDInputBuffer[], CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		// 出力誤差バッファのアドレスを配列に格納
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
@@ -207,6 +205,15 @@ namespace NeuralNetwork {
 				// バッファのクリア
 				memset(o_lppDInputBuffer[inputNum], 0, sizeof(F32)*this->lpInputBufferCount[inputNum]*this->GetBatchSize());
 			}
+			// 入力バッファのアドレスを配列に格納
+			for(U32 inputNum=0; inputNum<this->GetInputDataCount(); inputNum++)
+			{
+				for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
+					this->lppBatchInputBuffer[inputNum][batchNum] = &i_lppInputBuffer[inputNum][batchNum * this->lpInputBufferCount[inputNum]];
+			}
+			// 出力バッファのアドレスを配列に格納
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
+				this->lppBatchOutputBuffer[batchNum] = const_cast<BATCH_BUFFER_POINTER>(&i_lppOutputBuffer[batchNum * this->outputBufferCount]);
 
 			U32 CH_SIZE = this->GetOutputDataStruct().x * this->GetOutputDataStruct().y * this->GetOutputDataStruct().z;
 			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
@@ -215,9 +222,13 @@ namespace NeuralNetwork {
 				for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
 				{
 					U32 bufferSize = min(this->lpInputBufferCount[inputNum], outputBufferCount);
+
 					for(U32 bufNum=0; bufNum<bufferSize; bufNum++)
 					{
-						this->lppBatchDInputBuffer[inputNum][batchNum][bufNum] = this->lppBatchDOutputBuffer[batchNum][bufNum] / this->GetInputDataCount();
+						if(this->lppBatchOutputBuffer[batchNum][bufNum] == this->lppBatchInputBuffer[inputNum][batchNum][bufNum])	// 入力と出力が一致する場合
+						{
+							this->lppBatchDInputBuffer[inputNum][batchNum][bufNum] = this->lppBatchDOutputBuffer[batchNum][bufNum];
+						}
 					}
 				}
 			}
@@ -249,7 +260,7 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode MergeAverage_CPU::Training_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppDInputBuffer[], CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode MergeMax_CPU::Training_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppDInputBuffer[], CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		return this->CalculateDInput_device(i_lppInputBuffer, o_lppDInputBuffer, i_lppOutputBuffer, i_lppDOutputBuffer);
 	}

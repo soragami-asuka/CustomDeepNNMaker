@@ -5,12 +5,12 @@
 //======================================
 #include"stdafx.h"
 
-#include"MergeAverage_DATA.hpp"
-#include"MergeAverage_FUNC.hpp"
-#include"MergeAverage_Base.h"
+#include"MergeMultiply_DATA.hpp"
+#include"MergeMultiply_FUNC.hpp"
+#include"MergeMultiply_Base.h"
 
-#include"MergeAverage_CPU.h"
-#include"MergeAverage_LayerData_CPU.h"
+#include"MergeMultiply_CPU.h"
+#include"MergeMultiply_LayerData_CPU.h"
 
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
@@ -24,14 +24,14 @@ namespace NeuralNetwork {
 
 
 	/** コンストラクタ */
-	MergeAverage_CPU::MergeAverage_CPU(Gravisbell::GUID guid, MergeAverage_LayerData_CPU& i_layerData, const std::vector<IODataStruct>& i_lpInputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
-		:	MergeAverage_Base					(guid, i_lpInputDataStruct, i_layerData.GetOutputDataStruct(&i_lpInputDataStruct[0], (U32)i_lpInputDataStruct.size()))
+	MergeMultiply_CPU::MergeMultiply_CPU(Gravisbell::GUID guid, MergeMultiply_LayerData_CPU& i_layerData, const std::vector<IODataStruct>& i_lpInputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
+		:	MergeMultiply_Base					(guid, i_lpInputDataStruct, i_layerData.GetOutputDataStruct(&i_lpInputDataStruct[0], (U32)i_lpInputDataStruct.size()))
 		,	layerData						(i_layerData)	/**< レイヤーデータ */
 		,	outputBufferCount				(0)		/**< 出力バッファ数 */
 	{
 	}
 	/** デストラクタ */
-	MergeAverage_CPU::~MergeAverage_CPU()
+	MergeMultiply_CPU::~MergeMultiply_CPU()
 	{
 	}
 
@@ -40,14 +40,14 @@ namespace NeuralNetwork {
 	// 基本処理
 	//================================
 	/** レイヤー種別の取得 */
-	U32 MergeAverage_CPU::GetLayerKind()const
+	U32 MergeMultiply_CPU::GetLayerKind()const
 	{
 		return Layer::ELayerKind::LAYER_KIND_CPU | GetLayerKindBase();
 	}
 
 	/** 初期化. 各ニューロンの値をランダムに初期化
 		@return	成功した場合0 */
-	ErrorCode MergeAverage_CPU::Initialize(void)
+	ErrorCode MergeMultiply_CPU::Initialize(void)
 	{
 		return this->layerData.Initialize();
 	}
@@ -57,11 +57,11 @@ namespace NeuralNetwork {
 	// レイヤーデータ関連
 	//===========================
 	/** レイヤーデータを取得する */
-	MergeAverage_LayerData_Base& MergeAverage_CPU::GetLayerData()
+	MergeMultiply_LayerData_Base& MergeMultiply_CPU::GetLayerData()
 	{
 		return this->layerData;
 	}
-	const MergeAverage_LayerData_Base& MergeAverage_CPU::GetLayerData()const
+	const MergeMultiply_LayerData_Base& MergeMultiply_CPU::GetLayerData()const
 	{
 		return this->layerData;
 	}
@@ -74,7 +74,7 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はPreProcessLearnLoop以降の処理は実行不可. */
-	ErrorCode MergeAverage_CPU::PreProcessLearn()
+	ErrorCode MergeMultiply_CPU::PreProcessLearn()
 	{
 		ErrorCode errorCode = this->PreProcessCalculate();
 		if(errorCode != ErrorCode::ERROR_CODE_NONE)
@@ -98,7 +98,7 @@ namespace NeuralNetwork {
 		@param batchSize	同時に演算を行うバッチのサイズ.
 		NN作成後、演算処理を実行する前に一度だけ必ず実行すること。データごとに実行する必要はない.
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode MergeAverage_CPU::PreProcessCalculate()
+	ErrorCode MergeMultiply_CPU::PreProcessCalculate()
 	{
 		// 入力バッファ数を確認
 		this->lpInputBufferCount.resize(this->GetInputDataCount());
@@ -128,7 +128,7 @@ namespace NeuralNetwork {
 
 	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
-	ErrorCode MergeAverage_CPU::PreProcessLoop()
+	ErrorCode MergeMultiply_CPU::PreProcessLoop()
 	{
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -138,7 +138,7 @@ namespace NeuralNetwork {
 	/** 演算処理を実行する.
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 		@return 成功した場合0が返る */
-	ErrorCode MergeAverage_CPU::Calculate_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppOutputBuffer)
+	ErrorCode MergeMultiply_CPU::Calculate_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppOutputBuffer)
 	{
 		// 入力バッファのアドレスを配列に格納
 		for(U32 inputNum=0; inputNum<this->GetInputDataCount(); inputNum++)
@@ -166,15 +166,6 @@ namespace NeuralNetwork {
 			}
 		}
 
-		// 平均化
-		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
-		{
-			for(U32 bufNum=0; bufNum<this->outputBufferCount; bufNum++)
-			{
-				this->lppBatchOutputBuffer[batchNum][bufNum] /= this->GetInputDataCount();
-			}
-		}
-
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
@@ -188,7 +179,7 @@ namespace NeuralNetwork {
 		@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode MergeAverage_CPU::CalculateDInput_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppDInputBuffer[], CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode MergeMultiply_CPU::CalculateDInput_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppDInputBuffer[], CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		// 出力誤差バッファのアドレスを配列に格納
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
@@ -214,11 +205,10 @@ namespace NeuralNetwork {
 				U32 offset_output = 0;
 				for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
 				{
-					U32 bufferSize = min(this->lpInputBufferCount[inputNum], outputBufferCount);
-					for(U32 bufNum=0; bufNum<bufferSize; bufNum++)
-					{
-						this->lppBatchDInputBuffer[inputNum][batchNum][bufNum] = this->lppBatchDOutputBuffer[batchNum][bufNum] / this->GetInputDataCount();
-					}
+					memcpy(
+						this->lppBatchDInputBuffer[inputNum][batchNum],
+						this->lppBatchDOutputBuffer[batchNum],
+						sizeof(F32) * min(this->lpInputBufferCount[inputNum], outputBufferCount) );
 				}
 			}
 		}
@@ -249,7 +239,7 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode MergeAverage_CPU::Training_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppDInputBuffer[], CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode MergeMultiply_CPU::Training_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppDInputBuffer[], CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		return this->CalculateDInput_device(i_lppInputBuffer, o_lppDInputBuffer, i_lppOutputBuffer, i_lppDOutputBuffer);
 	}
