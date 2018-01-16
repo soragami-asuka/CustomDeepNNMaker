@@ -161,7 +161,7 @@ namespace NeuralNetwork {
 
 				for(U32 bufNum=0; bufNum<bufferSize; bufNum++)
 				{
-					this->lppBatchOutputBuffer[batchNum][bufNum] += this->lppBatchInputBuffer[inputNum][batchNum][bufNum];
+					this->lppBatchOutputBuffer[batchNum][bufNum] *= this->lppBatchInputBuffer[inputNum][batchNum][bufNum];
 				}
 			}
 		}
@@ -198,6 +198,16 @@ namespace NeuralNetwork {
 				// バッファのクリア
 				memset(o_lppDInputBuffer[inputNum], 0, sizeof(F32)*this->lpInputBufferCount[inputNum]*this->GetBatchSize());
 			}
+			// 入力バッファのアドレスを配列に格納
+			for(U32 inputNum=0; inputNum<this->GetInputDataCount(); inputNum++)
+			{
+				for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
+					this->lppBatchInputBuffer[inputNum][batchNum] = &i_lppInputBuffer[inputNum][batchNum * this->lpInputBufferCount[inputNum]];
+			}
+			// 出力バッファのアドレスを配列に格納
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
+				this->lppBatchOutputBuffer[batchNum] = const_cast<BATCH_BUFFER_POINTER>(&i_lppOutputBuffer[batchNum * this->outputBufferCount]);
+
 
 			U32 CH_SIZE = this->GetOutputDataStruct().x * this->GetOutputDataStruct().y * this->GetOutputDataStruct().z;
 			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
@@ -205,10 +215,19 @@ namespace NeuralNetwork {
 				U32 offset_output = 0;
 				for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
 				{
-					memcpy(
-						this->lppBatchDInputBuffer[inputNum][batchNum],
-						this->lppBatchDOutputBuffer[batchNum],
-						sizeof(F32) * min(this->lpInputBufferCount[inputNum], outputBufferCount) );
+					U32 bufferSize = min(this->lpInputBufferCount[inputNum], outputBufferCount);
+
+					for(U32 bufNum=0; bufNum<bufferSize; bufNum++)
+					{
+						if(abs(this->lppBatchOutputBuffer[batchNum][bufNum]) > 0.0f)
+						{
+							this->lppBatchDInputBuffer[inputNum][batchNum][bufNum] = this->lppBatchOutputBuffer[batchNum][bufNum] / this->lppBatchInputBuffer[inputNum][batchNum][bufNum] * this->lppBatchDOutputBuffer[batchNum][bufNum];
+						}
+						else
+						{
+							this->lppBatchDInputBuffer[inputNum][batchNum][bufNum] = 0.0f;
+						}
+					}
 				}
 			}
 		}

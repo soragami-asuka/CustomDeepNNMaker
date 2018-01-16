@@ -717,6 +717,56 @@ Layer::ILayerData* CreateMergeMaxLayer(
 }
 
 
+/** 入力結合レイヤー(乗算). 入力されたレイヤーの値を乗算する. 入力データ構造はX,Y,Zで同じサイズである必要がある.
+	@param	layerDLLManager		レイヤーDLL管理クラス
+	@param	i_mergeType			ch数をマージさせる方法. */
+GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+Layer::ILayerData* CreateMergeMultiplyLayer(
+	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+	LayerMergeType i_mergeType)
+{
+	const Gravisbell::GUID TYPE_CODE(0x7becf785, 0x60d0, 0x42ad, 0x88, 0x57, 0x1e, 0x2c, 0xb2, 0xd5, 0x67, 0x21);
+
+
+	// DLL取得
+	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(TYPE_CODE);
+	if(pLayerDLL == NULL)
+		return NULL;
+
+	// 設定の作成
+	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
+	if(pConfig == NULL)
+		return NULL;
+
+	// パディング種別
+	{
+		SettingData::Standard::IItem_Enum* pItem = dynamic_cast<SettingData::Standard::IItem_Enum*>(pConfig->GetItemByID(L"MergeType"));
+		switch(i_mergeType)
+		{
+		case LayerMergeType::LYAERMERGETYPE_MAX:
+			pItem->SetValue(L"max");
+			break;
+		case LayerMergeType::LYAERMERGETYPE_MIN:
+			pItem->SetValue(L"min");
+			break;
+		case LayerMergeType::LYAERMERGETYPE_LAYER0:
+			pItem->SetValue(L"layer0");
+			break;
+		}
+	}
+
+	// レイヤーの作成
+	Layer::ILayerData* pLayer = layerDataManager.CreateLayerData(layerDLLManager, TYPE_CODE, boost::uuids::random_generator()().data, *pConfig);
+	if(pLayer == NULL)
+		return NULL;
+
+	// 設定情報を削除
+	delete pConfig;
+
+	return pLayer;
+}
+
+
 /** チャンネル抽出レイヤー. 入力されたレイヤーの特定チャンネルを抽出する. 入力/出力データ構造でX,Y,Zは同じサイズ.
 	@param	startChannelNo	開始チャンネル番号.
 	@param	channelCount	抽出チャンネル数. */

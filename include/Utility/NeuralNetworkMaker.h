@@ -220,6 +220,30 @@ namespace NeuralNetworkLayer {
 		}
 
 
+
+	protected:
+		//=============================
+		// 入力結合レイヤー(乗算)
+		//=============================
+		/** 入力結合レイヤー. 入力されたレイヤーの値を乗算する. 入力データ構造はX,Y,Zで同じサイズである必要がある. */
+		virtual Gravisbell::GUID AddMergeMultiplyLayer(LayerMergeType i_layerMergeType, const Gravisbell::GUID lpInputLayerGUID[], U32 inputLayerCount) = 0;
+		
+		/** 入力結合レイヤー. 入力されたレイヤーの値を乗算する. 入力データ構造はX,Y,Zで同じサイズである必要がある. */
+		Gravisbell::GUID AddMergeMultiplyLayer(LayerMergeType i_layerMergeType, const std::vector<Gravisbell::GUID>& lpInputLayerGUID)
+		{
+			return AddMergeMultiplyLayer(i_layerMergeType, &lpInputLayerGUID[0], (U32)lpInputLayerGUID.size());
+		}
+		
+		/** 入力結合レイヤー. 入力されたレイヤーの値を乗算する. 入力データ構造はX,Y,Zで同じサイズである必要がある. */
+		template<typename... Rest>
+		Gravisbell::GUID AddMergeMultiplyLayer(LayerMergeType i_layerMergeType, std::vector<Gravisbell::GUID>& lpInputLayerGUID, const Gravisbell::GUID& lastLayerGUID_first, const Rest&... lpLastLayerGUID_rest)
+		{
+			lpInputLayerGUID.push_back(lastLayerGUID_first);
+	
+			return AddMergeMultiplyLayer(i_layerMergeType, lpInputLayerGUID, lpLastLayerGUID_rest...);
+		}
+
+
 	protected:
 		//=============================
 		// 入力結合レイヤー(加算)(旧式)
@@ -294,6 +318,19 @@ namespace NeuralNetworkLayer {
 			lpInputLayerGUID.push_back(lastLayerGUID_first);
 
 			return AddMergeMaxLayer(i_layerMergeType, lpInputLayerGUID, lpLastLayerGUID_rest...);
+		}
+		
+		/** 入力結合レイヤー. 入力されたレイヤーの値を乗算する. 入力データ構造はX,Y,Zで同じサイズである必要がある.
+			@param lastLayerGUID_first	
+			@param lpLastLayerGUID_rest	
+			*/
+		template<typename... Rest>
+		Gravisbell::GUID AddMergeMultiplyLayer(LayerMergeType i_layerMergeType, const Gravisbell::GUID& lastLayerGUID_first, const Rest&... lpLastLayerGUID_rest)
+		{
+			std::vector<Gravisbell::GUID> lpInputLayerGUID;
+			lpInputLayerGUID.push_back(lastLayerGUID_first);
+
+			return AddMergeMultiplyLayer(i_layerMergeType, lpInputLayerGUID, lpLastLayerGUID_rest...);
 		}
 
 		/** 入力結合レイヤー. 入力されたレイヤーの値を合算する. 出力されるレイヤーのサイズは全サイズのうちの最大値になる.

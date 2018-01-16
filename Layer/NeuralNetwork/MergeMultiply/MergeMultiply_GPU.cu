@@ -20,6 +20,45 @@ namespace Layer {
 namespace NeuralNetwork {
 
 
+#define CALC_BATCH_MAX	(256)
+#define CALC_INPUT_MAX	(1024)
+
+
+	__global__ void device_FillValue(U32 bufferCount, F32 lpOutputBuffer[], F32 value)
+	{
+		U32 batchNum = blockIdx.y;
+		U32 bufNum   = blockIdx.x * blockDim.x + threadIdx.x;
+
+		if(bufNum >= bufferCount)
+			return;
+
+		lpOutputBuffer[batchNum * bufferCount + bufNum] = value;
+	}
+	__global__ void device_CalculateOutput(U32 maxBufferCount, U32 inputBufferCount, U32 outputBufferCount, const F32 lpInputBuffer[], F32 lpOutputBuffer[])
+	{
+		U32 batchNum = blockIdx.y;
+		U32 bufNum   = blockIdx.x * blockDim.x + threadIdx.x;
+
+		if(bufNum >= maxBufferCount)
+			return;
+
+		lpOutputBuffer[batchNum * outputBufferCount + bufNum] *= lpInputBuffer[batchNum * inputBufferCount + bufNum];
+	}
+	__global__ void device_CalculateDInput(U32 maxBufferCount, U32 inputBufferCount, U32 outputBufferCount, const F32 lpInputBuffer[], const F32 lpOutputBuffer[], F32 lpDInputBuffer[], const F32 lpDOutputBuffer[])
+	{
+		U32 batchNum = blockIdx.y;
+		U32 bufNum   = blockIdx.x * blockDim.x + threadIdx.x;
+
+		if(bufNum >= maxBufferCount)
+			return;
+
+		U32 inputPos  = batchNum * inputBufferCount  + bufNum;
+		U32 outputPos = batchNum * outputBufferCount + bufNum;
+
+		lpDInputBuffer[inputPos] = (abs(lpOutputBuffer[outputPos]) > 1e-30) ? lpDOutputBuffer[outputPos] * lpOutputBuffer[outputPos] / lpInputBuffer[inputPos] : 0.0f;
+	}
+
+
 	/** コンストラクタ */
 	MergeMultiply_GPU::MergeMultiply_GPU(Gravisbell::GUID guid, MergeMultiply_LayerData_GPU& i_layerData, const std::vector<IODataStruct>& i_lpInputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
 		:	MergeMultiply_Base					(guid, i_lpInputDataStruct, i_layerData.GetOutputDataStruct(&i_lpInputDataStruct[0], (U32)i_lpInputDataStruct.size()))
@@ -126,27 +165,61 @@ namespace NeuralNetwork {
 	ErrorCode MergeMultiply_GPU::Calculate_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppOutputBuffer)
 	{
 		// 出力バッファを初期化
-		cudaMemset(&o_lppOutputBuffer[0], 0, sizeof(F32)*this->outputBufferCount*this->GetBatchSize());
-
-		F32 alpha = 1.0f;
-		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
+		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum+=CALC_BATCH_MAX)
 		{
-			for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
-			{
-				cublasStatus_t err = cublasSaxpy_v2(
-					this->cublasHandle,
-					min(this->lpInputBufferCount[inputNum], outputBufferCount),
-					&alpha,
-					&i_lppInputBuffer[inputNum][batchNum * this->lpInputBufferCount[inputNum]],
-					1,
-					thrust::raw_pointer_cast(&o_lppOutputBuffer[batchNum*this->outputBufferCount]),
-					1);
-				if(err != 0)
-					return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
+			dim3 grid(
+				(this->outputBufferCount + (CALC_INPUT_MAX-1))/CALC_INPUT_MAX,
+				min(this->GetBatchSize()-batchNum, CALC_BATCH_MAX));
+			dim3 block(
+				min(this->outputBufferCount, CALC_INPUT_MAX));
 
-			}
+			device_FillValue<<<grid, block>>>(
+				this->outputBufferCount,
+				o_lppOutputBuffer,
+				1.0f);
 		}
-		cudaThreadSynchronize();
+
+
+#ifdef _DEBUG
+		std::vector<float> lpTmpOutputBuffer(this->GetBatchSize() * this->outputBufferCount);
+		cudaMemcpy(&lpTmpOutputBuffer[0], o_lppOutputBuffer, sizeof(float)*lpTmpOutputBuffer.size(), cudaMemcpyDeviceToHost);
+#endif
+
+
+		for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
+		{
+			U32 bufferSize = min(this->lpInputBufferCount[inputNum], this->outputBufferCount);
+
+			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum+=CALC_BATCH_MAX)
+			{
+				dim3 grid(
+					(bufferSize + (CALC_INPUT_MAX-1))/CALC_INPUT_MAX,
+					min(this->GetBatchSize()-batchNum, CALC_BATCH_MAX));
+				dim3 block(
+					min(bufferSize, CALC_INPUT_MAX));
+
+				device_CalculateOutput<<<grid, block>>>(
+					bufferSize,
+					this->lpInputBufferCount[inputNum],
+					this->outputBufferCount,
+					i_lppInputBuffer[inputNum],
+					o_lppOutputBuffer);
+			}
+			cudaThreadSynchronize();
+		}
+
+
+#ifdef _DEBUG
+		std::vector<std::vector<float>> lpTmpInputBuffer(this->GetInputDataCount());
+		for(int i=0; i<lpTmpInputBuffer.size(); i++)
+		{
+			lpTmpInputBuffer[i].resize(this->GetBatchSize() * this->lpInputBufferCount[i]);
+			cudaMemcpy(&lpTmpInputBuffer[i][0], i_lppInputBuffer[i], sizeof(float)*lpTmpInputBuffer[i].size(), cudaMemcpyDeviceToHost);
+		}
+
+		cudaMemcpy(&lpTmpOutputBuffer[0], o_lppOutputBuffer, sizeof(float)*lpTmpOutputBuffer.size(), cudaMemcpyDeviceToHost);
+#endif
+
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -170,28 +243,41 @@ namespace NeuralNetwork {
 				cudaMemset(o_lppDInputBuffer[inputNum], 0, sizeof(F32)*this->lpInputBufferCount[inputNum]*this->GetBatchSize());
 			}
 
-			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
+
+			for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
 			{
-				for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
+				U32 bufferSize = min(this->lpInputBufferCount[inputNum], this->outputBufferCount);
+
+				for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum+=CALC_BATCH_MAX)
 				{
-					cudaError_t err = cudaMemcpyAsync(
-						&o_lppDInputBuffer[inputNum][batchNum*this->lpInputBufferCount[inputNum]],
-						&i_lppDOutputBuffer[batchNum*this->outputBufferCount],
-						sizeof(F32) * min(this->lpInputBufferCount[inputNum], this->outputBufferCount),
-						cudaMemcpyDeviceToDevice);
-					if(err != 0)
-						return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
+					dim3 grid(
+						(bufferSize + (CALC_INPUT_MAX-1))/CALC_INPUT_MAX,
+						min(this->GetBatchSize()-batchNum, CALC_BATCH_MAX));
+					dim3 block(
+						min(bufferSize, CALC_INPUT_MAX));
+
+					device_CalculateDInput<<<grid, block>>>(
+						bufferSize,
+						this->lpInputBufferCount[inputNum],
+						this->outputBufferCount,
+						i_lppInputBuffer[inputNum],
+						i_lppOutputBuffer,
+						o_lppDInputBuffer[inputNum],
+						i_lppDOutputBuffer);
 				}
+
+				cudaThreadSynchronize();
 			}
-			cudaThreadSynchronize();
 		}
 
 
 #ifdef _DEBUG
-		std::vector<float> lpTmpInputBuffer0(this->GetBatchSize() * this->lpInputBufferCount[0]);
-		cudaMemcpy(&lpTmpInputBuffer0[0], i_lppInputBuffer[0], sizeof(float)*lpTmpInputBuffer0.size(), cudaMemcpyDeviceToHost);
-		std::vector<float> lpTmpInputBuffer1(this->GetBatchSize() * this->lpInputBufferCount[1]);
-		cudaMemcpy(&lpTmpInputBuffer1[0], i_lppInputBuffer[1], sizeof(float)*lpTmpInputBuffer1.size(), cudaMemcpyDeviceToHost);
+		std::vector<std::vector<float>> lpTmpInputBuffer(this->GetInputDataCount());
+		for(int i=0; i<lpTmpInputBuffer.size(); i++)
+		{
+			lpTmpInputBuffer[i].resize(this->GetBatchSize() * this->lpInputBufferCount[i]);
+			cudaMemcpy(&lpTmpInputBuffer[i][0], i_lppInputBuffer[i], sizeof(float)*lpTmpInputBuffer[i].size(), cudaMemcpyDeviceToHost);
+		}
 
 		std::vector<float> lpTmpOutputBuffer(this->GetBatchSize() * this->outputBufferCount);
 		cudaMemcpy(&lpTmpOutputBuffer[0], i_lppOutputBuffer, sizeof(float)*lpTmpOutputBuffer.size(), cudaMemcpyDeviceToHost);
@@ -199,12 +285,13 @@ namespace NeuralNetwork {
 		std::vector<float> lpTmpDOutputBuffer(this->GetBatchSize() * this->outputBufferCount);
 		cudaMemcpy(&lpTmpDOutputBuffer[0], i_lppDOutputBuffer, sizeof(float)*lpTmpDOutputBuffer.size(), cudaMemcpyDeviceToHost);
 
-		std::vector<float> lpTmpDInputBuffer0(this->GetBatchSize() * this->lpInputBufferCount[0]);
-		cudaMemcpy(&lpTmpDInputBuffer0[0], o_lppDInputBuffer[0], sizeof(float)*lpTmpDInputBuffer0.size(), cudaMemcpyDeviceToHost);
-		std::vector<float> lpTmpDInputBuffer1(this->GetBatchSize() * this->lpInputBufferCount[1]);
-		cudaMemcpy(&lpTmpDInputBuffer1[0], o_lppDInputBuffer[1], sizeof(float)*lpTmpDInputBuffer1.size(), cudaMemcpyDeviceToHost);
+		std::vector<std::vector<float>> lpTmpDInputBuffer(this->GetInputDataCount());
+		for(int i=0; i<lpTmpInputBuffer.size(); i++)
+		{
+			lpTmpDInputBuffer[i].resize(this->GetBatchSize() * this->lpInputBufferCount[i]);
+			cudaMemcpy(&lpTmpDInputBuffer[i][0], o_lppDInputBuffer[i], sizeof(float)*lpTmpDInputBuffer[i].size(), cudaMemcpyDeviceToHost);
+		}
 #endif
-
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

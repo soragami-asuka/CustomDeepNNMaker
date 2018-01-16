@@ -1133,7 +1133,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver03(const Layer::Neural
 		}
 
 		// ƒ}[ƒW
-		lastLayerGUID = pNetworkMaker->AddMergeMaxLayer(
+		lastLayerGUID = pNetworkMaker->AddMergeMultiplyLayer(
 			Gravisbell::Utility::NeuralNetworkLayer::LayerMergeType::LYAERMERGETYPE_MIN,
 			lastLayerGUID_chA, lastLayerGUID_chB, lastLayerGUID_chC);
 

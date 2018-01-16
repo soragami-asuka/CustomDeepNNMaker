@@ -237,6 +237,15 @@ namespace NeuralNetworkLayer {
 		LayerMergeType i_mergeType);
 
 
+	/** 入力結合レイヤー(乗算). 入力されたレイヤーの値を乗算する. 入力データ構造はX,Y,Zで同じサイズである必要がある.
+		@param	layerDLLManager		レイヤーDLL管理クラス
+		@param	i_mergeType			ch数をマージさせる方法. */
+	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+	Layer::ILayerData* CreateMergeMultiplyLayer(
+		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+		LayerMergeType i_mergeType);
+
+
 	/** 入力結合レイヤー. 入力されたレイヤーの値を合算する. 出力されるレイヤーのサイズは全サイズのうちの最大値になる.
 		@param	layerDLLManager		レイヤーDLL管理クラス.
 		@param	inputDataStruct		入力データ構造.
