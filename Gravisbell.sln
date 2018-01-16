@@ -119,6 +119,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.MergeMa
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.MergeMultiply", "Layer\NeuralNetwork\MergeMultiply\MergeMultiply.vcxproj", "{DFD7719F-AB2E-4864-8464-2E9B537BB4F0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sample05_Autoencoder", "exe\Sample05_Autoencoder\Sample05_Autoencoder.vcxproj", "{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_Kepler|Mixed Platforms = Debug_Kepler|Mixed Platforms
@@ -1509,6 +1511,36 @@ Global
 		{DFD7719F-AB2E-4864-8464-2E9B537BB4F0}.Release|Win32.Build.0 = Release|Win32
 		{DFD7719F-AB2E-4864-8464-2E9B537BB4F0}.Release|x64.ActiveCfg = Release|x64
 		{DFD7719F-AB2E-4864-8464-2E9B537BB4F0}.Release|x64.Build.0 = Release|x64
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Debug_Kepler|Mixed Platforms.ActiveCfg = Debug_Kepler|Win32
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Debug_Kepler|Mixed Platforms.Build.0 = Debug_Kepler|Win32
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Debug_Kepler|Win32.ActiveCfg = Debug_Kepler|Win32
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Debug_Kepler|Win32.Build.0 = Debug_Kepler|Win32
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Debug_Kepler|x64.ActiveCfg = Debug_Kepler|x64
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Debug_Kepler|x64.Build.0 = Debug_Kepler|x64
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Debug_Maxwell|Mixed Platforms.ActiveCfg = Debug_Maxwell|Win32
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Debug_Maxwell|Mixed Platforms.Build.0 = Debug_Maxwell|Win32
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Debug_Maxwell|Win32.ActiveCfg = Debug_Maxwell|Win32
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Debug_Maxwell|Win32.Build.0 = Debug_Maxwell|Win32
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Debug_Maxwell|x64.ActiveCfg = Debug_Maxwell|x64
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Debug_Maxwell|x64.Build.0 = Debug_Maxwell|x64
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Debug|Win32.Build.0 = Debug|Win32
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Debug|x64.ActiveCfg = Debug|x64
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Debug|x64.Build.0 = Debug|x64
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Release_Kepler|Mixed Platforms.ActiveCfg = Release_Kepler|Win32
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Release_Kepler|Mixed Platforms.Build.0 = Release_Kepler|Win32
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Release_Kepler|Win32.ActiveCfg = Release_Kepler|Win32
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Release_Kepler|Win32.Build.0 = Release_Kepler|Win32
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Release_Kepler|x64.ActiveCfg = Release_Kepler|x64
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Release_Kepler|x64.Build.0 = Release_Kepler|x64
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Release|Win32.ActiveCfg = Release|Win32
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Release|Win32.Build.0 = Release|Win32
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Release|x64.ActiveCfg = Release|x64
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1567,6 +1599,7 @@ Global
 		{FDF38455-5A1C-4694-B587-E85E2AD35583} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
 		{DE2C445A-B646-4AA6-8265-18F3F197455E} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
 		{DFD7719F-AB2E-4864-8464-2E9B537BB4F0} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
+		{C62FA489-4101-48CC-B4B5-9E39FFA99D0F} = {9DEE086C-8571-41DD-ADD4-7583EB13580A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		VisualSVNWorkingCopyRoot = .
