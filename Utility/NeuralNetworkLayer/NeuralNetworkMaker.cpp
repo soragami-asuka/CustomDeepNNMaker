@@ -318,6 +318,20 @@ namespace NeuralNetworkLayer {
 
 			return layerGUID;
 		}
+		
+		/** 入力結合レイヤー. 入力されたレイヤーの最大値を算出する. 入力データ構造はX,Y,Zで同じサイズである必要がある. */
+		Gravisbell::GUID AddMergeMaxLayer(LayerMergeType i_layerMergeType, const Gravisbell::GUID lpInputLayerGUID[], U32 inputLayerCount)
+		{
+			Gravisbell::GUID layerGUID;
+
+			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
+				*this->pLayerConnectData,
+				layerGUID,
+				CreateMergeMaxLayer(layerDLLManager, layerDataManager, i_layerMergeType), false,
+				lpInputLayerGUID, inputLayerCount);
+
+			return layerGUID;
+		}
 
 		/** 入力結合レイヤー. 入力されたレイヤーの値を合算する. 出力されるレイヤーのサイズは全サイズのうちの最大値になる. */
 		Gravisbell::GUID AddResidualLayer(const Gravisbell::GUID lpInputLayerGUID[], U32 inputLayerCount)
