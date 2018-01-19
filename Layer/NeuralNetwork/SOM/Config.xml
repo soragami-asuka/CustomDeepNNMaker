@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="AF36DF4D-9F50-46FF-A1C1-5311CA761F6A" version="1.0.0.0" default-language="ja">
+
+  <SourceName>SOM</SourceName>
+  <Name>自己組織化マップ</Name>
+  <Text>自己組織化マップ.</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+    <Int id="InputBufferCount">
+      <Name>入力バッファ数</Name>
+      <Text>レイヤーに対する入力バッファ数</Text>
+      <Min>1</Min>
+      <Max>65535</Max>
+      <Default>200</Default>
+    </Int>
+    
+    <Int id="DimensionCount">
+      <Name>次元数</Name>
+      <Text>生成されるマップの次元数</Text>
+      <Min>1</Min>
+      <Max>16</Max>
+      <Default>2</Default>
+    </Int>
+
+    <Int id="ResolutionCount">
+      <Name>分解能</Name>
+      <Text>次元ごとの分解性能</Text>
+      <Min>2</Min>
+      <Max>65535</Max>
+      <Default>10</Default>
+    </Int>
+
+    <Float id="InitializeMinValue">
+      <Name>初期化最小値</Name>
+      <Text>初期化に使用する値の最小値</Text>
+      <Min>-65535</Min>
+      <Max>65535</Max>
+      <Default>0.0</Default>
+    </Float>
+
+    <Float id="InitializeMaxValue">
+      <Name>初期化最大値</Name>
+      <Text>初期化に使用する値の最大値</Text>
+      <Min>-65535</Min>
+      <Max>65535</Max>
+      <Default>1.0</Default>
+    </Float>
+
+  </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <RuntimeParameter>
+
+    <Float id="SOM_L0">
+      <Name>学習係数</Name>
+      <Text>パラメータ更新の係数</Text>
+      <Min>0.0</Min>
+      <Max>1.0</Max>
+      <Default>0.1</Default>
+    </Float>
+
+    <Float id="SOM_ramda">
+      <Name>時間減衰率</Name>
+      <Text>学習回数に応じた学習率の減衰率.値が高いほうが減衰率は低い</Text>
+      <Min>1.0</Min>
+      <Max>65535</Max>
+      <Default>2500</Default>
+    </Float>
+
+    <Float id="SOM_sigma">
+      <Name>距離減衰率</Name>
+      <Text>更新個体とBMUとの距離に応じた減衰率.値が高いほうが減衰率は低い</Text>
+      <Min>1.0</Min>
+      <Max>65535</Max>
+      <Default>10</Default>
+    </Float>
+
+  </RuntimeParameter>
+
+</Config>

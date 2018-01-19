@@ -189,6 +189,64 @@ Layer::ILayerData* CreateFullyConnectLayer(
 
 	return pLayer;
 }
+/** 自己組織化マップレイヤー */
+GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+Layer::ILayerData* CreateSOMLayer(
+	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+	U32 inputBufferCount,
+	U32 dimensionCount, U32 resolutionCount,
+	F32 initValueMin, F32 initValueMax)
+{
+	const Gravisbell::GUID TYPE_CODE(0xaf36df4d, 0x9f50, 0x46ff, 0xa1, 0xc1, 0x53, 0x11, 0xca, 0x76, 0x1f, 0x6a);
+
+
+	// DLL取得
+	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(TYPE_CODE);
+	if(pLayerDLL == NULL)
+		return NULL;
+
+	// 設定の作成
+	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
+	if(pConfig == NULL)
+		return NULL;
+	// 入力バッファ数
+	{
+		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"InputBufferCount"));
+		pItem->SetValue(inputBufferCount);
+	}
+	// 次元数
+	{
+		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"DimensionCount"));
+		pItem->SetValue(dimensionCount);
+	}
+	// 分解性能
+	{
+		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"ResolutionCount"));
+		pItem->SetValue(resolutionCount);
+	}
+	// 初期化最小値
+	{
+		SettingData::Standard::IItem_Float* pItem = dynamic_cast<SettingData::Standard::IItem_Float*>(pConfig->GetItemByID(L"InitializeMinValue"));
+		pItem->SetValue(initValueMin);
+	}
+	// 初期化最大値
+	{
+		SettingData::Standard::IItem_Float* pItem = dynamic_cast<SettingData::Standard::IItem_Float*>(pConfig->GetItemByID(L"InitializeMaxValue"));
+		pItem->SetValue(initValueMax);
+	}
+
+	// レイヤーの作成
+	Layer::ILayerData* pLayer = layerDataManager.CreateLayerData(layerDLLManager, TYPE_CODE, boost::uuids::random_generator()().data, *pConfig);
+	if(pLayer == NULL)
+		return NULL;
+
+	// 設定情報を削除
+	delete pConfig;
+
+	return pLayer;
+}
+
+
 Layer::ILayerData* CreateActivationLayer(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 	const wchar_t activationType[])

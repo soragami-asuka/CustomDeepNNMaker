@@ -1,0 +1,512 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug_Kepler|Win32">
+      <Configuration>Debug_Kepler</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug_Kepler|x64">
+      <Configuration>Debug_Kepler</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug_Maxwell|Win32">
+      <Configuration>Debug_Maxwell</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug_Maxwell|x64">
+      <Configuration>Debug_Maxwell</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_Kepler|Win32">
+      <Configuration>Release_Kepler</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_Kepler|x64">
+      <Configuration>Release_Kepler</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{96ADC207-C136-4150-86CD-7BAD0A179676}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Sample06_SOM</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Maxwell|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Kepler|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Maxwell|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Kepler|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Kepler|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Kepler|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 8.0.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Maxwell|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Kepler|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Maxwell|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Kepler|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_Kepler|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_Kepler|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+    <NuGetPackageImportStamp>51a85e3b</NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Maxwell|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Kepler|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Maxwell|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Kepler|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Kepler|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Kepler|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/D GRAVISBELL_LIBRARY %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Maxwell|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/D GRAVISBELL_LIBRARY %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Kepler|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/D GRAVISBELL_LIBRARY %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/D GRAVISBELL_LIBRARY %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>cudart.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CudaCompile>
+      <CodeGeneration>compute_50,sm_50</CodeGeneration>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Maxwell|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/D GRAVISBELL_LIBRARY /D USE_CUDA_KEPLER %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>cudart.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CudaCompile>
+      <CodeGeneration>compute_35,sm_35</CodeGeneration>
+      <GPUDebugInfo>true</GPUDebugInfo>
+      <HostDebugInfo>true</HostDebugInfo>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Kepler|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/D GRAVISBELL_LIBRARY  /D USE_CUDA_KEPLER %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>cudart.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CudaCompile>
+      <CodeGeneration>compute_20,sm_20</CodeGeneration>
+      <GPUDebugInfo>false</GPUDebugInfo>
+      <HostDebugInfo>true</HostDebugInfo>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/D GRAVISBELL_LIBRARY %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_Kepler|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/D GRAVISBELL_LIBRARY %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/D GRAVISBELL_LIBRARY %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>cudart.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CudaCompile>
+      <CodeGeneration>compute_50,sm_50</CodeGeneration>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_Kepler|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/D GRAVISBELL_LIBRARY /D USE_CUDA_KEPLER %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>cudart.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CudaCompile>
+      <CodeGeneration>compute_20,sm_20</CodeGeneration>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Sample06_SOM.cpp">
+      <FileType>CppCode</FileType>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_Maxwell|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_Kepler|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_Maxwell|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_Kepler|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_Kepler|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_Kepler|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="DataFormat_image.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+    <Xml Include="DataFormat_label.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Layer\IOData\IODataLayer\IODataLayer.vcxproj">
+      <Project>{fe50f8d5-efe1-4b8e-9ba8-1754980d6266}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Library\Common\BatchDataNoListGenerator\BatchDataNoListGenerator.vcxproj">
+      <Project>{8609a0f5-ad98-4b79-b039-5492c1d26ce9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Library\DataFormat\Binary\Binary.vcxproj">
+      <Project>{b3700b28-5d2c-4b7b-9857-09682f048974}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Library\NeuralNetwork\Initializer\Initializer.vcxproj">
+      <Project>{77c0f1be-8e5e-4f63-b575-78a2358b0a42}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Library\NeuralNetwork\LayerDataManager\LayerDataManager.vcxproj">
+      <Project>{0d56f731-5409-4b4c-8a69-d74e3ac68cda}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Library\NeuralNetwork\LayerDLLManager\LayerDLLManager.vcxproj">
+      <Project>{ac9b4528-ab0b-4549-a844-cfdc8837a7c6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Library\NeuralNetwork\NetworkParserXML\NetworkParserXML.vcxproj">
+      <Project>{919c80f1-a324-47d4-9e5f-1accb15b3a52}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Utility\NeuralNetworkLayer\NeuralNetworkLayer.vcxproj">
+      <Project>{6e7bc978-1b15-43a9-98fd-46e609ed925f}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 8.0.targets" />
+    <Import Project="..\..\packages\boost.1.66.0.0\build\native\boost.targets" Condition="Exists('..\..\packages\boost.1.66.0.0\build\native\boost.targets')" />
+    <Import Project="..\..\packages\boost_atomic-vc120.1.66.0.0\build\native\boost_atomic-vc120.targets" Condition="Exists('..\..\packages\boost_atomic-vc120.1.66.0.0\build\native\boost_atomic-vc120.targets')" />
+    <Import Project="..\..\packages\boost_bzip2-vc120.1.66.0.0\build\native\boost_bzip2-vc120.targets" Condition="Exists('..\..\packages\boost_bzip2-vc120.1.66.0.0\build\native\boost_bzip2-vc120.targets')" />
+    <Import Project="..\..\packages\boost_chrono-vc120.1.66.0.0\build\native\boost_chrono-vc120.targets" Condition="Exists('..\..\packages\boost_chrono-vc120.1.66.0.0\build\native\boost_chrono-vc120.targets')" />
+    <Import Project="..\..\packages\boost_container-vc120.1.66.0.0\build\native\boost_container-vc120.targets" Condition="Exists('..\..\packages\boost_container-vc120.1.66.0.0\build\native\boost_container-vc120.targets')" />
+    <Import Project="..\..\packages\boost_context-vc120.1.66.0.0\build\native\boost_context-vc120.targets" Condition="Exists('..\..\packages\boost_context-vc120.1.66.0.0\build\native\boost_context-vc120.targets')" />
+    <Import Project="..\..\packages\boost_coroutine-vc120.1.66.0.0\build\native\boost_coroutine-vc120.targets" Condition="Exists('..\..\packages\boost_coroutine-vc120.1.66.0.0\build\native\boost_coroutine-vc120.targets')" />
+    <Import Project="..\..\packages\boost_date_time-vc120.1.66.0.0\build\native\boost_date_time-vc120.targets" Condition="Exists('..\..\packages\boost_date_time-vc120.1.66.0.0\build\native\boost_date_time-vc120.targets')" />
+    <Import Project="..\..\packages\boost_filesystem-vc120.1.66.0.0\build\native\boost_filesystem-vc120.targets" Condition="Exists('..\..\packages\boost_filesystem-vc120.1.66.0.0\build\native\boost_filesystem-vc120.targets')" />
+    <Import Project="..\..\packages\boost_graph-vc120.1.66.0.0\build\native\boost_graph-vc120.targets" Condition="Exists('..\..\packages\boost_graph-vc120.1.66.0.0\build\native\boost_graph-vc120.targets')" />
+    <Import Project="..\..\packages\boost_iostreams-vc120.1.66.0.0\build\native\boost_iostreams-vc120.targets" Condition="Exists('..\..\packages\boost_iostreams-vc120.1.66.0.0\build\native\boost_iostreams-vc120.targets')" />
+    <Import Project="..\..\packages\boost_locale-vc120.1.66.0.0\build\native\boost_locale-vc120.targets" Condition="Exists('..\..\packages\boost_locale-vc120.1.66.0.0\build\native\boost_locale-vc120.targets')" />
+    <Import Project="..\..\packages\boost_log-vc120.1.66.0.0\build\native\boost_log-vc120.targets" Condition="Exists('..\..\packages\boost_log-vc120.1.66.0.0\build\native\boost_log-vc120.targets')" />
+    <Import Project="..\..\packages\boost_log_setup-vc120.1.66.0.0\build\native\boost_log_setup-vc120.targets" Condition="Exists('..\..\packages\boost_log_setup-vc120.1.66.0.0\build\native\boost_log_setup-vc120.targets')" />
+    <Import Project="..\..\packages\boost_math_c99-vc120.1.66.0.0\build\native\boost_math_c99-vc120.targets" Condition="Exists('..\..\packages\boost_math_c99-vc120.1.66.0.0\build\native\boost_math_c99-vc120.targets')" />
+    <Import Project="..\..\packages\boost_math_c99f-vc120.1.66.0.0\build\native\boost_math_c99f-vc120.targets" Condition="Exists('..\..\packages\boost_math_c99f-vc120.1.66.0.0\build\native\boost_math_c99f-vc120.targets')" />
+    <Import Project="..\..\packages\boost_math_c99l-vc120.1.66.0.0\build\native\boost_math_c99l-vc120.targets" Condition="Exists('..\..\packages\boost_math_c99l-vc120.1.66.0.0\build\native\boost_math_c99l-vc120.targets')" />
+    <Import Project="..\..\packages\boost_math_tr1-vc120.1.66.0.0\build\native\boost_math_tr1-vc120.targets" Condition="Exists('..\..\packages\boost_math_tr1-vc120.1.66.0.0\build\native\boost_math_tr1-vc120.targets')" />
+    <Import Project="..\..\packages\boost_math_tr1f-vc120.1.66.0.0\build\native\boost_math_tr1f-vc120.targets" Condition="Exists('..\..\packages\boost_math_tr1f-vc120.1.66.0.0\build\native\boost_math_tr1f-vc120.targets')" />
+    <Import Project="..\..\packages\boost_math_tr1l-vc120.1.66.0.0\build\native\boost_math_tr1l-vc120.targets" Condition="Exists('..\..\packages\boost_math_tr1l-vc120.1.66.0.0\build\native\boost_math_tr1l-vc120.targets')" />
+    <Import Project="..\..\packages\boost_prg_exec_monitor-vc120.1.66.0.0\build\native\boost_prg_exec_monitor-vc120.targets" Condition="Exists('..\..\packages\boost_prg_exec_monitor-vc120.1.66.0.0\build\native\boost_prg_exec_monitor-vc120.targets')" />
+    <Import Project="..\..\packages\boost_program_options-vc120.1.66.0.0\build\native\boost_program_options-vc120.targets" Condition="Exists('..\..\packages\boost_program_options-vc120.1.66.0.0\build\native\boost_program_options-vc120.targets')" />
+    <Import Project="..\..\packages\boost_python-vc120.1.66.0.0\build\native\boost_python-vc120.targets" Condition="Exists('..\..\packages\boost_python-vc120.1.66.0.0\build\native\boost_python-vc120.targets')" />
+    <Import Project="..\..\packages\boost_random-vc120.1.66.0.0\build\native\boost_random-vc120.targets" Condition="Exists('..\..\packages\boost_random-vc120.1.66.0.0\build\native\boost_random-vc120.targets')" />
+    <Import Project="..\..\packages\boost_regex-vc120.1.66.0.0\build\native\boost_regex-vc120.targets" Condition="Exists('..\..\packages\boost_regex-vc120.1.66.0.0\build\native\boost_regex-vc120.targets')" />
+    <Import Project="..\..\packages\boost_serialization-vc120.1.66.0.0\build\native\boost_serialization-vc120.targets" Condition="Exists('..\..\packages\boost_serialization-vc120.1.66.0.0\build\native\boost_serialization-vc120.targets')" />
+    <Import Project="..\..\packages\boost_signals-vc120.1.66.0.0\build\native\boost_signals-vc120.targets" Condition="Exists('..\..\packages\boost_signals-vc120.1.66.0.0\build\native\boost_signals-vc120.targets')" />
+    <Import Project="..\..\packages\boost_stacktrace_noop-vc120.1.66.0.0\build\native\boost_stacktrace_noop-vc120.targets" Condition="Exists('..\..\packages\boost_stacktrace_noop-vc120.1.66.0.0\build\native\boost_stacktrace_noop-vc120.targets')" />
+    <Import Project="..\..\packages\boost_stacktrace_windbg-vc120.1.66.0.0\build\native\boost_stacktrace_windbg-vc120.targets" Condition="Exists('..\..\packages\boost_stacktrace_windbg-vc120.1.66.0.0\build\native\boost_stacktrace_windbg-vc120.targets')" />
+    <Import Project="..\..\packages\boost_system-vc120.1.66.0.0\build\native\boost_system-vc120.targets" Condition="Exists('..\..\packages\boost_system-vc120.1.66.0.0\build\native\boost_system-vc120.targets')" />
+    <Import Project="..\..\packages\boost_thread-vc120.1.66.0.0\build\native\boost_thread-vc120.targets" Condition="Exists('..\..\packages\boost_thread-vc120.1.66.0.0\build\native\boost_thread-vc120.targets')" />
+    <Import Project="..\..\packages\boost_timer-vc120.1.66.0.0\build\native\boost_timer-vc120.targets" Condition="Exists('..\..\packages\boost_timer-vc120.1.66.0.0\build\native\boost_timer-vc120.targets')" />
+    <Import Project="..\..\packages\boost_type_erasure-vc120.1.66.0.0\build\native\boost_type_erasure-vc120.targets" Condition="Exists('..\..\packages\boost_type_erasure-vc120.1.66.0.0\build\native\boost_type_erasure-vc120.targets')" />
+    <Import Project="..\..\packages\boost_unit_test_framework-vc120.1.66.0.0\build\native\boost_unit_test_framework-vc120.targets" Condition="Exists('..\..\packages\boost_unit_test_framework-vc120.1.66.0.0\build\native\boost_unit_test_framework-vc120.targets')" />
+    <Import Project="..\..\packages\boost_wave-vc120.1.66.0.0\build\native\boost_wave-vc120.targets" Condition="Exists('..\..\packages\boost_wave-vc120.1.66.0.0\build\native\boost_wave-vc120.targets')" />
+    <Import Project="..\..\packages\boost_wserialization-vc120.1.66.0.0\build\native\boost_wserialization-vc120.targets" Condition="Exists('..\..\packages\boost_wserialization-vc120.1.66.0.0\build\native\boost_wserialization-vc120.targets')" />
+    <Import Project="..\..\packages\boost_zlib-vc120.1.66.0.0\build\native\boost_zlib-vc120.targets" Condition="Exists('..\..\packages\boost_zlib-vc120.1.66.0.0\build\native\boost_zlib-vc120.targets')" />
+    <Import Project="..\..\packages\boost_exception-vc120.1.66.0.0\build\native\boost_exception-vc120.targets" Condition="Exists('..\..\packages\boost_exception-vc120.1.66.0.0\build\native\boost_exception-vc120.targets')" />
+    <Import Project="..\..\packages\boost_test_exec_monitor-vc120.1.66.0.0\build\native\boost_test_exec_monitor-vc120.targets" Condition="Exists('..\..\packages\boost_test_exec_monitor-vc120.1.66.0.0\build\native\boost_test_exec_monitor-vc120.targets')" />
+    <Import Project="..\..\packages\boost-vc120.1.66.0.0\build\native\boost-vc120.targets" Condition="Exists('..\..\packages\boost-vc120.1.66.0.0\build\native\boost-vc120.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\boost.1.66.0.0\build\native\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost.1.66.0.0\build\native\boost.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_atomic-vc120.1.66.0.0\build\native\boost_atomic-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_atomic-vc120.1.66.0.0\build\native\boost_atomic-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_bzip2-vc120.1.66.0.0\build\native\boost_bzip2-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_bzip2-vc120.1.66.0.0\build\native\boost_bzip2-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_chrono-vc120.1.66.0.0\build\native\boost_chrono-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_chrono-vc120.1.66.0.0\build\native\boost_chrono-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_container-vc120.1.66.0.0\build\native\boost_container-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_container-vc120.1.66.0.0\build\native\boost_container-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_context-vc120.1.66.0.0\build\native\boost_context-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_context-vc120.1.66.0.0\build\native\boost_context-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_coroutine-vc120.1.66.0.0\build\native\boost_coroutine-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_coroutine-vc120.1.66.0.0\build\native\boost_coroutine-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_date_time-vc120.1.66.0.0\build\native\boost_date_time-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_date_time-vc120.1.66.0.0\build\native\boost_date_time-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_filesystem-vc120.1.66.0.0\build\native\boost_filesystem-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_filesystem-vc120.1.66.0.0\build\native\boost_filesystem-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_graph-vc120.1.66.0.0\build\native\boost_graph-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_graph-vc120.1.66.0.0\build\native\boost_graph-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_iostreams-vc120.1.66.0.0\build\native\boost_iostreams-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_iostreams-vc120.1.66.0.0\build\native\boost_iostreams-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_locale-vc120.1.66.0.0\build\native\boost_locale-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_locale-vc120.1.66.0.0\build\native\boost_locale-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_log-vc120.1.66.0.0\build\native\boost_log-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_log-vc120.1.66.0.0\build\native\boost_log-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_log_setup-vc120.1.66.0.0\build\native\boost_log_setup-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_log_setup-vc120.1.66.0.0\build\native\boost_log_setup-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_math_c99-vc120.1.66.0.0\build\native\boost_math_c99-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_math_c99-vc120.1.66.0.0\build\native\boost_math_c99-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_math_c99f-vc120.1.66.0.0\build\native\boost_math_c99f-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_math_c99f-vc120.1.66.0.0\build\native\boost_math_c99f-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_math_c99l-vc120.1.66.0.0\build\native\boost_math_c99l-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_math_c99l-vc120.1.66.0.0\build\native\boost_math_c99l-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_math_tr1-vc120.1.66.0.0\build\native\boost_math_tr1-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_math_tr1-vc120.1.66.0.0\build\native\boost_math_tr1-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_math_tr1f-vc120.1.66.0.0\build\native\boost_math_tr1f-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_math_tr1f-vc120.1.66.0.0\build\native\boost_math_tr1f-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_math_tr1l-vc120.1.66.0.0\build\native\boost_math_tr1l-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_math_tr1l-vc120.1.66.0.0\build\native\boost_math_tr1l-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_prg_exec_monitor-vc120.1.66.0.0\build\native\boost_prg_exec_monitor-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_prg_exec_monitor-vc120.1.66.0.0\build\native\boost_prg_exec_monitor-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_program_options-vc120.1.66.0.0\build\native\boost_program_options-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_program_options-vc120.1.66.0.0\build\native\boost_program_options-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_python-vc120.1.66.0.0\build\native\boost_python-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_python-vc120.1.66.0.0\build\native\boost_python-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_random-vc120.1.66.0.0\build\native\boost_random-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_random-vc120.1.66.0.0\build\native\boost_random-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_regex-vc120.1.66.0.0\build\native\boost_regex-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_regex-vc120.1.66.0.0\build\native\boost_regex-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_serialization-vc120.1.66.0.0\build\native\boost_serialization-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_serialization-vc120.1.66.0.0\build\native\boost_serialization-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_signals-vc120.1.66.0.0\build\native\boost_signals-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_signals-vc120.1.66.0.0\build\native\boost_signals-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_stacktrace_noop-vc120.1.66.0.0\build\native\boost_stacktrace_noop-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_stacktrace_noop-vc120.1.66.0.0\build\native\boost_stacktrace_noop-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_stacktrace_windbg-vc120.1.66.0.0\build\native\boost_stacktrace_windbg-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_stacktrace_windbg-vc120.1.66.0.0\build\native\boost_stacktrace_windbg-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_system-vc120.1.66.0.0\build\native\boost_system-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_system-vc120.1.66.0.0\build\native\boost_system-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_thread-vc120.1.66.0.0\build\native\boost_thread-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_thread-vc120.1.66.0.0\build\native\boost_thread-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_timer-vc120.1.66.0.0\build\native\boost_timer-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_timer-vc120.1.66.0.0\build\native\boost_timer-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_type_erasure-vc120.1.66.0.0\build\native\boost_type_erasure-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_type_erasure-vc120.1.66.0.0\build\native\boost_type_erasure-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_unit_test_framework-vc120.1.66.0.0\build\native\boost_unit_test_framework-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_unit_test_framework-vc120.1.66.0.0\build\native\boost_unit_test_framework-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_wave-vc120.1.66.0.0\build\native\boost_wave-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_wave-vc120.1.66.0.0\build\native\boost_wave-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_wserialization-vc120.1.66.0.0\build\native\boost_wserialization-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_wserialization-vc120.1.66.0.0\build\native\boost_wserialization-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_zlib-vc120.1.66.0.0\build\native\boost_zlib-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_zlib-vc120.1.66.0.0\build\native\boost_zlib-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_exception-vc120.1.66.0.0\build\native\boost_exception-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_exception-vc120.1.66.0.0\build\native\boost_exception-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost_test_exec_monitor-vc120.1.66.0.0\build\native\boost_test_exec_monitor-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_test_exec_monitor-vc120.1.66.0.0\build\native\boost_test_exec_monitor-vc120.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost-vc120.1.66.0.0\build\native\boost-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost-vc120.1.66.0.0\build\native\boost-vc120.targets'))" />
+  </Target>
+</Project>

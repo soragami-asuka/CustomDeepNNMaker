@@ -1,0 +1,207 @@
+//======================================
+// 全結合ニューラルネットワークのレイヤーデータ
+// CPU制御
+//======================================
+#include"stdafx.h"
+
+#include"SOM_LayerData_CPU.h"
+#include"SOM_FUNC.hpp"
+#include"SOM_CPU.h"
+
+#include"../_LayerBase/CLayerBase_CPU.h"
+
+#include"Library/NeuralNetwork/Optimizer.h"
+#include"Library/NeuralNetwork/Initializer.h"
+
+namespace Gravisbell {
+namespace Layer {
+namespace NeuralNetwork {
+
+
+	//===========================
+	// コンストラクタ / デストラクタ
+	//===========================
+	/** コンストラクタ */
+	SOM_LayerData_CPU::SOM_LayerData_CPU(const Gravisbell::GUID& guid)
+		:	SOM_LayerData_Base(guid)
+	{
+	}
+	/** デストラクタ */
+	SOM_LayerData_CPU::~SOM_LayerData_CPU()
+	{
+	}
+
+
+	//===========================
+	// 初期化
+	//===========================
+	/** 初期化. 各ニューロンの値をランダムに初期化
+		@return	成功した場合0 */
+	ErrorCode SOM_LayerData_CPU::Initialize(void)
+	{
+		// 入力バッファ数を確認
+		unsigned int inputBufferCount = this->GetInputBufferCount();
+		if(inputBufferCount == 0)
+			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_VALUERANGE;
+
+		// ユニット数を確認
+		unsigned int unitCount = this->GetUnitCount();
+		if(unitCount == 0)
+			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_VALUERANGE;
+
+		// バッファを確保しつつ、初期値を設定
+		U32 inputCount  = inputBufferCount;
+		U32 outputCount = this->layerStructure.DimensionCount;
+
+		this->lpUnitData.resize(unitCount * inputBufferCount);
+		this->lppUnitData.resize(unitCount);
+		for(U32 unitNum=0; unitNum<this->lppUnitData.size(); unitNum++)
+		{
+			this->lppUnitData[unitNum] = &this->lpUnitData[unitNum * inputBufferCount];
+		}
+
+		// ユニット初期化
+		for(unsigned int bufNum=0; bufNum<this->lpUnitData.size(); bufNum++)
+		{
+			this->lpUnitData[bufNum] = Gravisbell::Layer::NeuralNetwork::GetInitializerManager().GetRandomValue(this->layerStructure.InitializeMinValue, this->layerStructure.InitializeMaxValue);
+		}
+
+		// 学習回数初期化
+		this->learnTime = 0;			/**< 学習実行回数 */
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+	/** 初期化. 各ニューロンの値をランダムに初期化
+		@param	i_config			設定情報
+		@oaram	i_inputDataStruct	入力データ構造情報
+		@return	成功した場合0 */
+	ErrorCode SOM_LayerData_CPU::Initialize(const SettingData::Standard::IData& i_data)
+	{
+		ErrorCode err;
+
+		// 設定情報の登録
+		err = this->SetLayerConfig(i_data);
+		if(err != ErrorCode::ERROR_CODE_NONE)
+			return err;
+
+		// 初期化
+		err = this->Initialize();
+		if(err != ErrorCode::ERROR_CODE_NONE)
+			return err;
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+	/** 初期化. バッファからデータを読み込む
+		@param i_lpBuffer	読み込みバッファの先頭アドレス.
+		@param i_bufferSize	読み込み可能バッファのサイズ.
+		@return	成功した場合0 */
+	ErrorCode SOM_LayerData_CPU::InitializeFromBuffer(const BYTE* i_lpBuffer, U32 i_bufferSize, S32& o_useBufferSize)
+	{
+		int readBufferByte = 0;
+
+		// 設定情報
+		S32 useBufferByte = 0;
+		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, useBufferByte);
+		if(pLayerStructure == NULL)
+			return ErrorCode::ERROR_CODE_INITLAYER_READ_CONFIG;
+		readBufferByte += useBufferByte;
+		this->SetLayerConfig(*pLayerStructure);
+		delete pLayerStructure;
+
+		// 初期化する
+		this->Initialize();
+
+		// ユニット
+		memcpy(&this->lpUnitData[0], &i_lpBuffer[readBufferByte], this->lpUnitData.size() * sizeof(NEURON_TYPE));
+		readBufferByte += (int)this->lpUnitData.size() * sizeof(F32);
+
+		o_useBufferSize = readBufferByte;
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+
+
+	//===========================
+	// レイヤー保存
+	//===========================
+	/** レイヤーをバッファに書き込む.
+		@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
+		@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
+	S32 SOM_LayerData_CPU::WriteToBuffer(BYTE* o_lpBuffer)const
+	{
+		if(this->pLayerStructure == NULL)
+			return ErrorCode::ERROR_CODE_NONREGIST_CONFIG;
+
+		int writeBufferByte = 0;
+
+		// 設定情報
+		writeBufferByte += this->pLayerStructure->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
+
+		// ユニット
+		memcpy(&o_lpBuffer[writeBufferByte], &this->lpUnitData[0], this->lpUnitData.size() * sizeof(F32));
+		writeBufferByte += (int)this->lpUnitData.size() * sizeof(NEURON_TYPE);
+
+
+		return writeBufferByte;
+	}
+
+
+	//===========================
+	// レイヤー作成
+	//===========================
+	/** レイヤーを作成する.
+		@param guid	新規生成するレイヤーのGUID. */
+	ILayerBase* SOM_LayerData_CPU::CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
+	{
+		if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
+			return NULL;
+
+		return new CNNSingle2SingleLayerBase_CPU<SOM_CPU, SOM_LayerData_CPU>(guid, *this, i_lpInputDataStruct[0], i_temporaryMemoryManager);
+	}
+
+} // Gravisbell;
+} // Layer;
+} // NeuralNetwork;
+
+
+/** Create a layer for CPU processing.
+  * @param GUID of layer to create.
+  */
+EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPU(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const Gravisbell::SettingData::Standard::IData& i_data)
+{
+	// 作成
+	Gravisbell::Layer::NeuralNetwork::SOM_LayerData_CPU* pLayerData = new Gravisbell::Layer::NeuralNetwork::SOM_LayerData_CPU(guid);
+	if(pLayerData == NULL)
+		return NULL;
+
+	// 初期化
+	Gravisbell::ErrorCode errCode = pLayerData->Initialize(i_data);
+	if(errCode != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	{
+		delete pLayerData;
+		return NULL;
+	}
+
+	return pLayerData;
+}
+EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPUfromBuffer(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)
+{
+	// 作成
+	Gravisbell::Layer::NeuralNetwork::SOM_LayerData_CPU* pLayerData = new Gravisbell::Layer::NeuralNetwork::SOM_LayerData_CPU(guid);
+	if(pLayerData == NULL)
+		return NULL;
+
+	// 初期化
+	S32 useBufferSize = 0;
+	Gravisbell::ErrorCode errCode = pLayerData->InitializeFromBuffer(i_lpBuffer, i_bufferSize, useBufferSize);
+	if(errCode != Gravisbell::ErrorCode::ERROR_CODE_NONE)
+	{
+		delete pLayerData;
+		return NULL;
+	}
+
+	// 使用したバッファ量を格納
+	o_useBufferSize = useBufferSize;
+
+	return pLayerData;
+}

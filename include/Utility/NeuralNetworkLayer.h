@@ -78,6 +78,15 @@ namespace NeuralNetworkLayer {
 		U32 inputBufferCount, U32 neuronCount,
 		const wchar_t i_szInitializerID[] = L"glorot_uniform");
 
+	/** 自己組織化マップレイヤー */
+	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+	Layer::ILayerData* CreateSOMLayer(
+		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+		U32 inputBufferCount,
+		U32 dimensionCount=2, U32 resolutionCount=16,
+		F32 initValueMin=0.0f, F32 initValueMax=1.0f);
+
+
 	/** 活性化レイヤー.
 		@param	layerDLLManager		レイヤーDLL管理クラス.
 		@param	inputDataStruct		入力データ構造.

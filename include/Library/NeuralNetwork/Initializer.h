@@ -28,6 +28,9 @@ namespace NeuralNetwork {
 		virtual ~IInitializerManager(){}
 
 	public:
+		/** —”‚ğæ“¾‚·‚é */
+		virtual F32 GetRandomValue(F32 i_minValue, F32 i_maxValue) = 0;
+
 		/** —”‚ğ‰Šú‰»‚·‚é */
 		virtual ErrorCode InitializeRandomParameter() = 0;
 		/** —”‚ğ‰Šú‰»‚·‚é */

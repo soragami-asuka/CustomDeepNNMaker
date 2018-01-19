@@ -109,6 +109,19 @@ namespace NeuralNetworkLayer {
 				false);
 		}
 
+		/** 自己組織化マップレイヤー */
+		Gravisbell::GUID AddSOMLayer(
+			const Gravisbell::GUID& i_inputLayerGUID,
+			U32 dimensionCount=2, U32 resolutionCount=16,
+			F32 initValueMin=0.0f, F32 initValueMax=1.0f,
+			bool onLayerFix=false)
+		{
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateSOMLayer(layerDLLManager, layerDataManager, this->GetOutputDataStruct(i_inputLayerGUID).GetDataCount(), dimensionCount, resolutionCount, initValueMin, initValueMax),
+				onLayerFix);
+		}
+
 		/** 活性化レイヤー.
 			@param	i_inputLayerGUID		追加レイヤーの入力先レイヤーのGUID.
 			@param	i_activationType		活性化種別. */

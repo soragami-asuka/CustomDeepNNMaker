@@ -82,6 +82,12 @@ namespace NeuralNetwork {
 		}
 
 	public:
+		/** —”‚ğæ“¾‚·‚é */
+		F32 GetRandomValue(F32 i_minValue, F32 i_maxValue)
+		{
+			return this->random.GetUniformValue(i_minValue, i_maxValue);
+		}
+
 		/** —”‚ğ‰Šú‰»‚·‚é */
 		ErrorCode InitializeRandomParameter()
 		{
