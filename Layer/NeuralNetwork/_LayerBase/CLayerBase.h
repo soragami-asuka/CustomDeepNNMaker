@@ -144,7 +144,7 @@ namespace NeuralNetwork {
 			:	CLayerBase<IOLayer>				()
 			,	guid							(guid)
 			,	pRuntimeParameter				(i_pRuntimeParameter)
-			,	onUpdateRuntimeParameter		(false)
+			,	onUpdateRuntimeParameter		(true)
 			,	runtimeParameter				()
 		{
 		}
