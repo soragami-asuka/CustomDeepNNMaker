@@ -98,7 +98,7 @@ namespace NeuralNetwork {
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@param o_useBufferSize 実際に読み込んだバッファサイズ
 			@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-		SettingData::Standard::IData* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)const
+		SettingData::Standard::IData* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, S64 i_bufferSize, S64& o_useBufferSize)const
 		{
 			if(this->funcCreateLayerStructureSettingFromBuffer == NULL)
 				return NULL;
@@ -124,7 +124,7 @@ namespace NeuralNetwork {
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@param o_useBufferSize 実際に読み込んだバッファサイズ
 			@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-		SettingData::Standard::IData* CreateRuntimeParameterFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)const
+		SettingData::Standard::IData* CreateRuntimeParameterFromBuffer(const BYTE* i_lpBuffer, S64 i_bufferSize, S64& o_useBufferSize)const
 		{
 			if(this->funcCreateRuntimeParameterFromBuffer == NULL)
 				return NULL;
@@ -164,7 +164,7 @@ namespace NeuralNetwork {
 			GUIDは自動割り当て.
 			@param	i_layerStructure	レイヤー構造.
 			@param	i_inputDataStruct	入力データ構造. */
-		ILayerData* CreateLayerDataFromBuffer(const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)const
+		ILayerData* CreateLayerDataFromBuffer(const BYTE* i_lpBuffer, S64 i_bufferSize, S64& o_useBufferSize)const
 		{
 			boost::uuids::uuid uuid = boost::uuids::random_generator()();
 
@@ -174,7 +174,7 @@ namespace NeuralNetwork {
 			@param guid	作成レイヤーのGUID
 			@param	i_layerStructure	レイヤー構造.
 			@param	i_inputDataStruct	入力データ構造. */
-		ILayerData* CreateLayerDataFromBuffer(const Gravisbell::GUID& guid, const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)const
+		ILayerData* CreateLayerDataFromBuffer(const Gravisbell::GUID& guid, const BYTE* i_lpBuffer, S64 i_bufferSize, S64& o_useBufferSize)const
 		{
 			if(this->funcCreateLayerDataFromBuffer == NULL)
 				return NULL;

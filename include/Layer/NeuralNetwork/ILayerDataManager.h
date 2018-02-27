@@ -56,7 +56,7 @@ namespace NeuralNetwork {
 			const ILayerDLLManager& i_layerDLLManager,
 			const Gravisbell::GUID& i_typeCode,
 			const Gravisbell::GUID& i_guid,
-			const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize,
+			const BYTE* i_lpBuffer, S64 i_bufferSize, S64& o_useBufferSize,
 			Gravisbell::ErrorCode* o_pErrorCode = NULL) = 0;
 
 

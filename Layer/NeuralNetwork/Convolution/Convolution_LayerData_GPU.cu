@@ -103,12 +103,12 @@ namespace NeuralNetwork {
 		@param i_lpBuffer	読み込みバッファの先頭アドレス.
 		@param i_bufferSize	読み込み可能バッファのサイズ.
 		@return	成功した場合0 */
-	ErrorCode Convolution_LayerData_GPU::InitializeFromBuffer(const BYTE* i_lpBuffer, U32 i_bufferSize, S32& o_useBufferSize )
+	ErrorCode Convolution_LayerData_GPU::InitializeFromBuffer(const BYTE* i_lpBuffer, U64 i_bufferSize, S64& o_useBufferSize )
 	{
-		int readBufferByte = 0;
+		S64 readBufferByte = 0;
 
 		// 設定情報
-		S32 useBufferByte = 0;
+		S64 useBufferByte = 0;
 		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, useBufferByte);
 		if(pLayerStructure == NULL)
 			return ErrorCode::ERROR_CODE_INITLAYER_READ_CONFIG;
@@ -138,7 +138,7 @@ namespace NeuralNetwork {
 
 
 		// オプティマイザ
-		S32 useBufferSize = 0;
+		S64 useBufferSize = 0;
 		// bias
 		if(this->m_pOptimizer_bias)
 			delete this->m_pOptimizer_bias;
@@ -163,12 +163,12 @@ namespace NeuralNetwork {
 	/** レイヤーをバッファに書き込む.
 		@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
 		@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
-	S32 Convolution_LayerData_GPU::WriteToBuffer(BYTE* o_lpBuffer)const
+	S64 Convolution_LayerData_GPU::WriteToBuffer(BYTE* o_lpBuffer)const
 	{
 		if(this->pLayerStructure == NULL)
-			return ErrorCode::ERROR_CODE_NONREGIST_CONFIG;
+			return -1;
 
-		int writeBufferByte = 0;
+		S64 writeBufferByte = 0;
 
 		// 設定情報
 		writeBufferByte += this->pLayerStructure->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
@@ -253,7 +253,7 @@ EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataGPU(const Gravisbell::L
 
 	return pLayerData;
 }
-EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataGPUfromBuffer(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, Gravisbell::S32 i_bufferSize, Gravisbell::S32& o_useBufferSize)
+EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataGPUfromBuffer(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, Gravisbell::S64 i_bufferSize, Gravisbell::S64& o_useBufferSize)
 {
 	// 作成
 	Gravisbell::Layer::NeuralNetwork::Convolution_LayerData_GPU* pLayerData = new Gravisbell::Layer::NeuralNetwork::Convolution_LayerData_GPU(guid);
@@ -261,7 +261,7 @@ EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataGPUfromBuffer(const Gra
 		return NULL;
 
 	// 初期化
-	S32 useBufferSize = 0;
+	S64 useBufferSize = 0;
 	Gravisbell::ErrorCode errCode = pLayerData->InitializeFromBuffer(i_lpBuffer, i_bufferSize, useBufferSize);
 	if(errCode != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 	{

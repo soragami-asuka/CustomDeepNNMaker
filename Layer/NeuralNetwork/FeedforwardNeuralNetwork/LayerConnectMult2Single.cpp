@@ -357,6 +357,8 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_ARRAYRANGE;
 
 		this->lpDInputBufferID[i_inputNum] = i_DInputBufferID;
+
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 	/** レイヤーで使用する入力誤差バッファのIDを取得する
 		@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */

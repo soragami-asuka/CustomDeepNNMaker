@@ -234,11 +234,11 @@ namespace NeuralNetwork {
 		{
 			for(U32 neuronNum=0; neuronNum<(U32)this->layerData.layerStructure.Output_Channel; neuronNum++)
 			{
-				for(S32 convZ=0; convZ<this->GetOutputDataStruct().z; convZ++)
+				for(U32 convZ=0; convZ<this->GetOutputDataStruct().z; convZ++)
 				{
-					for(S32 convY=0; convY<this->GetOutputDataStruct().y; convY++)
+					for(U32 convY=0; convY<this->GetOutputDataStruct().y; convY++)
 					{
-						for(S32 convX=0; convX<this->GetOutputDataStruct().x; convX++)
+						for(U32 convX=0; convX<this->GetOutputDataStruct().x; convX++)
 						{
 							U32 outputOffset = POSITION_TO_OFFSET_STRUCT(convX,convY,convZ,neuronNum, this->GetOutputDataStruct());
 
@@ -331,11 +331,11 @@ namespace NeuralNetwork {
 			// ì¸óÕåÎç∑åvéZ
 			for(S32 neuronNum=0; neuronNum<this->layerData.layerStructure.Output_Channel; neuronNum++)
 			{
-				for(S32 convZ=0; convZ<this->GetOutputDataStruct().z; convZ++)
+				for(U32 convZ=0; convZ<this->GetOutputDataStruct().z; convZ++)
 				{
-					for(S32 convY=0; convY<this->GetOutputDataStruct().y; convY++)
+					for(U32 convY=0; convY<this->GetOutputDataStruct().y; convY++)
 					{
-						for(S32 convX=0; convX<this->GetOutputDataStruct().x; convX++)
+						for(U32 convX=0; convX<this->GetOutputDataStruct().x; convX++)
 						{
 							U32 outputOffet = POSITION_TO_OFFSET_STRUCT(convX,convY,convZ,neuronNum, this->GetOutputDataStruct());
 							F32 dOutput = this->lppBatchDOutputBuffer[batchNum][outputOffet];

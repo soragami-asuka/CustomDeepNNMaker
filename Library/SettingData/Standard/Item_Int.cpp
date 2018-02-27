@@ -137,7 +137,7 @@ namespace Standard {
 		//================================
 
 		/** 保存に必要なバイト数を取得する */
-		U32 GetUseBufferByteCount()const
+		U64 GetUseBufferByteCount()const
 		{
 			U32 byteCount = 0;
 
@@ -150,12 +150,12 @@ namespace Standard {
 			@param i_lpBuffer	読み込みバッファの先頭アドレス.
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-		S32 ReadFromBuffer(const BYTE* i_lpBuffer, S32 i_bufferSize)
+		S64 ReadFromBuffer(const BYTE* i_lpBuffer, S64 i_bufferSize)
 		{
-			if(i_bufferSize < (S32)this->GetUseBufferByteCount())
+			if(i_bufferSize < (S64)this->GetUseBufferByteCount())
 				return -1;
 
-			U32 bufferPos = 0;
+			U64 bufferPos = 0;
 
 			// 値
 			S32 value = *(S32*)&i_lpBuffer[bufferPos];
@@ -168,15 +168,15 @@ namespace Standard {
 		/** バッファに書き込む.
 			@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
 			@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
-		S32 WriteToBuffer(BYTE* o_lpBuffer)const
+		S64 WriteToBuffer(BYTE* o_lpBuffer)const
 		{
-			U32 bufferPos = 0;
+			U64 bufferPos = 0;
 
 			// 値
 			*(S32*)&o_lpBuffer[bufferPos] = this->value;
 			bufferPos += sizeof(this->value);
 
-			return bufferPos;
+			return (S64)bufferPos;
 		}
 
 	public:

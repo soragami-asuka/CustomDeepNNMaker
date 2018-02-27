@@ -191,13 +191,13 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
   * @param  o_useBufferSize  Buffer size actually read.
   * @return If successful, the configuration information created from the buffer
   */
-EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)
+EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, Gravisbell::S64 i_bufferSize, Gravisbell::S64& o_useBufferSize)
 {
 	Gravisbell::SettingData::Standard::IDataEx* pLayerConfig = (Gravisbell::SettingData::Standard::IDataEx*)CreateLayerStructureSetting();
 	if(pLayerConfig == NULL)
 		return NULL;
 
-	int useBufferSize = pLayerConfig->ReadFromBuffer(i_lpBuffer, i_bufferSize);
+	Gravisbell::S64 useBufferSize = pLayerConfig->ReadFromBuffer(i_lpBuffer, i_bufferSize);
 	if(useBufferSize < 0)
 	{
 		delete pLayerConfig;
@@ -248,13 +248,13 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameter(void
   * @param  o_useBufferSize  Buffer size actually read.
   * @return If successful, the configuration information created from the buffer
   */
-EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameterFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)
+EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameterFromBuffer(const BYTE* i_lpBuffer, Gravisbell::S64 i_bufferSize, Gravisbell::S64& o_useBufferSize)
 {
 	Gravisbell::SettingData::Standard::IDataEx* pLayerConfig = (Gravisbell::SettingData::Standard::IDataEx*)CreateRuntimeParameter();
 	if(pLayerConfig == NULL)
 		return NULL;
 
-	int useBufferSize = pLayerConfig->ReadFromBuffer(i_lpBuffer, i_bufferSize);
+	Gravisbell::S64 useBufferSize = pLayerConfig->ReadFromBuffer(i_lpBuffer, i_bufferSize);
 	if(useBufferSize < 0)
 	{
 		delete pLayerConfig;

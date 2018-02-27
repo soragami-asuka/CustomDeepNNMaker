@@ -33,7 +33,7 @@ namespace NeuralNetwork {
 		@param i_bufferSize	読み込み可能バッファのサイズ.
 		@param o_useBufferSize 実際に読み込んだバッファサイズ
 		@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-	typedef SettingData::Standard::IData* (*FuncCreateLayerStructureSettingFromBuffer)(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);
+	typedef SettingData::Standard::IData* (*FuncCreateLayerStructureSettingFromBuffer)(const BYTE* i_lpBuffer, S64 i_bufferSize, S64& o_useBufferSize);
 
 
 	/** 学習設定を作成する */
@@ -43,12 +43,12 @@ namespace NeuralNetwork {
 		@param i_bufferSize	読み込み可能バッファのサイズ.
 		@param o_useBufferSize 実際に読み込んだバッファサイズ
 		@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-	typedef SettingData::Standard::IData* (*FuncCreateLayerRuntimeParameterFromBuffer)(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);
+	typedef SettingData::Standard::IData* (*FuncCreateLayerRuntimeParameterFromBuffer)(const BYTE* i_lpBuffer, S64 i_bufferSize, S64& o_useBufferSize);
 
 
 	/** レイヤーを作成 */
 	typedef ILayerData* (*FuncCreateLayerData)			(const ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const SettingData::Standard::IData& i_layerStructure);
-	typedef ILayerData* (*FuncCreateLayerDataFromBuffer)(const ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize);
+	typedef ILayerData* (*FuncCreateLayerDataFromBuffer)(const ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, S64 i_bufferSize, S64& o_useBufferSize);
 
 }	// NeuralNetwork
 }	// Layer

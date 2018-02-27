@@ -1110,7 +1110,7 @@ Gravisbell::ErrorCode WriteNetworkToBinaryFile(const Layer::ILayerData& neuralNe
 
 	// バッファを用意する
 	std::vector<BYTE> lpBuffer;
-	S32 writeByteCount = 0;
+	S64 writeByteCount = 0;
 	lpBuffer.resize(sizeof(Gravisbell::GUID) + neuralNetwork.GetUseBufferByteCount());
 
 	// レイヤー種別を書き込む
@@ -1178,7 +1178,7 @@ Gravisbell::ErrorCode ReadNetworkFromBinaryFile(const Layer::NeuralNetwork::ILay
 		return ErrorCode::ERROR_CODE_DLL_NOTFOUND;
 
 	// ネットワークを作成
-	S32 useBufferCount = 0;
+	S64 useBufferCount = 0;
 	*ppNeuralNetwork = pLayerDLL->CreateLayerDataFromBuffer(&lpBuffer[readByteCount], (S32)lpBuffer.size()-readByteCount, useBufferCount);
 	readByteCount += useBufferCount;
 

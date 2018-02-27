@@ -30,13 +30,13 @@ namespace Connect {
 			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
 			@return	使用可能な入力データ構造の場合trueが返る. */
 		virtual bool CheckCanUseInputDataStruct(const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount) = 0;
-		virtual bool CheckCanUseInputDataStruct(Gravisbell::GUID i_guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount) = 0;
+		virtual bool CheckCanUseInputDataStruct(const Gravisbell::GUID& i_guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount) = 0;
 
 		/** 出力データ構造を取得する.
 			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
 			@return	入力データ構造が不正な場合(x=0,y=0,z=0,ch=0)が返る. */
 		virtual IODataStruct GetOutputDataStruct(const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount) = 0;
-		virtual IODataStruct GetOutputDataStruct(Gravisbell::GUID i_guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount) = 0;
+		virtual IODataStruct GetOutputDataStruct(const Gravisbell::GUID& i_guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount) = 0;
 
 
 		//====================================

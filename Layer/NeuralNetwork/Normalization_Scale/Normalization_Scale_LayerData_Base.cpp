@@ -101,9 +101,9 @@ namespace NeuralNetwork {
 	// レイヤー保存
 	//===========================
 	/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
-	U32 Normalization_Scale_LayerData_Base::GetUseBufferByteCount()const
+	U64 Normalization_Scale_LayerData_Base::GetUseBufferByteCount()const
 	{
-		U32 bufferSize = 0;
+		U64 bufferSize = 0;
 
 		if(pLayerStructure == NULL)
 			return 0;

@@ -68,7 +68,7 @@ namespace NeuralNetwork {
 		//===========================
 	public:
 		/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
-		U32 GetUseBufferByteCount()const;
+		U64 GetUseBufferByteCount()const;
 
 
 	public:

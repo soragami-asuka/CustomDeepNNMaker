@@ -30,7 +30,7 @@ namespace Standard {
 			@param i_lpBuffer	読み込みバッファの先頭アドレス.
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-		virtual int ReadFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize) = 0;
+		virtual S64 ReadFromBuffer(const BYTE* i_lpBuffer, S64 i_bufferSize) = 0;
 	};
 
 }	// Standard

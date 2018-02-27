@@ -15,7 +15,7 @@ namespace NeuralNetwork {
 	{
 	public:
 		/** コンストラクタ */
-		Optimizer_SGD_CPU(U32 i_parameterCount)
+		Optimizer_SGD_CPU(U64 i_parameterCount)
 			:	Optimizer_SGD_base	(i_parameterCount)
 		{
 		}
@@ -43,17 +43,17 @@ namespace NeuralNetwork {
 	};
 
 	/** オプティマイザを作成する */
-	IOptimizer* CreateOptimizer_SGD_CPU(U32 i_parameterCount)
+	IOptimizer* CreateOptimizer_SGD_CPU(U64 i_parameterCount)
 	{
 		return new Optimizer_SGD_CPU(i_parameterCount);
 	}
 	/** オプティマイザをバッファから作成する */
-	IOptimizer* CreateOptimizerFromBuffer_SGD_CPU(const BYTE* i_lpBuffer, Gravisbell::S32 i_bufferSize, Gravisbell::S32& o_useBufferSize)
+	IOptimizer* CreateOptimizerFromBuffer_SGD_CPU(const BYTE* i_lpBuffer, Gravisbell::S64 i_bufferSize, Gravisbell::S64& o_useBufferSize)
 	{
 		return CreateOptimizerFromBuffer_SGD(i_lpBuffer, i_bufferSize, o_useBufferSize, CreateOptimizer_SGD_CPU);
 	}
 	/** オプティマイザーを更新する.異なる型だった場合は強制的に指定の型に変換される. */
-	ErrorCode ChangeOptimizer_SGD_CPU(IOptimizer** io_ppOptimizer, U32 i_parameterCount)
+	ErrorCode ChangeOptimizer_SGD_CPU(IOptimizer** io_ppOptimizer, U64 i_parameterCount)
 	{
 		Optimizer_SGD_CPU* pOptimizer = dynamic_cast<Optimizer_SGD_CPU*>(*io_ppOptimizer);
 		if(pOptimizer == NULL)

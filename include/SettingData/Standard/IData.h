@@ -74,17 +74,17 @@ namespace Standard {
 		//================================
 
 		/** 保存に必要なバイト数を取得する */
-		virtual U32 GetUseBufferByteCount()const = 0;
+		virtual U64 GetUseBufferByteCount()const = 0;
 
 		/** バッファに書き込む.
 			@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
 			@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
-		virtual S32 WriteToBuffer(BYTE* o_lpBuffer)const = 0;
+		virtual S64 WriteToBuffer(BYTE* o_lpBuffer)const = 0;
 		/** バッファから読み込む.
 			@param i_lpBuffer	読み込みバッファの先頭アドレス.
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-		virtual S32 ReadFromBuffer(const BYTE* i_lpBuffer, S32 i_bufferSize) = 0;
+		virtual S64 ReadFromBuffer(const BYTE* i_lpBuffer, S64 i_bufferSize) = 0;
 
 	public:
 		//================================
@@ -354,12 +354,12 @@ namespace Standard {
 
 	public:
 		/** 保存に必要なバイト数を取得する */
-		virtual U32 GetUseBufferByteCount()const = 0;
+		virtual U64 GetUseBufferByteCount()const = 0;
 
 		/** バッファに書き込む.
 			@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
 			@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
-		virtual S32 WriteToBuffer(BYTE* o_lpBuffer)const = 0;
+		virtual S64 WriteToBuffer(BYTE* o_lpBuffer)const = 0;
 
 	public:
 		/** 構造体にデータを格納する.

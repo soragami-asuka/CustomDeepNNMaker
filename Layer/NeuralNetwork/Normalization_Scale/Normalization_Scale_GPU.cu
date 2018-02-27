@@ -103,8 +103,6 @@ namespace NeuralNetwork {
 		失敗した場合はCalculate以降の処理は実行不可. */
 	ErrorCode Normalization_Scale_GPU::PreProcessCalculate()
 	{
-		cudnnStatus_t err_cudnn;
-
 		// 平均値用のバッファを作成
 		this->lpTmpMean.resize(this->GetBatchSize());
 
@@ -148,8 +146,6 @@ namespace NeuralNetwork {
 		@return 成功した場合0が返る */
 	ErrorCode Normalization_Scale_GPU::Calculate_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer)
 	{
-		cudnnStatus_t err_cudnn;
-
 		// 入力バッファをホストにコピー
 		cudaMemcpy(&this->m_lpInputBuffer_h[0], i_lppInputBuffer, sizeof(F32)*this->m_lpInputBuffer_h.size(), cudaMemcpyDeviceToHost);
 

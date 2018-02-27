@@ -176,7 +176,7 @@ namespace Parser {
 				
 				// バッファを用意する
 				std::vector<BYTE> lpBuffer;
-				S32 writeByteCount = 0;
+				S64 writeByteCount = 0;
 				lpBuffer.resize(sizeof(Gravisbell::GUID) + i_NNLayer.GetUseBufferByteCount());
 
 				// レイヤー種別を書き込む
@@ -433,7 +433,7 @@ namespace Parser {
 			// GUIDを調べる
 			Gravisbell::GUID guid = ::String2GUID(layerFilePath.stem().string());
 
-			S32 useBufferCount = 0;
+			S64 useBufferCount = 0;
 			return io_layerDataManager.CreateLayerData(
 				i_layerDLLManager,
 				typeCode,

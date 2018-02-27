@@ -42,7 +42,7 @@ namespace NeuralNetwork {
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@param o_useBufferSize 実際に読み込んだバッファサイズ
 			@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-		virtual SettingData::Standard::IData* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)const = 0;
+		virtual SettingData::Standard::IData* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, S64 i_bufferSize, S64& o_useBufferSize)const = 0;
 
 
 		//==============================
@@ -55,7 +55,7 @@ namespace NeuralNetwork {
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@param o_useBufferSize 実際に読み込んだバッファサイズ
 			@return	実際に読み取ったバッファサイズ. 失敗した場合は負の値 */
-		virtual SettingData::Standard::IData* CreateRuntimeParameterFromBuffer(const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)const = 0;
+		virtual SettingData::Standard::IData* CreateRuntimeParameterFromBuffer(const BYTE* i_lpBuffer, S64 i_bufferSize, S64& o_useBufferSize)const = 0;
 
 
 		//==============================
@@ -78,10 +78,10 @@ namespace NeuralNetwork {
 			@param	i_lpBuffer		読み取り用バッファ.
 			@param	i_bufferSize	使用可能なバッファサイズ.
 			@param	o_useBufferSize	実際に使用したバッファサイズ. */
-		virtual ILayerData* CreateLayerDataFromBuffer(const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)const = 0;
+		virtual ILayerData* CreateLayerDataFromBuffer(const BYTE* i_lpBuffer, S64 i_bufferSize, S64& o_useBufferSize)const = 0;
 		/** レイヤーを作成
 			@param guid	作成レイヤーのGUID */
-		virtual ILayerData* CreateLayerDataFromBuffer(const Gravisbell::GUID& guid, const BYTE* i_lpBuffer, S32 i_bufferSize, S32& o_useBufferSize)const = 0;
+		virtual ILayerData* CreateLayerDataFromBuffer(const Gravisbell::GUID& guid, const BYTE* i_lpBuffer, S64 i_bufferSize, S64& o_useBufferSize)const = 0;
 	};
 
 }	// NeuralNetwork

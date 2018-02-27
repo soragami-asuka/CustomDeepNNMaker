@@ -68,7 +68,7 @@ namespace NeuralNetwork {
 		Gravisbell::GUID outputLayerGUID;		/**< 出力信号に割り当てられているGUID. */
 
 		std::map<Gravisbell::GUID, ILayerData*> lpLayerData;	/**< レイヤーデータGUID, レイヤーデータ */
-		std::vector<LayerConnect> lpConnectInfo;	/**< レイヤーGUID, レイヤー接続情報 */
+		std::map<Gravisbell::GUID, LayerConnect> lpConnectInfo;	/**< レイヤーGUID, レイヤー接続情報 */
 
 		SettingData::Standard::IData* pLayerStructure;	/**< レイヤー構造を定義したコンフィグクラス */
 
@@ -99,7 +99,7 @@ namespace NeuralNetwork {
 			@param i_lpBuffer	読み込みバッファの先頭アドレス.
 			@param i_bufferSize	読み込み可能バッファのサイズ.
 			@return	成功した場合0 */
-		ErrorCode InitializeFromBuffer(const BYTE* i_lpBuffer, U32 i_bufferSize, S32& o_useBufferSize);
+		ErrorCode InitializeFromBuffer(const BYTE* i_lpBuffer, U64 i_bufferSize, S64& o_useBufferSize);
 
 
 		//===========================
@@ -122,12 +122,12 @@ namespace NeuralNetwork {
 		//===========================
 	public:
 		/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
-		U32 GetUseBufferByteCount()const;
+		U64 GetUseBufferByteCount()const;
 
 		/** レイヤーをバッファに書き込む.
 			@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
 			@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
-		S32 WriteToBuffer(BYTE* o_lpBuffer)const;
+		S64 WriteToBuffer(BYTE* o_lpBuffer)const;
 
 
 		//===========================
@@ -149,20 +149,28 @@ namespace NeuralNetwork {
 		/** 入力データ構造が使用可能か確認する.
 			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
 			@return	使用可能な入力データ構造の場合trueが返る. */
-		bool CheckCanUseInputDataStruct(Gravisbell::GUID i_guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
+		bool CheckCanUseInputDataStruct(const Gravisbell::GUID& i_guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
 		bool CheckCanUseInputDataStruct(const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
 
 
 		/** 出力データ構造を取得する.
 			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
 			@return	入力データ構造が不正な場合(x=0,y=0,z=0,ch=0)が返る. */
-		IODataStruct GetOutputDataStruct(Gravisbell::GUID i_guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
+		IODataStruct GetOutputDataStruct(const Gravisbell::GUID& i_guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
 		IODataStruct GetOutputDataStruct(const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
 
 
 		/** 複数出力が可能かを確認する */
 		bool CheckCanHaveMultOutputLayer(void);
 
+	private:
+		const IODataStruct* tmp_lpInputDataStruct;
+		U32 tmp_inputLayerCount;
+
+		/** 出力データ構造を取得する.
+			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+			@return	入力データ構造が不正な場合(x=0,y=0,z=0,ch=0)が返る. */
+		IODataStruct GetOutputDataStruct(const Gravisbell::GUID& i_guid);
 
 	public:
 		//===========================

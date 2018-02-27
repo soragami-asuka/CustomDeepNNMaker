@@ -12,7 +12,7 @@ namespace NeuralNetwork {
 	const std::wstring Optimizer_SGD_base::OPTIMIZER_ID = L"SGD";
 
 	/** コンストラクタ */
-	Optimizer_SGD_base::Optimizer_SGD_base(U32 i_parameterCount)
+	Optimizer_SGD_base::Optimizer_SGD_base(U64 i_parameterCount)
 		:	m_parameterCount	(i_parameterCount)
 		,	m_learnCoeff		(1.0f)
 	{
@@ -69,12 +69,12 @@ namespace NeuralNetwork {
 	// 保存
 	//===========================
 	/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
-	U32 Optimizer_SGD_base::GetUseBufferByteCount()const
+	U64 Optimizer_SGD_base::GetUseBufferByteCount()const
 	{
-		U32 useBufferByte = 0;
+		U64 useBufferByte = 0;
 
 		// 使用バイト数格納
-		useBufferByte += sizeof(U32);
+		useBufferByte += sizeof(U64);
 
 		// IDバッファサイズ
 		useBufferByte += sizeof(U32);
@@ -94,12 +94,12 @@ namespace NeuralNetwork {
 	/** レイヤーをバッファに書き込む.
 		@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
 		@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
-	S32 Optimizer_SGD_base::WriteToBuffer(BYTE* o_lpBuffer)const
+	S64 Optimizer_SGD_base::WriteToBuffer(BYTE* o_lpBuffer)const
 	{
-		U32 writePos = 0;
+		U64 writePos = 0;
 
 		// 使用バイト数
-		U32 userBufferByte = this->GetUseBufferByteCount();
+		U64 userBufferByte = this->GetUseBufferByteCount();
 		memcpy(&o_lpBuffer[writePos], &userBufferByte, sizeof(userBufferByte));
 		writePos += sizeof(userBufferByte);
 
@@ -124,15 +124,15 @@ namespace NeuralNetwork {
 	}
 
 	/** バッファから作成する */
-	IOptimizer* CreateOptimizerFromBuffer_SGD(const BYTE* i_lpBuffer, Gravisbell::S32 i_bufferSize, Gravisbell::S32& o_useBufferSize, IOptimizer* (*CreateOptimizer_SGD)(U32) )
+	IOptimizer* CreateOptimizerFromBuffer_SGD(const BYTE* i_lpBuffer, Gravisbell::S64 i_bufferSize, Gravisbell::S64& o_useBufferSize, IOptimizer* (*CreateOptimizer_SGD)(U64) )
 	{
 		o_useBufferSize = -1;
-		U32 readBufferPos = 0;
+		U64 readBufferPos = 0;
 
 		// 使用バッファ数, IDは読み取り済み
 
 		// パラメータ数
-		U32 parameterCount = 0;
+		U64 parameterCount = 0;
 		memcpy(&parameterCount, &i_lpBuffer[readBufferPos], sizeof(parameterCount));
 		readBufferPos += sizeof(parameterCount);
 

@@ -76,12 +76,12 @@ namespace NeuralNetwork {
 		@param i_lpBuffer	読み込みバッファの先頭アドレス.
 		@param i_bufferSize	読み込み可能バッファのサイズ.
 		@return	成功した場合0 */
-	ErrorCode ChooseChannel_LayerData_Base::InitializeFromBuffer(const BYTE* i_lpBuffer, U32 i_bufferSize, S32& o_useBufferSize)
+	ErrorCode ChooseChannel_LayerData_Base::InitializeFromBuffer(const BYTE* i_lpBuffer, U64 i_bufferSize, S64& o_useBufferSize)
 	{
-		int readBufferByte = 0;
+		S64 readBufferByte = 0;
 
 		// 設定情報
-		S32 useBufferByte = 0;
+		S64 useBufferByte = 0;
 		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, useBufferByte);
 		if(pLayerStructure == NULL)
 			return ErrorCode::ERROR_CODE_INITLAYER_READ_CONFIG;
@@ -143,9 +143,9 @@ namespace NeuralNetwork {
 	// レイヤー保存
 	//===========================
 	/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
-	U32 ChooseChannel_LayerData_Base::GetUseBufferByteCount()const
+	U64 ChooseChannel_LayerData_Base::GetUseBufferByteCount()const
 	{
-		U32 bufferSize = 0;
+		U64 bufferSize = 0;
 
 		if(pLayerStructure == NULL)
 			return 0;
@@ -160,12 +160,12 @@ namespace NeuralNetwork {
 	/** レイヤーをバッファに書き込む.
 		@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
 		@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
-	S32 ChooseChannel_LayerData_Base::WriteToBuffer(BYTE* o_lpBuffer)const
+	S64 ChooseChannel_LayerData_Base::WriteToBuffer(BYTE* o_lpBuffer)const
 	{
 		if(this->pLayerStructure == NULL)
 			return ErrorCode::ERROR_CODE_NONREGIST_CONFIG;
 
-		int writeBufferByte = 0;
+		S64 writeBufferByte = 0;
 
 		// 設定情報
 		writeBufferByte += this->pLayerStructure->WriteToBuffer(&o_lpBuffer[writeBufferByte]);

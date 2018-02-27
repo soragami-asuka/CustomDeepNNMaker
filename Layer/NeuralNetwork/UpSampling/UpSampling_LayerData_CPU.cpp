@@ -68,7 +68,7 @@ EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPU(const Gravisbell::L
 
 	return pLayerData;
 }
-EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPUfromBuffer(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, Gravisbell::S32 i_bufferSize, Gravisbell::S32& o_useBufferSize)
+EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPUfromBuffer(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, Gravisbell::S64 i_bufferSize, Gravisbell::S64& o_useBufferSize)
 {
 	// ì¬
 	Gravisbell::Layer::NeuralNetwork::UpSampling_LayerData_CPU* pLayerData = new Gravisbell::Layer::NeuralNetwork::UpSampling_LayerData_CPU(guid);
@@ -76,7 +76,7 @@ EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPUfromBuffer(const Gra
 		return NULL;
 
 	// ‰Šú‰»
-	S32 useBufferSize = 0;
+	S64 useBufferSize = 0;
 	Gravisbell::ErrorCode errCode = pLayerData->InitializeFromBuffer(i_lpBuffer, i_bufferSize, useBufferSize);
 	if(errCode != Gravisbell::ErrorCode::ERROR_CODE_NONE)
 	{

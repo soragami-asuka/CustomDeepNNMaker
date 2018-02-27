@@ -53,7 +53,7 @@ namespace NeuralNetwork {
 
 	public:
 		/** コンストラクタ */
-		Optimizer_Adam_GPU(U32 i_parameterCount)
+		Optimizer_Adam_GPU(U64 i_parameterCount)
 			:	Optimizer_Adam_base	(i_parameterCount)
 			,	m_beta2Pows	(1.0f)	/**< β2の階乗値 */
 			,	m_beta1Pows	(1.0f)	/**< β1の階乗値 */
@@ -77,7 +77,7 @@ namespace NeuralNetwork {
 		{
 			this->m_beta1Pows *= this->m_beta1;
 			this->m_beta2Pows *= this->m_beta2;
-			
+
 			dim3 grid((this->m_parameterCount +(BLOCK_SIZE - 1))/BLOCK_SIZE , 1, 1);
 			dim3 block(BLOCK_SIZE, 1, 1);
 
@@ -101,9 +101,9 @@ namespace NeuralNetwork {
 		/** レイヤーをバッファに書き込む.
 			@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
 			@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
-		S32 WriteToBuffer(BYTE* o_lpBuffer)const
+		S64 WriteToBuffer(BYTE* o_lpBuffer)const
 		{
-			U32 writePos = WriteToBufferBase(o_lpBuffer);
+			S64 writePos = WriteToBufferBase(o_lpBuffer);
 
 			// M
 			cudaMemcpy(&o_lpBuffer[writePos], thrust::raw_pointer_cast(&this->lpParameterM[0]), sizeof(F32)*this->m_parameterCount, cudaMemcpyDeviceToHost);
@@ -124,12 +124,12 @@ namespace NeuralNetwork {
 	};
 
 	/** オプティマイザを作成する */
-	Optimizer_Adam_base* CreateOptimizer_Adam_GPU(U32 i_parameterCount)
+	Optimizer_Adam_base* CreateOptimizer_Adam_GPU(U64 i_parameterCount)
 	{
 		return new Optimizer_Adam_GPU(i_parameterCount);
 	}
 	/** オプティマイザをバッファから作成する */
-	IOptimizer* CreateOptimizerFromBuffer_Adam_GPU(const BYTE* i_lpBuffer, Gravisbell::S32 i_bufferSize, Gravisbell::S32& o_useBufferSize)
+	IOptimizer* CreateOptimizerFromBuffer_Adam_GPU(const BYTE* i_lpBuffer, Gravisbell::S64 i_bufferSize, Gravisbell::S64& o_useBufferSize)
 	{
 		Optimizer_Adam_base* pOptimizer = CreateOptimizerFromBuffer_Adam(i_lpBuffer, i_bufferSize, o_useBufferSize, CreateOptimizer_Adam_GPU);
 		if(pOptimizer == NULL)
@@ -158,7 +158,7 @@ namespace NeuralNetwork {
 		return pOptimizer;
 	}
 	/** オプティマイザーを更新する.異なる型だった場合は強制的に指定の型に変換される. */
-	ErrorCode ChangeOptimizer_Adam_GPU(IOptimizer** io_ppOptimizer, U32 i_parameterCount)
+	ErrorCode ChangeOptimizer_Adam_GPU(IOptimizer** io_ppOptimizer, U64 i_parameterCount)
 	{
 		Optimizer_Adam_base* pOptimizer = dynamic_cast<Optimizer_Adam_base*>(*io_ppOptimizer);
 		if(pOptimizer == NULL)

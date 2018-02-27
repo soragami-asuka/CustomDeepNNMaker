@@ -18,7 +18,7 @@ namespace NeuralNetwork {
 		,	m_alpha			(0.001f)		/**< 慣性. */
 		,	m_beta1			(0.9f)			/**< 減衰率. */
 		,	m_beta2			(0.999f)		/**< 減衰率. */
-		,	m_epsilon		(1e-8)			/**< 補助係数. */
+		,	m_epsilon		(1e-8f)			/**< 補助係数. */
 	{
 	}
 	/** デストラクタ */
@@ -85,12 +85,12 @@ namespace NeuralNetwork {
 	// 保存
 	//===========================
 	/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
-	U32 Optimizer_Adam_base::GetUseBufferByteCount()const
+	U64 Optimizer_Adam_base::GetUseBufferByteCount()const
 	{
-		U32 useBufferByte = 0;
+		U64 useBufferByte = 0;
 
 		// 使用バイト数格納
-		useBufferByte += sizeof(U32);
+		useBufferByte += sizeof(U64);
 
 		// IDバッファサイズ
 		useBufferByte += sizeof(U32);
@@ -127,12 +127,12 @@ namespace NeuralNetwork {
 	/** レイヤーをバッファに書き込む.
 		@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
 		@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
-	S32 Optimizer_Adam_base::WriteToBufferBase(BYTE* o_lpBuffer)const
+	S64 Optimizer_Adam_base::WriteToBufferBase(BYTE* o_lpBuffer)const
 	{
 		U32 writePos = 0;
 
 		// 使用バイト数
-		U32 userBufferByte = this->GetUseBufferByteCount();
+		U64 userBufferByte = this->GetUseBufferByteCount();
 		memcpy(&o_lpBuffer[writePos], &userBufferByte, sizeof(userBufferByte));
 		writePos += sizeof(userBufferByte);
 
@@ -168,15 +168,15 @@ namespace NeuralNetwork {
 	}
 
 	/** バッファから作成する */
-	Optimizer_Adam_base* CreateOptimizerFromBuffer_Adam(const BYTE* i_lpBuffer, Gravisbell::S32 i_bufferSize, Gravisbell::S32& o_useBufferSize, Optimizer_Adam_base* (*CreateOptimizer_Adam)(U32) )
+	Optimizer_Adam_base* CreateOptimizerFromBuffer_Adam(const BYTE* i_lpBuffer, Gravisbell::S64 i_bufferSize, Gravisbell::S64& o_useBufferSize, Optimizer_Adam_base* (*CreateOptimizer_Adam)(U64) )
 	{
 		o_useBufferSize = -1;
-		U32 readBufferPos = 0;
+		U64 readBufferPos = 0;
 
 		// 使用バッファ数, IDは読み取り済み
 
 		// パラメータ数
-		U32 parameterCount = 0;
+		U64 parameterCount = 0;
 		memcpy(&parameterCount, &i_lpBuffer[readBufferPos], sizeof(parameterCount));
 		readBufferPos += sizeof(parameterCount);
 

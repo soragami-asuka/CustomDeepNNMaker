@@ -45,7 +45,7 @@ namespace
 	Vector3D<S32> GetTreeValue<Vector3D<S32>>(const boost::property_tree::ptree& pXmlTree, const std::string& id)
 	{
 		auto pTree = pXmlTree.get_child_optional(id);
-		if(pTree)
+		if(!pTree)
 			return Vector3D<S32>();
 
 		Vector3D<S32> value;
@@ -60,7 +60,7 @@ namespace
 	Vector3D<F32> GetTreeValue<Vector3D<F32>>(const boost::property_tree::ptree& pXmlTree, const std::string& id)
 	{
 		auto pTree = pXmlTree.get_child_optional(id);
-		if(pTree)
+		if(!pTree)
 			return Vector3D<F32>();
 
 		Vector3D<F32> value;
@@ -1157,7 +1157,7 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"  * @param  o_useBufferSize  Buffer size actually read.\n");
 		fwprintf(fp, L"  * @return If successful, the configuration information created from the buffer\n");
 		fwprintf(fp, L"  */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, Gravisbell::S64 i_bufferSize, Gravisbell::S64& o_useBufferSize);\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"/** Create a runtime parameter.\n");
@@ -1170,7 +1170,7 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"  * @param  o_useBufferSize  Buffer size actually read.\n");
 		fwprintf(fp, L"  * @return If successful, the configuration information created from the buffer\n");
 		fwprintf(fp, L"  */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameterFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize);\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameterFromBuffer(const BYTE* i_lpBuffer, Gravisbell::S64 i_bufferSize, Gravisbell::S64& o_useBufferSize);\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"/** Create a layer for CPU processing.\n");
@@ -1184,7 +1184,7 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		{
 			fwprintf(fp, L"EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPU(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const Gravisbell::SettingData::Standard::IData& i_data);\n");
 		}
-		fwprintf(fp, L"EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPUfromBuffer(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, Gravisbell::S32 i_bufferSize, Gravisbell::S32& o_useBufferSize );\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataCPUfromBuffer(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, Gravisbell::S64 i_bufferSize, Gravisbell::S64& o_useBufferSize );\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"/** Create a layer for GPU processing.\n");
 		fwprintf(fp, L"  * @param GUID of layer to create.\n");
@@ -1197,7 +1197,7 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		{
 			fwprintf(fp, L"EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataGPU(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const Gravisbell::SettingData::Standard::IData& i_data);\n");
 		}
-		fwprintf(fp, L"EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataGPUfromBuffer(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, Gravisbell::S32 i_bufferSize, Gravisbell::S32& o_useBufferSize);\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataGPUfromBuffer(const Gravisbell::Layer::NeuralNetwork::ILayerDLLManager* pLayerDLLManager, Gravisbell::GUID guid, const BYTE* i_lpBuffer, Gravisbell::S64 i_bufferSize, Gravisbell::S64& o_useBufferSize);\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");
 		fwprintf(fp, L"\n");
@@ -1504,13 +1504,13 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"  * @param  o_useBufferSize  Buffer size actually read.\n");
 		fwprintf(fp, L"  * @return If successful, the configuration information created from the buffer\n");
 		fwprintf(fp, L"  */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSettingFromBuffer(const BYTE* i_lpBuffer, Gravisbell::S64 i_bufferSize, Gravisbell::S64& o_useBufferSize)\n");
 		fwprintf(fp, L"{\n");
 		fwprintf(fp, L"	Gravisbell::SettingData::Standard::IDataEx* pLayerConfig = (Gravisbell::SettingData::Standard::IDataEx*)CreateLayerStructureSetting();\n");
 		fwprintf(fp, L"	if(pLayerConfig == NULL)\n");
 		fwprintf(fp, L"		return NULL;\n");
 		fwprintf(fp, L"\n");
-		fwprintf(fp, L"	int useBufferSize = pLayerConfig->ReadFromBuffer(i_lpBuffer, i_bufferSize);\n");
+		fwprintf(fp, L"	Gravisbell::S64 useBufferSize = pLayerConfig->ReadFromBuffer(i_lpBuffer, i_bufferSize);\n");
 		fwprintf(fp, L"	if(useBufferSize < 0)\n");
 		fwprintf(fp, L"	{\n");
 		fwprintf(fp, L"		delete pLayerConfig;\n");
@@ -1536,13 +1536,13 @@ int LayerConfigData::ConvertToCPPFile(const boost::filesystem::wpath& exportDirP
 		fwprintf(fp, L"  * @param  o_useBufferSize  Buffer size actually read.\n");
 		fwprintf(fp, L"  * @return If successful, the configuration information created from the buffer\n");
 		fwprintf(fp, L"  */\n");
-		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameterFromBuffer(const BYTE* i_lpBuffer, int i_bufferSize, int& o_useBufferSize)\n");
+		fwprintf(fp, L"EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameterFromBuffer(const BYTE* i_lpBuffer, Gravisbell::S64 i_bufferSize, Gravisbell::S64& o_useBufferSize)\n");
 		fwprintf(fp, L"{\n");
 		fwprintf(fp, L"	Gravisbell::SettingData::Standard::IDataEx* pLayerConfig = (Gravisbell::SettingData::Standard::IDataEx*)CreateRuntimeParameter();\n");
 		fwprintf(fp, L"	if(pLayerConfig == NULL)\n");
 		fwprintf(fp, L"		return NULL;\n");
 		fwprintf(fp, L"\n");
-		fwprintf(fp, L"	int useBufferSize = pLayerConfig->ReadFromBuffer(i_lpBuffer, i_bufferSize);\n");
+		fwprintf(fp, L"	Gravisbell::S64 useBufferSize = pLayerConfig->ReadFromBuffer(i_lpBuffer, i_bufferSize);\n");
 		fwprintf(fp, L"	if(useBufferSize < 0)\n");
 		fwprintf(fp, L"	{\n");
 		fwprintf(fp, L"		delete pLayerConfig;\n");

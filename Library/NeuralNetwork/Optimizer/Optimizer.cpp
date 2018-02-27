@@ -17,7 +17,7 @@ namespace NeuralNetwork {
 
 
 	/** オプティマイザーを変更する.CPU */
-	Optimizer_API ErrorCode ChangeOptimizer_CPU(IOptimizer** io_ppOptimizer, const wchar_t i_optimizerID[], U32 i_parameterCount)
+	Optimizer_API ErrorCode ChangeOptimizer_CPU(IOptimizer** io_ppOptimizer, const wchar_t i_optimizerID[], U64 i_parameterCount)
 	{
 		std::wstring optimizerID = i_optimizerID;
 
@@ -37,7 +37,7 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 	/** オプティマイザーを変更する.GPU */
-	Optimizer_API ErrorCode ChangeOptimizer_GPU(IOptimizer** io_ppOptimizer, const wchar_t i_optimizerID[], U32 i_parameterCount)
+	Optimizer_API ErrorCode ChangeOptimizer_GPU(IOptimizer** io_ppOptimizer, const wchar_t i_optimizerID[], U64 i_parameterCount)
 	{
 		std::wstring optimizerID = i_optimizerID;
 
@@ -58,12 +58,12 @@ namespace NeuralNetwork {
 	}
 
 	/** 共通部分の読み込み */
-	ErrorCode ReadBaseFromBuffer(const BYTE* i_lpBuffer, Gravisbell::S32 i_bufferSize, Gravisbell::S32& o_useBufferSize, U32& o_remainingBufferCount, std::wstring& o_optimizerID)
+	ErrorCode ReadBaseFromBuffer(const BYTE* i_lpBuffer, Gravisbell::S64 i_bufferSize, Gravisbell::S64& o_useBufferSize, U64& o_remainingBufferCount, std::wstring& o_optimizerID)
 	{
-		U32 readBufferPos = 0;
+		U64 readBufferPos = 0;
 
 		// 使用バッファ数
-		U32 useBufferCount = 0;
+		U64 useBufferCount = 0;
 		memcpy(&useBufferCount, &i_lpBuffer[readBufferPos], sizeof(useBufferCount));
 		if(useBufferCount > i_bufferSize)
 			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_ARRAYRANGE;
@@ -88,10 +88,10 @@ namespace NeuralNetwork {
 	}
 
 	/** オプティマイザーをバッファから作成する.CPU */
-	Optimizer_API IOptimizer* CreateOptimizerFromBuffer_CPU(const BYTE* i_lpBuffer, Gravisbell::S32 i_bufferSize, Gravisbell::S32& o_useBufferSize)
+	Optimizer_API IOptimizer* CreateOptimizerFromBuffer_CPU(const BYTE* i_lpBuffer, Gravisbell::S64 i_bufferSize, Gravisbell::S64& o_useBufferSize)
 	{
-		S32 readBufferPos = 0;
-		U32 remainingBufferCount = 0;
+		S64 readBufferPos = 0;
+		U64 remainingBufferCount = 0;
 		std::wstring optimizerID;
 
 		if(ReadBaseFromBuffer(i_lpBuffer, i_bufferSize, readBufferPos, remainingBufferCount, optimizerID) != ErrorCode::ERROR_CODE_NONE)
@@ -100,25 +100,25 @@ namespace NeuralNetwork {
 		// 使い切ったことにしておく
 		o_useBufferSize = readBufferPos + remainingBufferCount;
 
-		U32 useBufferSize = 0;
+		U64 useBufferSize = 0;
 		if(optimizerID == Optimizer_SGD_base::OPTIMIZER_ID)
 		{
-			S32 useBufferCount = 0;
+			S64 useBufferCount = 0;
 			return CreateOptimizerFromBuffer_SGD_CPU(&i_lpBuffer[readBufferPos], remainingBufferCount, useBufferCount);
 		}
 		else if(optimizerID == Optimizer_Adam_base::OPTIMIZER_ID)
 		{
-			S32 useBufferCount = 0;
+			S64 useBufferCount = 0;
 			return CreateOptimizerFromBuffer_Adam_CPU(&i_lpBuffer[readBufferPos], remainingBufferCount, useBufferCount);
 		}
 
 		return NULL;
 	}
 	/** オプティマイザーをバッファから作成する.GPU */
-	Optimizer_API IOptimizer* CreateOptimizerFromBuffer_GPU(const BYTE* i_lpBuffer, Gravisbell::S32 i_bufferSize, Gravisbell::S32& o_useBufferSize)
+	Optimizer_API IOptimizer* CreateOptimizerFromBuffer_GPU(const BYTE* i_lpBuffer, Gravisbell::S64 i_bufferSize, Gravisbell::S64& o_useBufferSize)
 	{
-		S32 readBufferPos = 0;
-		U32 remainingBufferCount = 0;
+		S64 readBufferPos = 0;
+		U64 remainingBufferCount = 0;
 		std::wstring optimizerID;
 
 		if(ReadBaseFromBuffer(i_lpBuffer, i_bufferSize, readBufferPos, remainingBufferCount, optimizerID) != ErrorCode::ERROR_CODE_NONE)
@@ -127,15 +127,15 @@ namespace NeuralNetwork {
 		// 使い切ったことにしておく
 		o_useBufferSize = readBufferPos + remainingBufferCount;
 
-		U32 useBufferSize = 0;
+		U64 useBufferSize = 0;
 		if(optimizerID == Optimizer_SGD_base::OPTIMIZER_ID)
 		{
-			S32 useBufferCount = 0;
+			S64 useBufferCount = 0;
 			return CreateOptimizerFromBuffer_SGD_GPU(&i_lpBuffer[readBufferPos], remainingBufferCount, useBufferCount);
 		}
 		else if(optimizerID == Optimizer_Adam_base::OPTIMIZER_ID)
 		{
-			S32 useBufferCount = 0;
+			S64 useBufferCount = 0;
 			return CreateOptimizerFromBuffer_Adam_GPU(&i_lpBuffer[readBufferPos], remainingBufferCount, useBufferCount);
 		}
 

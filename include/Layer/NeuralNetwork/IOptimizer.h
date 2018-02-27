@@ -58,12 +58,12 @@ namespace NeuralNetwork {
 		// 保存
 		//===========================
 		/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
-		virtual U32 GetUseBufferByteCount()const = 0;
+		virtual U64 GetUseBufferByteCount()const = 0;
 
 		/** レイヤーをバッファに書き込む.
 			@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
 			@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
-		virtual S32 WriteToBuffer(BYTE* o_lpBuffer)const = 0;
+		virtual S64 WriteToBuffer(BYTE* o_lpBuffer)const = 0;
 	};
 
 	/** SGD */

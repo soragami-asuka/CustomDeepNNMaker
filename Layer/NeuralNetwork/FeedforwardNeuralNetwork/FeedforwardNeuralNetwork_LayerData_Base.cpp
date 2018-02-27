@@ -46,7 +46,7 @@ namespace NeuralNetwork {
 	{
 		for(auto& connectInfo : this->lpConnectInfo)
 		{
-			connectInfo.pLayerData->Initialize();
+			connectInfo.second.pLayerData->Initialize();
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
@@ -70,12 +70,12 @@ namespace NeuralNetwork {
 		@param i_lpBuffer	読み込みバッファの先頭アドレス.
 		@param i_bufferSize	読み込み可能バッファのサイズ.
 		@return	成功した場合0 */
-	ErrorCode FeedforwardNeuralNetwork_LayerData_Base::InitializeFromBuffer(const BYTE* i_lpBuffer, U32 i_bufferSize, S32& o_useBufferSize)
+	ErrorCode FeedforwardNeuralNetwork_LayerData_Base::InitializeFromBuffer(const BYTE* i_lpBuffer, U64 i_bufferSize, S64& o_useBufferSize)
 	{
-		int readBufferByte = 0;
+		S64 readBufferByte = 0;
 
 		// 設定情報
-		S32 useBufferByte = 0;
+		S64 useBufferByte = 0;
 		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, useBufferByte);
 		if(pLayerStructure == NULL)
 			return ErrorCode::ERROR_CODE_INITLAYER_READ_CONFIG;
@@ -113,7 +113,7 @@ namespace NeuralNetwork {
 			auto pLayerDLL = this->layerDLLManager.GetLayerDLLByGUID(typeCode);
 			if(pLayerDLL == NULL)
 				return ErrorCode::ERROR_CODE_DLL_NOTFOUND;
-			S32 useBufferSize = 0;
+			S64 useBufferSize = 0;
 			auto pLayerData = pLayerDLL->CreateLayerDataFromBuffer(guid, &i_lpBuffer[readBufferByte], i_bufferSize - readBufferByte, useBufferSize);
 			if(pLayerData == NULL)
 				return ErrorCode::ERROR_CODE_LAYER_CREATE;
@@ -187,7 +187,7 @@ namespace NeuralNetwork {
 				}
 
 				// レイヤーを接続
-				this->lpConnectInfo.push_back(layerConnect);
+				this->lpConnectInfo[layerConnect.guid] = layerConnect;
 			}
 		}
 
@@ -232,9 +232,9 @@ namespace NeuralNetwork {
 	// レイヤー保存
 	//===========================
 	/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
-	U32 FeedforwardNeuralNetwork_LayerData_Base::GetUseBufferByteCount()const
+	U64 FeedforwardNeuralNetwork_LayerData_Base::GetUseBufferByteCount()const
 	{
-		U32 bufferSize = 0;
+		U64 bufferSize = 0;
 
 		if(pLayerStructure == NULL)
 			return 0;
@@ -247,7 +247,7 @@ namespace NeuralNetwork {
 				lpTmpLayerData[it.first] = it.second;
 			// 接続レイヤー
 			for(auto& it : this->lpConnectInfo)
-				lpTmpLayerData[it.pLayerData->GetGUID()] = it.pLayerData;
+				lpTmpLayerData[it.second.pLayerData->GetGUID()] = it.second.pLayerData;
 		}
 
 
@@ -291,13 +291,13 @@ namespace NeuralNetwork {
 				bufferSize += sizeof(U32);
 
 				// 入力レイヤー
-				bufferSize += sizeof(Gravisbell::GUID) * (U32)it.lpInputLayerGUID.size();
+				bufferSize += sizeof(Gravisbell::GUID) * (U32)it.second.lpInputLayerGUID.size();
 
 				// バイパス入力レイヤーの数
 				bufferSize += sizeof(U32);
 
 				// バイパス入力レイヤー
-				bufferSize += sizeof(Gravisbell::GUID) * (U32)it.lpBypassLayerGUID.size();
+				bufferSize += sizeof(Gravisbell::GUID) * (U32)it.second.lpBypassLayerGUID.size();
 			}
 		}
 
@@ -311,10 +311,10 @@ namespace NeuralNetwork {
 	/** レイヤーをバッファに書き込む.
 		@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
 		@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
-	S32 FeedforwardNeuralNetwork_LayerData_Base::WriteToBuffer(BYTE* o_lpBuffer)const
+	S64 FeedforwardNeuralNetwork_LayerData_Base::WriteToBuffer(BYTE* o_lpBuffer)const
 	{
 		if(this->pLayerStructure == NULL)
-			return ErrorCode::ERROR_CODE_NONREGIST_CONFIG;
+			return -1;
 
 		// レイヤーデータの一覧を作成する
 		std::map<Gravisbell::GUID, ILayerData*> lpTmpLayerData;
@@ -324,11 +324,11 @@ namespace NeuralNetwork {
 				lpTmpLayerData[it.first] = it.second;
 			// 接続レイヤー
 			for(auto& it : this->lpConnectInfo)
-				lpTmpLayerData[it.pLayerData->GetGUID()] = it.pLayerData;
+				lpTmpLayerData[it.second.pLayerData->GetGUID()] = it.second.pLayerData;
 		}
 
 
-		int writeBufferByte = 0;
+		S64 writeBufferByte = 0;
 
 		U32 tmpCount = 0;
 		Gravisbell::GUID tmpGUID;
@@ -379,38 +379,38 @@ namespace NeuralNetwork {
 			for(auto& it : this->lpConnectInfo)
 			{
 				// レイヤーのGUID
-				tmpGUID = it.guid;
+				tmpGUID = it.second.guid;
 				memcpy(&o_lpBuffer[writeBufferByte], &tmpGUID, sizeof(Gravisbell::GUID));
 				writeBufferByte += sizeof(Gravisbell::GUID);
 
 				// レイヤーの固定フラグ
-				memcpy(&o_lpBuffer[writeBufferByte], &it.onFixFlag, sizeof(it.onFixFlag));
-				writeBufferByte += sizeof(it.onFixFlag);
+				memcpy(&o_lpBuffer[writeBufferByte], &it.second.onFixFlag, sizeof(it.second.onFixFlag));
+				writeBufferByte += sizeof(it.second.onFixFlag);
 
 				// レイヤーデータのGUID
-				tmpGUID = it.pLayerData->GetGUID();
+				tmpGUID = it.second.pLayerData->GetGUID();
 				memcpy(&o_lpBuffer[writeBufferByte], &tmpGUID, sizeof(Gravisbell::GUID));
 				writeBufferByte += sizeof(Gravisbell::GUID);
 
 				// 入力レイヤーの数
-				tmpCount = (U32)it.lpInputLayerGUID.size();
+				tmpCount = (U32)it.second.lpInputLayerGUID.size();
 				memcpy(&o_lpBuffer[writeBufferByte], &tmpCount, sizeof(U32));
 				writeBufferByte += sizeof(U32);
 
 				// 入力レイヤー
-				for(auto guid : it.lpInputLayerGUID)
+				for(auto guid : it.second.lpInputLayerGUID)
 				{
 					memcpy(&o_lpBuffer[writeBufferByte], &guid, sizeof(Gravisbell::GUID));
 					writeBufferByte += sizeof(Gravisbell::GUID);
 				}
 
 				// バイパス入力レイヤーの数
-				tmpCount = (U32)it.lpBypassLayerGUID.size();
+				tmpCount = (U32)it.second.lpBypassLayerGUID.size();
 				memcpy(&o_lpBuffer[writeBufferByte], &tmpCount, sizeof(U32));
 				writeBufferByte += sizeof(U32);
 
 				// バイパス入力レイヤー
-				for(auto guid : it.lpBypassLayerGUID)
+				for(auto guid : it.second.lpBypassLayerGUID)
 				{
 					memcpy(&o_lpBuffer[writeBufferByte], &guid, sizeof(Gravisbell::GUID));
 					writeBufferByte += sizeof(Gravisbell::GUID);
@@ -471,7 +471,7 @@ namespace NeuralNetwork {
 	/** 入力データ構造が使用可能か確認する.
 		@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
 		@return	使用可能な入力データ構造の場合trueが返る. */
-	bool FeedforwardNeuralNetwork_LayerData_Base::CheckCanUseInputDataStruct(Gravisbell::GUID i_guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
+	bool FeedforwardNeuralNetwork_LayerData_Base::CheckCanUseInputDataStruct(const Gravisbell::GUID& i_guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
 	{
 		return this->GetOutputDataStruct(i_guid, i_lpInputDataStruct, i_inputLayerCount).GetDataCount() != 0;
 	}
@@ -484,34 +484,40 @@ namespace NeuralNetwork {
 	/** 出力データ構造を取得する.
 		@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
 		@return	入力データ構造が不正な場合(x=0,y=0,z=0,ch=0)が返る. */
-	IODataStruct FeedforwardNeuralNetwork_LayerData_Base::GetOutputDataStruct(Gravisbell::GUID i_guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
+	IODataStruct FeedforwardNeuralNetwork_LayerData_Base::GetOutputDataStruct(const Gravisbell::GUID& i_guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
+	{
+		this->tmp_lpInputDataStruct = i_lpInputDataStruct;
+		this->tmp_inputLayerCount = i_inputLayerCount;
+
+		return this->GetOutputDataStruct(i_guid);
+	}
+	/** 出力データ構造を取得する.
+		@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
+		@return	入力データ構造が不正な場合(x=0,y=0,z=0,ch=0)が返る. */
+	IODataStruct FeedforwardNeuralNetwork_LayerData_Base::GetOutputDataStruct(const Gravisbell::GUID& i_guid)
 	{
 		if(i_guid == this->inputLayerGUID)
-			return i_lpInputDataStruct[0];
+			return this->tmp_lpInputDataStruct[0];
 
 		auto pConnectLayer = this->GetLayerByGUID(i_guid);
 		if(pConnectLayer == NULL)
 			return IODataStruct(0,0,0,0);;
 
 		// 入力レイヤー
-		std::vector<IODataStruct> lpInputDataStruct;
-		for(U32 inputLayerNum=0; inputLayerNum<pConnectLayer->lpInputLayerGUID.size(); inputLayerNum++)
+		std::vector<IODataStruct> lpInputDataStruct(pConnectLayer->lpInputLayerGUID.size());
+		for(U32 inputLayerNum=0; inputLayerNum<lpInputDataStruct.size(); inputLayerNum++)
 		{
-			IODataStruct inputDataStruct = this->GetOutputDataStruct(pConnectLayer->lpInputLayerGUID[inputLayerNum], i_lpInputDataStruct, i_inputLayerCount);
-			if(inputDataStruct.GetDataCount() == 0)
+			lpInputDataStruct[inputLayerNum] = this->GetOutputDataStruct(pConnectLayer->lpInputLayerGUID[inputLayerNum]);
+			if(lpInputDataStruct[inputLayerNum].GetDataCount() == 0)
 				return IODataStruct(0,0,0,0);
-
-			lpInputDataStruct.push_back(inputDataStruct);
 		}
 		// バイパスレイヤー
-		std::vector<IODataStruct> lpBypassDataStruct;
-		for(U32 inputLayerNum=0; inputLayerNum<pConnectLayer->lpBypassLayerGUID.size(); inputLayerNum++)
+		std::vector<IODataStruct> lpBypassDataStruct(pConnectLayer->lpBypassLayerGUID.size());
+		for(U32 inputLayerNum=0; inputLayerNum<lpBypassDataStruct.size(); inputLayerNum++)
 		{
-			IODataStruct inputDataStruct = this->GetOutputDataStruct(pConnectLayer->lpBypassLayerGUID[inputLayerNum], i_lpInputDataStruct, i_inputLayerCount);
-			if(inputDataStruct.GetDataCount() == 0)
+			lpBypassDataStruct[inputLayerNum] = this->GetOutputDataStruct(pConnectLayer->lpBypassLayerGUID[inputLayerNum]);
+			if(lpBypassDataStruct[inputLayerNum].GetDataCount() == 0)
 				return IODataStruct(0,0,0,0);
-			
-			lpBypassDataStruct.push_back(inputDataStruct);
 		}
 
 		if(lpInputDataStruct.size() == 0)
@@ -544,6 +550,7 @@ namespace NeuralNetwork {
 
 		return pConnectLayer->pLayerData->GetOutputDataStruct(&lpInputDataStruct[0], 1);
 	}
+
 	/** 出力データ構造を取得する.
 		@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要
 		@return	入力データ構造が不正な場合(x=0,y=0,z=0,ch=0)が返る. */
@@ -584,12 +591,12 @@ namespace NeuralNetwork {
 		{
 			// 対象レイヤーに対する入力データ構造一覧を作成
 			std::vector<IODataStruct> lpInputDataStruct;
-			for(auto inputGUID : it.lpInputLayerGUID)
+			for(auto inputGUID : it.second.lpInputLayerGUID)
 			{
 				lpInputDataStruct.push_back(this->GetOutputDataStruct(inputGUID, i_lpInputDataStruct, i_inputLayerCount));
 			}
 			
-			err = neuralNetwork.AddLayer(it.pLayerData->CreateLayer(it.guid, &lpInputDataStruct[0], (U32)lpInputDataStruct.size(), neuralNetwork.GetTemporaryMemoryManager()), it.onFixFlag);
+			err = neuralNetwork.AddLayer(it.second.pLayerData->CreateLayer(it.second.guid, &lpInputDataStruct[0], (U32)lpInputDataStruct.size(), neuralNetwork.GetTemporaryMemoryManager()), it.second.onFixFlag);
 
 			if(err != ErrorCode::ERROR_CODE_NONE)
 				return err;
@@ -598,9 +605,9 @@ namespace NeuralNetwork {
 		// 複数出力を持つレイヤーで、単一出力の能力しか持たないものを探し、代替レイヤーを作成する
 		for(auto it : this->lpConnectInfo)
 		{
-			if(this->GetOutputLayerCount(it.guid) > 1)
+			if(this->GetOutputLayerCount(it.second.guid) > 1)
 			{
-				ILayerData* pLayerData = it.pLayerData;
+				ILayerData* pLayerData = it.second.pLayerData;
 				if(!pLayerData->CheckCanHaveMultOutputLayer())
 				{
 					// 単一出力機能しか持たないのに複数出力を持っている
@@ -618,7 +625,7 @@ namespace NeuralNetwork {
 					if(pItem == NULL)
 						return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
 
-					pItem->SetValue(this->GetOutputLayerCount(it.guid));
+					pItem->SetValue(this->GetOutputLayerCount(it.second.guid));
 
 					// レイヤーデータを作成
 					auto pSubstitutionLayerData = pDLL->CreateLayerData(*pLayerStructure);
@@ -626,14 +633,14 @@ namespace NeuralNetwork {
 
 					// レイヤーを追加
 					ILayerBase* pSubstitutionLayer = NULL;
-					err = neuralNetwork.AddTemporaryLayer(pSubstitutionLayerData, &pSubstitutionLayer, &this->GetOutputDataStruct(it.guid, i_lpInputDataStruct, i_inputLayerCount), 1);
+					err = neuralNetwork.AddTemporaryLayer(pSubstitutionLayerData, &pSubstitutionLayer, &this->GetOutputDataStruct(it.second.guid, i_lpInputDataStruct, i_inputLayerCount), 1);
 					if(err != ErrorCode::ERROR_CODE_NONE)
 						return err;
 
-					lpSubstitutionLayer[it.guid] = pSubstitutionLayer->GetGUID();
+					lpSubstitutionLayer[it.second.guid] = pSubstitutionLayer->GetGUID();
 
 					// 代替レイヤーの入力を代替先レイヤーに設定
-					err = neuralNetwork.AddInputLayerToLayer(pSubstitutionLayer->GetGUID(), it.guid);
+					err = neuralNetwork.AddInputLayerToLayer(pSubstitutionLayer->GetGUID(), it.second.guid);
 					if(err != ErrorCode::ERROR_CODE_NONE)
 						return err;
 				}
@@ -680,27 +687,27 @@ namespace NeuralNetwork {
 		for(auto it_connectInfo : this->lpConnectInfo)
 		{
 			// 入力レイヤー
-			for(auto inputGUID : it_connectInfo.lpInputLayerGUID)
+			for(auto inputGUID : it_connectInfo.second.lpInputLayerGUID)
 			{
 				if(lpSubstitutionLayer.count(inputGUID))
 				{
 					// 代替レイヤーを使用する
-					err = neuralNetwork.AddInputLayerToLayer(it_connectInfo.guid, lpSubstitutionLayer[inputGUID]);
+					err = neuralNetwork.AddInputLayerToLayer(it_connectInfo.second.guid, lpSubstitutionLayer[inputGUID]);
 					if(err != ErrorCode::ERROR_CODE_NONE)
 						return err;
 				}
 				else
 				{
-					err = neuralNetwork.AddInputLayerToLayer(it_connectInfo.guid, inputGUID);
+					err = neuralNetwork.AddInputLayerToLayer(it_connectInfo.second.guid, inputGUID);
 					if(err != ErrorCode::ERROR_CODE_NONE)
 						return err;
 				}
 			}
 
 			// バイパスレイヤー
-			for(auto bypassGUID : it_connectInfo.lpBypassLayerGUID)
+			for(auto bypassGUID : it_connectInfo.second.lpBypassLayerGUID)
 			{
-				err = neuralNetwork.AddBypassLayerToLayer(it_connectInfo.guid, bypassGUID);
+				err = neuralNetwork.AddBypassLayerToLayer(it_connectInfo.second.guid, bypassGUID);
 				if(err != ErrorCode::ERROR_CODE_NONE)
 					return err;
 			}
@@ -731,7 +738,7 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_ADDLAYER_ALREADY_SAMEID;
 
 		// 追加
-		this->lpConnectInfo.push_back(LayerConnect(i_guid, i_pLayerData, i_onFixFlag));
+		this->lpConnectInfo[i_guid] = LayerConnect(i_guid, i_pLayerData, i_onFixFlag);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -743,7 +750,7 @@ namespace NeuralNetwork {
 		auto it = this->lpConnectInfo.begin();
 		while(it != this->lpConnectInfo.end())
 		{
-			if(it->guid == i_guid)
+			if(it->second.guid == i_guid)
 				break;
 		}
 		if(it == this->lpConnectInfo.end())
@@ -752,22 +759,22 @@ namespace NeuralNetwork {
 		// 削除対象のレイヤーを入力に持つ場合は削除
 		for(auto& it_search : this->lpConnectInfo)
 		{
-			this->EraseInputLayerFromLayer(it_search.guid, i_guid);
-			this->EraseBypassLayerFromLayer(it_search.guid, i_guid);
+			this->EraseInputLayerFromLayer(it_search.second.guid, i_guid);
+			this->EraseBypassLayerFromLayer(it_search.second.guid, i_guid);
 		}
 
 		// レイヤーデータ本体を持つ場合は削除
 		{
-			auto it_pLayerData = this->lpLayerData.find(it->pLayerData->GetGUID());
+			auto it_pLayerData = this->lpLayerData.find(it->second.pLayerData->GetGUID());
 			if(it_pLayerData != this->lpLayerData.end())
 			{
 				// 削除対象のレイヤー以外に同一のレイヤーデータを使用しているレイヤーが存在しないか確認
 				bool onCanErase = true;
 				for(auto& it_search : this->lpConnectInfo)
 				{
-					if(it_search.guid != i_guid)
+					if(it_search.second.guid != i_guid)
 					{
-						if(it_search.pLayerData->GetGUID() == it_pLayerData->first)
+						if(it_search.second.pLayerData->GetGUID() == it_pLayerData->first)
 						{
 							onCanErase = false;
 							break;
@@ -827,7 +834,7 @@ namespace NeuralNetwork {
 		for(U32 i=0; i<i_layerNum; i++)
 			it++;
 
-		o_guid = it->guid;
+		o_guid = it->second.guid;
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -838,17 +845,20 @@ namespace NeuralNetwork {
 		if(i_layerNum >= this->lpConnectInfo.size())
 			return NULL;
 
-		return &this->lpConnectInfo[i_layerNum];
+		auto it = this->lpConnectInfo.begin();
+		for(U32 i=0; i<i_layerNum; i++)
+			it++;
+
+		return &it->second;
 	}
 	/** 登録されているレイヤーをGUID指定で取得する */
 	FeedforwardNeuralNetwork_LayerData_Base::LayerConnect* FeedforwardNeuralNetwork_LayerData_Base::GetLayerByGUID(const Gravisbell::GUID& i_guid)
 	{
-		for(U32 layerNum=0; layerNum<this->lpConnectInfo.size(); layerNum++)
-		{
-			if(this->lpConnectInfo[layerNum].guid == i_guid)
-				return &this->lpConnectInfo[layerNum];
-		}
-		return NULL;
+		auto it = this->lpConnectInfo.find(i_guid);
+		if(it == this->lpConnectInfo.end())
+			return NULL;
+
+		return &it->second;
 	}
 	FeedforwardNeuralNetwork_LayerData_Base::LayerConnect* FeedforwardNeuralNetwork_LayerData_Base::GetLayerByGUID(const Gravisbell::GUID& i_guid)const
 	{
@@ -1081,9 +1091,9 @@ namespace NeuralNetwork {
 		U32 outputCount = 0;
 		for(auto it : this->lpConnectInfo)
 		{
-			for(U32 inputNum=0; inputNum<it.lpInputLayerGUID.size(); inputNum++)
+			for(U32 inputNum=0; inputNum<it.second.lpInputLayerGUID.size(); inputNum++)
 			{
-				if(it.lpInputLayerGUID[inputNum] == i_layerGUID)
+				if(it.second.lpInputLayerGUID[inputNum] == i_layerGUID)
 					outputCount++;
 			}
 		}
@@ -1180,8 +1190,8 @@ namespace NeuralNetwork {
 	{
 		for(auto& it : this->lpConnectInfo)
 		{
-			if(it.pLayerData)
-				it.pLayerData->ChangeOptimizer(i_optimizerID);
+			if(it.second.pLayerData)
+				it.second.pLayerData->ChangeOptimizer(i_optimizerID);
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
@@ -1191,8 +1201,8 @@ namespace NeuralNetwork {
 	{
 		for(auto& it : this->lpConnectInfo)
 		{
-			if(it.pLayerData)
-				it.pLayerData->SetOptimizerHyperParameter(i_parameterID, i_value);
+			if(it.second.pLayerData)
+				it.second.pLayerData->SetOptimizerHyperParameter(i_parameterID, i_value);
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
@@ -1201,8 +1211,8 @@ namespace NeuralNetwork {
 	{
 		for(auto& it : this->lpConnectInfo)
 		{
-			if(it.pLayerData)
-				it.pLayerData->SetOptimizerHyperParameter(i_parameterID, i_value);
+			if(it.second.pLayerData)
+				it.second.pLayerData->SetOptimizerHyperParameter(i_parameterID, i_value);
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;
