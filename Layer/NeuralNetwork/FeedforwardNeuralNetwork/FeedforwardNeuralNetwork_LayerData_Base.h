@@ -166,6 +166,7 @@ namespace NeuralNetwork {
 	private:
 		const IODataStruct* tmp_lpInputDataStruct;
 		U32 tmp_inputLayerCount;
+		std::map<Gravisbell::GUID, IODataStruct> tmp_lpOutputDataStruct;
 
 		/** 出力データ構造を取得する.
 			@param	i_lpInputDataStruct	入力データ構造の配列. GetInputFromLayerCount()の戻り値以上の要素数が必要

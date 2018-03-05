@@ -1145,7 +1145,7 @@ Gravisbell::ErrorCode ReadNetworkFromBinaryFile(const Layer::NeuralNetwork::ILay
 	boost::filesystem::path filePath = i_filePath;
 
 	std::vector<BYTE> lpBuffer;
-	S32 readByteCount = 0;
+	S64 readByteCount = 0;
 
 	// ファイルの中身をバッファにコピーする
 	{
@@ -1155,12 +1155,12 @@ Gravisbell::ErrorCode ReadNetworkFromBinaryFile(const Layer::NeuralNetwork::ILay
 			return ErrorCode::ERROR_CODE_COMMON_FILE_NOT_FOUND;
 
 		// ファイルサイズを調べてバッファを作成する
-		fseek(fp, 0, SEEK_END);
-		U32 fileSize = ftell(fp);
+		_fseeki64(fp, 0, SEEK_END);
+		U64 fileSize = _ftelli64(fp);
 		lpBuffer.resize(fileSize);
 
 		// 読込
-		fseek(fp, 0, SEEK_SET);
+		_fseeki64(fp, 0, SEEK_SET);
 		fread(&lpBuffer[0], 1, fileSize, fp);
 
 		// ファイルクローズ
@@ -1179,7 +1179,7 @@ Gravisbell::ErrorCode ReadNetworkFromBinaryFile(const Layer::NeuralNetwork::ILay
 
 	// ネットワークを作成
 	S64 useBufferCount = 0;
-	*ppNeuralNetwork = pLayerDLL->CreateLayerDataFromBuffer(&lpBuffer[readByteCount], (S32)lpBuffer.size()-readByteCount, useBufferCount);
+	*ppNeuralNetwork = pLayerDLL->CreateLayerDataFromBuffer(&lpBuffer[readByteCount], (S64)lpBuffer.size()-readByteCount, useBufferCount);
 	readByteCount += useBufferCount;
 
 	return ErrorCode::ERROR_CODE_NONE;

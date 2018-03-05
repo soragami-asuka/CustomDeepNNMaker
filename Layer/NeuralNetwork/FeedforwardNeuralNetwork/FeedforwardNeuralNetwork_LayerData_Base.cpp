@@ -488,6 +488,7 @@ namespace NeuralNetwork {
 	{
 		this->tmp_lpInputDataStruct = i_lpInputDataStruct;
 		this->tmp_inputLayerCount = i_inputLayerCount;
+		this->tmp_lpOutputDataStruct.clear();
 
 		return this->GetOutputDataStruct(i_guid);
 	}
@@ -496,12 +497,21 @@ namespace NeuralNetwork {
 		@return	入力データ構造が不正な場合(x=0,y=0,z=0,ch=0)が返る. */
 	IODataStruct FeedforwardNeuralNetwork_LayerData_Base::GetOutputDataStruct(const Gravisbell::GUID& i_guid)
 	{
+		// 既に計算済みのレイヤーか確認する
+		{
+			auto it_layer = this->tmp_lpOutputDataStruct.find(i_guid);
+			if(it_layer != this->tmp_lpOutputDataStruct.end())
+				return it_layer->second;
+		}
+
 		if(i_guid == this->inputLayerGUID)
-			return this->tmp_lpInputDataStruct[0];
+		{
+			return this->tmp_lpOutputDataStruct[i_guid] = this->tmp_lpInputDataStruct[0];
+		}
 
 		auto pConnectLayer = this->GetLayerByGUID(i_guid);
 		if(pConnectLayer == NULL)
-			return IODataStruct(0,0,0,0);;
+			return this->tmp_lpOutputDataStruct[i_guid] = IODataStruct(0,0,0,0);
 
 		// 入力レイヤー
 		std::vector<IODataStruct> lpInputDataStruct(pConnectLayer->lpInputLayerGUID.size());
@@ -509,7 +519,7 @@ namespace NeuralNetwork {
 		{
 			lpInputDataStruct[inputLayerNum] = this->GetOutputDataStruct(pConnectLayer->lpInputLayerGUID[inputLayerNum]);
 			if(lpInputDataStruct[inputLayerNum].GetDataCount() == 0)
-				return IODataStruct(0,0,0,0);
+				return this->tmp_lpOutputDataStruct[i_guid] = IODataStruct(0,0,0,0);
 		}
 		// バイパスレイヤー
 		std::vector<IODataStruct> lpBypassDataStruct(pConnectLayer->lpBypassLayerGUID.size());
@@ -517,11 +527,11 @@ namespace NeuralNetwork {
 		{
 			lpBypassDataStruct[inputLayerNum] = this->GetOutputDataStruct(pConnectLayer->lpBypassLayerGUID[inputLayerNum]);
 			if(lpBypassDataStruct[inputLayerNum].GetDataCount() == 0)
-				return IODataStruct(0,0,0,0);
+				return this->tmp_lpOutputDataStruct[i_guid] = IODataStruct(0,0,0,0);
 		}
 
 		if(lpInputDataStruct.size() == 0)
-			return IODataStruct(0,0,0,0);
+			return this->tmp_lpOutputDataStruct[i_guid] = IODataStruct(0,0,0,0);
 
 		// 入力が複数ある場合
 		if(lpInputDataStruct.size() > 1)
@@ -529,7 +539,7 @@ namespace NeuralNetwork {
 			// 複数入力を受け付けているかチェック
 			if(pConnectLayer->pLayerData->CheckCanUseInputDataStruct(&lpInputDataStruct[0], (U32)lpInputDataStruct.size()))
 			{
-				return pConnectLayer->pLayerData->GetOutputDataStruct(&lpInputDataStruct[0], (U32)lpInputDataStruct.size());
+				return this->tmp_lpOutputDataStruct[i_guid] = pConnectLayer->pLayerData->GetOutputDataStruct(&lpInputDataStruct[0], (U32)lpInputDataStruct.size());
 			}
 			else
 			{
@@ -537,18 +547,18 @@ namespace NeuralNetwork {
 				IODataStruct inputDataStruct = lpInputDataStruct[0];
 				for(U32 layerNum=1; layerNum<lpInputDataStruct.size(); layerNum++)
 				{
-					if(inputDataStruct.x != lpInputDataStruct[layerNum].x)	return IODataStruct(0,0,0,0);
-					if(inputDataStruct.y != lpInputDataStruct[layerNum].y)	return IODataStruct(0,0,0,0);
-					if(inputDataStruct.z != lpInputDataStruct[layerNum].z)	return IODataStruct(0,0,0,0);
+					if(inputDataStruct.x != lpInputDataStruct[layerNum].x)	return this->tmp_lpOutputDataStruct[i_guid] = IODataStruct(0,0,0,0);
+					if(inputDataStruct.y != lpInputDataStruct[layerNum].y)	return this->tmp_lpOutputDataStruct[i_guid] = IODataStruct(0,0,0,0);
+					if(inputDataStruct.z != lpInputDataStruct[layerNum].z)	return this->tmp_lpOutputDataStruct[i_guid] = IODataStruct(0,0,0,0);
 
 					inputDataStruct.ch += lpInputDataStruct[layerNum].ch;
 				}
 
-				return pConnectLayer->pLayerData->GetOutputDataStruct(&inputDataStruct, 1);
+				return this->tmp_lpOutputDataStruct[i_guid] = pConnectLayer->pLayerData->GetOutputDataStruct(&inputDataStruct, 1);
 			}
 		}
 
-		return pConnectLayer->pLayerData->GetOutputDataStruct(&lpInputDataStruct[0], 1);
+		return this->tmp_lpOutputDataStruct[i_guid] = pConnectLayer->pLayerData->GetOutputDataStruct(&lpInputDataStruct[0], 1);
 	}
 
 	/** 出力データ構造を取得する.
