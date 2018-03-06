@@ -16,6 +16,7 @@ call ConvertNNConfigToSource.exe "./BatchNormalizationAll/Config.xml" "./BatchNo
 call ConvertNNConfigToSource.exe "./Normalization_Scale/Config.xml" "./Normalization_Scale/" "Normalization_Scale"
 call ConvertNNConfigToSource.exe "./SeparateOutput/Config.xml" "./SeparateOutput/" "SeparateOutput"
 call ConvertNNConfigToSource.exe "./ChooseChannel/Config.xml" "./ChooseChannel/" "ChooseChannel"
+call ConvertNNConfigToSource.exe "./ChooseBox/Config.xml" "./ChooseBox/" "ChooseBox"
 call ConvertNNConfigToSource.exe "./Reshape/Config.xml" "./Reshape/" "Reshape"
 call ConvertNNConfigToSource.exe "./Reshape_MirrorX/Config.xml" "./Reshape_MirrorX/" "Reshape_MirrorX"
 call ConvertNNConfigToSource.exe "./Reshape_SquaresCenterCross/Config.xml" "./Reshape_SquaresCenterCross/" "Reshape_SquaresCenterCross"

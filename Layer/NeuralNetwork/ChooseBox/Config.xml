@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="14086A2C-2B99-4849-BC19-B2238BBDA5B7" version="1.0.0.0" default-language="ja">
+
+  <SourceName>ChooseBox</SourceName>
+  <Name>入力信号から特定XYZ区間を抽出する</Name>
+  <Text>入力信号から特定XYZ区間を抽出する.&#x0A;</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+
+    <Vector3D type="Int" id="startPosition">
+      <Name>開始位置</Name>
+      <Text></Text>
+      <Min>
+        <x>0</x>
+        <y>0</y>
+        <z>0</z>
+      </Min>
+      <Max>
+        <x>65535</x>
+        <y>65535</y>
+        <z>65535</z>
+      </Max>
+      <Default>
+        <x>0</x>
+        <y>0</y>
+        <z>0</z>
+      </Default>
+    </Vector3D>
+
+    <Vector3D type="Int" id="boxSize">
+      <Name>抽出XYZサイズ</Name>
+      <Text></Text>
+      <Min>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
+      </Min>
+      <Max>
+        <x>65535</x>
+        <y>65535</y>
+        <z>65535</z>
+      </Max>
+      <Default>
+        <x>0</x>
+        <y>0</y>
+        <z>0</z>
+      </Default>
+    </Vector3D>
+
+  </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <Learn>
+
+  </Learn>
+
+</Config>

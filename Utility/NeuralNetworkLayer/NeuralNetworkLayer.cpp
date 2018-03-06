@@ -867,6 +867,48 @@ Layer::ILayerData* CreateChooseChannelLayer(
 }
 
 
+/** XYZ抽出レイヤー. 入力されたレイヤーの特定XYZ区間を抽出する. 入力/出力データ構造でCHは同じサイズ.
+	@param	startPosition	開始XYZ位置.
+	@param	boxSize			抽出XYZ数. */
+Layer::ILayerData* CreateChooseBoxLayer(
+	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+	Vector3D<S32> startPosition, Vector3D<S32> boxSize)
+{
+	const Gravisbell::GUID TYPE_CODE(0x14086a2c, 0x2b99, 0x4849, 0xbc, 0x19, 0xb2, 0x23, 0x8b, 0xbd, 0xa5, 0xb7);
+
+	// DLL取得
+	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(TYPE_CODE);
+	if(pLayerDLL == NULL)
+		return NULL;
+
+	// 設定の作成
+	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
+	if(pConfig == NULL)
+		return NULL;
+
+	// 開始チャンネル番号
+	{
+		SettingData::Standard::IItem_Vector3D<S32>* pItem = dynamic_cast<SettingData::Standard::IItem_Vector3D<S32>*>(pConfig->GetItemByID(L"startPosition"));
+		pItem->SetValue(startPosition);
+	}
+	// 出力チャンネル数
+	{
+		SettingData::Standard::IItem_Vector3D<S32>* pItem = dynamic_cast<SettingData::Standard::IItem_Vector3D<S32>*>(pConfig->GetItemByID(L"boxSize"));
+		pItem->SetValue(boxSize);
+	}
+
+	// レイヤーの作成
+	Layer::ILayerData* pLayer = layerDataManager.CreateLayerData(layerDLLManager, TYPE_CODE, boost::uuids::random_generator()().data, *pConfig);
+	if(pLayer == NULL)
+		return NULL;
+
+	// 設定情報を削除
+	delete pConfig;
+
+	return pLayer;
+}
+
+
 /** 出力データ構造変換レイヤー.
 	@param	ch	CH数.
 	@param	x	X軸.

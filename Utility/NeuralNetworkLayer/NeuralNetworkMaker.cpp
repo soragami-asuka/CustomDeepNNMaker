@@ -242,6 +242,18 @@ namespace NeuralNetworkLayer {
 				false);
 		}
 
+		/** XYZ抽出レイヤー. 入力されたレイヤーの特定XYZ区間を抽出する. 入力/出力データ構造でCHは同じサイズ.
+			@param	startPosition	開始XYZ位置.
+			@param	boxSize			抽出XYZ数. */
+		Gravisbell::GUID AddChooseBoxLayer(const Gravisbell::GUID& i_inputLayerGUID, Vector3D<S32> startPosition, Vector3D<S32> boxSize)
+		{
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateChooseBoxLayer(layerDLLManager, layerDataManager, startPosition, boxSize),
+				false);
+		}
+
+
 		/** 出力データ構造変換レイヤー.
 			@param	ch	CH数.
 			@param	x	X軸.

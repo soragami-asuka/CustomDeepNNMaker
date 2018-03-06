@@ -177,6 +177,14 @@ namespace NeuralNetworkLayer {
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 		U32 startChannelNo, U32 channelCount);
 
+	/** XYZ抽出レイヤー. 入力されたレイヤーの特定XYZ区間を抽出する. 入力/出力データ構造でCHは同じサイズ.
+		@param	startPosition	開始XYZ位置.
+		@param	boxSize			抽出XYZ数. */
+	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+	Layer::ILayerData* CreateChooseBoxLayer(
+		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+		Vector3D<S32> startPosition, Vector3D<S32> boxSize);
+
 	/** 出力データ構造変換レイヤー.
 		@param	ch	CH数.
 		@param	x	X軸.

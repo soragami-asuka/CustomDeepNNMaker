@@ -110,6 +110,11 @@ namespace NeuralNetworkLayer {
 			@param	i_channelCount		抽出チャンネル数. */
 		virtual Gravisbell::GUID AddChooseChannelLayer(const Gravisbell::GUID& i_inputLayerGUID, U32 i_startChannelNo, U32 i_channelCount) = 0;
 
+		/** XYZ抽出レイヤー. 入力されたレイヤーの特定XYZ区間を抽出する. 入力/出力データ構造でCHは同じサイズ.
+			@param	startPosition	開始XYZ位置.
+			@param	boxSize			抽出XYZ数. */
+		virtual Gravisbell::GUID AddChooseBoxLayer(const Gravisbell::GUID& i_inputLayerGUID, Vector3D<S32> startPosition, Vector3D<S32> boxSize) = 0;
+
 		/** 出力データ構造変換レイヤー.
 			@param	ch	CH数.
 			@param	x	X軸.
