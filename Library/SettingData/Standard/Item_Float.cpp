@@ -185,6 +185,11 @@ namespace Standard {
 		// 構造体を利用したデータの取り扱い.
 		// 情報量が少ない代わりにアクセス速度が速い
 		//================================
+		/** アライメントのサイズを取得する */
+		U64 GetAlignmentByteCount()const
+		{
+			return sizeof(this->value);
+		}
 
 		/** 構造体に書き込む.
 			@return	使用したバイト数. */

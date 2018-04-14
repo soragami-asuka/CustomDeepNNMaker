@@ -302,6 +302,9 @@ namespace Standard {
 				if(pItemBase == NULL)
 					continue;
 
+				U64 alignmentSize = pItemBase->GetAlignmentByteCount();
+				bufferPos = (bufferPos + alignmentSize-1)/alignmentSize * alignmentSize;
+
 				bufferPos += pItemBase->WriteToStruct(&o_lpBuffer[bufferPos]);
 			}
 
@@ -319,6 +322,9 @@ namespace Standard {
 				IItemBase* pItemBase = this->GetItemByNum(itemNum);
 				if(pItemBase == NULL)
 					continue;
+
+				U64 alignmentSize = pItemBase->GetAlignmentByteCount();
+				bufferPos = (bufferPos + alignmentSize-1)/alignmentSize * alignmentSize;
 
 				bufferPos += pItemBase->ReadFromStruct(&i_lpBuffer[bufferPos]);
 			}
