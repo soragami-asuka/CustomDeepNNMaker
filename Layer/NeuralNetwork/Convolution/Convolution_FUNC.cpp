@@ -74,6 +74,13 @@ namespace DefaultLanguage
             }
         },
         {
+            L"Dilation",
+            {
+                L"入力拡張量",
+                L"入力信号のスキップ幅",
+            }
+        },
+        {
             L"Padding",
             {
                 L"パディングサイズ",
@@ -251,6 +258,19 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			L"Stride",
 			CurrentLanguage::g_lpItemData_LayerStructure[L"Stride"].name.c_str(),
 			CurrentLanguage::g_lpItemData_LayerStructure[L"Stride"].text.c_str(),
+			1, 1, 1,
+			65535, 65535, 65535,
+			1, 1, 1));
+
+	/** Name : 入力拡張量
+	  * ID   : Dilation
+	  * Text : 入力信号のスキップ幅
+	  */
+	pLayerConfig->AddItem(
+		Gravisbell::SettingData::Standard::CreateItem_Vector3D_Int(
+			L"Dilation",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"Dilation"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"Dilation"].text.c_str(),
 			1, 1, 1,
 			65535, 65535, 65535,
 			1, 1, 1));

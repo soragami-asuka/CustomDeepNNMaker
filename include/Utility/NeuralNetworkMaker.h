@@ -48,6 +48,19 @@ namespace NeuralNetworkLayer {
 			Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize,
 			const wchar_t i_szInitializerID[] = L"glorot_uniform") = 0;
 
+		/** 入力拡張畳込みニューラルネットワークレイヤー.
+			@param	i_inputLayerGUID		追加レイヤーの入力先レイヤーのGUID.
+			@param	i_filterSize			フィルタサイズ.
+			@param	i_outputChannelCount	フィルタの個数.
+			@param	i_dilation				入力の拡張量.
+			@param	i_stride				フィルタの移動量.
+			@param	i_paddingSize			パディングサイズ. */
+		virtual Gravisbell::GUID AddDilatedConvolutionLayer(
+			const Gravisbell::GUID& i_inputLayerGUID,
+			Vector3D<S32> i_filterSize, U32 i_outputChannelCount, Vector3D<S32> i_dilation, Vector3D<S32> i_stride, Vector3D<S32> i_paddingSize,
+			const wchar_t i_szInitializerID[] = L"glorot_uniform") = 0;
+
+
 		/** 全結合ニューラルネットワークレイヤー.
 			@param	i_inputLayerGUID		追加レイヤーの入力先レイヤーのGUID.
 			@param	i_neuronCount			ニューロン数. */

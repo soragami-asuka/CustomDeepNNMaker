@@ -68,6 +68,20 @@ namespace NeuralNetworkLayer {
 		U32 inputChannelCount, Vector3D<S32> filterSize, U32 outputChannelCount, Vector3D<S32> stride, Vector3D<S32> paddingSize,
 		const wchar_t i_szInitializerID[] = L"glorot_uniform");
 
+	/** 入力拡張畳込みニューラルネットワークレイヤー.
+		@param	layerDLLManager		レイヤーDLL管理クラス.
+		@param	inputDataStruct		入力データ構造.
+		@param	filterSize			フィルタサイズ.
+		@param	outputChannelCount	フィルタの個数.
+		@param	dilation			入力の拡張量
+		@param	stride				フィルタの移動量.
+		@param	paddingSize			パディングサイズ. */
+	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+	Layer::ILayerData* CreateDilatedConvolutionLayer(
+		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+		U32 inputChannelCount, Vector3D<S32> filterSize, U32 outputChannelCount, Vector3D<S32> dilation, Vector3D<S32> stride, Vector3D<S32> paddingSize,
+		const wchar_t i_szInitializerID[] = L"glorot_uniform");
+
 	/** 全結合ニューラルネットワークレイヤー.
 		@param	layerDLLManager		レイヤーDLL管理クラス.
 		@param	inputDataStruct		入力データ構造.

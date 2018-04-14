@@ -203,9 +203,9 @@ namespace NeuralNetwork {
 			dimPadding[2] = this->layerData.layerStructure.Padding.x;
 
 			dimUpscale.resize(convDim);
-			dimUpscale[0] = 1;
-			dimUpscale[1] = 1;
-			dimUpscale[2] = 1;
+			dimUpscale[0] = this->layerData.layerStructure.Dilation.z;
+			dimUpscale[1] = this->layerData.layerStructure.Dilation.y;
+			dimUpscale[2] = this->layerData.layerStructure.Dilation.x;
 
 			dimStride.resize(convDim);
 			dimStride[0] = this->layerData.layerStructure.Stride.z;
@@ -257,8 +257,8 @@ namespace NeuralNetwork {
 			dimPadding[1] = this->layerData.layerStructure.Padding.x;
 
 			dimUpscale.resize(convDim);
-			dimUpscale[0] = 1;
-			dimUpscale[1] = 1;
+			dimUpscale[0] = this->layerData.layerStructure.Dilation.y;
+			dimUpscale[1] = this->layerData.layerStructure.Dilation.x;
 
 			dimStride.resize(convDim);
 			dimStride[0] = this->layerData.layerStructure.Stride.y;
@@ -303,7 +303,7 @@ namespace NeuralNetwork {
 			dimPadding[0] = this->layerData.layerStructure.Padding.x;
 
 			dimUpscale.resize(convDim);
-			dimUpscale[0] = 1;
+			dimUpscale[0] = this->layerData.layerStructure.Dilation.x;
 
 			dimStride.resize(convDim);
 			dimStride[0] = this->layerData.layerStructure.Stride.x;

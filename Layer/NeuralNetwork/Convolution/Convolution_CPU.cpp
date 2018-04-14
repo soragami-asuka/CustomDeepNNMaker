@@ -250,19 +250,19 @@ namespace NeuralNetwork {
 							{
 								for(S32 filterZ=0; filterZ<this->layerData.layerStructure.FilterSize.z; filterZ++)
 								{
-									const S32 inputZ = (S32)(convZ * this->layerData.layerStructure.Stride.z + filterZ - this->layerData.layerStructure.Padding.z);
+									const S32 inputZ = (S32)(convZ * this->layerData.layerStructure.Stride.z + filterZ*this->layerData.layerStructure.Dilation.z - this->layerData.layerStructure.Padding.z);
 									if((U32)inputZ >= this->GetInputDataStruct().z)
 										continue;
 
 									for(S32 filterY=0; filterY<this->layerData.layerStructure.FilterSize.y; filterY++)
 									{
-										const S32 inputY = (S32)(convY * this->layerData.layerStructure.Stride.y + filterY - this->layerData.layerStructure.Padding.y);
+										const S32 inputY = (S32)(convY * this->layerData.layerStructure.Stride.y + filterY*this->layerData.layerStructure.Dilation.y - this->layerData.layerStructure.Padding.y);
 										if((U32)inputY >= this->GetInputDataStruct().y)
 											continue;
 
 										for(S32 filterX=0; filterX<this->layerData.layerStructure.FilterSize.x; filterX++)
 										{
-											const S32 inputX = (S32)(convX * this->layerData.layerStructure.Stride.x + filterX - this->layerData.layerStructure.Padding.x);
+											const S32 inputX = (S32)(convX * this->layerData.layerStructure.Stride.x + filterX*this->layerData.layerStructure.Dilation.x - this->layerData.layerStructure.Padding.x);
 											if((U32)inputX >= this->GetInputDataStruct().x)
 												continue;
 
@@ -345,19 +345,19 @@ namespace NeuralNetwork {
 							{
 								for(S32 filterZ=0; filterZ<this->layerData.layerStructure.FilterSize.z; filterZ++)
 								{
-									const S32 inputZ = (S32)((convZ * this->layerData.layerStructure.Stride.z) - this->layerData.layerStructure.Padding.z + filterZ);
+									const S32 inputZ = (S32)((convZ * this->layerData.layerStructure.Stride.z) - this->layerData.layerStructure.Padding.z + filterZ*this->layerData.layerStructure.Dilation.z);
 									if((U32)inputZ>=this->GetInputDataStruct().z)
 										continue;
 
 									for(S32 filterY=0; filterY<this->layerData.layerStructure.FilterSize.y; filterY++)
 									{
-										const S32 inputY = (S32)((convY * this->layerData.layerStructure.Stride.y) - this->layerData.layerStructure.Padding.y + filterY);
+										const S32 inputY = (S32)((convY * this->layerData.layerStructure.Stride.y) - this->layerData.layerStructure.Padding.y + filterY*this->layerData.layerStructure.Dilation.y);
 										if((U32)inputY>=this->GetInputDataStruct().y)
 											continue;
 
 										for(S32 filterX=0; filterX<this->layerData.layerStructure.FilterSize.x; filterX++)
 										{
-											const S32 inputX = (S32)((convX * this->layerData.layerStructure.Stride.x) - this->layerData.layerStructure.Padding.x + filterX);
+											const S32 inputX = (S32)((convX * this->layerData.layerStructure.Stride.x) - this->layerData.layerStructure.Padding.x + filterX*this->layerData.layerStructure.Dilation.x);
 											if((U32)inputX>=this->GetInputDataStruct().x)
 												continue;
 

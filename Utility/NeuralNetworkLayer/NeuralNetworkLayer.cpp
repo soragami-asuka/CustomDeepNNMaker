@@ -146,6 +146,84 @@ Layer::ILayerData* CreateConvolutionLayer(
 
 	return pLayer;
 }
+/** 入力拡張畳込みニューラルネットワークレイヤー.
+	@param	layerDLLManager		レイヤーDLL管理クラス.
+	@param	inputDataStruct		入力データ構造.
+	@param	filterSize			フィルタサイズ.
+	@param	outputChannelCount	フィルタの個数.
+	@param	dilation			入力の拡張量
+	@param	stride				フィルタの移動量.
+	@param	paddingSize			パディングサイズ. */
+GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+Layer::ILayerData* CreateDilatedConvolutionLayer(
+	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+	U32 inputChannelCount, Vector3D<S32> filterSize, U32 outputChannelCount, Vector3D<S32> dilation, Vector3D<S32> stride, Vector3D<S32> paddingSize,
+	const wchar_t i_szInitializerID[])
+{
+	const Gravisbell::GUID TYPE_CODE(0xf6662e0e, 0x1ca4, 0x4d59, 0xac, 0xca, 0xca, 0xc2, 0x9a, 0x16, 0xc0, 0xaa);
+
+	// DLL取得
+	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(TYPE_CODE);
+	if(pLayerDLL == NULL)
+		return NULL;
+
+	// 設定の作成
+	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
+	if(pConfig == NULL)
+		return NULL;
+	// 入力チャンネル数
+	{
+		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"Input_Channel"));
+		pItem->SetValue(inputChannelCount);
+	}
+	// フィルタサイズ
+	{
+		SettingData::Standard::IItem_Vector3D_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Vector3D_Int*>(pConfig->GetItemByID(L"FilterSize"));
+		pItem->SetValue(filterSize);
+	}
+	// 出力チャンネル数
+	{
+		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"Output_Channel"));
+		pItem->SetValue(outputChannelCount);
+	}
+	// 入力拡張量
+	{
+		SettingData::Standard::IItem_Vector3D_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Vector3D_Int*>(pConfig->GetItemByID(L"Dilation"));
+		pItem->SetValue(dilation);
+	}
+	// フィルタ移動量
+	{
+		SettingData::Standard::IItem_Vector3D_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Vector3D_Int*>(pConfig->GetItemByID(L"Stride"));
+		pItem->SetValue(stride);
+	}
+	// パディングサイズ
+	{
+		SettingData::Standard::IItem_Vector3D_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Vector3D_Int*>(pConfig->GetItemByID(L"Padding"));
+		pItem->SetValue(paddingSize);
+	}
+	// パディング種別
+	{
+		SettingData::Standard::IItem_Enum* pItem = dynamic_cast<SettingData::Standard::IItem_Enum*>(pConfig->GetItemByID(L"PaddingType"));
+		pItem->SetValue(L"zero");
+	}
+	// 初期化方法
+	{
+		SettingData::Standard::IItem_String* pItem = dynamic_cast<SettingData::Standard::IItem_String*>(pConfig->GetItemByID(L"Initializer"));
+		pItem->SetValue(i_szInitializerID);
+	}
+
+	// レイヤーの作成
+	Layer::ILayerData* pLayer = layerDataManager.CreateLayerData(layerDLLManager, TYPE_CODE, boost::uuids::random_generator()().data, *pConfig);
+	if(pLayer == NULL)
+		return NULL;
+
+	// 設定情報を削除
+	delete pConfig;
+
+	return pLayer;
+}
+
+
 Layer::ILayerData* CreateFullyConnectLayer(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 	U32 inputBufferCount, U32 neuronCount,

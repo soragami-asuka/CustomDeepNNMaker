@@ -45,6 +45,12 @@ namespace Convolution {
 		  */
 		Vector3D<S32> Stride;
 
+		/** Name : 入力拡張量
+		  * ID   : Dilation
+		  * Text : 入力信号のスキップ幅
+		  */
+		Vector3D<S32> Dilation;
+
 		/** Name : パディングサイズ
 		  * ID   : Padding
 		  */

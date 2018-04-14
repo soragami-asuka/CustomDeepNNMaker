@@ -160,9 +160,9 @@ namespace NeuralNetwork {
 
 		IODataStruct outputDataStruct;
 
-		outputDataStruct.x  = (S32)ceilf((F32)((i_lpInputDataStruct[0].x + this->layerStructure.Padding.x*2 - (this->layerStructure.FilterSize.x - 1)) / this->layerStructure.Stride.x));
-		outputDataStruct.y  = (S32)ceilf((F32)((i_lpInputDataStruct[0].y + this->layerStructure.Padding.y*2 - (this->layerStructure.FilterSize.y - 1)) / this->layerStructure.Stride.y));
-		outputDataStruct.z  = (S32)ceilf((F32)((i_lpInputDataStruct[0].z + this->layerStructure.Padding.z*2 - (this->layerStructure.FilterSize.z - 1)) / this->layerStructure.Stride.z));
+		outputDataStruct.x  = (S32)ceilf((F32)((i_lpInputDataStruct[0].x + this->layerStructure.Padding.x*2 - ((this->layerStructure.FilterSize.x-1)*this->layerStructure.Dilation.x+1 - 1)) / this->layerStructure.Stride.x));
+		outputDataStruct.y  = (S32)ceilf((F32)((i_lpInputDataStruct[0].y + this->layerStructure.Padding.y*2 - ((this->layerStructure.FilterSize.y-1)*this->layerStructure.Dilation.y+1 - 1)) / this->layerStructure.Stride.y));
+		outputDataStruct.z  = (S32)ceilf((F32)((i_lpInputDataStruct[0].z + this->layerStructure.Padding.z*2 - ((this->layerStructure.FilterSize.z-1)*this->layerStructure.Dilation.z+1 - 1)) / this->layerStructure.Stride.z));
 		outputDataStruct.ch = this->layerStructure.Output_Channel;
 
 		return outputDataStruct;

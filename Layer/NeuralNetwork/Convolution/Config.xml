@@ -73,6 +73,26 @@
       </Default>
     </Vector3D>
 
+    <Vector3D type="Int" id="Dilation">
+      <Name>入力拡張量</Name>
+      <Text>入力信号のスキップ幅</Text>
+      <Min>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
+      </Min>
+      <Max>
+        <x>65535</x>
+        <y>65535</y>
+        <z>65535</z>
+      </Max>
+      <Default>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
+      </Default>
+    </Vector3D>
+    
     <Vector3D type="Int" id="Padding">
       <Name>パディングサイズ</Name>
       <Min>
