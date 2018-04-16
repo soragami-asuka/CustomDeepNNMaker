@@ -148,6 +148,11 @@ namespace NeuralNetworkLayer {
 			@param	y	Y軸. */
 		virtual Gravisbell::GUID AddReshapeSquareZeroSideLeftTopLayer(const Gravisbell::GUID& i_inputLayerGUID, U32 x, U32 y) = 0;
 
+		/** 信号の配列から値へ変換.
+			@param	outputMinValue	出力の最小値
+			@param	outputMaxValue	出力の最大値 */
+		virtual Gravisbell::GUID AddSignalArray2ValueLayer(const Gravisbell::GUID& i_inputLayerGUID, Gravisbell::F32 outputMinValue, Gravisbell::F32 outputMaxValue) = 0;
+
 
 	protected:
 		//=============================

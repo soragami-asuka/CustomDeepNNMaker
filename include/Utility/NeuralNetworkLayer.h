@@ -231,6 +231,12 @@ namespace NeuralNetworkLayer {
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 		Gravisbell::U32 x, Gravisbell::U32 y);
 
+	/** 信号の配列から値へ変換 */
+	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+	Layer::ILayerData* CreateSignalArray2ValueLayer(
+		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+		Gravisbell::F32 outputMinValue, Gravisbell::F32 outputMaxValue);
+
 
 	/** 入力結合レイヤー. 入力されたレイヤーのCHを結合する. 入力データ構造はX,Y,Zで同じサイズである必要がある.
 		@param	layerDLLManager		レイヤーDLL管理クラス.

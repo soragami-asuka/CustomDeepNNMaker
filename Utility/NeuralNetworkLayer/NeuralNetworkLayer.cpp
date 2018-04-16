@@ -1143,6 +1143,48 @@ Layer::ILayerData* CreateReshapeSquareZeroSideLeftTopLayer(
 }
 
 
+/** 信号の配列から値へ変換 */
+GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+Layer::ILayerData* CreateSignalArray2ValueLayer(
+	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+	Gravisbell::F32 outputMinValue, Gravisbell::F32 outputMaxValue)
+{
+	const Gravisbell::GUID TYPE_CODE(0x97c8e5d3, 0xaa0e, 0x43aa, 0x96, 0xc2, 0xe7, 0xe4, 0x34, 0xf1, 0x04, 0xb8);
+
+	// DLL取得
+	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(TYPE_CODE);
+	if(pLayerDLL == NULL)
+		return NULL;
+
+	// 設定の作成
+	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
+	if(pConfig == NULL)
+		return NULL;
+
+	// 出力最小値
+	{
+		SettingData::Standard::IItem_Float* pItem = dynamic_cast<SettingData::Standard::IItem_Float*>(pConfig->GetItemByID(L"outputMinValue"));
+		pItem->SetValue(outputMinValue);
+	}
+	// 出力最大値
+	{
+		SettingData::Standard::IItem_Float* pItem = dynamic_cast<SettingData::Standard::IItem_Float*>(pConfig->GetItemByID(L"outputMaxValue"));
+		pItem->SetValue(outputMaxValue);
+	}
+
+	// レイヤーの作成
+	Layer::ILayerData* pLayer = layerDataManager.CreateLayerData(layerDLLManager, TYPE_CODE, boost::uuids::random_generator()().data, *pConfig);
+	if(pLayer == NULL)
+		return NULL;
+
+	// 設定情報を削除
+	delete pConfig;
+
+	return pLayer;
+}
+
+
+
 
 Layer::ILayerData* CreateResidualLayer(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager)

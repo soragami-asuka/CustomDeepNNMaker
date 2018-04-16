@@ -318,6 +318,15 @@ namespace NeuralNetworkLayer {
 				false);
 		}
 
+		/** 信号の配列から値へ変換 */
+		Gravisbell::GUID AddSignalArray2ValueLayer(const Gravisbell::GUID& i_inputLayerGUID, Gravisbell::F32 outputMinValue, Gravisbell::F32 outputMaxValue)
+		{
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateSignalArray2ValueLayer(layerDLLManager, layerDataManager, outputMinValue, outputMaxValue),
+				false);
+		}
+
 	protected:
 		/** 入力結合レイヤー. 入力されたレイヤーのCHを結合する. 入力データ構造はX,Y,Zで同じサイズである必要がある. */
 		Gravisbell::GUID AddMergeInputLayer(const Gravisbell::GUID lpInputLayerGUID[], U32 inputLayerCount)

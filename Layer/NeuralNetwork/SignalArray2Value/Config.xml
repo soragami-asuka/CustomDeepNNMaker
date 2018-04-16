@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="97C8E5D3-AA0E-43AA-96C2-E7E434F104B8" version="1.0.0.0" default-language="ja">
+
+  <SourceName>SignalArray2Value</SourceName>
+  <Name>信号の配列から値へ変換</Name>
+  <Text>信号の配列から値へ変換する.&#x0A;最大値を取るCH番号を値に変換する.&#x0A;出力CH数を1に強制変換.</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+
+    <Float id="outputMinValue">
+      <Name>出力最小値</Name>
+      <Min>-32767</Min>
+      <Max>32767</Max>
+      <Default>0</Default>
+    </Float>
+
+    <Float id="outputMaxValue">
+      <Name>出力最大値</Name>
+      <Min>-32767</Min>
+      <Max>32767</Max>
+      <Default>0</Default>
+    </Float>
+
+   </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <Learn>
+
+  </Learn>
+
+</Config>

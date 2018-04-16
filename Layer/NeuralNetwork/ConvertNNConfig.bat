@@ -29,6 +29,7 @@ call ConvertNNConfigToSource.exe "./MergeMultiply/Config.xml" "./MergeMultiply/"
 call ConvertNNConfigToSource.exe "./Residual/Config.xml" "./Residual/" "Residual"
 call ConvertNNConfigToSource.exe "./GaussianNoise/Config.xml" "./GaussianNoise/" "GaussianNoise"
 call ConvertNNConfigToSource.exe "./SOM/Config.xml" "./SOM/" "SOM"
+call ConvertNNConfigToSource.exe "./SignalArray2Value/Config.xml" "./SignalArray2Value/" "SignalArray2Value"
 
 
 pause
