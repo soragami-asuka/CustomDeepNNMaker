@@ -4,7 +4,8 @@
  * guid      : 97C8E5D3-AA0E-43AA-96C2-E7E434F104B8
  * 
  * Text      : 信号の配列から値へ変換する.
- *           : 出力CH数を1に強制変換.
+ *           : 最大値を取るCH番号を値に変換する.
+ *           : 入力CH数＝分解能の整数倍である必要がある.
 --------------------------------------------*/
 #ifndef __GRAVISBELL_NEURALNETWORK_LAYER_FUNC_SignalArray2Value_H__
 #define __GRAVISBELL_NEURALNETWORK_LAYER_FUNC_SignalArray2Value_H__

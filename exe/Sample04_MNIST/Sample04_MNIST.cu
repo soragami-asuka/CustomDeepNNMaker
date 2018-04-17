@@ -27,7 +27,7 @@
 
 using namespace Gravisbell;
 
-#define USE_GPU	1
+#define USE_CPU	1
 #define USE_HOST_MEMORY 1
 
 #define USE_BATCHNORM	1
@@ -83,6 +83,8 @@ int _tmain(int argc, _TCHAR* argv[])
 #ifdef _DEBUG
 	::_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_ALLOC_MEM_DF);
 #endif
+
+	boost::filesystem::path workDirPath = boost::filesystem::current_path();
 
 	//void* pValue = NULL;
 	//cudaMalloc(&pValue, 16);

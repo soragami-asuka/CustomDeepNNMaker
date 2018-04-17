@@ -190,6 +190,17 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
+
+	//==================================
+	// SOM関連処理
+	//==================================
+	/** マップサイズを取得する.
+		@return	マップのバッファ数を返す. */
+	U32 SOM_LayerData_Base::GetMapSize()const
+	{
+		return this->GetUnitCount() * this->GetInputBufferCount();
+	}
+
 } // Gravisbell;
 } // Layer;
 } // NeuralNetwork;

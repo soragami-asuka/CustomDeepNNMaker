@@ -184,7 +184,7 @@ namespace NeuralNetwork {
 					F32 matchRate=0;
 					for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
 					{
-						matchRate += this->m_lppInputBuffer[batchNum][inputNum] * this->layerData.lppUnitData[unitNo][inputNum];
+						matchRate += (this->m_lppInputBuffer[batchNum][inputNum] - this->layerData.lppUnitData[unitNo][inputNum]) * (this->m_lppInputBuffer[batchNum][inputNum] - this->layerData.lppUnitData[unitNo][inputNum]);
 					}
 
 					if(bmuNo<0 || matchRate>bmuMatchRate)
@@ -238,6 +238,9 @@ namespace NeuralNetwork {
 
 		// 誤差を計算
 		{
+			// 誤差初期化
+			memset(&this->lpDUnit[0], 0, sizeof(F32)*this->lpDUnit.size());
+
 			// 時間減衰率を計算
 			F32 timeAttenuationRate = this->GetRuntimeParameterByStructure().SOM_L0 * exp(-(S32)this->layerData.learnTime / this->GetRuntimeParameterByStructure().SOM_ramda);
 			// 距離減衰率計算量の係数を計算
@@ -245,6 +248,32 @@ namespace NeuralNetwork {
 
 			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
+				// BMUを計算
+				std::vector<F32> lpBMUPos(this->layerData.layerStructure.DimensionCount);
+				{
+					S32 bmuNo = -1;
+					F32 bmuMatchRate = 0.0f;
+
+					for(U32 unitNo=0; unitNo<this->unitCount; unitNo++)
+					{
+						F32 matchRate=0;
+						for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
+						{
+							matchRate += (this->m_lppInputBuffer[batchNum][inputNum] - this->layerData.lppUnitData[unitNo][inputNum]) * (this->m_lppInputBuffer[batchNum][inputNum] - this->layerData.lppUnitData[unitNo][inputNum]);
+						}
+
+						if(bmuNo<0 || matchRate>bmuMatchRate)
+						{
+							bmuNo = unitNo;
+							bmuMatchRate = matchRate;
+						}
+					}
+
+					// BMU番号からN次元座標に変換
+					for(U32 dimNo=0; dimNo<(U32)this->layerData.layerStructure.DimensionCount; dimNo++)
+						lpBMUPos[dimNo] = this->lpUnitPos[bmuNo][dimNo];
+				}
+
 				// ユニットごとに誤差を計算
 				for(U32 unitNo=0; unitNo<this->layerData.lppUnitData.size(); unitNo++)
 				{
@@ -252,7 +281,8 @@ namespace NeuralNetwork {
 					F32 length2 = 0.0f;
 					for(U32 dimNo=0; dimNo<(U32)this->layerData.layerStructure.DimensionCount; dimNo++)
 					{
-						length2 += pow(this->m_lppOutputBuffer[batchNum][dimNo] - this->lpUnitPos[unitNo][dimNo], 2);
+//						length2 += pow(this->m_lppOutputBuffer[batchNum][dimNo] - this->lpUnitPos[unitNo][dimNo], 2);
+						length2 += pow(lpBMUPos[dimNo] - this->lpUnitPos[unitNo][dimNo], 2);
 					}
 
 					// 距離減衰率を求める
@@ -260,6 +290,7 @@ namespace NeuralNetwork {
 
 					// 減衰率を求める
 					F32 attenuationRate = timeAttenuationRate * lengthAttenuationRate;
+//					F32 attenuationRate = 0.5f * exp(-length2*100);
 
 					// 誤差の更新
 					for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
@@ -267,6 +298,7 @@ namespace NeuralNetwork {
 						F32 dValue = this->m_lppInputBuffer[batchNum][inputNum] - this->layerData.lppUnitData[unitNo][inputNum];
 
 						this->lppDUnit[unitNo][inputNum] += attenuationRate * dValue;
+//						this->layerData.lppUnitData[unitNo][inputNum] += attenuationRate * dValue;
 					}
 				}
 			}
@@ -275,7 +307,7 @@ namespace NeuralNetwork {
 		// 誤差をユニットに加算
 		for(int i=0; i<this->layerData.lpUnitData.size(); i++)
 		{
-			this->layerData.lpUnitData[i] += this->lpDUnit[i] / this->GetBatchSize();
+			this->layerData.lpUnitData[i] += this->lpDUnit[i];
 		}
 
 		// 学習回数をカウントアップ

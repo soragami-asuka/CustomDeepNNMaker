@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\OpenCV.2.4.11\build\native\OpenCV.props" Condition="Exists('..\..\packages\OpenCV.2.4.11\build\native\OpenCV.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug_Kepler|Win32">
       <Configuration>Debug_Kepler</Configuration>
@@ -44,9 +43,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{96ADC207-C136-4150-86CD-7BAD0A179676}</ProjectGuid>
+    <ProjectGuid>{350215CA-E1A0-4B7B-906A-5B299C1328DD}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Sample06_SOM</RootNamespace>
+    <RootNamespace>Sample04b_MNIST_VALUE</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -148,7 +147,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros">
-    <NuGetPackageImportStamp>8fb73ba3</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>51a85e3b</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -368,9 +367,9 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Sample06_SOM.cpp">
+    <CudaCompile Include="Sample04b_MNIST_VALUE.cu">
       <FileType>CppCode</FileType>
-    </ClCompile>
+    </CudaCompile>
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_Maxwell|Win32'">Create</PrecompiledHeader>
@@ -383,6 +382,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_Kepler|x64'">Create</PrecompiledHeader>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="DataFormat_image.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+    <Xml Include="DataFormat_label.xml">
+      <SubType>Designer</SubType>
+    </Xml>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Layer\IOData\IODataLayer\IODataLayer.vcxproj">
@@ -456,7 +463,6 @@
     <Import Project="..\..\packages\boost_exception-vc120.1.66.0.0\build\native\boost_exception-vc120.targets" Condition="Exists('..\..\packages\boost_exception-vc120.1.66.0.0\build\native\boost_exception-vc120.targets')" />
     <Import Project="..\..\packages\boost_test_exec_monitor-vc120.1.66.0.0\build\native\boost_test_exec_monitor-vc120.targets" Condition="Exists('..\..\packages\boost_test_exec_monitor-vc120.1.66.0.0\build\native\boost_test_exec_monitor-vc120.targets')" />
     <Import Project="..\..\packages\boost-vc120.1.66.0.0\build\native\boost-vc120.targets" Condition="Exists('..\..\packages\boost-vc120.1.66.0.0\build\native\boost-vc120.targets')" />
-    <Import Project="..\..\packages\OpenCV.2.4.11\build\native\OpenCV.targets" Condition="Exists('..\..\packages\OpenCV.2.4.11\build\native\OpenCV.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -502,7 +508,5 @@
     <Error Condition="!Exists('..\..\packages\boost_exception-vc120.1.66.0.0\build\native\boost_exception-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_exception-vc120.1.66.0.0\build\native\boost_exception-vc120.targets'))" />
     <Error Condition="!Exists('..\..\packages\boost_test_exec_monitor-vc120.1.66.0.0\build\native\boost_test_exec_monitor-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost_test_exec_monitor-vc120.1.66.0.0\build\native\boost_test_exec_monitor-vc120.targets'))" />
     <Error Condition="!Exists('..\..\packages\boost-vc120.1.66.0.0\build\native\boost-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost-vc120.1.66.0.0\build\native\boost-vc120.targets'))" />
-    <Error Condition="!Exists('..\..\packages\OpenCV.2.4.11\build\native\OpenCV.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\OpenCV.2.4.11\build\native\OpenCV.props'))" />
-    <Error Condition="!Exists('..\..\packages\OpenCV.2.4.11\build\native\OpenCV.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\OpenCV.2.4.11\build\native\OpenCV.targets'))" />
   </Target>
 </Project>

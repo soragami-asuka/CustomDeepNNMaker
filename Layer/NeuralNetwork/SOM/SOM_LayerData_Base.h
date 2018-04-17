@@ -4,7 +4,7 @@
 #ifndef __SOM_DATA_BASE_H__
 #define __SOM_DATA_BASE_H__
 
-#include<Layer/ILayerData.h>
+#include<Layer/ILayerDataSOM.h>
 #include<Layer/NeuralNetwork/IOptimizer.h>
 
 #include<vector>
@@ -18,7 +18,7 @@ namespace NeuralNetwork {
 	
 	typedef F32 NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class SOM_LayerData_Base : public ILayerData
+	class SOM_LayerData_Base : public ILayerDataSOM
 	{
 	protected:
 		Gravisbell::GUID guid;	/**< レイヤーデータ識別用のGUID */
@@ -108,6 +108,19 @@ namespace NeuralNetwork {
 		ErrorCode SetOptimizerHyperParameter(const wchar_t i_parameterID[], F32 i_value);
 		ErrorCode SetOptimizerHyperParameter(const wchar_t i_parameterID[], S32 i_value);
 		ErrorCode SetOptimizerHyperParameter(const wchar_t i_parameterID[], const wchar_t i_value[]);
+
+
+		//==================================
+		// SOM関連処理
+		//==================================
+	public:
+		/** マップサイズを取得する.
+			@return	マップのバッファ数を返す. */
+		U32 GetMapSize()const;
+
+		/** マップのバッファを取得する.
+			@param	o_lpMapBuffer	マップを格納するホストメモリバッファ. GetMapSize()の戻り値の要素数が必要. */
+		virtual Gravisbell::ErrorCode GetMapBuffer(F32* o_lpMapBuffer)const = 0;
 	};
 
 } // Gravisbell;

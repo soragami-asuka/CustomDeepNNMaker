@@ -73,7 +73,7 @@
     <Float id="SOM_ramda">
       <Name>時間減衰率</Name>
       <Text>学習回数に応じた学習率の減衰率.値が高いほうが減衰率は低い</Text>
-      <Min>1.0</Min>
+      <Min>0.00000001</Min>
       <Max>65535</Max>
       <Default>2500</Default>
     </Float>
@@ -81,7 +81,7 @@
     <Float id="SOM_sigma">
       <Name>距離減衰率</Name>
       <Text>更新個体とBMUとの距離に応じた減衰率.値が高いほうが減衰率は低い</Text>
-      <Min>1.0</Min>
+      <Min>0.00000001</Min>
       <Max>65535</Max>
       <Default>10</Default>
     </Float>

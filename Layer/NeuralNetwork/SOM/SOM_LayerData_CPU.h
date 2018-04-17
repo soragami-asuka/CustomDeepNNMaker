@@ -51,6 +51,15 @@ namespace NeuralNetwork {
 		ErrorCode InitializeFromBuffer(const BYTE* i_lpBuffer, U64 i_bufferSize, S64& o_useBufferSize );
 
 
+		//==================================
+		// SOM関連処理
+		//==================================
+	public:
+		/** マップのバッファを取得する.
+			@param	o_lpMapBuffer	マップを格納するホストメモリバッファ. GetMapSize()の戻り値の要素数が必要. */
+		Gravisbell::ErrorCode GetMapBuffer(F32* o_lpMapBuffer)const;
+
+
 		//===========================
 		// レイヤー保存
 		//===========================
@@ -68,6 +77,7 @@ namespace NeuralNetwork {
 		/** レイヤーを作成する.
 			@param guid	新規生成するレイヤーのGUID. */
 		ILayerBase* CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager);
+
 	};
 
 } // Gravisbell;

@@ -129,6 +129,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.ChooseB
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.SignalArray2Value", "Layer\NeuralNetwork\SignalArray2Value\SignalArray2Value.vcxproj", "{9760483B-649B-4033-BF9C-98426A527149}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sample04b_MNIST_VALUE", "exe\Sample04b_MNIST_VALUE\Sample04b_MNIST_VALUE.vcxproj", "{350215CA-E1A0-4B7B-906A-5B299C1328DD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_Kepler|Mixed Platforms = Debug_Kepler|Mixed Platforms
@@ -1669,6 +1671,36 @@ Global
 		{9760483B-649B-4033-BF9C-98426A527149}.Release|Win32.Build.0 = Release|Win32
 		{9760483B-649B-4033-BF9C-98426A527149}.Release|x64.ActiveCfg = Release|x64
 		{9760483B-649B-4033-BF9C-98426A527149}.Release|x64.Build.0 = Release|x64
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Debug_Kepler|Mixed Platforms.ActiveCfg = Debug_Kepler|Win32
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Debug_Kepler|Mixed Platforms.Build.0 = Debug_Kepler|Win32
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Debug_Kepler|Win32.ActiveCfg = Debug_Kepler|Win32
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Debug_Kepler|Win32.Build.0 = Debug_Kepler|Win32
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Debug_Kepler|x64.ActiveCfg = Debug_Kepler|x64
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Debug_Kepler|x64.Build.0 = Debug_Kepler|x64
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Debug_Maxwell|Mixed Platforms.ActiveCfg = Debug_Maxwell|Win32
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Debug_Maxwell|Mixed Platforms.Build.0 = Debug_Maxwell|Win32
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Debug_Maxwell|Win32.ActiveCfg = Debug_Maxwell|Win32
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Debug_Maxwell|Win32.Build.0 = Debug_Maxwell|Win32
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Debug_Maxwell|x64.ActiveCfg = Debug_Maxwell|x64
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Debug_Maxwell|x64.Build.0 = Debug_Maxwell|x64
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Debug|Win32.Build.0 = Debug|Win32
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Debug|x64.ActiveCfg = Debug|x64
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Debug|x64.Build.0 = Debug|x64
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Release_Kepler|Mixed Platforms.ActiveCfg = Release_Kepler|Win32
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Release_Kepler|Mixed Platforms.Build.0 = Release_Kepler|Win32
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Release_Kepler|Win32.ActiveCfg = Release_Kepler|Win32
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Release_Kepler|Win32.Build.0 = Release_Kepler|Win32
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Release_Kepler|x64.ActiveCfg = Release_Kepler|x64
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Release_Kepler|x64.Build.0 = Release_Kepler|x64
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Release|Win32.ActiveCfg = Release|Win32
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Release|Win32.Build.0 = Release|Win32
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Release|x64.ActiveCfg = Release|x64
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1732,6 +1764,7 @@ Global
 		{96ADC207-C136-4150-86CD-7BAD0A179676} = {9DEE086C-8571-41DD-ADD4-7583EB13580A}
 		{4AA7E059-F3AC-4AEE-9E8C-C7AB8CAF3E2B} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
 		{9760483B-649B-4033-BF9C-98426A527149} = {24922AAC-CD9D-4507-AB9F-DBCC9BBCC2F8}
+		{350215CA-E1A0-4B7B-906A-5B299C1328DD} = {9DEE086C-8571-41DD-ADD4-7583EB13580A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		VisualSVNWorkingCopyRoot = .

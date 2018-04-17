@@ -316,7 +316,7 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameter(void
 			L"SOM_ramda",
 			CurrentLanguage::g_lpItemData_Learn[L"SOM_ramda"].name.c_str(),
 			CurrentLanguage::g_lpItemData_Learn[L"SOM_ramda"].text.c_str(),
-			1.0000000000000000f, 65535.0000000000000000f, 2500.0000000000000000f));
+			0.0000000099999999f, 65535.0000000000000000f, 2500.0000000000000000f));
 
 	/** Name : ãóó£å∏êäó¶
 	  * ID   : SOM_sigma
@@ -327,7 +327,7 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameter(void
 			L"SOM_sigma",
 			CurrentLanguage::g_lpItemData_Learn[L"SOM_sigma"].name.c_str(),
 			CurrentLanguage::g_lpItemData_Learn[L"SOM_sigma"].text.c_str(),
-			1.0000000000000000f, 65535.0000000000000000f, 10.0000000000000000f));
+			0.0000000099999999f, 65535.0000000000000000f, 10.0000000000000000f));
 
 	return pLayerConfig;
 }

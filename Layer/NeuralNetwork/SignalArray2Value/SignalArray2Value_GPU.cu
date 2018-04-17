@@ -44,7 +44,7 @@ namespace NeuralNetwork {
 
 		F32 teachValue = lpOutputBuffer[outputOffset] + lpDOutputBuffer[outputOffset];
 
-		U32 teachCh = (U32)((teachValue - outputMinValue) * (outputMaxValue - outputMinValue) * inputChSize + 0.5f);
+		U32 teachCh = max(0, min(inputChSize-1, (U32)((teachValue - outputMinValue) * (outputMaxValue - outputMinValue) * inputChSize + 0.5f)));
 
 		U32 inputOffset = (inputChBufferSize * inputChSize * batchNum) + (inputChBufferSize * teachCh) + bufferPos;
 
@@ -136,7 +136,7 @@ namespace NeuralNetwork {
 		this->inputChannelSize = this->GetOutputDataStruct().x * this->GetOutputDataStruct().y * this->GetOutputDataStruct().z;
 
 		/**< 入力信号のバッチごとのバッファサイズ */
-		this->inputBatchBufferSize = this->inputChannelSize * this->GetOutputDataStruct().ch;
+		this->inputBatchBufferSize = this->inputChannelSize * this->GetInputDataStruct().ch;
 
 		// 一時出力バッファ(ホストメモリ)
 		this->lpTmpOutputBuffer_h.resize(this->outputBufferCount * this->GetBatchSize());
@@ -247,12 +247,21 @@ namespace NeuralNetwork {
 			F32 alpha = -1;
 			cublasSaxpy_v2(
 				this->cublasHandle,
-				this->outputBufferCount * this->GetBatchSize(),
+				this->inputBufferCount * this->GetBatchSize(),
 				&alpha,
-				i_lppOutputBuffer,
+				i_lppInputBuffer,
 				1,
 				o_lppDInputBuffer,
 				1);
+			
+#if _DEBUG
+			std::vector<F32> lpOutputBuffer(this->outputBufferCount * this->GetBatchSize());
+			cudaMemcpy(&lpOutputBuffer[0], i_lppOutputBuffer, sizeof(F32) * this->outputBufferCount * this->GetBatchSize(), cudaMemcpyDeviceToHost);
+
+			std::vector<F32> lpDInputBuffer(this->inputBufferCount * this->GetBatchSize());
+			cudaMemcpy(&lpDInputBuffer[0], o_lppDInputBuffer, sizeof(F32) * this->inputBufferCount * this->GetBatchSize(), cudaMemcpyDeviceToHost);
+#endif
+
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;

@@ -418,6 +418,7 @@
     <ClInclude Include="..\..\..\include\Common\VersionCode.h" />
     <ClInclude Include="..\..\..\include\Layer\ILayerBase.h" />
     <ClInclude Include="..\..\..\include\Layer\ILayerData.h" />
+    <ClInclude Include="..\..\..\include\Layer\ILayerDataSOM.h" />
     <ClInclude Include="..\..\..\include\Layer\IOData\IDataLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer.h" />
     <ClInclude Include="..\..\..\include\Layer\IO\IInputLayer.h" />

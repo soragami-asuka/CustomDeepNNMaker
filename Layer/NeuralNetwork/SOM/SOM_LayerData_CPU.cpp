@@ -120,6 +120,19 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
+	
+	//==================================
+	// SOM関連処理
+	//==================================
+	/** マップのバッファを取得する.
+		@param	o_lpMapBuffer	マップを格納するホストメモリバッファ. GetMapSize()の戻り値の要素数が必要. */
+	Gravisbell::ErrorCode SOM_LayerData_CPU::GetMapBuffer(F32* o_lpMapBuffer)const
+	{
+		memcpy(o_lpMapBuffer, &this->lpUnitData[0], sizeof(F32)*this->GetMapSize());
+
+		return Gravisbell::ErrorCode::ERROR_CODE_NONE;
+	}
+
 
 	//===========================
 	// レイヤー保存

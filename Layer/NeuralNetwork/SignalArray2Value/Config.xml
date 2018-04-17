@@ -13,7 +13,7 @@
 
   <SourceName>SignalArray2Value</SourceName>
   <Name>信号の配列から値へ変換</Name>
-  <Text>信号の配列から値へ変換する.&#x0A;最大値を取るCH番号を値に変換する.&#x0A;出力CH数を1に強制変換.</Text>
+  <Text>信号の配列から値へ変換する.&#x0A;最大値を取るCH番号を値に変換する.&#x0A;入力CH数＝分解能の整数倍である必要がある.</Text>
 
   <!--レイヤーのデータ構造-->
   <Structure>
@@ -32,6 +32,29 @@
       <Default>0</Default>
     </Float>
 
+    <Int id="resolution">
+      <Name>分解能</Name>
+      <Min>2</Min>
+      <Max>65535</Max>
+      <Default>2</Default>
+    </Int>
+
+    <Enum id="allocationType">
+      <Name>割り当て種別</Name>
+      <Text>CH番号→値に変換するための変換方法</Text>
+      <Items>
+        <Item id="max">
+          <Name>最大値</Name>
+          <Text>CH内の最大値を出力する</Text>
+        </Item>
+        <Item id="average">
+          <Name>平均</Name>
+          <Text>CH番号とCHの値を掛け合わせた値の平均値を出力する(相加平均)</Text>
+        </Item>
+      </Items>
+      <Default>max</Default>
+    </Enum>
+    
    </Structure>
 
   <!--学習に使用するデータの構造-->

@@ -147,7 +147,7 @@ namespace NeuralNetwork {
 						F32 maxValue = this->lppBatchInputBuffer[batchNum][inputOffset];
 						U32 maxCh = 0;
 
-						for(U32 ch=1; ch<this->GetOutputDataStruct().ch; ch++)
+						for(U32 ch=1; ch<this->GetInputDataStruct().ch; ch++)
 						{
 							inputOffset  = this->GetInputDataStruct().POSITION_TO_OFFSET(x, y, z, ch);
 							F32 value = this->lppBatchInputBuffer[batchNum][inputOffset];
@@ -217,7 +217,7 @@ namespace NeuralNetwork {
 
 							// ³‰ð‚ð‹‚ß‚é
 							F32 trueValue = this->lppBatchOutputBuffer[batchNum][outputOffset] + this->lppBatchDOutputBuffer[batchNum][outputOffset];
-							U32 truePos = (U32)( std::max<F32>(0.0f, std::min<F32>(1.0f, (trueValue - this->layerData.layerStructure.outputMinValue) * (this->layerData.layerStructure.outputMaxValue - this->layerData.layerStructure.outputMinValue))) * this->GetInputDataStruct().ch + 0.5f);
+							U32 truePos = std::max<U32>(0, std::min<U32>(this->GetInputDataStruct().ch-1, (U32)((trueValue - this->layerData.layerStructure.outputMinValue) * (this->layerData.layerStructure.outputMaxValue - this->layerData.layerStructure.outputMinValue) * this->GetInputDataStruct().ch + 0.5f)));
 
 							for(U32 ch=0; ch<this->GetInputDataStruct().ch; ch++)
 							{
@@ -228,15 +228,16 @@ namespace NeuralNetwork {
 						}
 					}
 				}
+#if _DEBUG
+				std::vector<F32> lpDOutputBuffer(this->outputBufferCount);
+				memcpy(&lpDOutputBuffer[0], this->lppBatchDOutputBuffer[batchNum], sizeof(F32) * this->outputBufferCount);
+
+				std::vector<F32> lpDInputBuffer(this->inputBufferCount);
+				memcpy(&lpDInputBuffer[0], this->lppBatchDInputBuffer[batchNum], sizeof(F32) * this->inputBufferCount);
+#endif
+
 			}
 
-#if _DEBUG
-			std::vector<F32> lpDOutputBuffer(this->outputBufferCount);
-			memcpy(&lpDOutputBuffer[0], this->lppBatchDOutputBuffer[batchNum], sizeof(F32) * this->outputBufferCount);
-
-			std::vector<F32> lpDInputBuffer(this->inputBufferCount);
-			memcpy(&lpDInputBuffer[0], this->lppBatchDInputBuffer[batchNum], sizeof(F32) * this->inputBufferCount);
-#endif
 		}
 
 		return ErrorCode::ERROR_CODE_NONE;

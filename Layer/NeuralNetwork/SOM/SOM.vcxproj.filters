@@ -186,6 +186,9 @@
     <ClInclude Include="..\_LayerBase\ILayerCore.h">
       <Filter>LayerBase</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\ILayerDataSOM.h">
+      <Filter>include\Layer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

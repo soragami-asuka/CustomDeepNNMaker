@@ -4,7 +4,8 @@
  * guid      : 97C8E5D3-AA0E-43AA-96C2-E7E434F104B8
  * 
  * Text      : 信号の配列から値へ変換する.
- *           : 出力CH数を1に強制変換.
+ *           : 最大値を取るCH番号を値に変換する.
+ *           : 入力CH数＝分解能の整数倍である必要がある.
 --------------------------------------------*/
 #include"stdafx.h"
 
@@ -39,7 +40,7 @@ namespace DefaultLanguage
     static const StringData g_baseData = 
     {
         L"信号の配列から値へ変換",
-        L"信号の配列から値へ変換する.\n出力CH数を1に強制変換."
+        L"信号の配列から値へ変換する.\n最大値を取るCH番号を値に変換する.\n入力CH数＝分解能の整数倍である必要がある."
     };
 
 
@@ -60,12 +61,45 @@ namespace DefaultLanguage
                 L"",
             }
         },
+        {
+            L"resolution",
+            {
+                L"分解能",
+                L"",
+            }
+        },
+        {
+            L"allocationType",
+            {
+                L"割り当て種別",
+                L"CH番号→値に変換するための変換方法",
+            }
+        },
     };
 
 
     /** ItemData Layer Structure Enum <id, enumID, StringData> */
     static const std::map<std::wstring, std::map<std::wstring, StringData>> g_lpItemDataEnum_LayerStructure =
     {
+        {
+            L"allocationType",
+            {
+                {
+                    L"max",
+                    {
+                        L"最大値",
+                        L"CH内の最大値を出力する",
+                    },
+                },
+                {
+                    L"average",
+                    {
+                        L"平均",
+                        L"CH番号とCHの値を掛け合わせた値の平均値を出力する(相加平均)",
+                    },
+                },
+            }
+        },
     };
 
 
@@ -173,6 +207,43 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			CurrentLanguage::g_lpItemData_LayerStructure[L"outputMaxValue"].name.c_str(),
 			CurrentLanguage::g_lpItemData_LayerStructure[L"outputMaxValue"].text.c_str(),
 			-32767.0000000000000000f, 32767.0000000000000000f, 0.0000000000000000f));
+
+	/** Name : 分解能
+	  * ID   : resolution
+	  */
+	pLayerConfig->AddItem(
+		Gravisbell::SettingData::Standard::CreateItem_Int(
+			L"resolution",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"resolution"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"resolution"].text.c_str(),
+			2, 65535, 2));
+
+	/** Name : 割り当て種別
+	  * ID   : allocationType
+	  * Text : CH番号→値に変換するための変換方法
+	  */
+	{
+		Gravisbell::SettingData::Standard::IItemEx_Enum* pItemEnum = Gravisbell::SettingData::Standard::CreateItem_Enum(
+			L"allocationType",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"allocationType"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"allocationType"].text.c_str());
+
+		// 0
+		pItemEnum->AddEnumItem(
+			L"max",
+			L"最大値",
+			L"CH内の最大値を出力する");
+		// 1
+		pItemEnum->AddEnumItem(
+			L"average",
+			L"平均",
+			L"CH番号とCHの値を掛け合わせた値の平均値を出力する(相加平均)");
+
+pItemEnum->SetDefaultItem(0);
+pItemEnum->SetValue(pItemEnum->GetDefault());
+
+		pLayerConfig->AddItem(pItemEnum);
+	}
 
 	return pLayerConfig;
 }
