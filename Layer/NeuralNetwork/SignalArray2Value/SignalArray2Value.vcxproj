@@ -487,7 +487,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="Config.xml" />
+    <Xml Include="Config.xml">
+      <SubType>Designer</SubType>
+    </Xml>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="SignalArray2Value_GPU.cu" />
