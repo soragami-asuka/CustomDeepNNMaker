@@ -243,6 +243,14 @@ namespace NeuralNetwork {
 				i_lppOutputBuffer,
 				i_lppDOutputBuffer);
 
+#if _DEBUG
+			std::vector<F32> lpDOutputBuffer(this->outputBufferCount * this->GetBatchSize());
+			cudaMemcpy(&lpDOutputBuffer[0], i_lppDOutputBuffer, sizeof(F32) * this->outputBufferCount * this->GetBatchSize(), cudaMemcpyDeviceToHost);
+
+			std::vector<F32> lpTeachBuffer(this->inputBufferCount * this->GetBatchSize());
+			cudaMemcpy(&lpTeachBuffer[0], o_lppDInputBuffer, sizeof(F32) * this->inputBufferCount * this->GetBatchSize(), cudaMemcpyDeviceToHost);
+#endif
+
 			// ê≥âÇ∆èoóÕÇ≈åÎç∑ÇéÊÇÈ
 			F32 alpha = -1;
 			cublasSaxpy_v2(
@@ -253,7 +261,7 @@ namespace NeuralNetwork {
 				1,
 				o_lppDInputBuffer,
 				1);
-			
+
 #if _DEBUG
 			std::vector<F32> lpOutputBuffer(this->outputBufferCount * this->GetBatchSize());
 			cudaMemcpy(&lpOutputBuffer[0], i_lppOutputBuffer, sizeof(F32) * this->outputBufferCount * this->GetBatchSize(), cudaMemcpyDeviceToHost);
