@@ -217,7 +217,7 @@ namespace NeuralNetwork {
 
 							// ³‰ð‚ð‹‚ß‚é
 							F32 trueValue = this->lppBatchOutputBuffer[batchNum][outputOffset] + this->lppBatchDOutputBuffer[batchNum][outputOffset];
-							U32 truePos = std::max<U32>(0, std::min<U32>(this->GetInputDataStruct().ch-1, (U32)((trueValue - this->layerData.layerStructure.outputMinValue) * (this->layerData.layerStructure.outputMaxValue - this->layerData.layerStructure.outputMinValue) * this->GetInputDataStruct().ch + 0.5f)));
+							U32 truePos = std::max<U32>(0, std::min<U32>(this->GetInputDataStruct().ch-1, (U32)((trueValue - this->layerData.layerStructure.outputMinValue) / (this->layerData.layerStructure.outputMaxValue - this->layerData.layerStructure.outputMinValue) * this->GetInputDataStruct().ch + 0.5f)));
 
 							for(U32 ch=0; ch<this->GetInputDataStruct().ch; ch++)
 							{

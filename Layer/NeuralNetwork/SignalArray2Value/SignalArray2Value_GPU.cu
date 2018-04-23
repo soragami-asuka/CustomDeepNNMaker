@@ -44,7 +44,7 @@ namespace NeuralNetwork {
 
 		F32 teachValue = lpOutputBuffer[outputOffset] + lpDOutputBuffer[outputOffset];
 
-		U32 teachCh = max(0, min(inputChSize-1, (U32)((teachValue - outputMinValue) * (outputMaxValue - outputMinValue) * inputChSize + 0.5f)));
+		U32 teachCh = max(0, min(inputChSize-1, (U32)((teachValue - outputMinValue) / (outputMaxValue - outputMinValue) * inputChSize + 0.5f)));
 
 		U32 inputOffset = (inputChBufferSize * inputChSize * batchNum) + (inputChBufferSize * teachCh) + bufferPos;
 

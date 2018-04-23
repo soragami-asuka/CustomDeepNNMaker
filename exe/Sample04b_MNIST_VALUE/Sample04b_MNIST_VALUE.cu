@@ -27,7 +27,7 @@
 
 using namespace Gravisbell;
 
-#define USE_GPU	1
+#define USE_GPU	0
 #define USE_HOST_MEMORY 1
 
 #define USE_BATCHNORM	1
@@ -441,7 +441,7 @@ Gravisbell::ErrorCode LoadSampleData_label(
 	U32 teachDataCount = (U32)(dataCount*(1.0f - i_testRate));
 	for(U32 imageNum=0; imageNum<dataCount; imageNum++)
 	{
-		F32 value = (F32)lpBuf[bufPos] / 10.0f;	// 最大値を1.0にする必要があるため、10ではなく9で割る
+		F32 value = (F32)lpBuf[bufPos] / 10.0f * 2.0f - 1;	// 最大値を1.0にする必要があるため、10ではなく9で割る
 
 		if(imageNum < teachDataCount)
 			(*o_ppDataLayerTeach)->AddData(&value);
@@ -481,7 +481,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver01(const Layer::Neural
 		lastLayerGUID = pNetworkMaker->AddActivationLayer(lastLayerGUID, L"ReLU");
 
 		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_FA(lastLayerGUID, 10, L"softmax_ALL_crossEntropy");
-		lastLayerGUID = pNetworkMaker->AddSignalArray2ValueLayer(lastLayerGUID, 0.0f, 1.0f);
+		lastLayerGUID = pNetworkMaker->AddSignalArray2ValueLayer(lastLayerGUID, -1.0, 1.0f);
 
 		// 出力レイヤー設定
 		pNeuralNetwork->SetOutputLayerGUID(lastLayerGUID);
@@ -707,8 +707,8 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 				for(U32 batchDataNum=0; batchDataNum<pTeachOutputLayer->GetBatchSize(); batchDataNum++)
 				{
 					// 正解の番号を取得
-					U32 correctNo = (U32)(lpTeachBuffer[batchDataNum]  * 10 + 0.5);
-					U32 outputNo  = (U32)(lpOutputBuffer[batchDataNum] * 10 + 0.5);
+					U32 correctNo = (U32)((lpTeachBuffer[batchDataNum]  + 1.0)/2 * 10 + 0.5);
+					U32 outputNo  = (U32)((lpOutputBuffer[batchDataNum] + 1.0)/2 * 10 + 0.5);
 
 					if(correctNo == outputNo)
 					{
@@ -752,8 +752,8 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 				pSampleOutputLayer->GetOutputBuffer(&lpTeachBuffer[0]);
 				pNeuralNetworkSample->GetOutputBuffer(&lpOutputBuffer[0]);
 				{
-					U32 correctNo = (U32)(lpTeachBuffer[0]  * 10 + 0.5);
-					U32 outputNo  = (U32)(lpOutputBuffer[0] * 10 + 0.5);
+					U32 correctNo = (U32)((lpTeachBuffer[0]  + 1.0)/2 * 10 + 0.5);
+					U32 outputNo  = (U32)((lpOutputBuffer[0] + 1.0)/2 * 10 + 0.5);
 
 					if(correctNo == outputNo)
 					{
