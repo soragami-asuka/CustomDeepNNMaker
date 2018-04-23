@@ -14,11 +14,6 @@
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
 
-#define POSITION_TO_OFFSET(x,y,z,ch,xSize,ySize,zSize,chSize)		((((((ch)*(zSize)+(z))*(ySize))+(y))*(xSize))+(x))
-#define POSITION_TO_OFFSET_STRUCT(inX,inY,inZ,inCh,structure)		POSITION_TO_OFFSET(inX, inY, inZ, inCh, structure.x, structure.y, structure.z, structure.ch)
-#define POSITION_TO_OFFSET_VECTOR(inX,inY,inZ,inCh,vector,chSize)	POSITION_TO_OFFSET(inX, inY, inZ, inCh, vector.x,    vector.y,    vector.z,    chSize)
-
-
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
@@ -149,7 +144,7 @@ namespace NeuralNetwork {
 					{
 						for(U32 inputX=0; inputX<this->GetInputDataStruct().x; inputX++)
 						{
-							U32 inputOffset = POSITION_TO_OFFSET_STRUCT(inputX, inputY, inputZ, ch, this->GetInputDataStruct());
+							U32 inputOffset = this->GetInputDataStruct().POSITION_TO_OFFSET(inputX, inputY, inputZ, ch);
 
 							switch(this->layerData.layerStructure.PaddingType)
 							{
@@ -161,12 +156,11 @@ namespace NeuralNetwork {
 										{
 											for(S32 offsetX=0; offsetX<this->layerData.layerStructure.UpScale.x; offsetX++)
 											{
-												U32 outputOffset = POSITION_TO_OFFSET_STRUCT(
+												U32 outputOffset = this->GetOutputDataStruct().POSITION_TO_OFFSET(
 													inputX*this->layerData.layerStructure.UpScale.x + offsetX,
 													inputY*this->layerData.layerStructure.UpScale.y + offsetY,
 													inputZ*this->layerData.layerStructure.UpScale.z + offsetZ,
-													ch,
-													this->GetOutputDataStruct());
+													ch);
 
 												this->lppBatchOutputBuffer[batchNum][outputOffset] = this->lppBatchInputBuffer[batchNum][inputOffset];
 											}
@@ -176,12 +170,11 @@ namespace NeuralNetwork {
 								break;
 							case UpSampling::LayerStructure::PaddingType_zero:
 								{
-									U32 outputOffset = POSITION_TO_OFFSET_STRUCT(
+									U32 outputOffset = this->GetOutputDataStruct().POSITION_TO_OFFSET(
 										inputX*this->layerData.layerStructure.UpScale.x + 0,
 										inputY*this->layerData.layerStructure.UpScale.y + 0,
 										inputZ*this->layerData.layerStructure.UpScale.z + 0,
-										ch,
-										this->GetOutputDataStruct());
+										ch);
 
 									this->lppBatchOutputBuffer[batchNum][outputOffset] = this->lppBatchInputBuffer[batchNum][inputOffset];
 								}
@@ -231,7 +224,7 @@ namespace NeuralNetwork {
 						{
 							for(U32 inputX=0; inputX<this->GetInputDataStruct().x; inputX++)
 							{
-								U32 inputOffset = POSITION_TO_OFFSET_STRUCT(inputX, inputY, inputZ, ch, this->GetInputDataStruct());
+								U32 inputOffset = this->GetInputDataStruct().POSITION_TO_OFFSET(inputX, inputY, inputZ, ch);
 
 								switch(this->layerData.layerStructure.PaddingType)
 								{
@@ -243,13 +236,11 @@ namespace NeuralNetwork {
 											{
 												for(S32 offsetX=0; offsetX<this->layerData.layerStructure.UpScale.x; offsetX++)
 												{
-													U32 outputOffset = POSITION_TO_OFFSET_STRUCT(
+													U32 outputOffset = this->GetOutputDataStruct().POSITION_TO_OFFSET(
 														inputX*this->layerData.layerStructure.UpScale.x + offsetX,
 														inputY*this->layerData.layerStructure.UpScale.y + offsetY,
 														inputZ*this->layerData.layerStructure.UpScale.z + offsetZ,
-														ch,
-														this->GetOutputDataStruct());
-
+														ch);
 
 													this->lppBatchDInputBuffer[batchNum][inputOffset] += this->lppBatchDOutputBuffer[batchNum][outputOffset];
 												}
@@ -259,12 +250,11 @@ namespace NeuralNetwork {
 									break;
 								case UpSampling::LayerStructure::PaddingType_zero:
 									{
-										U32 outputOffset = POSITION_TO_OFFSET_STRUCT(
+										U32 outputOffset = this->GetOutputDataStruct().POSITION_TO_OFFSET(
 											inputX*this->layerData.layerStructure.UpScale.x + 0,
 											inputY*this->layerData.layerStructure.UpScale.y + 0,
 											inputZ*this->layerData.layerStructure.UpScale.z + 0,
-											ch,
-											this->GetOutputDataStruct());
+											ch);
 
 										this->lppBatchDInputBuffer[batchNum][inputOffset] = this->lppBatchDOutputBuffer[batchNum][outputOffset];
 									}

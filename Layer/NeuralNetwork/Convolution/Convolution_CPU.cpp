@@ -16,9 +16,7 @@
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
 
-#define POSITION_TO_OFFSET(x,y,z,ch,xSize,ySize,zSize,chSize)		((((((ch)*(zSize)+(z))*(ySize))+(y))*(xSize))+(x))
-#define POSITION_TO_OFFSET_STRUCT(inX,inY,inZ,inCh,structure)		POSITION_TO_OFFSET(inX, inY, inZ, inCh, structure.x, structure.y, structure.z, structure.ch)
-#define POSITION_TO_OFFSET_VECTOR(inX,inY,inZ,inCh,vector,chSize)	POSITION_TO_OFFSET(inX, inY, inZ, inCh, vector.x,    vector.y,    vector.z,    chSize)
+#define POSITION_TO_OFFSET_VECTOR(inX,inY,inZ,inCh,vector)	Gravisbell::CalculateOffset((vector).x,    (vector).y,    (vector).z, inCh, inX, inY, inZ)
 
 
 namespace Gravisbell {
@@ -240,7 +238,7 @@ namespace NeuralNetwork {
 					{
 						for(U32 convX=0; convX<this->GetOutputDataStruct().x; convX++)
 						{
-							U32 outputOffset = POSITION_TO_OFFSET_STRUCT(convX,convY,convZ,neuronNum, this->GetOutputDataStruct());
+							U32 outputOffset = this->GetOutputDataStruct().POSITION_TO_OFFSET(convX,convY,convZ,neuronNum);
 
 							// 一時保存用のバッファを作成
 							F32 tmp = 0.0f;
@@ -266,8 +264,8 @@ namespace NeuralNetwork {
 											if((U32)inputX >= this->GetInputDataStruct().x)
 												continue;
 
-											const S32 inputOffset  = POSITION_TO_OFFSET_STRUCT(inputX,inputY,inputZ, chNum, this->GetInputDataStruct());
-											const S32 filterOffset = POSITION_TO_OFFSET_VECTOR(filterX, filterY, filterZ, chNum, this->layerData.layerStructure.FilterSize, this->layerData.inputDataStruct.ch);
+											const S32 inputOffset  = this->GetInputDataStruct().POSITION_TO_OFFSET(inputX,inputY,inputZ, chNum);
+											const S32 filterOffset = POSITION_TO_OFFSET_VECTOR(filterX, filterY, filterZ, chNum, this->layerData.layerStructure.FilterSize);
 
 											tmp += this->layerData.lppNeuron[neuronNum][filterOffset] * this->lppBatchInputBuffer[batchNum][inputOffset];
 										}
@@ -337,7 +335,7 @@ namespace NeuralNetwork {
 					{
 						for(U32 convX=0; convX<this->GetOutputDataStruct().x; convX++)
 						{
-							U32 outputOffet = POSITION_TO_OFFSET_STRUCT(convX,convY,convZ,neuronNum, this->GetOutputDataStruct());
+							U32 outputOffet = this->GetOutputDataStruct().POSITION_TO_OFFSET(convX,convY,convZ,neuronNum);
 							F32 dOutput = this->lppBatchDOutputBuffer[batchNum][outputOffet];
 
 							// フィルタを処理する
@@ -361,8 +359,8 @@ namespace NeuralNetwork {
 											if((U32)inputX>=this->GetInputDataStruct().x)
 												continue;
 
-											const S32 inputOffset  = POSITION_TO_OFFSET_STRUCT(inputX,inputY,inputZ, chNum, this->GetInputDataStruct());
-											const S32 filterOffset = POSITION_TO_OFFSET_VECTOR(filterX, filterY, filterZ, chNum, this->layerData.layerStructure.FilterSize, this->layerData.inputDataStruct.ch);
+											const S32 inputOffset  = this->GetInputDataStruct().POSITION_TO_OFFSET(inputX,inputY,inputZ, chNum);
+											const S32 filterOffset = POSITION_TO_OFFSET_VECTOR(filterX, filterY, filterZ, chNum, this->layerData.layerStructure.FilterSize);
 
 											if(o_lppDInputBuffer)
 												this->lppBatchDInputBuffer[batchNum][inputOffset] += this->layerData.lppNeuron[neuronNum][filterOffset] * dOutput;

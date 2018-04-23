@@ -22,11 +22,6 @@ namespace NeuralNetwork {
 #define CALC_BATCH_MAX	(256)
 #define CALC_INPUT_MAX	(1024)
 
-	__device__ U32 CalculateOffset(U32 batchNum, U32 chCount, U32 xCount, U32 yCount, U32 zCount, U32 ch, U32 x, U32 y, U32 z)
-	{
-		return ((((((batchNum*chCount+ch)*zCount+z)*yCount)+y)*xCount)+x);
-	}
-
 	__global__ void device_Value2SignalArray(
 		U32 inputChSize,
 		U32 outputBatchBufferSize,

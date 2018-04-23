@@ -475,9 +475,11 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver01(const Layer::Neural
 		// 入力信号を直前レイヤーに設定
 		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID();
 
-		lastLayerGUID = pNetworkMaker->AddDilatedConvolutionLayer(lastLayerGUID, Vector3D<S32>(3,3,1), 8, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,0));
+		lastLayerGUID = pNetworkMaker->AddConvolutionLayer(lastLayerGUID, Vector3D<S32>(3,3,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(1,1,0));
+//		lastLayerGUID = pNetworkMaker->AddDilatedConvolutionLayer(lastLayerGUID, Vector3D<S32>(3,3,1), 8, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,0));
 		lastLayerGUID = pNetworkMaker->AddActivationLayer(lastLayerGUID, L"ReLU");
-		lastLayerGUID = pNetworkMaker->AddDilatedConvolutionLayer(lastLayerGUID, Vector3D<S32>(3,3,1), 16, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1), Vector3D<S32>(0,0,0));
+		lastLayerGUID = pNetworkMaker->AddConvolutionLayer(lastLayerGUID, Vector3D<S32>(3,3,1), 16, Vector3D<S32>(1,1,1), Vector3D<S32>(1,1,0));
+//		lastLayerGUID = pNetworkMaker->AddDilatedConvolutionLayer(lastLayerGUID, Vector3D<S32>(3,3,1), 16, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1), Vector3D<S32>(0,0,0));
 		lastLayerGUID = pNetworkMaker->AddActivationLayer(lastLayerGUID, L"ReLU");
 
 		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_FA(lastLayerGUID, 10, L"softmax_ALL_crossEntropy");

@@ -15,9 +15,6 @@
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
 
-#define POSITION_TO_OFFSET(x,y,z,ch,xSize,ySize,zSize,chSize)		((((((ch)*(zSize)+(z))*(ySize))+(y))*(xSize))+(x))
-#define POSITION_TO_OFFSET_STRUCT(inX,inY,inZ,inCh,structure)		POSITION_TO_OFFSET(inX, inY, inZ, inCh, structure.x, structure.y, structure.z, structure.ch)
-
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
@@ -167,19 +164,14 @@ namespace NeuralNetwork {
 										if(inputX >= this->GetInputDataStruct().x)
 											continue;
 
-										U32 inputOffset = POSITION_TO_OFFSET_STRUCT(
-																inputX,
-																inputY,
-																inputZ,
-																ch,
-																this->GetInputDataStruct());
+										U32 inputOffset = this->GetInputDataStruct().POSITION_TO_OFFSET(inputX, inputY, inputZ, ch);
 
 										maxValue = max(maxValue, this->lppBatchInputBuffer[batchNum][inputOffset]);
 									}
 								}
 							}
 							
-							U32 outputOffset = POSITION_TO_OFFSET_STRUCT(outputX,outputY,outputZ,ch, this->GetOutputDataStruct());
+							U32 outputOffset = this->GetOutputDataStruct().POSITION_TO_OFFSET(outputX,outputY,outputZ,ch);
 							this->lppBatchOutputBuffer[batchNum][outputOffset] = maxValue;
 						}
 					}
@@ -226,7 +218,7 @@ namespace NeuralNetwork {
 						{
 							for(U32 outputX=0; outputX<this->GetOutputDataStruct().x; outputX++)
 							{
-								U32 outputOffset = POSITION_TO_OFFSET_STRUCT(outputX,outputY,outputZ,ch, this->GetOutputDataStruct());
+								U32 outputOffset = this->GetOutputDataStruct().POSITION_TO_OFFSET(outputX,outputY,outputZ,ch);
 
 								// Å‘å’l‚ğ’²‚×‚é
 								for(S32 filterZ=0; filterZ<this->layerData.layerStructure.FilterSize.z; filterZ++)
@@ -247,12 +239,7 @@ namespace NeuralNetwork {
 											if(inputX >= this->GetInputDataStruct().x)
 												continue;
 
-											U32 inputOffset = POSITION_TO_OFFSET_STRUCT(
-																	inputX,
-																	inputY,
-																	inputZ,
-																	ch,
-																	this->GetInputDataStruct());
+											U32 inputOffset = this->GetInputDataStruct().POSITION_TO_OFFSET(inputX, inputY, inputZ, ch);
 
 											if(this->lppBatchInputBuffer[batchNum][inputOffset] == this->lppBatchOutputBuffer[batchNum][outputOffset])
 											{

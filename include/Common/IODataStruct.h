@@ -65,6 +65,25 @@ namespace Gravisbell {
 		}
 	};
 
+
+#ifdef __CUDACC__
+	inline __device__ __host__ U32 CalculateOffset(U32 batchNum, U32 chCount, U32 xCount, U32 yCount, U32 zCount, U32 ch, U32 x, U32 y, U32 z)
+#else
+	inline U32 CalculateOffset(U32 batchNum, U32 chCount, U32 xCount, U32 yCount, U32 zCount, U32 ch, U32 x, U32 y, U32 z)
+#endif
+	{
+		return ((((((batchNum*chCount+ch)*zCount+z)*yCount)+y)*xCount)+x);
+	}
+
+#ifdef __CUDACC__
+	inline __device__ __host__ U32 CalculateOffset(U32 xCount, U32 yCount, U32 zCount, U32 ch, U32 x, U32 y, U32 z)
+#else
+	inline U32 CalculateOffset(U32 xCount, U32 yCount, U32 zCount, U32 ch, U32 x, U32 y, U32 z)
+#endif
+	{
+			return (((((ch*zCount+z)*yCount)+y)*xCount)+x);
+	}
+
 }	// Gravisbell
 
 #endif
