@@ -150,8 +150,22 @@ namespace NeuralNetworkLayer {
 
 		/** 信号の配列から値へ変換.
 			@param	outputMinValue	出力の最小値
-			@param	outputMaxValue	出力の最大値 */
+			@param	outputMaxValue	出力の最大値
+			@param	resolution		分解能. 指定しない場合は現時点の出力チャンネル数が入る*/
 		virtual Gravisbell::GUID AddSignalArray2ValueLayer(const Gravisbell::GUID& i_inputLayerGUID, Gravisbell::F32 outputMinValue, Gravisbell::F32 outputMaxValue) = 0;
+		virtual Gravisbell::GUID AddSignalArray2ValueLayer(const Gravisbell::GUID& i_inputLayerGUID, Gravisbell::F32 outputMinValue, Gravisbell::F32 outputMaxValue, Gravisbell::U32 resolution) = 0;
+		/** 確率の配列から値へ変換.
+			@param	outputMinValue	出力の最小値
+			@param	outputMaxValue	出力の最大値
+			@param	resolution		分解能. 指定しない場合は現時点の出力チャンネル数が入る
+			@param	variance		分散. 入力に対する教師信号を作成する際の正規分布の分散 */
+		virtual Gravisbell::GUID AddProbabilityArray2ValueLayer(const Gravisbell::GUID& i_inputLayerGUID, Gravisbell::F32 outputMinValue, Gravisbell::F32 outputMaxValue, Gravisbell::F32 variance) = 0;
+		virtual Gravisbell::GUID AddProbabilityArray2ValueLayer(const Gravisbell::GUID& i_inputLayerGUID, Gravisbell::F32 outputMinValue, Gravisbell::F32 outputMaxValue, Gravisbell::F32 variance, Gravisbell::U32 resolution) = 0;
+		/** 値から信号の配列へ変換.
+			@param	outputMinValue	出力の最小値
+			@param	outputMaxValue	出力の最大値
+			@param	resolution		分解能*/
+		virtual Gravisbell::GUID AddValue2SignalArrayLayer(const Gravisbell::GUID& i_inputLayerGUID, Gravisbell::F32 inputMinValue, Gravisbell::F32 inputMaxValue, Gravisbell::U32 resolution) = 0;
 
 
 	protected:

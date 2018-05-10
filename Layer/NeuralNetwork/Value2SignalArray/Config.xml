@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="6F6C75B8-9C41-43EA-8F80-98C6F1CF4A2D" version="1.0.0.0" default-language="ja">
+
+  <SourceName>Value2SignalArray</SourceName>
+  <Name>信号の配列から値へ変換</Name>
+  <Text>信号の配列から値へ変換する.&#x0A;最大値を取るCH番号を値に変換する.&#x0A;入力CH数＝分解能の整数倍である必要がある.</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+
+    <Float id="inputMinValue">
+      <Name>入力最小値</Name>
+      <Min>-32767</Min>
+      <Max>32767</Max>
+      <Default>0</Default>
+    </Float>
+
+    <Float id="inputMaxValue">
+      <Name>入力最大値</Name>
+      <Min>-32767</Min>
+      <Max>32767</Max>
+      <Default>0</Default>
+    </Float>
+
+    <Int id="resolution">
+      <Name>分解能</Name>
+      <Min>2</Min>
+      <Max>65535</Max>
+      <Default>2</Default>
+    </Int>
+
+   </Structure>
+
+  <!--学習に使用するデータの構造-->
+  <Learn>
+
+  </Learn>
+
+</Config>

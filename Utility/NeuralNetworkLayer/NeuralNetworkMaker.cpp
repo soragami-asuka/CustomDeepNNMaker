@@ -323,7 +323,44 @@ namespace NeuralNetworkLayer {
 		{
 			return this->AddLayer(
 				i_inputLayerGUID,
-				CreateSignalArray2ValueLayer(layerDLLManager, layerDataManager, outputMinValue, outputMaxValue),
+				CreateSignalArray2ValueLayer(layerDLLManager, layerDataManager, outputMinValue, outputMaxValue, this->GetOutputDataStruct(i_inputLayerGUID).ch),
+				false);
+		}
+		Gravisbell::GUID AddSignalArray2ValueLayer(const Gravisbell::GUID& i_inputLayerGUID, Gravisbell::F32 outputMinValue, Gravisbell::F32 outputMaxValue, Gravisbell::U32 resolution)
+		{
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateSignalArray2ValueLayer(layerDLLManager, layerDataManager, outputMinValue, outputMaxValue, resolution),
+				false);
+		}
+		/** 確率の配列から値へ変換.
+			@param	outputMinValue	出力の最小値
+			@param	outputMaxValue	出力の最大値
+			@param	resolution		分解能. 指定しない場合は現時点の出力チャンネル数が入る
+			@param	variance		分散. 入力に対する教師信号を作成する際の正規分布の分散 */
+		Gravisbell::GUID AddProbabilityArray2ValueLayer(const Gravisbell::GUID& i_inputLayerGUID, Gravisbell::F32 outputMinValue, Gravisbell::F32 outputMaxValue, Gravisbell::F32 variance)
+		{
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateProbabilityArray2ValueLayer(layerDLLManager, layerDataManager, outputMinValue, outputMaxValue, variance, this->GetOutputDataStruct(i_inputLayerGUID).ch),
+				false);
+		}
+		Gravisbell::GUID AddProbabilityArray2ValueLayer(const Gravisbell::GUID& i_inputLayerGUID, Gravisbell::F32 outputMinValue, Gravisbell::F32 outputMaxValue, Gravisbell::F32 variance, Gravisbell::U32 resolution)
+		{
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateProbabilityArray2ValueLayer(layerDLLManager, layerDataManager, outputMinValue, outputMaxValue, variance, resolution),
+				false);
+		}
+		/** 値から信号の配列へ変換.
+			@param	outputMinValue	出力の最小値
+			@param	outputMaxValue	出力の最大値
+			@param	resolution		分解能*/
+		Gravisbell::GUID AddValue2SignalArrayLayer(const Gravisbell::GUID& i_inputLayerGUID, Gravisbell::F32 inputMinValue, Gravisbell::F32 inputMaxValue, Gravisbell::U32 resolution)
+		{
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateValue2SignalArrayLayer(layerDLLManager, layerDataManager, inputMinValue, inputMaxValue, resolution),
 				false);
 		}
 
