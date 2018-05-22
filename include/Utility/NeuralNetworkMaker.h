@@ -168,7 +168,7 @@ namespace NeuralNetworkLayer {
 		virtual Gravisbell::GUID AddValue2SignalArrayLayer(const Gravisbell::GUID& i_inputLayerGUID, Gravisbell::F32 inputMinValue, Gravisbell::F32 inputMaxValue, Gravisbell::U32 resolution) = 0;
 
 
-	protected:
+	public:
 		//=============================
 		// 入力結合レイヤー(チャンネル結合)
 		//=============================
@@ -191,30 +191,45 @@ namespace NeuralNetworkLayer {
 		}
 
 
-	protected:
+	public:
 		//=============================
 		// 入力結合レイヤー(加算)
 		//=============================
 		/** 入力結合レイヤー. 入力されたレイヤーの値を合算する. 入力データ構造はX,Y,Zで同じサイズである必要がある. */
-		virtual Gravisbell::GUID AddMergeAddLayer(LayerMergeType i_layerMergeType, const Gravisbell::GUID lpInputLayerGUID[], U32 inputLayerCount) = 0;
+		virtual Gravisbell::GUID AddMergeAddLayer(LayerMergeType i_layerMergeType, Gravisbell::F32 i_scale, const Gravisbell::GUID lpInputLayerGUID[], U32 inputLayerCount) = 0;
+		Gravisbell::GUID AddMergeAddLayer(LayerMergeType i_layerMergeType, const Gravisbell::GUID lpInputLayerGUID[], U32 inputLayerCount)
+		{
+			return AddMergeAddLayer(i_layerMergeType, 1.0f, lpInputLayerGUID, inputLayerCount);
+		}
 
 		/** 入力結合レイヤー. 入力されたレイヤーの値を合算する. 入力データ構造はX,Y,Zで同じサイズである必要がある. */
+		Gravisbell::GUID AddMergeAddLayer(LayerMergeType i_layerMergeType, Gravisbell::F32 i_scale, const std::vector<Gravisbell::GUID>& lpInputLayerGUID)
+		{
+			return AddMergeAddLayer(i_layerMergeType, i_scale, &lpInputLayerGUID[0], (U32)lpInputLayerGUID.size());
+		}
 		Gravisbell::GUID AddMergeAddLayer(LayerMergeType i_layerMergeType, const std::vector<Gravisbell::GUID>& lpInputLayerGUID)
 		{
-			return AddMergeAddLayer(i_layerMergeType, &lpInputLayerGUID[0], (U32)lpInputLayerGUID.size());
+			return AddMergeAddLayer(i_layerMergeType, 1.0f, &lpInputLayerGUID[0], (U32)lpInputLayerGUID.size());
 		}
 
 		/** 入力結合レイヤー. 入力されたレイヤーの値を合算する. 入力データ構造はX,Y,Zで同じサイズである必要がある. */
 		template<typename... Rest>
+		Gravisbell::GUID AddMergeAddLayer(LayerMergeType i_layerMergeType, Gravisbell::F32 i_scale, std::vector<Gravisbell::GUID>& lpInputLayerGUID, const Gravisbell::GUID& lastLayerGUID_first, const Rest&... lpLastLayerGUID_rest)
+		{
+			lpInputLayerGUID.push_back(lastLayerGUID_first);
+
+			return AddMergeAddLayer(i_layerMergeType, i_scale, lpInputLayerGUID, lpLastLayerGUID_rest...);
+		}
+		template<typename... Rest>
 		Gravisbell::GUID AddMergeAddLayer(LayerMergeType i_layerMergeType, std::vector<Gravisbell::GUID>& lpInputLayerGUID, const Gravisbell::GUID& lastLayerGUID_first, const Rest&... lpLastLayerGUID_rest)
 		{
 			lpInputLayerGUID.push_back(lastLayerGUID_first);
-	
-			return AddMergeAddLayer(i_layerMergeType, lpInputLayerGUID, lpLastLayerGUID_rest...);
+
+			return AddMergeAddLayer(i_layerMergeType, 1.0f, lpInputLayerGUID, lpLastLayerGUID_rest...);
 		}
 
 
-	protected:
+	public:
 		//=============================
 		// 入力結合レイヤー(平均)
 		//=============================
@@ -237,7 +252,7 @@ namespace NeuralNetworkLayer {
 		}
 
 
-	protected:
+	public:
 		//=============================
 		// 入力結合レイヤー(最大値)
 		//=============================
@@ -261,7 +276,7 @@ namespace NeuralNetworkLayer {
 
 
 
-	protected:
+	public:
 		//=============================
 		// 入力結合レイヤー(乗算)
 		//=============================
@@ -284,7 +299,7 @@ namespace NeuralNetworkLayer {
 		}
 
 
-	protected:
+	public:
 		//=============================
 		// 入力結合レイヤー(加算)(旧式)
 		//=============================
@@ -326,12 +341,20 @@ namespace NeuralNetworkLayer {
 			@param lpLastLayerGUID_rest	
 			*/
 		template<typename... Rest>
+		Gravisbell::GUID AddMergeAddLayer(LayerMergeType i_layerMergeType, F32 i_scale, const Gravisbell::GUID& lastLayerGUID_first, const Rest&... lpLastLayerGUID_rest)
+		{
+			std::vector<Gravisbell::GUID> lpInputLayerGUID;
+			lpInputLayerGUID.push_back(lastLayerGUID_first);
+
+			return AddMergeAddLayer(i_layerMergeType, i_scale, lpInputLayerGUID, lpLastLayerGUID_rest...);
+		}
+		template<typename... Rest>
 		Gravisbell::GUID AddMergeAddLayer(LayerMergeType i_layerMergeType, const Gravisbell::GUID& lastLayerGUID_first, const Rest&... lpLastLayerGUID_rest)
 		{
 			std::vector<Gravisbell::GUID> lpInputLayerGUID;
 			lpInputLayerGUID.push_back(lastLayerGUID_first);
 
-			return AddMergeAddLayer(i_layerMergeType, lpInputLayerGUID, lpLastLayerGUID_rest...);
+			return AddMergeAddLayer(i_layerMergeType, 1.0f, lpInputLayerGUID, lpLastLayerGUID_rest...);
 		}
 
 		/** 入力結合レイヤー. 入力されたレイヤーの値を合算する. 入力データ構造はX,Y,Zで同じサイズである必要がある.

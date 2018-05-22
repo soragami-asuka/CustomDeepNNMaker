@@ -705,10 +705,11 @@ Layer::ILayerData* CreateMergeInputLayer(
 
 /** 入力結合レイヤー(加算). 入力されたレイヤーの値を合算する. 入力データ構造はX,Y,Zで同じサイズである必要がある.
 	@param	layerDLLManager		レイヤーDLL管理クラス
-	@param	i_mergeType			ch数をマージさせる方法. */
+	@param	i_mergeType			ch数をマージさせる方法. 
+	@param	i_scale				出力信号に掛け合わせるスカラー値 */
 Layer::ILayerData* CreateMergeAddLayer(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
-	LayerMergeType i_mergeType)
+	LayerMergeType i_mergeType, F32 i_scale)
 {
 	const Gravisbell::GUID TYPE_CODE(0x754f6bbf, 0x7931, 0x473e, 0xae, 0x82, 0x29, 0xe9, 0x99, 0xa3, 0x4b, 0x22);
 
@@ -737,6 +738,14 @@ Layer::ILayerData* CreateMergeAddLayer(
 		case LayerMergeType::LYAERMERGETYPE_LAYER0:
 			pItem->SetValue(L"layer0");
 			break;
+		}
+	}
+	// スケール値
+	{
+		SettingData::Standard::IItem_Float* pItem = dynamic_cast<SettingData::Standard::IItem_Float*>(pConfig->GetItemByID(L"Scale"));
+		if(pItem)
+		{
+			pItem->SetValue(i_scale);
 		}
 	}
 

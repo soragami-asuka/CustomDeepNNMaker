@@ -7,6 +7,7 @@
  *           : Å‘å’l‚ðŽæ‚éCH”Ô†‚ð’l‚É•ÏŠ·‚·‚é.
  *           : “ü—ÍCH”•ª‰ð”\‚Ì®””{‚Å‚ ‚é•K—v‚ª‚ ‚é.
  *           : ŠwKŽž‚Ì“ü—Í‚É‘Î‚·‚é‹³ŽtM†‚Í³‰ðM†‚ð’†S‚Æ‚µ‚½³‹K•ª•z‚Ì•½‹Ï’l‚ð‚Æ‚é
+ *           : —×‚è‡‚¤“ü—ÍCH‚ÉˆÓ–¡‚Ì‚ ‚é’l‚ðŽg—p‚·‚éê‡‚É•Ö—˜
 --------------------------------------------*/
 #include"stdafx.h"
 
@@ -41,7 +42,7 @@ namespace DefaultLanguage
     static const StringData g_baseData = 
     {
         L"Šm—¦‚Ì”z—ñ‚©‚ç’l‚Ö•ÏŠ·",
-        L"Šm—¦‚Ì”z—ñ‚©‚ç’l‚Ö•ÏŠ·‚·‚é.\nÅ‘å’l‚ðŽæ‚éCH”Ô†‚ð’l‚É•ÏŠ·‚·‚é.\n“ü—ÍCH”•ª‰ð”\‚Ì®””{‚Å‚ ‚é•K—v‚ª‚ ‚é.\nŠwKŽž‚Ì“ü—Í‚É‘Î‚·‚é‹³ŽtM†‚Í³‰ðM†‚ð’†S‚Æ‚µ‚½³‹K•ª•z‚Ì•½‹Ï’l‚ð‚Æ‚é"
+        L"Šm—¦‚Ì”z—ñ‚©‚ç’l‚Ö•ÏŠ·‚·‚é.\nÅ‘å’l‚ðŽæ‚éCH”Ô†‚ð’l‚É•ÏŠ·‚·‚é.\n“ü—ÍCH”•ª‰ð”\‚Ì®””{‚Å‚ ‚é•K—v‚ª‚ ‚é.\nŠwKŽž‚Ì“ü—Í‚É‘Î‚·‚é‹³ŽtM†‚Í³‰ðM†‚ð’†S‚Æ‚µ‚½³‹K•ª•z‚Ì•½‹Ï’l‚ð‚Æ‚é\n—×‚è‡‚¤“ü—ÍCH‚ÉˆÓ–¡‚Ì‚ ‚é’l‚ðŽg—p‚·‚éê‡‚É•Ö—˜"
     };
 
 
@@ -72,8 +73,8 @@ namespace DefaultLanguage
         {
             L"variance",
             {
-                L"‹³ŽtM†‚Ì•ªŽU",
-                L"",
+                L"•ªŽU",
+                L"‹³ŽtM†‚ðŒvŽZ‚·‚éÛ‚Ì³‹K•ª•z‚Ì•ªŽU",
             }
         },
         {
@@ -226,8 +227,9 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			CurrentLanguage::g_lpItemData_LayerStructure[L"resolution"].text.c_str(),
 			2, 65535, 2));
 
-	/** Name : ‹³ŽtM†‚Ì•ªŽU
+	/** Name : •ªŽU
 	  * ID   : variance
+	  * Text : ‹³ŽtM†‚ðŒvŽZ‚·‚éÛ‚Ì³‹K•ª•z‚Ì•ªŽU
 	  */
 	pLayerConfig->AddItem(
 		Gravisbell::SettingData::Standard::CreateItem_Float(

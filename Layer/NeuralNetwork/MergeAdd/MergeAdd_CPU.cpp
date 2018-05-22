@@ -158,7 +158,7 @@ namespace NeuralNetwork {
 
 				for(U32 bufNum=0; bufNum<bufferSize; bufNum++)
 				{
-					this->lppBatchOutputBuffer[batchNum][bufNum] += this->lppBatchInputBuffer[inputNum][batchNum][bufNum];
+					this->lppBatchOutputBuffer[batchNum][bufNum] += this->lppBatchInputBuffer[inputNum][batchNum][bufNum] * this->layerData.layerStructure.Scale;
 				}
 			}
 		}
@@ -202,10 +202,16 @@ namespace NeuralNetwork {
 				U32 offset_output = 0;
 				for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
 				{
-					memcpy(
-						this->lppBatchDInputBuffer[inputNum][batchNum],
-						this->lppBatchDOutputBuffer[batchNum],
-						sizeof(F32) * min(this->lpInputBufferCount[inputNum], outputBufferCount) );
+					U32 bufferSize = min(this->lpInputBufferCount[inputNum], outputBufferCount);
+
+					for(U32 bufNum=0; bufNum<bufferSize; bufNum++)
+					{
+						this->lppBatchDInputBuffer[inputNum][batchNum][bufNum] = this->lppBatchDOutputBuffer[batchNum][bufNum] * this->layerData.layerStructure.Scale;
+					}
+					//memcpy(
+					//	this->lppBatchDInputBuffer[inputNum][batchNum],
+					//	this->lppBatchDOutputBuffer[batchNum],
+					//	sizeof(F32) * min(this->lpInputBufferCount[inputNum], outputBufferCount) );
 				}
 			}
 		}

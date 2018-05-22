@@ -52,6 +52,13 @@ namespace DefaultLanguage
                 L"ƒ}[ƒW‚·‚éÛ‚ÉCH”‚ð‚Ç‚Ì‚æ‚¤‚ÉŒˆ’è‚·‚é‚©",
             }
         },
+        {
+            L"Scale",
+            {
+                L"”{—¦",
+                L"o—ÍM†‚ÉŠ|‚¯‚é”{—¦",
+            }
+        },
     };
 
 
@@ -203,6 +210,17 @@ pItemEnum->SetValue(pItemEnum->GetDefault());
 
 		pLayerConfig->AddItem(pItemEnum);
 	}
+
+	/** Name : ”{—¦
+	  * ID   : Scale
+	  * Text : o—ÍM†‚ÉŠ|‚¯‚é”{—¦
+	  */
+	pLayerConfig->AddItem(
+		Gravisbell::SettingData::Standard::CreateItem_Float(
+			L"Scale",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"Scale"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"Scale"].text.c_str(),
+			-65535.0000000000000000f, 65535.0000000000000000f, 1.0000000000000000f));
 
 	return pLayerConfig;
 }

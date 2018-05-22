@@ -555,7 +555,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver02(const Layer::Neural
 			IODataStruct tmpDataStruct = pNetworkMaker->GetOutputDataStruct(lastLayerGUID);
 			layerGUID_bypass = pNetworkMaker->AddChooseBoxLayer(layerGUID_bypass, Vector3D<S32>(0,0,0), Vector3D<S32>(tmpDataStruct.x, tmpDataStruct.y, tmpDataStruct.z));
 
-			lastLayerGUID = pNetworkMaker->AddMergeAddLayer(Utility::NeuralNetworkLayer::LayerMergeType::LYAERMERGETYPE_LAYER0, lastLayerGUID, layerGUID_bypass);
+			lastLayerGUID = pNetworkMaker->AddMergeAddLayer(Utility::NeuralNetworkLayer::LayerMergeType::LYAERMERGETYPE_LAYER0, sqrtf(0.5f), lastLayerGUID, layerGUID_bypass);
 		}
 		IODataStruct tmpDataStruct2 = pNetworkMaker->GetOutputDataStruct(lastLayerGUID);
 
@@ -631,7 +631,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver03(const Layer::Neural
 
 Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager, const IODataStruct& inputDataStruct, const IODataStruct& outputDataStruct)
 {
-	return CreateNeuralNetwork_ver03(layerDLLManager, layerDataManager, inputDataStruct, outputDataStruct);
+	return CreateNeuralNetwork_ver02(layerDLLManager, layerDataManager, inputDataStruct, outputDataStruct);
 }
 
 /** ニューラルネットワークの学習とサンプル実行を同時実行 */

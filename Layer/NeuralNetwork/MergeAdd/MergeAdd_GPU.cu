@@ -127,7 +127,7 @@ namespace NeuralNetwork {
 		// 出力バッファを初期化
 		cudaMemset(&o_lppOutputBuffer[0], 0, sizeof(F32)*this->outputBufferCount*this->GetBatchSize());
 
-		F32 alpha = 1.0f;
+		F32 alpha = this->layerData.layerStructure.Scale;
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
 			for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
@@ -168,16 +168,21 @@ namespace NeuralNetwork {
 			{
 				cudaMemset(o_lppDInputBuffer[inputNum], 0, sizeof(F32)*this->lpInputBufferCount[inputNum]*this->GetBatchSize());
 			}
-
+			
+			F32 alpha = this->layerData.layerStructure.Scale;
 			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
 				for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
 				{
-					cudaError_t err = cudaMemcpyAsync(
-						&o_lppDInputBuffer[inputNum][batchNum*this->lpInputBufferCount[inputNum]],
+					cublasStatus_t err = cublasSaxpy_v2(
+						this->cublasHandle,
+						min(this->lpInputBufferCount[inputNum], outputBufferCount),
+						&alpha,
 						&i_lppDOutputBuffer[batchNum*this->outputBufferCount],
-						sizeof(F32) * min(this->lpInputBufferCount[inputNum], this->outputBufferCount),
-						cudaMemcpyDeviceToDevice);
+						1,
+						&o_lppDInputBuffer[inputNum][batchNum*this->lpInputBufferCount[inputNum]],
+						1);
+
 					if(err != 0)
 						return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
 				}

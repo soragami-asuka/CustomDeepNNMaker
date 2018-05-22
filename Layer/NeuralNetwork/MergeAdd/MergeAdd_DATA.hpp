@@ -46,6 +46,12 @@ namespace MergeAdd {
 
 		}MergeType;
 
+		/** Name : ”{—¦
+		  * ID   : Scale
+		  * Text : o—ÍM†‚ÉŠ|‚¯‚é”{—¦
+		  */
+		F32 Scale;
+
 	};
 
 } // MergeAdd

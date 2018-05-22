@@ -364,7 +364,7 @@ namespace NeuralNetworkLayer {
 				false);
 		}
 
-	protected:
+	public:
 		/** 入力結合レイヤー. 入力されたレイヤーのCHを結合する. 入力データ構造はX,Y,Zで同じサイズである必要がある. */
 		Gravisbell::GUID AddMergeInputLayer(const Gravisbell::GUID lpInputLayerGUID[], U32 inputLayerCount)
 		{
@@ -380,14 +380,14 @@ namespace NeuralNetworkLayer {
 		}
 
 		/** 入力結合レイヤー. 入力されたレイヤーの値を合算する. 入力データ構造はX,Y,Zで同じサイズである必要がある. */
-		Gravisbell::GUID AddMergeAddLayer(LayerMergeType i_layerMergeType, const Gravisbell::GUID lpInputLayerGUID[], U32 inputLayerCount)
+		Gravisbell::GUID AddMergeAddLayer(LayerMergeType i_layerMergeType, Gravisbell::F32 i_scale, const Gravisbell::GUID lpInputLayerGUID[], U32 inputLayerCount)
 		{
 			Gravisbell::GUID layerGUID;
 
 			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
 				*this->pLayerConnectData,
 				layerGUID,
-				CreateMergeAddLayer(layerDLLManager, layerDataManager, i_layerMergeType), false,
+				CreateMergeAddLayer(layerDLLManager, layerDataManager, i_layerMergeType, i_scale), false,
 				lpInputLayerGUID, inputLayerCount);
 
 			return layerGUID;

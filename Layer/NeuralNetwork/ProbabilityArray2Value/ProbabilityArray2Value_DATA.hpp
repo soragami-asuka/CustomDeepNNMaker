@@ -7,6 +7,7 @@
  *           : 最大値を取るCH番号を値に変換する.
  *           : 入力CH数＝分解能の整数倍である必要がある.
  *           : 学習時の入力に対する教師信号は正解信号を中心とした正規分布の平均値をとる
+ *           : 隣り合う入力CHに意味のある値を使用する場合に便利
 --------------------------------------------*/
 #ifndef __GRAVISBELL_NEURALNETWORK_LAYER_DATA_ProbabilityArray2Value_H__
 #define __GRAVISBELL_NEURALNETWORK_LAYER_DATA_ProbabilityArray2Value_H__
@@ -39,8 +40,9 @@ namespace ProbabilityArray2Value {
 		  */
 		S32 resolution;
 
-		/** Name : 教師信号の分散
+		/** Name : 分散
 		  * ID   : variance
+		  * Text : 教師信号を計算する際の正規分布の分散
 		  */
 		F32 variance;
 

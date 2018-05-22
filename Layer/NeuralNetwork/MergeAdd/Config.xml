@@ -37,6 +37,14 @@
       <Default>max</Default>
     </Enum>
 
+    <Float id="Scale">
+      <Name>倍率</Name>
+      <Text>出力信号に掛ける倍率</Text>
+      <Min>-65535</Min>
+      <Max>65535</Max>
+      <Default>1.0</Default>
+    </Float>
+
   </Structure>
 
   <!--学習に使用するデータの構造-->
