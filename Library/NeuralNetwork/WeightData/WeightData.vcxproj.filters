@@ -37,14 +37,14 @@
     <Filter Include="include\Layer\IO">
       <UniqueIdentifier>{cac536c5-dd96-4366-b009-114863a0f0c2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Optimizer">
+    <Filter Include="WeightData">
       <UniqueIdentifier>{cf708eec-9c1a-48f9-aaa6-70f8f562bc40}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Optimizer\SGD">
-      <UniqueIdentifier>{208dd79d-3b35-40c4-9d6c-feee1713d96c}</UniqueIdentifier>
+    <Filter Include="WeightData\Default">
+      <UniqueIdentifier>{bc878409-95a0-4998-a4fb-869918679c71}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Optimizer\Adam">
-      <UniqueIdentifier>{d0251e61-4903-47bc-840f-034618d3205e}</UniqueIdentifier>
+    <Filter Include="WeightData\WeightNormalization">
+      <UniqueIdentifier>{16d250f1-3152-4e9a-9727-5245c5336d2b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -102,6 +102,9 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INeuralNetwork.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayer.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
@@ -120,13 +123,10 @@
     <ClInclude Include="..\..\..\include\Layer\IO\ISingleOutputLayer.h">
       <Filter>include\Layer\IO</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Library\NeuralNetwork\Optimizer.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingle2SingleLayer.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\IOptimizer.h">
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\IWeightData.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNMult2SingleLayer.h">
@@ -135,48 +135,30 @@
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingle2MultLayer.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
-    <ClInclude Include="Optimizer_SGD_base.h">
-      <Filter>Optimizer\SGD</Filter>
+    <ClInclude Include="..\..\..\include\Library\NeuralNetwork\WeightData.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Optimizer_Adam_base.h">
-      <Filter>Optimizer\Adam</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\IWeightData.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\IInitializer.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
+    <ClInclude Include="WeightData_Default_base.h">
+      <Filter>WeightData\Default</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Optimizer.cpp">
+    <ClCompile Include="WeightData.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Optimizer_SGD_CPU.cpp">
-      <Filter>Optimizer\SGD</Filter>
-    </ClCompile>
-    <ClCompile Include="Optimizer_SGD_base.cpp">
-      <Filter>Optimizer\SGD</Filter>
-    </ClCompile>
-    <ClCompile Include="Optimizer_Adam_CPU.cpp">
-      <Filter>Optimizer\Adam</Filter>
-    </ClCompile>
-    <ClCompile Include="Optimizer_Adam_base.cpp">
-      <Filter>Optimizer\Adam</Filter>
+    <ClCompile Include="WeightData_Default_CPU.cpp">
+      <Filter>WeightData\Default</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="Optimizer_SGD_GPU.cu">
-      <Filter>Optimizer\SGD</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Optimizer_Adam_GPU.cu">
-      <Filter>Optimizer\Adam</Filter>
+    <CudaCompile Include="WeightData_Default_GPU.cu">
+      <Filter>WeightData\Default</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

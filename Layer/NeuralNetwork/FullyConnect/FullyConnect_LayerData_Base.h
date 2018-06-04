@@ -6,6 +6,7 @@
 
 #include<Layer/ILayerData.h>
 #include<Layer/NeuralNetwork/IOptimizer.h>
+#include<Layer/NeuralNetwork/IWeightData.h>
 
 #include<vector>
 
@@ -26,8 +27,7 @@ namespace NeuralNetwork {
 		SettingData::Standard::IData* pLayerStructure;	/**< レイヤー構造を定義したコンフィグクラス */
 		FullyConnect::LayerStructure layerStructure;	/**< レイヤー構造 */
 
-		IOptimizer* m_pOptimizer_neuron;	/**< ニューロン更新用オプティマイザ */
-		IOptimizer* m_pOptimizer_bias;		/**< バイアス更新用オプティマイザ */
+		IWeightData* pWeightData;	/**< 重み情報 */
 
 
 		//===========================
@@ -39,6 +39,24 @@ namespace NeuralNetwork {
 		/** デストラクタ */
 		virtual ~FullyConnect_LayerData_Base();
 
+
+		//===========================
+		// 初期化
+		//===========================
+	public:
+		/** 初期化. 各ニューロンの値をランダムに初期化
+			@return	成功した場合0 */
+		virtual ErrorCode Initialize(void) = 0;
+		/** 初期化. 各ニューロンの値をランダムに初期化
+			@param	i_config			設定情報
+			@oaram	i_inputDataStruct	入力データ構造情報
+			@return	成功した場合0 */
+		ErrorCode Initialize(const SettingData::Standard::IData& i_data);
+		/** 初期化. バッファからデータを読み込む
+			@param i_lpBuffer	読み込みバッファの先頭アドレス.
+			@param i_bufferSize	読み込み可能バッファのサイズ.
+			@return	成功した場合0 */
+		ErrorCode InitializeFromBuffer(const BYTE* i_lpBuffer, U64 i_bufferSize, S64& o_useBufferSize);
 
 		//===========================
 		// 共通処理
@@ -71,6 +89,10 @@ namespace NeuralNetwork {
 		/** レイヤーの保存に必要なバッファ数をBYTE単位で取得する */
 		U64 GetUseBufferByteCount()const;
 
+		/** レイヤーをバッファに書き込む.
+			@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
+			@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
+		S64 WriteToBuffer(BYTE* o_lpBuffer)const;
 
 	public:
 		//===========================
@@ -106,7 +128,7 @@ namespace NeuralNetwork {
 		//===========================
 	public:
 		/** オプティマイザーを変更する */
-		virtual ErrorCode ChangeOptimizer(const wchar_t i_optimizerID[]) = 0;
+		ErrorCode ChangeOptimizer(const wchar_t i_optimizerID[]);
 		/** オプティマイザーのハイパーパラメータを変更する */
 		ErrorCode SetOptimizerHyperParameter(const wchar_t i_parameterID[], F32 i_value);
 		ErrorCode SetOptimizerHyperParameter(const wchar_t i_parameterID[], S32 i_value);

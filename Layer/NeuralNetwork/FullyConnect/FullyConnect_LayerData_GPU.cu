@@ -20,8 +20,9 @@
 #include "device_launch_parameters.h"
 #pragma warning(pop)
 
-#include"Library/NeuralNetwork/Optimizer.h"
-#include"Library/NeuralNetwork/Initializer.h"
+#include<Library/NeuralNetwork/Optimizer.h>
+#include<Library/NeuralNetwork/Initializer.h>
+#include<Library/NeuralNetwork/WeightData.h>
 
 
 namespace Gravisbell {
@@ -61,110 +62,12 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_VALUERANGE;
 
 		// バッファを確保しつつ、初期値を設定
-		auto& initializer = Gravisbell::Layer::NeuralNetwork::GetInitializerManager().GetInitializer(this->layerStructure.Initializer);
 		U32 inputCount  = inputBufferCount;
 		U32 outputCount = neuronCount;
-
-		this->lppNeuron_d.reserve(neuronCount * inputBufferCount);
-		this->lppNeuron_d.resize(neuronCount * inputBufferCount);
-		this->lpBias_d.reserve(neuronCount);
-		this->lpBias_d.resize(neuronCount);
-
-		thrust::host_vector<F32> lpTmpNeuron(neuronCount * inputBufferCount);
-		thrust::host_vector<F32> lpTmpBias(neuronCount);
-
-		for(U32 i=0; i<lpTmpNeuron.size(); i++)
-		{
-			lpTmpNeuron[i] = initializer.GetParameter(inputCount, outputCount);
-		}
-		for(U32 i=0; i<lpTmpBias.size(); i++)
-		{
-			lpTmpBias[i] = initializer.GetParameter(inputCount, outputCount);
-		}
-
-		this->lppNeuron_d = lpTmpNeuron;
-		this->lpBias_d = lpTmpBias;
-
-		return ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 初期化. 各ニューロンの値をランダムに初期化
-		@param	i_config			設定情報
-		@oaram	i_inputDataStruct	入力データ構造情報
-		@return	成功した場合0 */
-	ErrorCode FullyConnect_LayerData_GPU::Initialize(const SettingData::Standard::IData& i_data)
-	{
-		ErrorCode err;
-
-		// 設定情報の登録
-		err = this->SetLayerConfig(i_data);
-		if(err != ErrorCode::ERROR_CODE_NONE)
-			return err;
-
-		// 初期化
-		err = this->Initialize();
-		if(err != ErrorCode::ERROR_CODE_NONE)
-			return err;
-
-		// オプティマイザーの設定
-		err = this->ChangeOptimizer(L"SGD");
-		if(err != ErrorCode::ERROR_CODE_NONE)
-			return err;
-
-		return this->Initialize();
-	}
-	/** 初期化. バッファからデータを読み込む
-		@param i_lpBuffer	読み込みバッファの先頭アドレス.
-		@param i_bufferSize	読み込み可能バッファのサイズ.
-		@return	成功した場合0 */
-	ErrorCode FullyConnect_LayerData_GPU::InitializeFromBuffer(const BYTE* i_lpBuffer, U64 i_bufferSize, S64& o_useBufferSize )
-	{
-		S64 readBufferByte = 0;
-
-		// 設定情報
-		S64 useBufferByte = 0;
-		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, useBufferByte);
-		if(pLayerStructure == NULL)
-			return ErrorCode::ERROR_CODE_INITLAYER_READ_CONFIG;
-		readBufferByte += useBufferByte;
-		this->SetLayerConfig(*pLayerStructure);
-		delete pLayerStructure;
-
-		// 初期化する
-		this->Initialize();
-
-		// バッファからコピー
-		// ニューロン
-		cudaMemcpy(
-			thrust::raw_pointer_cast(&this->lppNeuron_d[0]),
-			&i_lpBuffer[readBufferByte],
-			sizeof(F32) * this->lppNeuron_d.size(),
-			cudaMemcpyHostToDevice);
-		readBufferByte += sizeof(F32) * this->lppNeuron_d.size();
-
-		// バイアス
-		cudaMemcpy(
-			thrust::raw_pointer_cast(&this->lpBias_d[0]),
-			&i_lpBuffer[readBufferByte],
-			sizeof(F32) * this->lpBias_d.size(),
-			cudaMemcpyHostToDevice);
-		readBufferByte += sizeof(F32) * this->lpBias_d.size();
-
-
-		// オプティマイザ
-		S64 useBufferSize = 0;
-		// bias
-		if(this->m_pOptimizer_bias)
-			delete this->m_pOptimizer_bias;
-		this->m_pOptimizer_bias = CreateOptimizerFromBuffer_GPU(&i_lpBuffer[readBufferByte], i_bufferSize-readBufferByte, useBufferSize);
-		readBufferByte += useBufferSize;
-		// neuron
-		if(this->m_pOptimizer_neuron)
-			delete this->m_pOptimizer_neuron;
-		this->m_pOptimizer_neuron = CreateOptimizerFromBuffer_GPU(&i_lpBuffer[readBufferByte], i_bufferSize-readBufferByte, useBufferSize);
-		readBufferByte += useBufferSize;
-
-
-		o_useBufferSize = readBufferByte;
+		if(this->pWeightData)
+			delete this->pWeightData;
+		this->pWeightData = Gravisbell::Layer::NeuralNetwork::GetWeightDataManager().CreateWeightData_GPU(this->layerStructure.WeightData, neuronCount * inputBufferCount, neuronCount);
+		this->pWeightData->Initialize(this->layerStructure.Initializer, inputCount, outputCount);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -173,46 +76,6 @@ namespace NeuralNetwork {
 	//===========================
 	// レイヤー保存
 	//===========================
-	/** レイヤーをバッファに書き込む.
-		@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
-		@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
-	S64 FullyConnect_LayerData_GPU::WriteToBuffer(BYTE* o_lpBuffer)const
-	{
-		if(this->pLayerStructure == NULL)
-			return ErrorCode::ERROR_CODE_NONREGIST_CONFIG;
-
-		S64 writeBufferByte = 0;
-
-		// 設定情報
-		writeBufferByte += this->pLayerStructure->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
-
-		// ニューロン
-		cudaMemcpy(
-			&o_lpBuffer[writeBufferByte],
-			thrust::raw_pointer_cast(&this->lppNeuron_d[0]),
-			sizeof(F32) * this->lppNeuron_d.size(),
-			cudaMemcpyDeviceToHost);
-		writeBufferByte += sizeof(F32) * this->lppNeuron_d.size();
-
-		// バイアス
-		cudaMemcpy(
-			&o_lpBuffer[writeBufferByte],
-			thrust::raw_pointer_cast(&this->lpBias_d[0]),
-			sizeof(F32) * this->lpBias_d.size(),
-			cudaMemcpyDeviceToHost);
-		writeBufferByte += sizeof(F32) * this->lpBias_d.size();
-
-
-		// オプティマイザ
-		// bias
-		writeBufferByte += this->m_pOptimizer_bias->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
-		// neuron
-		writeBufferByte += this->m_pOptimizer_neuron->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
-
-
-		return writeBufferByte;
-	}
-
 
 	//===========================
 	// レイヤー作成
@@ -227,18 +90,6 @@ namespace NeuralNetwork {
 		return new CNNSingle2SingleLayerBase_GPU<FullyConnect_GPU, FullyConnect_LayerData_GPU>(guid, *this, i_lpInputDataStruct[0], i_temporaryMemoryManager);
 	}
 
-
-	//===========================
-	// オプティマイザー設定
-	//===========================
-	/** オプティマイザーを変更する */
-	ErrorCode FullyConnect_LayerData_GPU::ChangeOptimizer(const wchar_t i_optimizerID[])
-	{
-		ChangeOptimizer_GPU(&this->m_pOptimizer_bias,   i_optimizerID, (U32)this->lpBias_d.size());
-		ChangeOptimizer_GPU(&this->m_pOptimizer_neuron, i_optimizerID, (U32)this->lppNeuron_d.size());
-
-		return ErrorCode::ERROR_CODE_NONE;
-	}
 
 } // Gravisbell;
 } // Layer;

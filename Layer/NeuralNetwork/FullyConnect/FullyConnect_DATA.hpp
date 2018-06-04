@@ -40,6 +40,12 @@ namespace FullyConnect {
 		  */
 		const wchar_t* Initializer;
 
+		/** Name : 重みデータの種別
+		  * ID   : WeightData
+		  * Text : 重みデータの種別
+		  */
+		const wchar_t* WeightData;
+
 	};
 
 	/** Runtime Parameter structure */

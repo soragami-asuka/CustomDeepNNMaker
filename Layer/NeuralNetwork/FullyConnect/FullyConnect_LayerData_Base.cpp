@@ -17,8 +17,7 @@ namespace NeuralNetwork {
 		:	guid	(guid)
 		,	pLayerStructure	(NULL)	/**< レイヤー構造を定義したコンフィグクラス */
 		,	layerStructure	()		/**< レイヤー構造 */
-		,	m_pOptimizer_neuron	(NULL)		/**< ニューロン更新用オプティマイザ */
-		,	m_pOptimizer_bias	(NULL)		/**< バイアス更新用オプティマイザ */
+		,	pWeightData		(NULL)	/**< 重み情報 */
 	{
 	}
 	/** デストラクタ */
@@ -27,10 +26,66 @@ namespace NeuralNetwork {
 		if(pLayerStructure != NULL)
 			delete pLayerStructure;
 
-		if(this->m_pOptimizer_neuron)
-			delete this->m_pOptimizer_neuron;
-		if(this->m_pOptimizer_bias)
-			delete this->m_pOptimizer_bias;
+		if(pWeightData)
+			delete pWeightData;
+	}
+
+
+	//===========================
+	// 初期化
+	//===========================
+	/** 初期化. 各ニューロンの値をランダムに初期化
+		@param	i_config			設定情報
+		@oaram	i_inputDataStruct	入力データ構造情報
+		@return	成功した場合0 */
+	ErrorCode FullyConnect_LayerData_Base::Initialize(const SettingData::Standard::IData& i_data)
+	{
+		ErrorCode err;
+
+		// 設定情報の登録
+		err = this->SetLayerConfig(i_data);
+		if(err != ErrorCode::ERROR_CODE_NONE)
+			return err;
+
+		// 初期化
+		err = this->Initialize();
+		if(err != ErrorCode::ERROR_CODE_NONE)
+			return err;
+
+		// オプティマイザーの設定
+		err = this->ChangeOptimizer(L"SGD");
+		if(err != ErrorCode::ERROR_CODE_NONE)
+			return err;
+
+		return ErrorCode::ERROR_CODE_NONE;
+	}
+	/** 初期化. バッファからデータを読み込む
+		@param i_lpBuffer	読み込みバッファの先頭アドレス.
+		@param i_bufferSize	読み込み可能バッファのサイズ.
+		@return	成功した場合0 */
+	ErrorCode FullyConnect_LayerData_Base::InitializeFromBuffer(const BYTE* i_lpBuffer, U64 i_bufferSize, S64& o_useBufferSize)
+	{
+		S64 readBufferByte = 0;
+
+		// 設定情報
+		S64 useBufferByte = 0;
+		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, useBufferByte);
+		if(pLayerStructure == NULL)
+			return ErrorCode::ERROR_CODE_INITLAYER_READ_CONFIG;
+		readBufferByte += useBufferByte;
+		this->SetLayerConfig(*pLayerStructure);
+		delete pLayerStructure;
+
+		// 初期化する
+		this->Initialize();
+
+		// 重みの初期化
+		readBufferByte += this->pWeightData->InitializeFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize-readBufferByte);
+
+
+		o_useBufferSize = readBufferByte;
+
+		return ErrorCode::ERROR_CODE_NONE;
 	}
 
 
@@ -107,20 +162,31 @@ namespace NeuralNetwork {
 		if(pLayerStructure == NULL)
 			return 0;
 
-
 		// 設定情報
 		bufferSize += pLayerStructure->GetUseBufferByteCount();
 
-		// 本体のバイト数
-		bufferSize += (this->GetNeuronCount() * this->layerStructure.InputBufferCount) * sizeof(NEURON_TYPE);	// ニューロン係数
-		bufferSize += this->GetNeuronCount() * sizeof(NEURON_TYPE);	// バイアス係数
-
-		// オプティマイザーのバイト数
-		bufferSize += this->m_pOptimizer_bias->GetUseBufferByteCount();
-		bufferSize += this->m_pOptimizer_neuron->GetUseBufferByteCount();
-
+		// 重みデータ
+		bufferSize += pWeightData->GetUseBufferByteCount();
 
 		return bufferSize;
+	}
+	/** レイヤーをバッファに書き込む.
+		@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
+		@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
+	S64 FullyConnect_LayerData_Base::WriteToBuffer(BYTE* o_lpBuffer)const
+	{
+		if(this->pLayerStructure == NULL)
+			return ErrorCode::ERROR_CODE_NONREGIST_CONFIG;
+
+		S64 writeBufferByte = 0;
+
+		// 設定情報
+		writeBufferByte += this->pLayerStructure->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
+
+		// 重み情報
+		writeBufferByte += this->pWeightData->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
+
+		return writeBufferByte;
 	}
 
 
@@ -182,33 +248,24 @@ namespace NeuralNetwork {
 	//===========================
 	// オプティマイザー設定
 	//===========================
+	/** オプティマイザーを変更する */
+	ErrorCode FullyConnect_LayerData_Base::ChangeOptimizer(const wchar_t i_optimizerID[])
+	{
+		return this->pWeightData->ChangeOptimizer(i_optimizerID);
+	}
+
 	/** オプティマイザーのハイパーパラメータを変更する */
 	ErrorCode FullyConnect_LayerData_Base::SetOptimizerHyperParameter(const wchar_t i_parameterID[], F32 i_value)
 	{
-		if(this->m_pOptimizer_bias)
-			this->m_pOptimizer_bias->SetHyperParameter(i_parameterID, i_value);
-		if(this->m_pOptimizer_neuron)
-			this->m_pOptimizer_neuron->SetHyperParameter(i_parameterID, i_value);
-
-		return ErrorCode::ERROR_CODE_NONE;
+		return this->pWeightData->SetOptimizerHyperParameter(i_parameterID, i_value);
 	}
 	ErrorCode FullyConnect_LayerData_Base::SetOptimizerHyperParameter(const wchar_t i_parameterID[], S32 i_value)
 	{
-		if(this->m_pOptimizer_bias)
-			this->m_pOptimizer_bias->SetHyperParameter(i_parameterID, i_value);
-		if(this->m_pOptimizer_neuron)
-			this->m_pOptimizer_neuron->SetHyperParameter(i_parameterID, i_value);
-		
-		return ErrorCode::ERROR_CODE_NONE;
+		return this->pWeightData->SetOptimizerHyperParameter(i_parameterID, i_value);
 	}
 	ErrorCode FullyConnect_LayerData_Base::SetOptimizerHyperParameter(const wchar_t i_parameterID[], const wchar_t i_value[])
 	{
-		if(this->m_pOptimizer_bias)
-			this->m_pOptimizer_bias->SetHyperParameter(i_parameterID, i_value);
-		if(this->m_pOptimizer_neuron)
-			this->m_pOptimizer_neuron->SetHyperParameter(i_parameterID, i_value);
-
-		return ErrorCode::ERROR_CODE_NONE;
+		return this->pWeightData->SetOptimizerHyperParameter(i_parameterID, i_value);
 	}
 
 } // Gravisbell;

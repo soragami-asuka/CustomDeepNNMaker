@@ -12,7 +12,7 @@ namespace NeuralNetwork {
 	const std::wstring Optimizer_Adam_base::OPTIMIZER_ID = L"Adam";
 
 	/** コンストラクタ */
-	Optimizer_Adam_base::Optimizer_Adam_base(U32 i_parameterCount)
+	Optimizer_Adam_base::Optimizer_Adam_base(U64 i_parameterCount)
 		:	m_parameterCount	(i_parameterCount)
 
 		,	m_alpha			(0.001f)		/**< 慣性. */

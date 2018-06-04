@@ -25,7 +25,7 @@ namespace NeuralNetwork {
 
 	public:
 		/** コンストラクタ */
-		Optimizer_Adam_base(U32 i_parameterCount);
+		Optimizer_Adam_base(U64 i_parameterCount);
 		/** デストラクタ */
 		virtual ~Optimizer_Adam_base();
 

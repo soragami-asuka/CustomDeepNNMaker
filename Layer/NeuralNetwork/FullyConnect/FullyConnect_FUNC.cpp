@@ -66,6 +66,13 @@ namespace DefaultLanguage
                 L"初期化関数の種類",
             }
         },
+        {
+            L"WeightData",
+            {
+                L"重みデータの種別",
+                L"重みデータの種別",
+            }
+        },
     };
 
 
@@ -200,6 +207,17 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			CurrentLanguage::g_lpItemData_LayerStructure[L"Initializer"].name.c_str(),
 			CurrentLanguage::g_lpItemData_LayerStructure[L"Initializer"].text.c_str(),
 			L"glorot_uniform"));
+
+	/** Name : 重みデータの種別
+	  * ID   : WeightData
+	  * Text : 重みデータの種別
+	  */
+	pLayerConfig->AddItem(
+		Gravisbell::SettingData::Standard::CreateItem_String(
+			L"WeightData",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"WeightData"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"WeightData"].text.c_str(),
+			L"Default"));
 
 	return pLayerConfig;
 }

@@ -69,7 +69,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver10(const Layer::Neural
 
 Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager, const IODataStruct& inputDataStruct, const IODataStruct& outputDataStruct)
 {
-	return CreateNeuralNetwork_ver10(layerDLLManager, layerDataManager, inputDataStruct, outputDataStruct);
+	return CreateNeuralNetwork_ver07(layerDLLManager, layerDataManager, inputDataStruct, outputDataStruct);
 }
 
 

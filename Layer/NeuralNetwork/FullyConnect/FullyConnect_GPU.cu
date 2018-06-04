@@ -141,10 +141,6 @@ namespace NeuralNetwork {
 		if(this->outputBufferCount == 0)
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
-		// ニューロンバッファのサイズ確認
-		if(this->layerData.lppNeuron_d.size() != this->neuronCount * this->inputBufferCount)
-			return ErrorCode::ERROR_CODE_FRAUD_NEURON_COUNT;
-
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
@@ -175,11 +171,20 @@ namespace NeuralNetwork {
 
 			std::vector<F32> lpTmpOutputBuffer(this->GetBatchSize() * this->outputBufferCount);
 
+			// バッファを確保
+			thrust::device_vector<F32> lpTmpWeight(this->layerData.pWeightData->GetWeigthSize());
+			thrust::device_vector<F32> lpTmpBias(this->layerData.pWeightData->GetBiasSize());
+
+			// バッファをコピー
+			cudaMemcpy(thrust::raw_pointer_cast(&lpTmpWeight[0]), this->layerData.pWeightData->GetWeight(), sizeof(F32)*lpTmpWeight.size(), cudaMemcpyDeviceToDevice);
+			cudaMemcpy(thrust::raw_pointer_cast(&lpTmpBias[0]),   this->layerData.pWeightData->GetBias(),   sizeof(F32)*lpTmpBias.size(), cudaMemcpyDeviceToDevice);
+
+
 			U32 procTime = 0;
 			do
 			{
 				// 演算を実行
-				ErrorCode err = this->CalculateBase(i_lppInputBuffer, o_lppOutputBuffer);
+				ErrorCode err = this->CalculateBase(i_lppInputBuffer, o_lppOutputBuffer, thrust::raw_pointer_cast(&lpTmpWeight[0]), thrust::raw_pointer_cast(&lpTmpBias[0]));
 				if(err != ErrorCode::ERROR_CODE_NONE)
 					return err;
 
@@ -211,8 +216,8 @@ namespace NeuralNetwork {
 				// 標準偏差で重みを割って更新する
 				F32 deviation = sqrtf(variance);
 				{
-					thrust::host_vector<F32> lpTmpNeuron = this->layerData.lppNeuron_d;
-					thrust::host_vector<F32> lpTmpBias   = this->layerData.lpBias_d;
+					thrust::host_vector<F32> lpTmpNeuron = lpTmpWeight;
+					thrust::host_vector<F32> lpTmpBias   = lpTmpBias;
 
 					for(U32 neuronNum=0; neuronNum<lpTmpNeuron.size(); neuronNum++)
 					{
@@ -223,16 +228,19 @@ namespace NeuralNetwork {
 						lpTmpBias[neuronNum] /= deviation;
 					}
 
-					this->layerData.lppNeuron_d = lpTmpNeuron;
-					this->layerData.lpBias_d    = lpTmpBias;
+					lpTmpWeight = lpTmpNeuron;
+					lpTmpBias    = lpTmpBias;
 				}
 
 				procTime++;
 			}while(procTime < 5);
+
+			// 重みを更新
+			this->layerData.pWeightData->SetData(thrust::raw_pointer_cast(&lpTmpWeight[0]), thrust::raw_pointer_cast(&lpTmpBias[0]));
 		}
 		else
 		{
-			ErrorCode err = this->CalculateBase(i_lppInputBuffer, o_lppOutputBuffer);
+			ErrorCode err = this->CalculateBase(i_lppInputBuffer, o_lppOutputBuffer, this->layerData.pWeightData->GetWeight(), this->layerData.pWeightData->GetBias());
 			if(err != ErrorCode::ERROR_CODE_NONE)
 				return err;
 		}
@@ -240,7 +248,7 @@ namespace NeuralNetwork {
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
-	ErrorCode FullyConnect_GPU::CalculateBase(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer)
+	ErrorCode FullyConnect_GPU::CalculateBase(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer, const F32* lpWeight, const F32* lpBias)
 	{
 		// バイアスを出力信号にコピーする
 		{
@@ -248,7 +256,7 @@ namespace NeuralNetwork {
 			{
 				cudaError_t err = cudaMemcpy(
 					&o_lppOutputBuffer[batchNum * this->outputBufferCount],
-					thrust::raw_pointer_cast(&this->layerData.lpBias_d[0]),
+					lpBias,
 					sizeof(F32) * this->neuronCount,
 					cudaMemcpyDeviceToDevice);
 				if(err != 0)
@@ -279,10 +287,10 @@ namespace NeuralNetwork {
 				this->GetBatchSize(),	// 行列Bの列数
 				this->inputBufferCount,	// 行列Aの列数,行列Bの行数
 				&alpha,
-				thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]),	// 行列A
-				this->inputBufferCount,										// 行列Aの転置前の行数
-				i_lppInputBuffer,											// 行列B
-				this->inputBufferCount,										// 行列Bの転置前の行数
+				lpWeight,					// 行列A
+				this->inputBufferCount,		// 行列Aの転置前の行数
+				i_lppInputBuffer,			// 行列B
+				this->inputBufferCount,		// 行列Bの転置前の行数
 				&beta,
 				&o_lppOutputBuffer[0],
 				this->outputBufferCount);
@@ -316,10 +324,10 @@ namespace NeuralNetwork {
 				this->GetBatchSize(),		// 行列Bの列数
 				this->neuronCount,		// 行列Aの列数,行列Bの行数
 				&alpha,
-				thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]),	// 行列A
-				this->inputBufferCount,										// 行列Aの転置前の行数
-				i_lppDOutputBuffer,											// 行列B
-				this->neuronCount,											// 行列Bの転置前の行数
+				this->layerData.pWeightData->GetWeight(),	// 行列A
+				this->inputBufferCount,						// 行列Aの転置前の行数
+				i_lppDOutputBuffer,							// 行列B
+				this->neuronCount,							// 行列Bの転置前の行数
 				&beta,
 				o_lppDInputBuffer,
 				this->inputBufferCount);
@@ -396,10 +404,7 @@ namespace NeuralNetwork {
 
 
 		// 誤差を反映
-		if(this->layerData.m_pOptimizer_bias)
-			this->layerData.m_pOptimizer_bias->UpdateParameter(thrust::raw_pointer_cast(&this->layerData.lpBias_d[0]),   thrust::raw_pointer_cast(&this->lpDBias[0]));
-		if(this->layerData.m_pOptimizer_neuron)
-			this->layerData.m_pOptimizer_neuron->UpdateParameter(thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]), thrust::raw_pointer_cast(&this->lpDNeuron[0]));
+		this->layerData.pWeightData->UpdateData(thrust::raw_pointer_cast(&this->lpDNeuron[0]), thrust::raw_pointer_cast(&this->lpDBias[0]));
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
