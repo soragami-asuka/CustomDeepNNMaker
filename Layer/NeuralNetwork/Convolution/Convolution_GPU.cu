@@ -107,8 +107,8 @@ namespace NeuralNetwork {
 
 
 		// パラメータ変化量のバッファを確保
-		this->lpDBias.resize(this->layerData.lpBias_d.size());
-		this->lpDNeuron.resize(this->layerData.lppNeuron_d.size());
+		this->lpDBias.resize(this->layerData.pWeightData->GetBiasSize());
+		this->lpDNeuron.resize(this->layerData.pWeightData->GetWeigthSize());
 
 
 		return ErrorCode::ERROR_CODE_NONE;
@@ -528,11 +528,20 @@ namespace NeuralNetwork {
 
 			std::vector<F32> lpTmpOutputBuffer(this->GetBatchSize() * this->outputBufferCount);
 
+			// バッファを確保
+			thrust::device_vector<F32> lpTmpWeight_d(this->layerData.pWeightData->GetWeigthSize());
+			thrust::device_vector<F32> lpTmpBias_d(this->layerData.pWeightData->GetBiasSize());
+
+			// バッファをコピー
+			cudaMemcpy(thrust::raw_pointer_cast(&lpTmpWeight_d[0]), this->layerData.pWeightData->GetWeight(), sizeof(F32)*lpTmpWeight_d.size(), cudaMemcpyDeviceToDevice);
+			cudaMemcpy(thrust::raw_pointer_cast(&lpTmpBias_d[0]),   this->layerData.pWeightData->GetBias(),   sizeof(F32)*lpTmpBias_d.size(), cudaMemcpyDeviceToDevice);
+
+
 			U32 procTime = 0;
 			do
 			{
 				// 演算を実行
-				ErrorCode err = this->Calculate_base(i_lppInputBuffer, o_lppOutputBuffer);
+				ErrorCode err = this->Calculate_base(i_lppInputBuffer, o_lppOutputBuffer, thrust::raw_pointer_cast(&lpTmpWeight_d[0]), thrust::raw_pointer_cast(&lpTmpBias_d[0]));
 				if(err != ErrorCode::ERROR_CODE_NONE)
 					return err;
 
@@ -564,8 +573,8 @@ namespace NeuralNetwork {
 				// 標準偏差で重みを割って更新する
 				F32 deviation = sqrtf(variance);
 				{
-					thrust::host_vector<F32> lpTmpNeuron = this->layerData.lppNeuron_d;
-					thrust::host_vector<F32> lpTmpBias   = this->layerData.lpBias_d;
+					thrust::host_vector<F32> lpTmpNeuron = lpTmpWeight_d;
+					thrust::host_vector<F32> lpTmpBias   = lpTmpBias_d;
 
 					for(U32 neuronNum=0; neuronNum<lpTmpNeuron.size(); neuronNum++)
 					{
@@ -576,16 +585,19 @@ namespace NeuralNetwork {
 						lpTmpBias[neuronNum] /= deviation;
 					}
 
-					this->layerData.lppNeuron_d = lpTmpNeuron;
-					this->layerData.lpBias_d    = lpTmpBias;
+					lpTmpWeight_d = lpTmpNeuron;
+					lpTmpBias_d    = lpTmpBias;
 				}
 
 				procTime++;
 			}while(procTime < 5);
+			
+			// 重みを更新
+			this->layerData.pWeightData->SetData(thrust::raw_pointer_cast(&lpTmpWeight_d[0]), thrust::raw_pointer_cast(&lpTmpBias_d[0]));
 		}
 		else
 		{
-			ErrorCode err = this->Calculate_base(i_lppInputBuffer, o_lppOutputBuffer);
+			ErrorCode err = this->Calculate_base(i_lppInputBuffer, o_lppOutputBuffer, this->layerData.pWeightData->GetWeight(), this->layerData.pWeightData->GetBias());
 			if(err != ErrorCode::ERROR_CODE_NONE)
 				return err;
 		}
@@ -593,7 +605,7 @@ namespace NeuralNetwork {
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
-	ErrorCode Convolution_GPU::Calculate_base(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer)
+	ErrorCode Convolution_GPU::Calculate_base(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer, const F32* lpWeight, const F32* lpBias)
 	{
 		cudnnStatus_t err_cudnn;
 
@@ -607,7 +619,7 @@ namespace NeuralNetwork {
 				this->inputTensorDesc,
 				i_lppInputBuffer,
 				this->filterDesc,
-				thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]),
+				lpWeight,
 				this->convDesc,
 				this->useForwardAlgorithm,
 				this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), WORKSPACE_CODE),
@@ -628,7 +640,7 @@ namespace NeuralNetwork {
 				this->cudnnHandle,
 				&alpha,
 				this->biasTensorDesc,
-				thrust::raw_pointer_cast(&this->layerData.lpBias_d[0]),
+				lpBias,
 				&beta,
 				this->outputTensorDesc,
 				o_lppOutputBuffer);
@@ -665,7 +677,7 @@ namespace NeuralNetwork {
 				this->cudnnHandle,
 				&alpha,
 				this->filterDesc,
-				thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]),
+				this->layerData.pWeightData->GetWeight(),
 				this->outputTensorDesc,
 				i_lppDOutputBuffer,
 				this->convDesc,
@@ -740,11 +752,7 @@ namespace NeuralNetwork {
 		}
 
 		// 変化量を反映
-		if(this->layerData.m_pOptimizer_bias)
-			this->layerData.m_pOptimizer_bias->UpdateParameter(thrust::raw_pointer_cast(&this->layerData.lpBias_d[0]),   thrust::raw_pointer_cast(&this->lpDBias[0]));
-		if(this->layerData.m_pOptimizer_neuron)
-			this->layerData.m_pOptimizer_neuron->UpdateParameter(thrust::raw_pointer_cast(&this->layerData.lppNeuron_d[0]), thrust::raw_pointer_cast(&this->lpDNeuron[0]));
-
+		this->layerData.pWeightData->UpdateData(thrust::raw_pointer_cast(&this->lpDNeuron[0]), thrust::raw_pointer_cast(&this->lpDBias[0]));
 
 		// 一時バッファ解放
 		this->temporaryMemoryManager.RestoreBuffer(this->GetGUID(), WORKSPACE_CODE);

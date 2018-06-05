@@ -66,7 +66,7 @@ namespace NeuralNetworkLayer {
 	Layer::ILayerData* CreateConvolutionLayer(
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 		U32 inputChannelCount, Vector3D<S32> filterSize, U32 outputChannelCount, Vector3D<S32> stride, Vector3D<S32> paddingSize,
-		const wchar_t i_szInitializerID[] = L"glorot_uniform");
+		const wchar_t i_szWeightData[] = L"Default", const wchar_t i_szInitializerID[] = L"glorot_uniform");
 
 	/** 入力拡張畳込みニューラルネットワークレイヤー.
 		@param	layerDLLManager		レイヤーDLL管理クラス.
@@ -80,7 +80,7 @@ namespace NeuralNetworkLayer {
 	Layer::ILayerData* CreateDilatedConvolutionLayer(
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 		U32 inputChannelCount, Vector3D<S32> filterSize, U32 outputChannelCount, Vector3D<S32> dilation, Vector3D<S32> stride, Vector3D<S32> paddingSize,
-		const wchar_t i_szInitializerID[] = L"glorot_uniform");
+		const wchar_t i_szWeightData[] = L"Default", const wchar_t i_szInitializerID[] = L"glorot_uniform");
 
 	/** 全結合ニューラルネットワークレイヤー.
 		@param	layerDLLManager		レイヤーDLL管理クラス.
@@ -90,7 +90,7 @@ namespace NeuralNetworkLayer {
 	Layer::ILayerData* CreateFullyConnectLayer(
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 		U32 inputBufferCount, U32 neuronCount,
-		const wchar_t i_szInitializerID[] = L"glorot_uniform");
+		const wchar_t i_szWeightData[] = L"Default", const wchar_t i_szInitializerID[] = L"glorot_uniform");
 
 	/** 自己組織化マップレイヤー */
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API

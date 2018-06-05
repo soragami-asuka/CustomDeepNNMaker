@@ -77,7 +77,9 @@ namespace NeuralNetwork {
 		delete pLayerStructure;
 
 		// ‰Šú‰»‚·‚é
-		this->Initialize();
+		ErrorCode err = this->Initialize();
+		if(err != ErrorCode::ERROR_CODE_NONE)
+			return err;
 
 		// d‚Ý‚Ì‰Šú‰»
 		readBufferByte += this->pWeightData->InitializeFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize-readBufferByte);

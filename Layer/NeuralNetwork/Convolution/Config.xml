@@ -144,6 +144,12 @@
       <Default>glorot_uniform</Default>
     </String>
 
+    <String id="WeightData">
+      <Name>重みデータの種別</Name>
+      <Text>重みデータの種別</Text>
+      <Default>Default</Default>
+    </String>
+    
   </Structure>
 
   <!--学習に使用するデータの構造-->

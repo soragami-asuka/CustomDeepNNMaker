@@ -10,6 +10,7 @@
 
 #include"Library/NeuralNetwork/Optimizer.h"
 #include"Library/NeuralNetwork/Initializer.h"
+#include<Library/NeuralNetwork/WeightData.h>
 
 #include"../_LayerBase/CLayerBase_CPU.h"
 
@@ -50,98 +51,14 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_COMMON_OUT_OF_VALUERANGE;
 
 		// バッファを確保しつつ、初期値を設定
-		auto& initializer = Gravisbell::Layer::NeuralNetwork::GetInitializerManager().GetInitializer(this->layerStructure.Initializer);
-		U32 inputCount  = this->layerStructure.FilterSize.x * this->layerStructure.FilterSize.y * this->layerStructure.FilterSize.z * this->layerStructure.Input_Channel;
-		U32 outputCount = this->layerStructure.Output_Channel;
-
-		this->lpNeuron.resize(neuronCount * inputBufferCount);
-		this->lppNeuron.resize(neuronCount);
-		this->lpBias.resize(neuronCount);
-		// ニューロン
-		for(unsigned int neuronNum=0; neuronNum<neuronCount; neuronNum++)
-		{
-			lppNeuron[neuronNum] = &this->lpNeuron[inputBufferCount * neuronNum];
-			for(unsigned int inputNum=0; inputNum<inputBufferCount; inputNum++)
-			{
-				this->lppNeuron[neuronNum][inputNum] = initializer.GetParameter(inputCount, outputCount);
-			}
-		}
-		// バイアス
-		for(unsigned int neuronNum=0; neuronNum<lppNeuron.size(); neuronNum++)
-		{
-			this->lpBias[neuronNum] = initializer.GetParameter(inputCount, outputCount);
-		}
-
-		return ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 初期化. 各ニューロンの値をランダムに初期化
-		@param	i_config			設定情報
-		@oaram	i_inputDataStruct	入力データ構造情報
-		@return	成功した場合0 */
-	ErrorCode Convolution_LayerData_CPU::Initialize(const SettingData::Standard::IData& i_data)
-	{
-		ErrorCode err;
-
-		// 設定情報の登録
-		err = this->SetLayerConfig(i_data);
-		if(err != ErrorCode::ERROR_CODE_NONE)
-			return err;
-
-		// 初期化
-		err = this->Initialize();
-		if(err != ErrorCode::ERROR_CODE_NONE)
-			return err;
-
-		// オプティマイザーの設定
-		err = this->ChangeOptimizer(L"SGD");
-		if(err != ErrorCode::ERROR_CODE_NONE)
-			return err;
-
-		return ErrorCode::ERROR_CODE_NONE;
-	}
-	/** 初期化. バッファからデータを読み込む
-		@param i_lpBuffer	読み込みバッファの先頭アドレス.
-		@param i_bufferSize	読み込み可能バッファのサイズ.
-		@return	成功した場合0 */
-	ErrorCode Convolution_LayerData_CPU::InitializeFromBuffer(const BYTE* i_lpBuffer, U64 i_bufferSize, S64& o_useBufferSize )
-	{
-		S64 readBufferByte = 0;
-
-		// 設定情報
-		S64 useBufferByte = 0;
-		SettingData::Standard::IData* pLayerStructure = CreateLayerStructureSettingFromBuffer(&i_lpBuffer[readBufferByte], i_bufferSize, useBufferByte);
-		if(pLayerStructure == NULL)
-			return ErrorCode::ERROR_CODE_INITLAYER_READ_CONFIG;
-		readBufferByte += useBufferByte;
-		this->SetLayerConfig(*pLayerStructure);
-		delete pLayerStructure;
-
-		// 初期化する
-		this->Initialize();
-
-		// ニューロン係数
-		memcpy(&this->lpNeuron[0], &i_lpBuffer[readBufferByte], this->lpNeuron.size() * sizeof(NEURON_TYPE));
-		readBufferByte += this->lpNeuron.size() * sizeof(NEURON_TYPE);
-
-		// バイアス
-		memcpy(&this->lpBias[0], &i_lpBuffer[readBufferByte], this->lpBias.size() * sizeof(NEURON_TYPE));
-		readBufferByte += this->lpBias.size() * sizeof(NEURON_TYPE);
-
-		// オプティマイザ
-		S64 useBufferSize = 0;
-		// bias
-		if(this->m_pOptimizer_bias)
-			delete this->m_pOptimizer_bias;
-		this->m_pOptimizer_bias = CreateOptimizerFromBuffer_CPU(&i_lpBuffer[readBufferByte], i_bufferSize-readBufferByte, useBufferSize);
-		readBufferByte += useBufferSize;
-		// neuron
-		if(this->m_pOptimizer_neuron)
-			delete this->m_pOptimizer_neuron;
-		this->m_pOptimizer_neuron = CreateOptimizerFromBuffer_CPU(&i_lpBuffer[readBufferByte], i_bufferSize-readBufferByte, useBufferSize);
-		readBufferByte += useBufferSize;
-
-
-		o_useBufferSize = readBufferByte;
+		U32 inputCount  = inputBufferCount;
+		U32 outputCount = neuronCount;
+		if(this->pWeightData)
+			delete this->pWeightData;
+		this->pWeightData = Gravisbell::Layer::NeuralNetwork::GetWeightDataManager().CreateWeightData_CPU(this->layerStructure.WeightData, neuronCount * inputBufferCount, neuronCount);
+		if(this->pWeightData == NULL)
+			return ErrorCode::ERROR_CODE_COMMON_NOT_EXIST;
+		this->pWeightData->Initialize(this->layerStructure.Initializer, inputCount, outputCount);
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -150,36 +67,6 @@ namespace NeuralNetwork {
 	//===========================
 	// レイヤー保存
 	//===========================
-	/** レイヤーをバッファに書き込む.
-		@param o_lpBuffer	書き込み先バッファの先頭アドレス. GetUseBufferByteCountの戻り値のバイト数が必要
-		@return 成功した場合書き込んだバッファサイズ.失敗した場合は負の値 */
-	S64 Convolution_LayerData_CPU::WriteToBuffer(BYTE* o_lpBuffer)const
-	{
-		if(this->pLayerStructure == NULL)
-			return -1;
-
-		S64 writeBufferByte = 0;
-
-		// 設定情報
-		writeBufferByte += this->pLayerStructure->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
-
-		// ニューロン係数
-		memcpy(&o_lpBuffer[writeBufferByte], &this->lpNeuron[0], this->lpNeuron.size() * sizeof(NEURON_TYPE));
-		writeBufferByte += this->lpNeuron.size() * sizeof(NEURON_TYPE);
-
-		// バイアス
-		memcpy(&o_lpBuffer[writeBufferByte], &this->lpBias[0], this->lpBias.size() * sizeof(NEURON_TYPE));
-		writeBufferByte += this->lpBias.size() * sizeof(NEURON_TYPE);
-
-		// オプティマイザ
-		// bias
-		writeBufferByte += this->m_pOptimizer_bias->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
-		// neuron
-		writeBufferByte += this->m_pOptimizer_neuron->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
-
-
-		return writeBufferByte;
-	}
 
 
 	//===========================
@@ -199,14 +86,6 @@ namespace NeuralNetwork {
 	//===========================
 	// オプティマイザー設定
 	//===========================
-	/** オプティマイザーを変更する */
-	ErrorCode Convolution_LayerData_CPU::ChangeOptimizer(const wchar_t i_optimizerID[])
-	{
-		ChangeOptimizer_CPU(&this->m_pOptimizer_bias,   i_optimizerID, (U32)this->lpBias.size());
-		ChangeOptimizer_CPU(&this->m_pOptimizer_neuron, i_optimizerID, (U32)this->lpNeuron.size());
-
-		return ErrorCode::ERROR_CODE_NONE;
-	}
 
 } // Gravisbell;
 } // Layer;

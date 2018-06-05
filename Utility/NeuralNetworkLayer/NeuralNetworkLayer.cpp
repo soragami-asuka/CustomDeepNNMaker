@@ -87,7 +87,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(
 Layer::ILayerData* CreateConvolutionLayer(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 	U32 inputChannelCount, Vector3D<S32> filterSize, U32 outputChannelCount, Vector3D<S32> stride, Vector3D<S32> paddingSize,
-	const wchar_t i_szInitializerID[])
+	const wchar_t i_szWeightData[], const wchar_t i_szInitializerID[])
 {
 	const Gravisbell::GUID TYPE_CODE(0xf6662e0e, 0x1ca4, 0x4d59, 0xac, 0xca, 0xca, 0xc2, 0x9a, 0x16, 0xc0, 0xaa);
 
@@ -130,6 +130,11 @@ Layer::ILayerData* CreateConvolutionLayer(
 		SettingData::Standard::IItem_Enum* pItem = dynamic_cast<SettingData::Standard::IItem_Enum*>(pConfig->GetItemByID(L"PaddingType"));
 		pItem->SetValue(L"zero");
 	}
+	// 重みデータ
+	{
+		SettingData::Standard::IItem_String* pItem = dynamic_cast<SettingData::Standard::IItem_String*>(pConfig->GetItemByID(L"WeightData"));
+		pItem->SetValue(i_szWeightData);
+	}
 	// 初期化方法
 	{
 		SettingData::Standard::IItem_String* pItem = dynamic_cast<SettingData::Standard::IItem_String*>(pConfig->GetItemByID(L"Initializer"));
@@ -158,7 +163,7 @@ GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 Layer::ILayerData* CreateDilatedConvolutionLayer(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 	U32 inputChannelCount, Vector3D<S32> filterSize, U32 outputChannelCount, Vector3D<S32> dilation, Vector3D<S32> stride, Vector3D<S32> paddingSize,
-	const wchar_t i_szInitializerID[])
+	const wchar_t i_szWeightData[], const wchar_t i_szInitializerID[])
 {
 	const Gravisbell::GUID TYPE_CODE(0xf6662e0e, 0x1ca4, 0x4d59, 0xac, 0xca, 0xca, 0xc2, 0x9a, 0x16, 0xc0, 0xaa);
 
@@ -206,6 +211,11 @@ Layer::ILayerData* CreateDilatedConvolutionLayer(
 		SettingData::Standard::IItem_Enum* pItem = dynamic_cast<SettingData::Standard::IItem_Enum*>(pConfig->GetItemByID(L"PaddingType"));
 		pItem->SetValue(L"zero");
 	}
+	// 重みデータ
+	{
+		SettingData::Standard::IItem_String* pItem = dynamic_cast<SettingData::Standard::IItem_String*>(pConfig->GetItemByID(L"WeightData"));
+		pItem->SetValue(i_szWeightData);
+	}
 	// 初期化方法
 	{
 		SettingData::Standard::IItem_String* pItem = dynamic_cast<SettingData::Standard::IItem_String*>(pConfig->GetItemByID(L"Initializer"));
@@ -227,7 +237,7 @@ Layer::ILayerData* CreateDilatedConvolutionLayer(
 Layer::ILayerData* CreateFullyConnectLayer(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 	U32 inputBufferCount, U32 neuronCount,
-	const wchar_t i_szInitializerID[])
+	const wchar_t i_szWeightData[], const wchar_t i_szInitializerID[])
 {
 	const Gravisbell::GUID TYPE_CODE(0x14cc33f4, 0x8cd3, 0x4686, 0x9c, 0x48, 0xef, 0x45, 0x2b, 0xa5, 0xd2, 0x02);
 
@@ -250,6 +260,11 @@ Layer::ILayerData* CreateFullyConnectLayer(
 	{
 		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"NeuronCount"));
 		pItem->SetValue(neuronCount);
+	}
+	// 重みデータ
+	{
+		SettingData::Standard::IItem_String* pItem = dynamic_cast<SettingData::Standard::IItem_String*>(pConfig->GetItemByID(L"WeightData"));
+		pItem->SetValue(i_szWeightData);
 	}
 	// 初期化方法
 	{

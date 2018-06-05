@@ -509,6 +509,9 @@
     <ProjectReference Include="..\..\..\Library\NeuralNetwork\Optimizer\Optimizer.vcxproj">
       <Project>{6863b36d-d1c4-4f1e-ab3a-0eba732fec1d}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Library\NeuralNetwork\WeightData\WeightData.vcxproj">
+      <Project>{5c1d14c6-0c49-4f36-a308-113c41a3b012}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Library\SettingData\Standard\Standard.vcxproj">
       <Project>{79fd5f13-1407-43ab-834c-04c1aeccdbb5}</Project>
     </ProjectReference>

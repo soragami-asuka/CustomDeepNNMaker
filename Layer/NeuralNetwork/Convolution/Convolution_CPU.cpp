@@ -85,8 +85,8 @@ namespace NeuralNetwork {
 			return errorCode;
 
 		// ニューロン/バイアスの誤差を一時保存するバッファを作成
-		this->lpDBias.resize(this->layerData.lpBias.size());
-		this->lpDNeuron.resize(this->layerData.lpNeuron.size());
+		this->lpDBias.resize(this->layerData.pWeightData->GetBiasSize());
+		this->lpDNeuron.resize(this->layerData.pWeightData->GetWeigthSize());
 
 		// 入力誤差/出力誤差バッファを作成
 		this->lppBatchDInputBuffer.resize(this->GetBatchSize());
@@ -118,15 +118,9 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
 		// フィルタサイズ確認
-		this->filterSize = this->layerData.layerStructure.FilterSize.x * this->layerData.layerStructure.FilterSize.y * this->layerData.layerStructure.FilterSize.z;
+		this->filterSize = this->GetInputDataStruct().ch * this->layerData.layerStructure.FilterSize.x * this->layerData.layerStructure.FilterSize.y * this->layerData.layerStructure.FilterSize.z;
 		if(this->filterSize == 0)
 			return ErrorCode::ERROR_CODE_FRAUD_INPUT_COUNT;
-
-		// ニューロンバッファのサイズ確認
-		if(this->layerData.lpNeuron.size() != this->neuronCount * this->filterSize * this->GetInputDataStruct().ch)
-			return ErrorCode::ERROR_CODE_FRAUD_NEURON_COUNT;
-		if(this->layerData.lppNeuron.size() != this->neuronCount)
-			return ErrorCode::ERROR_CODE_FRAUD_NEURON_COUNT;
 
 		// 出力バッファを作成
 		this->lppBatchInputBuffer.resize(this->GetBatchSize());
@@ -156,11 +150,19 @@ namespace NeuralNetwork {
 			U32 PROCTIME_MAX = 5;			// 実行最大値
 			F32	VARIANCE_TOLERANCE = 0.1f;	// 分散交差(許容範囲)
 
+			// バッファを確保
+			std::vector<F32> lpTmpWeight(this->layerData.pWeightData->GetWeigthSize());
+			std::vector<F32> lpTmpBias(this->layerData.pWeightData->GetBiasSize());
+
+			// バッファをコピー
+			memcpy(&lpTmpWeight[0], this->layerData.pWeightData->GetWeight(), sizeof(F32)*lpTmpWeight.size());
+			memcpy(&lpTmpBias[0],   this->layerData.pWeightData->GetBias(),   sizeof(F32)*lpTmpBias.size());
+
 			U32 procTime = 0;
 			do
 			{
 				// 演算を実行
-				ErrorCode err = this->Calculate_base(i_lppInputBuffer, o_lppOutputBuffer);
+				ErrorCode err = this->Calculate_base(i_lppInputBuffer, o_lppOutputBuffer, &lpTmpWeight[0], &lpTmpBias[0]);
 				if(err != ErrorCode::ERROR_CODE_NONE)
 					return err;
 
@@ -195,22 +197,25 @@ namespace NeuralNetwork {
 				// 標準偏差で重みを割って更新する
 				F32 deviation = sqrtf(variance);
 				{
-					for(U32 neuronNum=0; neuronNum<this->layerData.lpNeuron.size(); neuronNum++)
+					for(U32 neuronNum=0; neuronNum<lpTmpWeight.size(); neuronNum++)
 					{
-						this->layerData.lpNeuron[neuronNum] /= deviation;
+						lpTmpWeight[neuronNum] /= deviation;
 					}
-					for(U32 neuronNum=0; neuronNum<this->layerData.lpBias.size(); neuronNum++)
+					for(U32 neuronNum=0; neuronNum<lpTmpBias.size(); neuronNum++)
 					{
-						this->layerData.lpBias[neuronNum] /= deviation;
+						lpTmpBias[neuronNum] /= deviation;
 					}
 				}
 
 				procTime++;
 			}while(procTime < PROCTIME_MAX);
+			
+			// 重みを更新
+			this->layerData.pWeightData->SetData(&lpTmpWeight[0], &lpTmpBias[0]);
 		}
 		else
 		{
-			ErrorCode err = this->Calculate_base(i_lppInputBuffer, o_lppOutputBuffer);
+			ErrorCode err = this->Calculate_base(i_lppInputBuffer, o_lppOutputBuffer, this->layerData.pWeightData->GetWeight(), this->layerData.pWeightData->GetBias());
 			if(err != ErrorCode::ERROR_CODE_NONE)
 				return err;
 		}
@@ -218,7 +223,7 @@ namespace NeuralNetwork {
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
-	ErrorCode Convolution_CPU::Calculate_base(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer)
+	ErrorCode Convolution_CPU::Calculate_base(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer, const F32* lpWeight, const F32* lpBias)
 	{
 		// 入力バッファのアドレスを配列に格納
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
@@ -267,13 +272,13 @@ namespace NeuralNetwork {
 											const S32 inputOffset  = this->GetInputDataStruct().POSITION_TO_OFFSET(inputX,inputY,inputZ, chNum);
 											const S32 filterOffset = POSITION_TO_OFFSET_VECTOR(filterX, filterY, filterZ, chNum, this->layerData.layerStructure.FilterSize);
 
-											tmp += this->layerData.lppNeuron[neuronNum][filterOffset] * this->lppBatchInputBuffer[batchNum][inputOffset];
+											tmp += lpWeight[neuronNum * this->filterSize + filterOffset] * this->lppBatchInputBuffer[batchNum][inputOffset];
 										}
 									}
 								}
 							}
 							// バイアスを追加
-							tmp += this->layerData.lpBias[neuronNum];
+							tmp += lpBias[neuronNum];
 
 							// 計算結果を格納する
 							this->lppBatchOutputBuffer[batchNum][outputOffset] = tmp;
@@ -363,10 +368,10 @@ namespace NeuralNetwork {
 											const S32 filterOffset = POSITION_TO_OFFSET_VECTOR(filterX, filterY, filterZ, chNum, this->layerData.layerStructure.FilterSize);
 
 											if(o_lppDInputBuffer)
-												this->lppBatchDInputBuffer[batchNum][inputOffset] += this->layerData.lppNeuron[neuronNum][filterOffset] * dOutput;
+												this->lppBatchDInputBuffer[batchNum][inputOffset] += this->layerData.pWeightData->GetWeight()[neuronNum*this->filterSize + filterOffset] * dOutput;
 
 											// ニューロンの重み変化量を追加
-											this->lpDNeuron[neuronNum*this->filterSize*this->GetInputDataStruct().ch + filterOffset] += this->lppBatchInputBuffer[batchNum][inputOffset] * dOutput;
+											this->lpDNeuron[neuronNum*this->filterSize + filterOffset] += this->lppBatchInputBuffer[batchNum][inputOffset] * dOutput;
 										}
 									}
 								}
@@ -396,10 +401,7 @@ namespace NeuralNetwork {
 			return errCode;
 
 		// 学習差分の反映
-		if(this->layerData.m_pOptimizer_bias)
-			this->layerData.m_pOptimizer_bias->UpdateParameter(&this->layerData.lpBias[0], &this->lpDBias[0]);
-		if(this->layerData.m_pOptimizer_neuron)
-			this->layerData.m_pOptimizer_neuron->UpdateParameter(&this->layerData.lpNeuron[0], &this->lpDNeuron[0]);
+		this->layerData.pWeightData->UpdateData(&this->lpDNeuron[0], &this->lpDBias[0]);
 
 
 		return ErrorCode::ERROR_CODE_NONE;

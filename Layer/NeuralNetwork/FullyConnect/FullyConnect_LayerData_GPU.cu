@@ -67,6 +67,8 @@ namespace NeuralNetwork {
 		if(this->pWeightData)
 			delete this->pWeightData;
 		this->pWeightData = Gravisbell::Layer::NeuralNetwork::GetWeightDataManager().CreateWeightData_GPU(this->layerStructure.WeightData, neuronCount * inputBufferCount, neuronCount);
+		if(this->pWeightData == NULL)
+			return ErrorCode::ERROR_CODE_COMMON_NOT_EXIST;
 		this->pWeightData->Initialize(this->layerStructure.Initializer, inputCount, outputCount);
 
 		return ErrorCode::ERROR_CODE_NONE;

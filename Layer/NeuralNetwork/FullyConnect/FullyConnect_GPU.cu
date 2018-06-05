@@ -172,19 +172,19 @@ namespace NeuralNetwork {
 			std::vector<F32> lpTmpOutputBuffer(this->GetBatchSize() * this->outputBufferCount);
 
 			// バッファを確保
-			thrust::device_vector<F32> lpTmpWeight(this->layerData.pWeightData->GetWeigthSize());
-			thrust::device_vector<F32> lpTmpBias(this->layerData.pWeightData->GetBiasSize());
+			thrust::device_vector<F32> lpTmpWeight_d(this->layerData.pWeightData->GetWeigthSize());
+			thrust::device_vector<F32> lpTmpBias_d(this->layerData.pWeightData->GetBiasSize());
 
 			// バッファをコピー
-			cudaMemcpy(thrust::raw_pointer_cast(&lpTmpWeight[0]), this->layerData.pWeightData->GetWeight(), sizeof(F32)*lpTmpWeight.size(), cudaMemcpyDeviceToDevice);
-			cudaMemcpy(thrust::raw_pointer_cast(&lpTmpBias[0]),   this->layerData.pWeightData->GetBias(),   sizeof(F32)*lpTmpBias.size(), cudaMemcpyDeviceToDevice);
+			cudaMemcpy(thrust::raw_pointer_cast(&lpTmpWeight_d[0]), this->layerData.pWeightData->GetWeight(), sizeof(F32)*lpTmpWeight_d.size(), cudaMemcpyDeviceToDevice);
+			cudaMemcpy(thrust::raw_pointer_cast(&lpTmpBias_d[0]),   this->layerData.pWeightData->GetBias(),   sizeof(F32)*lpTmpBias_d.size(), cudaMemcpyDeviceToDevice);
 
 
 			U32 procTime = 0;
 			do
 			{
 				// 演算を実行
-				ErrorCode err = this->CalculateBase(i_lppInputBuffer, o_lppOutputBuffer, thrust::raw_pointer_cast(&lpTmpWeight[0]), thrust::raw_pointer_cast(&lpTmpBias[0]));
+				ErrorCode err = this->CalculateBase(i_lppInputBuffer, o_lppOutputBuffer, thrust::raw_pointer_cast(&lpTmpWeight_d[0]), thrust::raw_pointer_cast(&lpTmpBias_d[0]));
 				if(err != ErrorCode::ERROR_CODE_NONE)
 					return err;
 
@@ -216,8 +216,8 @@ namespace NeuralNetwork {
 				// 標準偏差で重みを割って更新する
 				F32 deviation = sqrtf(variance);
 				{
-					thrust::host_vector<F32> lpTmpNeuron = lpTmpWeight;
-					thrust::host_vector<F32> lpTmpBias   = lpTmpBias;
+					thrust::host_vector<F32> lpTmpNeuron = lpTmpWeight_d;
+					thrust::host_vector<F32> lpTmpBias   = lpTmpBias_d;
 
 					for(U32 neuronNum=0; neuronNum<lpTmpNeuron.size(); neuronNum++)
 					{
@@ -228,15 +228,15 @@ namespace NeuralNetwork {
 						lpTmpBias[neuronNum] /= deviation;
 					}
 
-					lpTmpWeight = lpTmpNeuron;
-					lpTmpBias    = lpTmpBias;
+					lpTmpWeight_d = lpTmpNeuron;
+					lpTmpBias_d    = lpTmpBias;
 				}
 
 				procTime++;
 			}while(procTime < 5);
 
 			// 重みを更新
-			this->layerData.pWeightData->SetData(thrust::raw_pointer_cast(&lpTmpWeight[0]), thrust::raw_pointer_cast(&lpTmpBias[0]));
+			this->layerData.pWeightData->SetData(thrust::raw_pointer_cast(&lpTmpWeight_d[0]), thrust::raw_pointer_cast(&lpTmpBias_d[0]));
 		}
 		else
 		{
