@@ -293,7 +293,7 @@ namespace Standard {
 			@param	o_lpBuffer	構造体の先頭アドレス. 構造体はConvertNNCofigToSourceから出力されたソースを使用する. */
 		ErrorCode WriteToStruct(BYTE* o_lpBuffer)const
 		{
-			unsigned int bufferPos = 0;
+			U64 bufferPos = 0;
 			
 			// 各アイテム
 			for(unsigned int itemNum=0; itemNum<this->lpLayerConfigItem.size(); itemNum++)
@@ -314,7 +314,7 @@ namespace Standard {
 			@param	o_lpBuffer	構造体の先頭アドレス. 構造体はConvertNNCofigToSourceから出力されたソースを使用する. */
 		ErrorCode ReadFromStruct(const BYTE* i_lpBuffer)
 		{
-			unsigned int bufferPos = 0;
+			U64 bufferPos = 0;
 			
 			// 各アイテム
 			for(unsigned int itemNum=0; itemNum<this->lpLayerConfigItem.size(); itemNum++)

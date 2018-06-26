@@ -4,7 +4,7 @@
 //=====================================
 #include<thrust/device_vector.h>
 
-#include"WeightData_Default_base.h"
+#include"WeightData_Default.h"
 
 #include<Layer/NeuralNetwork/IOptimizer.h>
 #include<Library/NeuralNetwork/Optimizer.h>
@@ -30,9 +30,9 @@ namespace NeuralNetwork {
 		// コンストラクタ/デストラクタ
 		//===========================
 		/** コンストラクタ */
-		WeightData_Default_GPU(U32 i_weightSize, U32 i_biasSize)
-			:	lpWeight			(i_weightSize)
-			,	lpBias				(i_biasSize)
+		WeightData_Default_GPU(U32 i_neuronCount, U32 i_inputCount)
+			:	lpWeight			(i_neuronCount * i_inputCount)
+			,	lpBias				(i_neuronCount)
 			,	m_pOptimizer_weight	(NULL)
 			,	m_pOptimizer_bias	(NULL)
 		{
@@ -254,9 +254,9 @@ namespace NeuralNetwork {
 
 	/** 重みクラスを作成する.
 		デフォルト.CPU制御. */
-	IWeightData* CreateWeightData_Default_GPU(U32 i_weightSize, U32 i_biasSize)
+	IWeightData* CreateWeightData_Default_GPU(U32 i_neuronCount, U32 i_inputCount)
 	{
-		return new WeightData_Default_GPU(i_weightSize, i_biasSize);
+		return new WeightData_Default_GPU(i_neuronCount, i_inputCount);
 	}
 }
 }

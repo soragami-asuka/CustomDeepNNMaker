@@ -13,38 +13,50 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="FromXML">
+      <UniqueIdentifier>{ca53a52b-720d-4d06-90da-eb7c63e4563a}</UniqueIdentifier>
+    </Filter>
     <Filter Include="include">
-      <UniqueIdentifier>{5bd9fe03-7625-4b0b-afef-65ffb365248c}</UniqueIdentifier>
+      <UniqueIdentifier>{964c6051-54bf-400d-a752-eeb4a1850f95}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\Common">
-      <UniqueIdentifier>{1ba813e6-6467-4e3e-b032-680e911bc35f}</UniqueIdentifier>
+      <UniqueIdentifier>{964860ed-e3d4-44f9-9aea-c20f07ba92da}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\SettingData">
-      <UniqueIdentifier>{77ad0c99-95e8-491a-9526-e6a39fbd72e3}</UniqueIdentifier>
+      <UniqueIdentifier>{71480580-0953-4446-a828-78f359c9e765}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\SettingData\Standard">
-      <UniqueIdentifier>{1332d953-2932-46c3-a978-8c49c4cdf510}</UniqueIdentifier>
+      <UniqueIdentifier>{5a77c93b-00b6-4fd3-ab0a-75e90cb27a21}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\Layer">
-      <UniqueIdentifier>{cab2f0f9-645e-43dc-b0f1-fbb79413a6bb}</UniqueIdentifier>
+      <UniqueIdentifier>{fd2d6731-ccd6-4f0d-827e-e5b06ad83c9e}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\Layer\IOData">
-      <UniqueIdentifier>{81abcc10-9924-4edf-8960-6ec370f5b894}</UniqueIdentifier>
+      <UniqueIdentifier>{54111579-0bd7-4508-aef4-93b1c3ac2236}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\Layer\NeuralNetwork">
-      <UniqueIdentifier>{b6303560-bc77-412e-bf16-e30580d21d03}</UniqueIdentifier>
+      <UniqueIdentifier>{9215cb73-934b-4772-a053-7819d76e7939}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\Layer\IO">
-      <UniqueIdentifier>{cac536c5-dd96-4366-b009-114863a0f0c2}</UniqueIdentifier>
+      <UniqueIdentifier>{867fb881-4bcd-415b-bac7-f80627a20efc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="WeightData">
-      <UniqueIdentifier>{cf708eec-9c1a-48f9-aaa6-70f8f562bc40}</UniqueIdentifier>
+    <Filter Include="include\DataFormat">
+      <UniqueIdentifier>{04ad90b2-54a4-4e79-a44c-8ddb2f690d94}</UniqueIdentifier>
     </Filter>
-    <Filter Include="WeightData\Default">
-      <UniqueIdentifier>{bc878409-95a0-4998-a4fb-869918679c71}</UniqueIdentifier>
+    <Filter Include="include\DataFormat\StringArray">
+      <UniqueIdentifier>{e0e344ff-14c7-4e3e-b8c0-da53518702e9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="WeightData\WeightNormalization">
-      <UniqueIdentifier>{16d250f1-3152-4e9a-9727-5245c5336d2b}</UniqueIdentifier>
+    <Filter Include="include\DataFormat\Binary">
+      <UniqueIdentifier>{c119ca9a-d028-4a69-867f-917d2f820245}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LayerData">
+      <UniqueIdentifier>{5f67eb82-375e-480e-b6d7-7e7f145dc922}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Layer">
+      <UniqueIdentifier>{65317a4e-8411-4853-b7a7-572d9e80e862}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LayerBase">
+      <UniqueIdentifier>{a6c42085-39b6-44c7-a6ed-6f1f73acd71b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -56,6 +68,12 @@
     </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="BatchExponentialNormalization_FUNC.hpp">
+      <Filter>FromXML</Filter>
+    </ClInclude>
+    <ClInclude Include="BatchExponentialNormalization_DATA.hpp">
+      <Filter>FromXML</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Common\Common.h">
       <Filter>include\Common</Filter>
@@ -81,20 +99,11 @@
     <ClInclude Include="..\..\..\include\Layer\ILayerBase.h">
       <Filter>include\Layer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\ILayerData.h">
-      <Filter>include\Layer</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\IOData\IDataLayer.h">
       <Filter>include\Layer\IOData</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\IOData\IIODataLayer.h">
       <Filter>include\Layer\IOData</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDataManager.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLL.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\ILayerDLLManager.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
@@ -103,6 +112,9 @@
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayer.h">
+      <Filter>include\Layer\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNLayerDLL.h">
       <Filter>include\Layer\NeuralNetwork</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\NNlayerFunction.h">
@@ -123,51 +135,75 @@
     <ClInclude Include="..\..\..\include\Layer\IO\ISingleOutputLayer.h">
       <Filter>include\Layer\IO</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingle2SingleLayer.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
+    <ClInclude Include="..\..\..\include\DataFormat\IDataFormatBase.h">
+      <Filter>include\DataFormat</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\IWeightData.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
+    <ClInclude Include="..\..\..\include\DataFormat\StringArray\IDataFormat.h">
+      <Filter>include\DataFormat\StringArray</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNMult2SingleLayer.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
+    <ClInclude Include="..\..\..\include\DataFormat\Binary\IDataFormat.h">
+      <Filter>include\DataFormat\Binary</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Layer\NeuralNetwork\INNSingle2MultLayer.h">
-      <Filter>include\Layer\NeuralNetwork</Filter>
+    <ClInclude Include="BatchExponentialNormalization_Base.h">
+      <Filter>Layer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\Library\NeuralNetwork\WeightData.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="BatchExponentialNormalization_CPU.h">
+      <Filter>Layer</Filter>
     </ClInclude>
-    <ClInclude Include="WeightData_Default.h">
-      <Filter>WeightData\Default</Filter>
+    <ClInclude Include="BatchExponentialNormalization_LayerData_Base.h">
+      <Filter>LayerData</Filter>
     </ClInclude>
-    <ClInclude Include="WeightData_WeightNormalization.h">
-      <Filter>WeightData\WeightNormalization</Filter>
+    <ClInclude Include="BatchExponentialNormalization_LayerData_CPU.h">
+      <Filter>LayerData</Filter>
+    </ClInclude>
+    <ClInclude Include="BatchExponentialNormalization_LayerData_GPU.cuh">
+      <Filter>LayerData</Filter>
+    </ClInclude>
+    <ClInclude Include="BatchExponentialNormalization_GPU.cuh">
+      <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase.h">
+      <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase_GPU.cuh">
+      <Filter>LayerBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_LayerBase\CLayerBase_CPU.h">
+      <Filter>LayerBase</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="WeightData.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="WeightData_Default_CPU.cpp">
-      <Filter>WeightData\Default</Filter>
+    <ClCompile Include="BatchExponentialNormalization_FUNC.cpp">
+      <Filter>FromXML</Filter>
     </ClCompile>
-    <ClCompile Include="WeightData_WeightNormalization_CPU.cpp">
-      <Filter>WeightData\WeightNormalization</Filter>
+    <ClCompile Include="BatchExponentialNormalization_Base.cpp">
+      <Filter>Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="BatchExponentialNormalization_CPU.cpp">
+      <Filter>Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="BatchExponentialNormalization_LayerData_CPU.cpp">
+      <Filter>LayerData</Filter>
+    </ClCompile>
+    <ClCompile Include="BatchExponentialNormalization_LayerData_Base.cpp">
+      <Filter>LayerData</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="WeightData_Default_GPU.cu">
-      <Filter>WeightData\Default</Filter>
+    <Xml Include="Config.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="BatchExponentialNormalization_LayerData_GPU.cu">
+      <Filter>LayerData</Filter>
     </CudaCompile>
-    <CudaCompile Include="WeightData_WeightNormalization_GPU.cu">
-      <Filter>WeightData\WeightNormalization</Filter>
+    <CudaCompile Include="BatchExponentialNormalization_GPU.cu">
+      <Filter>Layer</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

@@ -7,7 +7,8 @@
 
 #include"Library/NeuralNetwork/WeightData.h"
 
-#include"WeightData_Default_base.h"
+#include"WeightData_Default.h"
+#include"WeightData_WeightNormalization.h"
 
 
 namespace Gravisbell {
@@ -21,7 +22,8 @@ namespace NeuralNetwork {
 	};
 	static const std::map<std::wstring, WeightDataCreateFunc> lpWeightDataCreateFunc =
 	{
-		{L"Default", {CreateWeightData_Default_CPU, CreateWeightData_Default_GPU}},
+		{L"Default",				{CreateWeightData_Default_CPU,				CreateWeightData_Default_GPU}},
+		{L"WeightNormalization",	{CreateWeightData_WeightNormalization_CPU,	CreateWeightData_WeightNormalization_GPU}},
 	};
 	
 	/** 初期化管理クラス */
@@ -35,22 +37,22 @@ namespace NeuralNetwork {
 
 	public:
 		/** 重みデータを作成する(CPU) */
-		IWeightData* CreateWeightData_CPU(const wchar_t i_weigthDataID[], U32 i_weightSize, U32 i_biasSize)
+		IWeightData* CreateWeightData_CPU(const wchar_t i_weigthDataID[], U32 i_neuronCount, U32 i_inputCount)
 		{
 			auto it_func = lpWeightDataCreateFunc.find(i_weigthDataID);
 			if(it_func == lpWeightDataCreateFunc.end())
 				return NULL;
 
-			return it_func->second.func_cpu(i_weightSize, i_biasSize);
+			return it_func->second.func_cpu(i_neuronCount, i_inputCount);
 		}
 		/** 重みデータを作成する(GPU) */
-		IWeightData* CreateWeightData_GPU(const wchar_t i_weigthDataID[], U32 i_weightSize, U32 i_biasSize)
+		IWeightData* CreateWeightData_GPU(const wchar_t i_weigthDataID[], U32 i_neuronCount, U32 i_inputCount)
 		{
 			auto it_func = lpWeightDataCreateFunc.find(i_weigthDataID);
 			if(it_func == lpWeightDataCreateFunc.end())
 				return NULL;
 
-			return it_func->second.func_gpu(i_weightSize, i_biasSize);
+			return it_func->second.func_gpu(i_neuronCount, i_inputCount);
 		}
 	};
 

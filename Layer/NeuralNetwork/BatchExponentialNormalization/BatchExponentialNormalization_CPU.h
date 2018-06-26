@@ -1,24 +1,15 @@
 //======================================
-// プーリングレイヤー
-// GPU処理用
+// 活性関数レイヤー
+// CPU処理用
 //======================================
-#ifndef __MergeAdd_GPU_H__
-#define __MergeAdd_GPU_H__
+#ifndef __BatchExponentialNormalization_CPU_H__
+#define __BatchExponentialNormalization_CPU_H__
 
-#pragma warning(push)
-#pragma warning(disable : 4267)
-#pragma warning(disable : 4819)
-#include <cuda.h>
-#include <cudnn.h>
-#include <cublas_v2.h>
-#include <thrust/device_vector.h>
-#include <thrust/host_vector.h>
-#include "device_launch_parameters.h"
-#pragma warning(pop)
+#include"stdafx.h"
 
-#include"MergeAdd_DATA.hpp"
-#include"MergeAdd_FUNC.hpp"
-#include"MergeAdd_Base.h"
+#include"BatchExponentialNormalization_DATA.hpp"
+#include"BatchExponentialNormalization_FUNC.hpp"
+#include"BatchExponentialNormalization_Base.h"
 
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
@@ -27,28 +18,41 @@ namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-class MergeAdd_GPU : public MergeAdd_Base
+class BatchExponentialNormalization_CPU : public BatchExponentialNormalization_Base
 {
 private:
 	// データ本体
-	class MergeAdd_LayerData_GPU& layerData;
+	class BatchExponentialNormalization_LayerData_CPU& layerData;
+//	BatchExponentialNormalization::LearnDataStructure learnData;
+
+	// 入出力バッファ
+	std::vector<CONST_BATCH_BUFFER_POINTER> lppBatchInputBuffer;	/**< 演算時の入力データ */
+	std::vector<BATCH_BUFFER_POINTER>		lppBatchOutputBuffer;	/**< バッチ処理用出力バッファ <バッチ数> */
+	std::vector<BATCH_BUFFER_POINTER>		lppBatchDInputBuffer;	/**< 入力誤差計算時の出力誤差データ */
+	std::vector<CONST_BATCH_BUFFER_POINTER> lppBatchDOutputBuffer;	/**< 入力誤差計算時の出力誤差データ */
 
 	// Get関数を使うと処理負荷がかさむので一時保存用. PreCalculateで値を格納.
-	std::vector<U32>	lpInputBufferCount;				/**< 入力バッファ数 */
-	U32					outputBufferCount;				/**< 出力バッファ数 */
+	U32 inputBufferCount;				/**< 入力バッファ数 */
+	U32 outputBufferCount;				/**< 出力バッファ数 */
+	U32 channeclBufferCount;			/**< 1チャンネル当たりのバッファ数 */
 
-	U32 bufferCountPerCh;	/**< CHあたりのバッファ数 */
-	thrust::device_vector<U32> lpInputChCount_d;	/**< 各入力レイヤーのCh数 */
-	thrust::device_vector<const F32*> lppInputBuffer_d;	/**< 入力信号の先頭アドレスの配列 */
+	// 学習用のデータ
+	bool onLearnMode;	/**< 学習処理中フラグ */
+	U32 learnCount;		/**< 学習実行回数 */
+	std::vector<F32> lpTmpMean;			/**< 平均値格納用の一時変数 */
+	std::vector<F32> lpTmpVariance;		/**< 分散値格納用の一時変数 */
 
-	cublasHandle_t cublasHandle;
+	// 演算処理用のバッファ
+	std::vector<F32> lpDBias;	/**< バイアスの変化量 */
+	std::vector<F32> lpDScale;	/**< スケールの変化量 */
 
+	Gravisbell::Common::ITemporaryMemoryManager& temporaryMemoryManager;	/**< 一時バッファ管理 */
 
 public:
 	/** コンストラクタ */
-	MergeAdd_GPU(Gravisbell::GUID guid, class MergeAdd_LayerData_GPU& i_layerData, const std::vector<IODataStruct>& i_lpInputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager);
+	BatchExponentialNormalization_CPU(Gravisbell::GUID guid, class BatchExponentialNormalization_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager);
 	/** デストラクタ */
-	virtual ~MergeAdd_GPU();
+	virtual ~BatchExponentialNormalization_CPU();
 
 public:
 	//================================
@@ -66,8 +70,8 @@ public:
 	// レイヤーデータ関連
 	//===========================
 	/** レイヤーデータを取得する */
-	MergeAdd_LayerData_Base& GetLayerData();
-	const MergeAdd_LayerData_Base& GetLayerData()const;
+	ILayerData& GetLayerData();
+	const ILayerData& GetLayerData()const;
 
 
 public:
@@ -86,7 +90,7 @@ public:
 		失敗した場合はCalculate以降の処理は実行不可. */
 	ErrorCode PreProcessCalculate();
 
-
+	
 	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
 	ErrorCode PreProcessLoop();
@@ -99,7 +103,7 @@ public:
 	/** 演算処理を実行する.
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 		@return 成功した場合0が返る */
-	ErrorCode Calculate_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppOutputBuffer);
+	ErrorCode Calculate_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer);
 
 public:
 	//================================
@@ -110,14 +114,13 @@ public:
 		@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode CalculateDInput_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppDInputBuffer[], CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer);
-
+	ErrorCode CalculateDInput_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer);
 
 	/** 学習処理を実行する.
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode Training_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppDInputBuffer[], CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer);
+	ErrorCode Training_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer);
 
 };
 

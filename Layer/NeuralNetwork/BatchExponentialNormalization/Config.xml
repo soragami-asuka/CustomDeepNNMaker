@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+レイヤーに関する情報.
+ツールを使用してソース変換を行うためのマニュフェスト.
+属性の部分は入力必須項目.※[default-language]は除く.
+[guid]に識別用のコードを記述する.
+[default-language]に基本となる言語コードを記載する.
+言語コード規格は : ISO 639-1
+[default-language]が設定されていない場合は[ja]が標準となる
+-->
+
+<Config guid="6C2FFBC5-270D-4E29-82F8-EFD4812E2B70" version="1.0.0.0" default-language="ja">
+
+  <SourceName>BatchExponentialNormalization</SourceName>
+  <Name>バッチ正規化</Name>
+  <Text>バッチ単位で正規化を行う</Text>
+
+  <!--レイヤーのデータ構造-->
+  <Structure>
+    <Float id="epsilon">
+      <Name>安定化係数</Name>
+      <Text>分散の値が小さすぎる場合に割り算を安定させるための値</Text>
+      <Min>0.00001</Min>
+      <Max>1.0</Max>
+      <Default>0.00001</Default>
+    </Float>
+
+    <Int id="InputChannelCount">
+      <Name>入力チャンネル数</Name>
+      <Text>入力チャンネル数</Text>
+      <Min>1</Min>
+      <Max>65535</Max>
+      <Default>1</Default>
+    </Int>
+
+    <Int id="ExponentialTime">
+      <Name>平滑化時間数</Name>
+      <Text>平滑化時間数</Text>
+      <Min>1</Min>
+      <Max>65535</Max>
+      <Default>1</Default>
+    </Int>
+
+  </Structure>
+
+  <!--実行時パラメータ-->
+  <RuntimeParameter>
+
+  </RuntimeParameter>
+
+
+</Config>

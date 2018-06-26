@@ -29,9 +29,9 @@ namespace NeuralNetwork {
 
 	public:
 		/** 重みデータを作成する(CPU) */
-		virtual IWeightData* CreateWeightData_CPU(const wchar_t i_weigthDataID[], U32 i_weightSize, U32 i_biasSize) = 0;
+		virtual IWeightData* CreateWeightData_CPU(const wchar_t i_weigthDataID[], U32 i_neuronCount, U32 i_inputCount) = 0;
 		/** 重みデータを作成する(GPU) */
-		virtual IWeightData* CreateWeightData_GPU(const wchar_t i_weigthDataID[], U32 i_weightSize, U32 i_biasSize) = 0;
+		virtual IWeightData* CreateWeightData_GPU(const wchar_t i_weigthDataID[], U32 i_neuronCount, U32 i_inputCount) = 0;
 	};
 
 	/** 初期化管理クラスを取得する */
