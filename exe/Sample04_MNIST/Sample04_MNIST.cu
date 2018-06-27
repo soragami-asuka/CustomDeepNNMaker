@@ -34,7 +34,7 @@ using namespace Gravisbell;
 #define USE_DROPOUT		1
 
 #define USE_BATCH_SIZE	16
-#define MAX_EPOCH		35
+#define MAX_EPOCH		5
 
 
 /** データファイルをを読み込む
@@ -70,7 +70,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver11(const Layer::Neural
 
 Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager, const IODataStruct& inputDataStruct, const IODataStruct& outputDataStruct)
 {
-	return CreateNeuralNetwork_ver11(layerDLLManager, layerDataManager, inputDataStruct, outputDataStruct);
+	return CreateNeuralNetwork_ver10(layerDLLManager, layerDataManager, inputDataStruct, outputDataStruct);
 }
 
 

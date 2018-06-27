@@ -39,7 +39,7 @@ private:
 
 	U32 bufferCountPerCh;	/**< CHあたりのバッファ数 */
 	thrust::device_vector<U32> lpInputChCount_d;	/**< 各入力レイヤーのCh数 */
-	thrust::device_vector<const F32*> lppInputBuffer_d;	/**< 入力信号の先頭アドレスの配列 */
+	thrust::device_vector<F32*> lppInputBuffer_d;	/**< 入力信号の先頭アドレスの配列 */
 
 	cublasHandle_t cublasHandle;
 
