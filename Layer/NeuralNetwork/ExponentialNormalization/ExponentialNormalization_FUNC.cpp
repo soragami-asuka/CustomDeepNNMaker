@@ -1,7 +1,7 @@
 /*--------------------------------------------
- * FileName  : BatchExponentialNormalization_FUNC.cpp
+ * FileName  : ExponentialNormalization_FUNC.cpp
  * LayerName : バッチ正規化
- * guid      : ACD11A5A-BFB5-4951-8382-1DE89DFA96A8
+ * guid      : 44F733E8-417C-4598-BF05-2CC26E1AB6F1
  * 
  * Text      : バッチ単位で正規化を行う
 --------------------------------------------*/
@@ -12,11 +12,11 @@
 
 #include<Library/SettingData/Standard.h>
 
-#include"BatchExponentialNormalization_FUNC.hpp"
+#include"ExponentialNormalization_FUNC.hpp"
 
 
-// {ACD11A5A-BFB5-4951-8382-1DE89DFA96A8}
-static const Gravisbell::GUID g_guid(0xacd11a5a, 0xbfb5, 0x4951, 0x83, 0x82, 0x1d, 0xe8, 0x9d, 0xfa, 0x96, 0xa8);
+// {44F733E8-417C-4598-BF05-2CC26E1AB6F1}
+static const Gravisbell::GUID g_guid(0x44f733e8, 0x417c, 0x4598, 0xbf, 0x05, 0x2c, 0xc2, 0x6e, 0x1a, 0xb6, 0xf1);
 
 // VersionCode
 static const Gravisbell::VersionCode g_version = {   1,   0,   0,   0}; 
@@ -73,10 +73,10 @@ namespace DefaultLanguage
     static const std::map<std::wstring, StringData> g_lpItemData_Runtime = 
     {
         {
-            L"AverageUpdateCoeffMin",
+            L"ExponentialTime",
             {
-                L"最小平均値更新係数",
-                L"平均値を更新する際の係数の最小値.0=Epochの全データの平均値を使用する.1=直近のデータの平均値を使用する.",
+                L"平滑化時間数",
+                L"平滑化時間数",
             }
         },
     };
@@ -228,16 +228,16 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameter(void
 
 
 	// Create Item
-	/** Name : 最小平均値更新係数
-	  * ID   : AverageUpdateCoeffMin
-	  * Text : 平均値を更新する際の係数の最小値.0=Epochの全データの平均値を使用する.1=直近のデータの平均値を使用する.
+	/** Name : 平滑化時間数
+	  * ID   : ExponentialTime
+	  * Text : 平滑化時間数
 	  */
 	pLayerConfig->AddItem(
-		Gravisbell::SettingData::Standard::CreateItem_Float(
-			L"AverageUpdateCoeffMin",
-			CurrentLanguage::g_lpItemData_Learn[L"AverageUpdateCoeffMin"].name.c_str(),
-			CurrentLanguage::g_lpItemData_Learn[L"AverageUpdateCoeffMin"].text.c_str(),
-			0.0000000000000000f, 1.0000000000000000f, 0.0000000000000000f));
+		Gravisbell::SettingData::Standard::CreateItem_Int(
+			L"ExponentialTime",
+			CurrentLanguage::g_lpItemData_Learn[L"ExponentialTime"].name.c_str(),
+			CurrentLanguage::g_lpItemData_Learn[L"ExponentialTime"].text.c_str(),
+			1, 65535, 1));
 
 	return pLayerConfig;
 }

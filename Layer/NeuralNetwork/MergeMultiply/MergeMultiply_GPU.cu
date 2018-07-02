@@ -15,11 +15,14 @@
 using namespace Gravisbell;
 using namespace Gravisbell::Layer::NeuralNetwork;
 
+#define Ver01
+//#define Ver02
+
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-
+#if defined(Ver01)
 #define CALC_BATCH_MAX	(256)
 #define CALC_INPUT_MAX	(1024)
 
@@ -58,6 +61,86 @@ namespace NeuralNetwork {
 		lpDInputBuffer[inputPos] = (abs(lpOutputBuffer[outputPos]) > 1e-30) ? lpDOutputBuffer[outputPos] * lpOutputBuffer[outputPos] / lpInputBuffer[inputPos] : 0.0f;
 	}
 
+#else
+	
+#define THREAD_PER_BLOCK	32
+
+	/** 入力を足し合わせる.
+		<outputChCount, batchSize> <32>
+		@param	o_lpOutput			出力バッファ
+		@param	i_outputChCount		出力バッファのCH数
+		@param	i_inputLyaerCount	入力レイヤー数
+		@param	i_lppInput			入力バッファ
+		@param	i_lpInputChCount	入力バッファのCH数
+		@param	i_bufferPerCh		チャンネルあたりのバッファ数
+		@param	i_loopCount			1スレッドあたりの実行ループ回数
+		*/
+	__global__ void device_Calculate(F32* o_lpOutput, U32 i_outputChCount, U32 i_inputLayerCount, const F32*const* i_lppInput, const U32* i_lpInputChCount, U32 i_bufferPerCh, U32 i_loopCount)
+	{
+		U32 chNum    = blockIdx.x;
+		U32 batchNum = blockIdx.y;
+		U32 tid = threadIdx.x;
+
+		for(U32 loopNum=0; loopNum<i_loopCount; loopNum++)
+		{
+			U32 bufferPos = tid*i_loopCount + loopNum;
+			if(bufferPos >= i_bufferPerCh)
+				continue;
+
+			U32 outputOffset = (batchNum * i_outputChCount + chNum) * i_bufferPerCh + bufferPos;
+
+			// 出力初期化
+			o_lpOutput[outputOffset] = 1.0f;
+			for(U32 inputLayerNum=0; inputLayerNum<i_inputLayerCount; inputLayerNum++)
+			{
+				if(chNum >= i_lpInputChCount[inputLayerNum])
+					continue;
+
+				U32 inputOffset = (batchNum * i_lpInputChCount[inputLayerNum] + chNum) *i_bufferPerCh + bufferPos;
+
+				o_lpOutput[outputOffset] *= i_lppInput[inputLayerNum][inputOffset];
+			}
+		}
+	}
+
+	/** 入力誤差を計算する.
+		<outputChCount, batchSize> <32>
+		@param	o_lppDInput			入力誤差バッファ
+		@param	i_lpInputChCount	入力バッファのCH数
+		@param	i_inputLyaerCount	入力レイヤー数
+		@param	i_lpDOutput			出力誤差バッファ
+		@param	i_bufferPerCh		チャンネルあたりのバッファ数
+		@param	i_loopCount			1スレッドあたりの実行ループ回数
+		*/
+	__global__ void device_CalculateDInput(F32** o_lppDInput, const F32*const* i_lppInput, const U32* i_lpInputChCount, U32 i_inputLayerCount, const F32* i_lpDOutput, const F32* i_lpOutput, U32 i_bufferPerCh, U32 i_loopCount)
+	{
+		U32 chNum    = blockIdx.x;
+		U32 batchNum = blockIdx.y;
+		U32 tid = threadIdx.x;
+		U32 outputChCount = gridDim.x;
+
+		for(U32 loopNum=0; loopNum<i_loopCount; loopNum++)
+		{
+			U32 bufferPos = tid*i_loopCount + loopNum;
+			if(bufferPos >= i_bufferPerCh)
+				continue;
+
+			U32 outputOffset = (batchNum * outputChCount + chNum) * i_bufferPerCh + bufferPos;
+
+			// 入力誤差計算
+			for(U32 inputLayerNum=0; inputLayerNum<i_inputLayerCount; inputLayerNum++)
+			{
+				if(chNum >= i_lpInputChCount[inputLayerNum])
+					continue;
+
+				U32 inputOffset = (batchNum * i_lpInputChCount[inputLayerNum] + chNum) *i_bufferPerCh + bufferPos;
+
+				o_lppDInput[inputLayerNum][inputOffset] = abs(i_lpOutput[outputOffset])>0 ? i_lpOutput[outputOffset] / i_lppInput[inputLayerNum][inputOffset] * i_lpDOutput[outputOffset] : 0.0f;
+			}
+		}
+	}
+
+#endif
 
 	/** コンストラクタ */
 	MergeMultiply_GPU::MergeMultiply_GPU(Gravisbell::GUID guid, MergeMultiply_LayerData_GPU& i_layerData, const std::vector<IODataStruct>& i_lpInputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
@@ -143,6 +226,21 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
 
+		// CHあたりのバッファ数
+		this->bufferCountPerCh = this->GetOutputDataStruct().x * this->GetOutputDataStruct().y * this->GetOutputDataStruct().z;
+
+		// 各入力レイヤーのCH数
+		thrust::host_vector<U32> lpInputChCount(this->GetInputDataCount());
+		for(U32 inputNum=0; inputNum<this->GetInputDataCount(); inputNum++)
+		{
+			lpInputChCount[inputNum] = this->GetInputDataStruct(inputNum).ch;
+		}
+		this->lpInputChCount_d = lpInputChCount;
+		
+		// 入力信号の先頭アドレスの配列
+		// バッファの確保のみ
+		this->lppInputBuffer_d.resize(this->GetInputDataCount());
+		this->lppDInputBuffer_d.resize(this->GetInputDataCount());
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -164,6 +262,7 @@ namespace NeuralNetwork {
 		@return 成功した場合0が返る */
 	ErrorCode MergeMultiply_GPU::Calculate_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppOutputBuffer)
 	{
+#if defined(Ver01)
 		// 出力バッファを初期化
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum+=CALC_BATCH_MAX)
 		{
@@ -207,6 +306,22 @@ namespace NeuralNetwork {
 			}
 			cudaThreadSynchronize();
 		}
+#else
+		// 入力信号配列をDeviceにコピー
+		cudaMemcpy(thrust::raw_pointer_cast(&this->lppInputBuffer_d[0]), i_lppInputBuffer, sizeof(F32*)*this->lppInputBuffer_d.size(), cudaMemcpyHostToDevice);
+
+		// 計算
+		dim3 grid(this->GetOutputDataStruct().ch, this->GetBatchSize());
+		dim3 block(THREAD_PER_BLOCK);
+		U32 loopCount = (this->bufferCountPerCh + (THREAD_PER_BLOCK-1)) / THREAD_PER_BLOCK;
+
+		device_Calculate<<<grid,block>>>(
+			o_lppOutputBuffer, this->GetOutputDataStruct().ch,
+			this->GetInputDataCount(), thrust::raw_pointer_cast(&this->lppInputBuffer_d[0]), thrust::raw_pointer_cast(&this->lpInputChCount_d[0]),
+			this->bufferCountPerCh,
+			loopCount);
+#endif
+
 
 
 #ifdef _DEBUG
@@ -235,6 +350,7 @@ namespace NeuralNetwork {
 		直前の計算結果を使用する */
 	ErrorCode MergeMultiply_GPU::CalculateDInput_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer[], BATCH_BUFFER_POINTER o_lppDInputBuffer[], CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
+#if defined(Ver01)
 		if(o_lppDInputBuffer)
 		{
 			// 入力誤差バッファの初期化
@@ -269,6 +385,25 @@ namespace NeuralNetwork {
 				cudaThreadSynchronize();
 			}
 		}
+#else
+		// 入力誤差信号配列をDeviceにコピー
+		cudaMemcpy(thrust::raw_pointer_cast(&this->lppInputBuffer_d[0]), i_lppInputBuffer, sizeof(F32*)*this->lppInputBuffer_d.size(), cudaMemcpyHostToDevice);
+		cudaMemcpy(thrust::raw_pointer_cast(&this->lppDInputBuffer_d[0]), o_lppDInputBuffer, sizeof(F32*)*this->lppInputBuffer_d.size(), cudaMemcpyHostToDevice);
+
+		// 計算
+		dim3 grid(this->GetOutputDataStruct().ch, this->GetBatchSize());
+		dim3 block(THREAD_PER_BLOCK);
+		U32 loopCount = (this->bufferCountPerCh + (THREAD_PER_BLOCK-1)) / THREAD_PER_BLOCK;
+
+		device_CalculateDInput<<<grid, block>>>(
+			thrust::raw_pointer_cast(&this->lppDInputBuffer_d[0]),
+			thrust::raw_pointer_cast(&this->lppInputBuffer_d[0]),
+			thrust::raw_pointer_cast(&this->lpInputChCount_d[0]), this->GetInputDataCount(),
+			i_lppDOutputBuffer,
+			i_lppOutputBuffer,
+			this->bufferCountPerCh,
+			loopCount);
+#endif
 
 
 #ifdef _DEBUG

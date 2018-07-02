@@ -9,9 +9,9 @@
 [default-language]が設定されていない場合は[ja]が標準となる
 -->
 
-<Config guid="6C2FFBC5-270D-4E29-82F8-EFD4812E2B70" version="1.0.0.0" default-language="ja">
+<Config guid="44F733E8-417C-4598-BF05-2CC26E1AB6F1" version="1.0.0.0" default-language="ja">
 
-  <SourceName>BatchExponentialNormalization</SourceName>
+  <SourceName>ExponentialNormalization</SourceName>
   <Name>バッチ正規化</Name>
   <Text>バッチ単位で正規化を行う</Text>
 
@@ -33,18 +33,18 @@
       <Default>1</Default>
     </Int>
 
+  </Structure>
+
+  <!--実行時パラメータ-->
+  <RuntimeParameter>
+
     <Int id="ExponentialTime">
       <Name>平滑化時間数</Name>
       <Text>平滑化時間数</Text>
       <Min>1</Min>
       <Max>65535</Max>
-      <Default>1</Default>
+      <Default>128</Default>
     </Int>
-
-  </Structure>
-
-  <!--実行時パラメータ-->
-  <RuntimeParameter>
 
   </RuntimeParameter>
 

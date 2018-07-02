@@ -1,36 +1,43 @@
 //======================================
 // バッチ正規化のレイヤーデータ
 //======================================
-#ifndef __BatchExponentialNormalization_LAYERDATA_CPU_H__
-#define __BatchExponentialNormalization_LAYERDATA_CPU_H__
+#ifndef __ExponentialNormalization_LAYERDATA_GPU_H__
+#define __ExponentialNormalization_LAYERDATA_GPU_H__
 
-#include"BatchExponentialNormalization_LayerData_Base.h"
+#pragma warning(push)
+#pragma warning(disable : 4267)
+#pragma warning(disable : 4819)
+#include <cuda.h>
+#include <cudnn.h>
+#include <cublas_v2.h>
+#include <thrust/device_vector.h>
+#include <thrust/host_vector.h>
+#include "device_launch_parameters.h"
+#pragma warning(pop)
+
+#include"ExponentialNormalization_LayerData_Base.h"
 
 
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-	class BatchExponentialNormalization_LayerData_CPU : public BatchExponentialNormalization_LayerData_Base
+	class ExponentialNormalization_LayerData_GPU : public ExponentialNormalization_LayerData_Base
 	{
-		friend class BatchExponentialNormalization_CPU;
+		friend class ExponentialNormalization_GPU;
 
 	private:
-		std::vector<F32> lpMean;		/**< 各Chの平均 */
-		std::vector<F32> lpVariance;	/**< 各Chの分散 */
-
-		std::vector<F32>	lpScale;	/**< 各Chのスケール値 */
-		std::vector<F32>	lpBias;		/**< 各Chのバイアス値 */
-
+		thrust::device_vector<F32> lpMean;		/**< 各Chの平均 */
+		thrust::device_vector<F32> lpVariance;	/**< 各Chの分散 */
 
 		//===========================
 		// コンストラクタ / デストラクタ
 		//===========================
 	public:
 		/** コンストラクタ */
-		BatchExponentialNormalization_LayerData_CPU(const Gravisbell::GUID& guid);
+		ExponentialNormalization_LayerData_GPU(const Gravisbell::GUID& guid);
 		/** デストラクタ */
-		~BatchExponentialNormalization_LayerData_CPU();
+		~ExponentialNormalization_LayerData_GPU();
 
 
 		//===========================
@@ -69,6 +76,7 @@ namespace NeuralNetwork {
 		/** レイヤーを作成する.
 			@param guid	新規生成するレイヤーのGUID. */
 		ILayerBase* CreateLayer(const Gravisbell::GUID& guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager);
+
 
 		//===========================
 		// オプティマイザー設定

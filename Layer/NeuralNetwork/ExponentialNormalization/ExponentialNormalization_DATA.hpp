@@ -1,12 +1,12 @@
 /*--------------------------------------------
- * FileName  : BatchExponentialNormalization_DATA.hpp
+ * FileName  : ExponentialNormalization_DATA.hpp
  * LayerName : バッチ正規化
- * guid      : ACD11A5A-BFB5-4951-8382-1DE89DFA96A8
+ * guid      : 44F733E8-417C-4598-BF05-2CC26E1AB6F1
  * 
  * Text      : バッチ単位で正規化を行う
 --------------------------------------------*/
-#ifndef __GRAVISBELL_NEURALNETWORK_LAYER_DATA_BatchExponentialNormalization_H__
-#define __GRAVISBELL_NEURALNETWORK_LAYER_DATA_BatchExponentialNormalization_H__
+#ifndef __GRAVISBELL_NEURALNETWORK_LAYER_DATA_ExponentialNormalization_H__
+#define __GRAVISBELL_NEURALNETWORK_LAYER_DATA_ExponentialNormalization_H__
 
 #include<guiddef.h>
 
@@ -16,7 +16,7 @@
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
-namespace BatchExponentialNormalization {
+namespace ExponentialNormalization {
 
 	/** Layer structure */
 	struct LayerStructure
@@ -38,18 +38,18 @@ namespace BatchExponentialNormalization {
 	/** Runtime Parameter structure */
 	struct RuntimeParameterStructure
 	{
-		/** Name : 最小平均値更新係数
-		  * ID   : AverageUpdateCoeffMin
-		  * Text : 平均値を更新する際の係数の最小値.0=Epochの全データの平均値を使用する.1=直近のデータの平均値を使用する.
+		/** Name : 平滑化時間数
+		  * ID   : ExponentialTime
+		  * Text : 平滑化時間数
 		  */
-		F32 AverageUpdateCoeffMin;
+		S32 ExponentialTime;
 
 	};
 
-} // BatchExponentialNormalization
+} // ExponentialNormalization
 } // NeuralNetwork
 } // Layer
 } // Gravisbell
 
 
-#endif // __CUSTOM_DEEP_NN_LAYER_DATA_BatchExponentialNormalization_H__
+#endif // __CUSTOM_DEEP_NN_LAYER_DATA_ExponentialNormalization_H__

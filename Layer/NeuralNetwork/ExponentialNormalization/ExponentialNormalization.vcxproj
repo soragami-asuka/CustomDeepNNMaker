@@ -43,10 +43,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{57440150-CB12-43AF-8EF2-438777147CAC}</ProjectGuid>
+    <ProjectGuid>{85AF2EDF-2BCC-4A8D-8E3F-0E83D5A01B18}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>BatchExponentialNormalization</RootNamespace>
-    <ProjectName>Layer.NeuralNetwork.BatchExponentialNormalization</ProjectName>
+    <RootNamespace>ExponentialNormalization</RootNamespace>
+    <ProjectName>Layer.NeuralNetwork.ExponentialNormalization</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -193,7 +193,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;BatchExponentialNormalization_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;ExponentialNormalization_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -207,7 +207,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;BatchExponentialNormalization_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;ExponentialNormalization_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -221,7 +221,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;BatchExponentialNormalization_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;ExponentialNormalization_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -235,7 +235,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;BatchExponentialNormalization_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;ExponentialNormalization_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir);$(CUDA_PATH_V7_5)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -255,7 +255,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;BatchExponentialNormalization_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;ExponentialNormalization_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir);$(CUDA_PATH_V7_5)\include</AdditionalIncludeDirectories>
       <AdditionalOptions>/D USE_CUDA_KEPLER %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -278,7 +278,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;BatchExponentialNormalization_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;ExponentialNormalization_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir);$(CUDA_PATH_V7_5)\include</AdditionalIncludeDirectories>
       <AdditionalOptions>/D USE_CUDA_KEPLER %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -303,7 +303,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;BatchExponentialNormalization_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;ExponentialNormalization_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -321,7 +321,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;BatchExponentialNormalization_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;ExponentialNormalization_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -339,7 +339,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;BatchExponentialNormalization_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;ExponentialNormalization_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir);$(CUDA_PATH_V7_5)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -363,7 +363,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;BatchExponentialNormalization_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;ExponentialNormalization_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir);$(CUDA_PATH_V7_5)\include</AdditionalIncludeDirectories>
       <AdditionalOptions>/D USE_CUDA_KEPLER %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -411,23 +411,23 @@
     <ClInclude Include="..\_LayerBase\CLayerBase.h" />
     <ClInclude Include="..\_LayerBase\CLayerBase_CPU.h" />
     <ClInclude Include="..\_LayerBase\CLayerBase_GPU.cuh" />
-    <ClInclude Include="BatchExponentialNormalization_Base.h" />
-    <ClInclude Include="BatchExponentialNormalization_CPU.h" />
-    <ClInclude Include="BatchExponentialNormalization_DATA.hpp" />
-    <ClInclude Include="BatchExponentialNormalization_FUNC.hpp" />
-    <ClInclude Include="BatchExponentialNormalization_GPU.cuh" />
-    <ClInclude Include="BatchExponentialNormalization_LayerData_Base.h" />
-    <ClInclude Include="BatchExponentialNormalization_LayerData_CPU.h" />
-    <ClInclude Include="BatchExponentialNormalization_LayerData_GPU.cuh" />
+    <ClInclude Include="ExponentialNormalization_Base.h" />
+    <ClInclude Include="ExponentialNormalization_CPU.h" />
+    <ClInclude Include="ExponentialNormalization_DATA.hpp" />
+    <ClInclude Include="ExponentialNormalization_FUNC.hpp" />
+    <ClInclude Include="ExponentialNormalization_GPU.cuh" />
+    <ClInclude Include="ExponentialNormalization_LayerData_Base.h" />
+    <ClInclude Include="ExponentialNormalization_LayerData_CPU.h" />
+    <ClInclude Include="ExponentialNormalization_LayerData_GPU.cuh" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BatchExponentialNormalization_Base.cpp" />
-    <ClCompile Include="BatchExponentialNormalization_CPU.cpp" />
-    <ClCompile Include="BatchExponentialNormalization_LayerData_CPU.cpp" />
-    <ClCompile Include="BatchExponentialNormalization_LayerData_Base.cpp" />
-    <ClCompile Include="BatchExponentialNormalization_FUNC.cpp" />
+    <ClCompile Include="ExponentialNormalization_Base.cpp" />
+    <ClCompile Include="ExponentialNormalization_CPU.cpp" />
+    <ClCompile Include="ExponentialNormalization_LayerData_CPU.cpp" />
+    <ClCompile Include="ExponentialNormalization_LayerData_Base.cpp" />
+    <ClCompile Include="ExponentialNormalization_FUNC.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug_Maxwell|Win32'">false</CompileAsManaged>
@@ -477,8 +477,8 @@
     <Xml Include="Config.xml" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="BatchExponentialNormalization_GPU.cu" />
-    <CudaCompile Include="BatchExponentialNormalization_LayerData_GPU.cu" />
+    <CudaCompile Include="ExponentialNormalization_GPU.cu" />
+    <CudaCompile Include="ExponentialNormalization_LayerData_GPU.cu" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Library\NeuralNetwork\Optimizer\Optimizer.vcxproj">

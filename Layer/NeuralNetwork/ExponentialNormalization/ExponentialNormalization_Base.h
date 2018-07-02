@@ -1,8 +1,8 @@
 //======================================
 // バッチ正規化レイヤー
 //======================================
-#ifndef __BatchExponentialNormalization_BASE_H__
-#define __BatchExponentialNormalization_BASE_H__
+#ifndef __ExponentialNormalization_BASE_H__
+#define __ExponentialNormalization_BASE_H__
 
 #pragma warning(push)
 #pragma warning(disable : 4267)
@@ -18,9 +18,9 @@
 #include<vector>
 #include<Layer/NeuralNetwork/INNSingle2SingleLayer.h>
 
-#include"BatchExponentialNormalization_DATA.hpp"
+#include"ExponentialNormalization_DATA.hpp"
 
-#include"BatchExponentialNormalization_LayerData_Base.h"
+#include"ExponentialNormalization_LayerData_Base.h"
 #include"../_LayerBase/CLayerBase.h"
 
 
@@ -30,15 +30,15 @@ namespace NeuralNetwork {
 
 	typedef float NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class BatchExponentialNormalization_Base : public CNNSingle2SingleLayerBase<BatchExponentialNormalization::RuntimeParameterStructure>
+	class ExponentialNormalization_Base : public CNNSingle2SingleLayerBase<ExponentialNormalization::RuntimeParameterStructure>
 	{
 	protected:
 	public:
 		/** コンストラクタ */
-		BatchExponentialNormalization_Base(Gravisbell::GUID guid, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct);
+		ExponentialNormalization_Base(Gravisbell::GUID guid, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct);
 
 		/** デストラクタ */
-		virtual ~BatchExponentialNormalization_Base();
+		virtual ~ExponentialNormalization_Base();
 
 		//===========================
 		// レイヤー共通

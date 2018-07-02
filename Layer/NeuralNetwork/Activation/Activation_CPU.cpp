@@ -154,6 +154,12 @@ namespace NeuralNetwork {
 			this->func_activation  = &Activation_CPU::func_activation_SoftMax;
 			this->func_dactivation = &Activation_CPU::func_dactivation_sigmoid_crossEntropy;
 			break;
+
+			// tanh敬
+		case Gravisbell::Layer::NeuralNetwork::Activation::LayerStructure::ActivationType_tanh:
+			this->func_activation  = &Activation_CPU::func_activation_tanh;
+			this->func_dactivation = &Activation_CPU::func_dactivation_tanh;
+			break;
 		}
 
 		// 演算用のバッファを確保

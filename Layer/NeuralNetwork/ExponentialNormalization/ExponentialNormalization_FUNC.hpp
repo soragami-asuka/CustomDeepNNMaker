@@ -1,12 +1,12 @@
 /*--------------------------------------------
- * FileName  : BatchExponentialNormalization_DATA.hpp
+ * FileName  : ExponentialNormalization_DATA.hpp
  * LayerName : バッチ正規化
- * guid      : ACD11A5A-BFB5-4951-8382-1DE89DFA96A8
+ * guid      : 44F733E8-417C-4598-BF05-2CC26E1AB6F1
  * 
  * Text      : バッチ単位で正規化を行う
 --------------------------------------------*/
-#ifndef __GRAVISBELL_NEURALNETWORK_LAYER_FUNC_BatchExponentialNormalization_H__
-#define __GRAVISBELL_NEURALNETWORK_LAYER_FUNC_BatchExponentialNormalization_H__
+#ifndef __GRAVISBELL_NEURALNETWORK_LAYER_FUNC_ExponentialNormalization_H__
+#define __GRAVISBELL_NEURALNETWORK_LAYER_FUNC_ExponentialNormalization_H__
 
 #define EXPORT_API extern "C" __declspec(dllexport)
 
@@ -18,7 +18,7 @@
 #include<SettingData/Standard/IData.h>
 #include<Layer/NeuralNetwork/ILayerDLLManager.h>
 
-#include"BatchExponentialNormalization_DATA.hpp"
+#include"ExponentialNormalization_DATA.hpp"
 
 
 /** Acquire the layer identification code.
@@ -75,4 +75,4 @@ EXPORT_API Gravisbell::Layer::ILayerData* CreateLayerDataGPUfromBuffer(const Gra
 
 
 
-#endif // __GRAVISBELL_NEURAULNETWORK_LAYER_FUNC_BatchExponentialNormalization_H__
+#endif // __GRAVISBELL_NEURAULNETWORK_LAYER_FUNC_ExponentialNormalization_H__

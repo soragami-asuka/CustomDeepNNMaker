@@ -69,10 +69,10 @@
     <ClInclude Include="targetver.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="BatchExponentialNormalization_FUNC.hpp">
+    <ClInclude Include="ExponentialNormalization_FUNC.hpp">
       <Filter>FromXML</Filter>
     </ClInclude>
-    <ClInclude Include="BatchExponentialNormalization_DATA.hpp">
+    <ClInclude Include="ExponentialNormalization_DATA.hpp">
       <Filter>FromXML</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Common\Common.h">
@@ -144,22 +144,22 @@
     <ClInclude Include="..\..\..\include\DataFormat\Binary\IDataFormat.h">
       <Filter>include\DataFormat\Binary</Filter>
     </ClInclude>
-    <ClInclude Include="BatchExponentialNormalization_Base.h">
+    <ClInclude Include="ExponentialNormalization_Base.h">
       <Filter>Layer</Filter>
     </ClInclude>
-    <ClInclude Include="BatchExponentialNormalization_CPU.h">
+    <ClInclude Include="ExponentialNormalization_CPU.h">
       <Filter>Layer</Filter>
     </ClInclude>
-    <ClInclude Include="BatchExponentialNormalization_LayerData_Base.h">
+    <ClInclude Include="ExponentialNormalization_LayerData_Base.h">
       <Filter>LayerData</Filter>
     </ClInclude>
-    <ClInclude Include="BatchExponentialNormalization_LayerData_CPU.h">
+    <ClInclude Include="ExponentialNormalization_LayerData_CPU.h">
       <Filter>LayerData</Filter>
     </ClInclude>
-    <ClInclude Include="BatchExponentialNormalization_LayerData_GPU.cuh">
+    <ClInclude Include="ExponentialNormalization_LayerData_GPU.cuh">
       <Filter>LayerData</Filter>
     </ClInclude>
-    <ClInclude Include="BatchExponentialNormalization_GPU.cuh">
+    <ClInclude Include="ExponentialNormalization_GPU.cuh">
       <Filter>Layer</Filter>
     </ClInclude>
     <ClInclude Include="..\_LayerBase\CLayerBase.h">
@@ -179,19 +179,19 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="BatchExponentialNormalization_FUNC.cpp">
+    <ClCompile Include="ExponentialNormalization_FUNC.cpp">
       <Filter>FromXML</Filter>
     </ClCompile>
-    <ClCompile Include="BatchExponentialNormalization_Base.cpp">
+    <ClCompile Include="ExponentialNormalization_Base.cpp">
       <Filter>Layer</Filter>
     </ClCompile>
-    <ClCompile Include="BatchExponentialNormalization_CPU.cpp">
+    <ClCompile Include="ExponentialNormalization_CPU.cpp">
       <Filter>Layer</Filter>
     </ClCompile>
-    <ClCompile Include="BatchExponentialNormalization_LayerData_CPU.cpp">
+    <ClCompile Include="ExponentialNormalization_LayerData_CPU.cpp">
       <Filter>LayerData</Filter>
     </ClCompile>
-    <ClCompile Include="BatchExponentialNormalization_LayerData_Base.cpp">
+    <ClCompile Include="ExponentialNormalization_LayerData_Base.cpp">
       <Filter>LayerData</Filter>
     </ClCompile>
   </ItemGroup>
@@ -199,10 +199,10 @@
     <Xml Include="Config.xml" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="BatchExponentialNormalization_LayerData_GPU.cu">
+    <CudaCompile Include="ExponentialNormalization_LayerData_GPU.cu">
       <Filter>LayerData</Filter>
     </CudaCompile>
-    <CudaCompile Include="BatchExponentialNormalization_GPU.cu">
+    <CudaCompile Include="ExponentialNormalization_GPU.cu">
       <Filter>Layer</Filter>
     </CudaCompile>
   </ItemGroup>

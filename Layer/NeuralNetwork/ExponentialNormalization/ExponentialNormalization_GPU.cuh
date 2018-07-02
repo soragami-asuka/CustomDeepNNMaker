@@ -1,58 +1,55 @@
 //======================================
 // 活性関数レイヤー
-// CPU処理用
+// GPU処理用
 //======================================
-#ifndef __BatchExponentialNormalization_CPU_H__
-#define __BatchExponentialNormalization_CPU_H__
+#ifndef __ExponentialNormalization_GPU_H__
+#define __ExponentialNormalization_GPU_H__
 
-#include"stdafx.h"
+#pragma warning(push)
+#pragma warning(disable : 4267)
+#pragma warning(disable : 4819)
+#include <cuda.h>
+#include <cudnn.h>
+#include <cublas_v2.h>
+#include <thrust/device_vector.h>
+#include <thrust/host_vector.h>
+#include "device_launch_parameters.h"
+#pragma warning(pop)
 
-#include"BatchExponentialNormalization_DATA.hpp"
-#include"BatchExponentialNormalization_FUNC.hpp"
-#include"BatchExponentialNormalization_Base.h"
+#include"ExponentialNormalization_DATA.hpp"
+#include"ExponentialNormalization_FUNC.hpp"
+#include"ExponentialNormalization_Base.h"
 
-using namespace Gravisbell;
-using namespace Gravisbell::Layer::NeuralNetwork;
 
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-class BatchExponentialNormalization_CPU : public BatchExponentialNormalization_Base
+class ExponentialNormalization_GPU : public ExponentialNormalization_Base
 {
 private:
 	// データ本体
-	class BatchExponentialNormalization_LayerData_CPU& layerData;
-//	BatchExponentialNormalization::LearnDataStructure learnData;
-
-	// 入出力バッファ
-	std::vector<CONST_BATCH_BUFFER_POINTER> lppBatchInputBuffer;	/**< 演算時の入力データ */
-	std::vector<BATCH_BUFFER_POINTER>		lppBatchOutputBuffer;	/**< バッチ処理用出力バッファ <バッチ数> */
-	std::vector<BATCH_BUFFER_POINTER>		lppBatchDInputBuffer;	/**< 入力誤差計算時の出力誤差データ */
-	std::vector<CONST_BATCH_BUFFER_POINTER> lppBatchDOutputBuffer;	/**< 入力誤差計算時の出力誤差データ */
+	class ExponentialNormalization_LayerData_GPU& layerData;
+//	ExponentialNormalization::LearnDataStructure learnData;
 
 	// Get関数を使うと処理負荷がかさむので一時保存用. PreCalculateで値を格納.
 	U32 inputBufferCount;				/**< 入力バッファ数 */
 	U32 outputBufferCount;				/**< 出力バッファ数 */
-	U32 channeclBufferCount;			/**< 1チャンネル当たりのバッファ数 */
+	U32 channeclBufferCount;				/**< 1チャンネル当たりのバッファ数 */
 
 	// 学習用のデータ
-	bool onLearnMode;	/**< 学習処理中フラグ */
-	U32 learnCount;		/**< 学習実行回数 */
-	std::vector<F32> lpTmpMean;			/**< 平均値格納用の一時変数 */
-	std::vector<F32> lpTmpVariance;		/**< 分散値格納用の一時変数 */
 
 	// 演算処理用のバッファ
-	std::vector<F32> lpDBias;	/**< バイアスの変化量 */
-	std::vector<F32> lpDScale;	/**< スケールの変化量 */
+
+	// CUDNN用データ構造定義
 
 	Gravisbell::Common::ITemporaryMemoryManager& temporaryMemoryManager;	/**< 一時バッファ管理 */
 
 public:
 	/** コンストラクタ */
-	BatchExponentialNormalization_CPU(Gravisbell::GUID guid, class BatchExponentialNormalization_LayerData_CPU& i_layerData, const IODataStruct& i_inputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager);
+	ExponentialNormalization_GPU(Gravisbell::GUID guid, class ExponentialNormalization_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager);
 	/** デストラクタ */
-	virtual ~BatchExponentialNormalization_CPU();
+	virtual ~ExponentialNormalization_GPU();
 
 public:
 	//================================
@@ -70,8 +67,8 @@ public:
 	// レイヤーデータ関連
 	//===========================
 	/** レイヤーデータを取得する */
-	ILayerData& GetLayerData();
-	const ILayerData& GetLayerData()const;
+	ExponentialNormalization_LayerData_Base& GetLayerData();
+	const ExponentialNormalization_LayerData_Base& GetLayerData()const;
 
 
 public:
@@ -90,10 +87,11 @@ public:
 		失敗した場合はCalculate以降の処理は実行不可. */
 	ErrorCode PreProcessCalculate();
 
-	
+
 	/** ループの初期化処理.データセットの実行開始前に実行する
 		失敗した場合はCalculate以降の処理は実行不可. */
 	ErrorCode PreProcessLoop();
+
 
 
 public:
@@ -121,7 +119,6 @@ public:
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
 	ErrorCode Training_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer);
-
 };
 
 

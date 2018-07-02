@@ -1,15 +1,15 @@
 //======================================
 // バッチ正規化のレイヤーデータ
 //======================================
-#ifndef __BatchExponentialNormalization_DATA_BASE_H__
-#define __BatchExponentialNormalization_DATA_BASE_H__
+#ifndef __ExponentialNormalization_DATA_BASE_H__
+#define __ExponentialNormalization_DATA_BASE_H__
 
 #include<Layer/ILayerData.h>
 #include<Layer/NeuralNetwork/IOptimizer.h>
 
 #include<vector>
 
-#include"BatchExponentialNormalization_DATA.hpp"
+#include"ExponentialNormalization_DATA.hpp"
 
 
 namespace Gravisbell {
@@ -18,16 +18,13 @@ namespace NeuralNetwork {
 	
 	typedef F32 NEURON_TYPE;	/**< ニューロンに使用するデータ型. float or double */
 
-	class BatchExponentialNormalization_LayerData_Base : public ILayerData
+	class ExponentialNormalization_LayerData_Base : public ILayerData
 	{
 	protected:
 		Gravisbell::GUID guid;	/**< レイヤーデータ識別用のGUID */
 
 		SettingData::Standard::IData* pLayerStructure;	/**< レイヤー構造を定義したコンフィグクラス */
-		BatchExponentialNormalization::LayerStructure layerStructure;	/**< レイヤー構造 */
-
-		IOptimizer* m_pOptimizer_scale;		/**< スケール更新用オプティマイザ */
-		IOptimizer* m_pOptimizer_bias;		/**< バイアス更新用オプティマイザ */
+		ExponentialNormalization::LayerStructure layerStructure;	/**< レイヤー構造 */
 
 
 		//===========================
@@ -35,9 +32,9 @@ namespace NeuralNetwork {
 		//===========================
 	public:
 		/** コンストラクタ */
-		BatchExponentialNormalization_LayerData_Base(const Gravisbell::GUID& guid);
+		ExponentialNormalization_LayerData_Base(const Gravisbell::GUID& guid);
 		/** デストラクタ */
-		virtual ~BatchExponentialNormalization_LayerData_Base();
+		virtual ~ExponentialNormalization_LayerData_Base();
 
 
 		//===========================

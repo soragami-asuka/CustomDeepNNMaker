@@ -147,12 +147,23 @@ namespace NeuralNetwork {
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			this->lppBatchOutputBuffer[batchNum] = &o_lppOutputBuffer[batchNum * this->outputBufferCount];
 
-		// 出力バッファを0クリア
-		memset(o_lppOutputBuffer, 0, sizeof(F32)*this->outputBufferCount*this->GetBatchSize());
-
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
-			for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
+			// 先頭レイヤーを処理
+			{
+				U32 bufferSize = min(this->lpInputBufferCount[0], outputBufferCount);
+
+				for(U32 bufNum=0; bufNum<outputBufferCount; bufNum++)
+				{
+					if(bufNum < bufferSize)
+						this->lppBatchOutputBuffer[batchNum][bufNum] = this->lppBatchInputBuffer[0][batchNum][bufNum];
+					else
+						this->lppBatchOutputBuffer[batchNum][bufNum] = 1.0f;
+				}
+			}
+
+			// 2つ目以降のレイヤーを処理
+			for(U32 inputNum=1; inputNum<this->lpInputBufferCount.size(); inputNum++)
 			{
 				U32 bufferSize = min(this->lpInputBufferCount[inputNum], outputBufferCount);
 
@@ -162,6 +173,16 @@ namespace NeuralNetwork {
 				}
 			}
 		}
+
+#ifdef _DEBUG
+		std::vector<float> lpTmpInputBuffer0(this->GetBatchSize() * this->lpInputBufferCount[0]);
+		memcpy(&lpTmpInputBuffer0[0], i_lppInputBuffer[0], sizeof(float)*lpTmpInputBuffer0.size());
+		std::vector<float> lpTmpInputBuffer1(this->GetBatchSize() * this->lpInputBufferCount[1]);
+		memcpy(&lpTmpInputBuffer1[0], i_lppInputBuffer[1], sizeof(float)*lpTmpInputBuffer1.size());
+
+		std::vector<float> lpTmpOutputBuffer(this->GetBatchSize() * this->outputBufferCount);
+		memcpy(&lpTmpOutputBuffer[0], o_lppOutputBuffer, sizeof(float)*lpTmpOutputBuffer.size());
+#endif
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -206,10 +227,8 @@ namespace NeuralNetwork {
 				this->lppBatchOutputBuffer[batchNum] = const_cast<BATCH_BUFFER_POINTER>(&i_lppOutputBuffer[batchNum * this->outputBufferCount]);
 
 
-			U32 CH_SIZE = this->GetOutputDataStruct().x * this->GetOutputDataStruct().y * this->GetOutputDataStruct().z;
 			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
-				U32 offset_output = 0;
 				for(U32 inputNum=0; inputNum<this->lpInputBufferCount.size(); inputNum++)
 				{
 					U32 bufferSize = min(this->lpInputBufferCount[inputNum], outputBufferCount);
@@ -218,7 +237,7 @@ namespace NeuralNetwork {
 					{
 						if(abs(this->lppBatchOutputBuffer[batchNum][bufNum]) > 0.0f)
 						{
-							this->lppBatchDInputBuffer[inputNum][batchNum][bufNum] = this->lppBatchOutputBuffer[batchNum][bufNum] / this->lppBatchInputBuffer[inputNum][batchNum][bufNum] * this->lppBatchDOutputBuffer[batchNum][bufNum];
+							this->lppBatchDInputBuffer[inputNum][batchNum][bufNum] = this->lppBatchDOutputBuffer[batchNum][bufNum] * this->lppBatchOutputBuffer[batchNum][bufNum] / this->lppBatchInputBuffer[inputNum][batchNum][bufNum];
 						}
 						else
 						{
