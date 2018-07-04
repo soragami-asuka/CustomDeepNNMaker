@@ -33,16 +33,28 @@ namespace ExponentialNormalization {
 		  */
 		S32 InputChannelCount;
 
-	};
-
-	/** Runtime Parameter structure */
-	struct RuntimeParameterStructure
-	{
 		/** Name : •½ŠŠ‰»ŠÔ”
 		  * ID   : ExponentialTime
 		  * Text : •½ŠŠ‰»ŠÔ”
 		  */
 		S32 ExponentialTime;
+
+		/** Name : ‰Šú‰»ŠÔ”
+		  * ID   : InitParameterTime
+		  * Text : ‰Šú‰»ŠÔ”.‰Šú‰»‚·‚é‚½‚ß‚Ég—p‚·‚éŠÔ”.
+		  */
+		S32 InitParameterTime;
+
+	};
+
+	/** Runtime Parameter structure */
+	struct RuntimeParameterStructure
+	{
+		/** Name : ‰Á‘¬ŒW”
+		  * ID   : AccelCoeff
+		  * Text : ‰Á‘¬ŒW”
+		  */
+		F32 AccelCoeff;
 
 	};
 

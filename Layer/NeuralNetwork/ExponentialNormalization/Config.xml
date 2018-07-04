@@ -33,11 +33,6 @@
       <Default>1</Default>
     </Int>
 
-  </Structure>
-
-  <!--実行時パラメータ-->
-  <RuntimeParameter>
-
     <Int id="ExponentialTime">
       <Name>平滑化時間数</Name>
       <Text>平滑化時間数</Text>
@@ -45,6 +40,27 @@
       <Max>65535</Max>
       <Default>128</Default>
     </Int>
+
+    <Int id="InitParameterTime">
+      <Name>初期化時間数</Name>
+      <Text>初期化時間数.初期化するために使用する時間数.</Text>
+      <Min>0</Min>
+      <Max>65535</Max>
+      <Default>8</Default>
+    </Int>
+    
+  </Structure>
+
+  <!--実行時パラメータ-->
+  <RuntimeParameter>
+
+    <Float id="AccelCoeff">
+      <Name>加速係数</Name>
+      <Text>加速係数</Text>
+      <Min>0.0</Min>
+      <Max>65535.0</Max>
+      <Default>1.0</Default>
+    </Float>
 
   </RuntimeParameter>
 

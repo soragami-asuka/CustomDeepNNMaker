@@ -33,7 +33,7 @@ using namespace Gravisbell;
 #define USE_BATCHNORM	1
 #define USE_DROPOUT		1
 
-#define USE_BATCH_SIZE	16
+#define USE_BATCH_SIZE	128
 #define MAX_EPOCH		5
 
 
@@ -1652,7 +1652,8 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver13(const Layer::Neural
 			Gravisbell::Utility::NeuralNetworkLayer::LYAERMERGETYPE_LAYER0,
 			pNetworkMaker->AddNeuralNetworkLayer_CA(lastLayerGUID, Vector3D<S32>(3,3,1), 16, Vector3D<S32>(1,1,1), Vector3D<S32>(1,1,0), L"sigmoid"),
 			pNetworkMaker->AddNeuralNetworkLayer_CA(lastLayerGUID, Vector3D<S32>(3,3,1), 16, Vector3D<S32>(1,1,1), Vector3D<S32>(1,1,0), L"tanh"));
-		lastLayerGUID = pNetworkMaker->AddPoolingLayer(lastLayerGUID, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1));
+		lastLayerGUID = pNetworkMaker->AddExponentialNormalizationLayer(lastLayerGUID, 64, 4);
+//		lastLayerGUID = pNetworkMaker->AddBatchNormalizationLayer(lastLayerGUID);
 
 		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_FA(lastLayerGUID, i_outputDataStruct.GetDataCount(), L"softmax_ALL_crossEntropy", L"WeightNormalization");
 

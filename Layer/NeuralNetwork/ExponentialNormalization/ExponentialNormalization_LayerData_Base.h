@@ -26,6 +26,7 @@ namespace NeuralNetwork {
 		SettingData::Standard::IData* pLayerStructure;	/**< レイヤー構造を定義したコンフィグクラス */
 		ExponentialNormalization::LayerStructure layerStructure;	/**< レイヤー構造 */
 
+		U64 learnTime;	/**< 学習回数 */
 
 		//===========================
 		// コンストラクタ / デストラクタ
@@ -92,7 +93,6 @@ namespace NeuralNetwork {
 		// 固有関数
 		//===========================
 	public:
-
 
 		//===========================
 		// オプティマイザー設定

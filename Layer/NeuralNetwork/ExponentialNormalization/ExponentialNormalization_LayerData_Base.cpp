@@ -108,8 +108,7 @@ namespace NeuralNetwork {
 		// 各データ数
 		bufferSize += sizeof(F32) * this->layerStructure.InputChannelCount;	// 平均
 		bufferSize += sizeof(F32) * this->layerStructure.InputChannelCount;	// 分散
-		bufferSize += sizeof(F32) * this->layerStructure.InputChannelCount;	// スケーリング値
-		bufferSize += sizeof(F32) * this->layerStructure.InputChannelCount;	// バイアス値
+		bufferSize += sizeof(U64);
 
 		return bufferSize;
 	}

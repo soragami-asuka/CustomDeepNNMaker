@@ -49,6 +49,8 @@ namespace NeuralNetwork {
 			this->lpVariance[ch] = 0.0f;
 		}
 
+		this->learnTime = 0;	/**< ŠwK‰ñ” */
+
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 	/** ‰Šú‰». Šeƒjƒ…[ƒƒ“‚Ì’l‚ðƒ‰ƒ“ƒ_ƒ€‚É‰Šú‰»
@@ -103,6 +105,10 @@ namespace NeuralNetwork {
 		cudaMemcpy(thrust::raw_pointer_cast(&this->lpVariance[0]), &i_lpBuffer[readBufferByte], sizeof(F32)*this->lpMean.size(), cudaMemcpyHostToDevice);
 		readBufferByte += sizeof(F32)*(U32)this->lpMean.size();
 
+		// ŠwK‰ñ”
+		memcpy(&this->learnTime, &i_lpBuffer[readBufferByte], sizeof(this->learnTime));
+		readBufferByte += sizeof(this->learnTime);
+
 		o_useBufferSize = readBufferByte;
 
 		return ErrorCode::ERROR_CODE_NONE;
@@ -131,6 +137,10 @@ namespace NeuralNetwork {
 		// •ªŽU
 		cudaMemcpy(&o_lpBuffer[writeBufferByte], thrust::raw_pointer_cast(&this->lpVariance[0]), sizeof(F32)*this->lpVariance.size(), cudaMemcpyDeviceToHost);
 		writeBufferByte += sizeof(F32)*(U32)this->lpVariance.size();
+
+		// ŠwK‰ñ”
+		memcpy(&o_lpBuffer[writeBufferByte], &this->learnTime, sizeof(this->learnTime));
+		writeBufferByte += sizeof(U64);
 
 
 		return writeBufferByte;

@@ -21,4 +21,3 @@ ExponentialNormalization_Base::ExponentialNormalization_Base(Gravisbell::GUID gu
 ExponentialNormalization_Base::~ExponentialNormalization_Base()
 {
 }
-

@@ -158,6 +158,16 @@ namespace NeuralNetworkLayer {
 	Layer::ILayerData* CreateNormalizationScaleLayer(
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager);
 
+	/** 指数平滑正規化レイヤー.
+		@param	入力チャンネル数
+		@param	平滑化時間数
+		@param	初期化時間数 */
+	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+	Layer::ILayerData* CreateExponentialNormalizationLayer(
+		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+		U32 i_InputChannelCount, U32 i_ExponentialTime, U32 i_InitParameterTimes);
+
+
 	/** 広域平均プーリングレイヤー
 		@param	layerDLLManager		レイヤーDLL管理クラス.
 		@param	inputDataStruct		入力データ構造. */

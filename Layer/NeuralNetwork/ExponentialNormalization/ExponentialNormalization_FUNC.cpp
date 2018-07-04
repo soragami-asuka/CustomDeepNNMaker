@@ -59,6 +59,20 @@ namespace DefaultLanguage
                 L"入力チャンネル数",
             }
         },
+        {
+            L"ExponentialTime",
+            {
+                L"平滑化時間数",
+                L"平滑化時間数",
+            }
+        },
+        {
+            L"InitParameterTime",
+            {
+                L"初期化時間数",
+                L"初期化時間数.初期化するために使用する時間数.",
+            }
+        },
     };
 
 
@@ -73,10 +87,10 @@ namespace DefaultLanguage
     static const std::map<std::wstring, StringData> g_lpItemData_Runtime = 
     {
         {
-            L"ExponentialTime",
+            L"AccelCoeff",
             {
-                L"平滑化時間数",
-                L"平滑化時間数",
+                L"加速係数",
+                L"加速係数",
             }
         },
     };
@@ -182,6 +196,28 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 			CurrentLanguage::g_lpItemData_LayerStructure[L"InputChannelCount"].text.c_str(),
 			1, 65535, 1));
 
+	/** Name : 平滑化時間数
+	  * ID   : ExponentialTime
+	  * Text : 平滑化時間数
+	  */
+	pLayerConfig->AddItem(
+		Gravisbell::SettingData::Standard::CreateItem_Int(
+			L"ExponentialTime",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"ExponentialTime"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"ExponentialTime"].text.c_str(),
+			1, 65535, 128));
+
+	/** Name : 初期化時間数
+	  * ID   : InitParameterTime
+	  * Text : 初期化時間数.初期化するために使用する時間数.
+	  */
+	pLayerConfig->AddItem(
+		Gravisbell::SettingData::Standard::CreateItem_Int(
+			L"InitParameterTime",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"InitParameterTime"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"InitParameterTime"].text.c_str(),
+			0, 65535, 8));
+
 	return pLayerConfig;
 }
 
@@ -228,16 +264,16 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateRuntimeParameter(void
 
 
 	// Create Item
-	/** Name : 平滑化時間数
-	  * ID   : ExponentialTime
-	  * Text : 平滑化時間数
+	/** Name : 加速係数
+	  * ID   : AccelCoeff
+	  * Text : 加速係数
 	  */
 	pLayerConfig->AddItem(
-		Gravisbell::SettingData::Standard::CreateItem_Int(
-			L"ExponentialTime",
-			CurrentLanguage::g_lpItemData_Learn[L"ExponentialTime"].name.c_str(),
-			CurrentLanguage::g_lpItemData_Learn[L"ExponentialTime"].text.c_str(),
-			1, 65535, 1));
+		Gravisbell::SettingData::Standard::CreateItem_Float(
+			L"AccelCoeff",
+			CurrentLanguage::g_lpItemData_Learn[L"AccelCoeff"].name.c_str(),
+			CurrentLanguage::g_lpItemData_Learn[L"AccelCoeff"].text.c_str(),
+			0.0000000000000000f, 65535.0000000000000000f, 1.0000000000000000f));
 
 	return pLayerConfig;
 }

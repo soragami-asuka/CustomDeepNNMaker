@@ -4,6 +4,8 @@
 //======================================
 #include"stdafx.h"
 
+#include<algorithm>
+
 #include"ExponentialNormalization_DATA.hpp"
 #include"ExponentialNormalization_FUNC.hpp"
 #include"ExponentialNormalization_Base.h"
@@ -198,7 +200,7 @@ namespace NeuralNetwork {
 					for(U32 bufNum=0; bufNum<this->channeclBufferCount; bufNum++)
 					{
 						this->lppBatchDInputBuffer[batchNum][this->channeclBufferCount*ch + bufNum]
-							= this->lppBatchDOutputBuffer[batchNum][this->channeclBufferCount*ch + bufNum] * sqrtVariance;
+							= this->lppBatchDOutputBuffer[batchNum][this->channeclBufferCount*ch + bufNum] / sqrtVariance;
 					}
 				}
 			}
@@ -234,8 +236,16 @@ namespace NeuralNetwork {
 		if(errCode != ErrorCode::ERROR_CODE_NONE)
 			return errCode;
 
+		// ŠwK‰ñ”‚ðXV
+		this->layerData.learnTime++;
+
 		// CH‚²‚Æ‚É•½‹Ï‚Æ•ªŽU‚ð‹‚ß‚é
-		F32 alpha = 2 / (this->GetRuntimeParameterByStructure().ExponentialTime + 1);
+		F32 alpha = 0.0f;
+		if(this->layerData.learnTime < this->layerData.layerStructure.InitParameterTime)
+			alpha = 1.0f / (this->layerData.learnTime + 1);
+		else
+			alpha = std::min<F32>(1.0f, this->GetRuntimeParameterByStructure().AccelCoeff * 2 / (this->layerData.layerStructure.ExponentialTime + 1));
+
 		for(U32 ch=0; ch<this->GetInputDataStruct().ch; ch++)
 		{
 			// •½‹Ï‚ð‹‚ß‚é
@@ -266,6 +276,7 @@ namespace NeuralNetwork {
 					variance += (value - average) * (value - average);
 				}
 			}
+			variance /= (this->GetBatchSize() * this->channeclBufferCount);
 
 			// •ªŽU‚ðXV‚·‚é
 			this->layerData.lpVariance[ch] = alpha * variance + (1.0f - alpha) * this->layerData.lpVariance[ch];

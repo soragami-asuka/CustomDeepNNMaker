@@ -103,6 +103,12 @@ namespace NeuralNetworkLayer {
 			@param	i_inputLayerGUID		追加レイヤーの入力先レイヤーのGUID. */
 		virtual Gravisbell::GUID AddNormalizationScaleLayer(const Gravisbell::GUID& i_inputLayerGUID) = 0;
 
+		/** 指数平滑正規化レイヤー.
+			@param	入力チャンネル数
+			@param	平滑化時間数
+			@param	初期化時間数 */
+		virtual Gravisbell::GUID AddExponentialNormalizationLayer(const Gravisbell::GUID& i_inputLayerGUID, U32 i_ExponentialTime, U32 i_InitParameterTimes) = 0;
+
 		/** 広域平均プーリングレイヤー
 			@param	i_inputLayerGUID		追加レイヤーの入力先レイヤーのGUID. */
 		virtual Gravisbell::GUID AddGlobalAveragePoolingLayer(const Gravisbell::GUID& i_inputLayerGUID) = 0;

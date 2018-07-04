@@ -49,6 +49,9 @@ namespace NeuralNetwork {
 			this->lpVariance[ch] = 1.0f;
 		}
 
+		this->learnTime = 0;	/**< ŠwK‰ñ” */
+
+
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 	/** ‰Šú‰». Šeƒjƒ…[ƒƒ“‚Ì’l‚ðƒ‰ƒ“ƒ_ƒ€‚É‰Šú‰»
@@ -103,6 +106,9 @@ namespace NeuralNetwork {
 		memcpy(&this->lpVariance[0], &i_lpBuffer[readBufferByte], sizeof(F32)*this->lpMean.size());
 		readBufferByte += sizeof(F32)*(S32)this->lpMean.size();
 
+		// ŠwK‰ñ”
+		memcpy(&this->learnTime, &i_lpBuffer[readBufferByte], sizeof(this->learnTime));
+		readBufferByte += sizeof(this->learnTime);
 
 		o_useBufferSize = readBufferByte;
 
@@ -132,6 +138,10 @@ namespace NeuralNetwork {
 		// •ªŽU
 		memcpy(&o_lpBuffer[writeBufferByte], &this->lpVariance[0], sizeof(F32)*this->lpVariance.size());
 		writeBufferByte += sizeof(F32)*(S32)this->lpVariance.size();
+
+		// ŠwK‰ñ”
+		memcpy(&o_lpBuffer[writeBufferByte], &this->learnTime, sizeof(this->learnTime));
+		writeBufferByte += sizeof(U64);
 
 
 		return writeBufferByte;

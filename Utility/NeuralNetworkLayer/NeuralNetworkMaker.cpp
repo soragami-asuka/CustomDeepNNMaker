@@ -208,6 +208,18 @@ namespace NeuralNetworkLayer {
 				false);
 		}
 
+		/** 指数平滑正規化レイヤー.
+			@param	入力チャンネル数
+			@param	平滑化時間数
+			@param	初期化時間数 */
+		Gravisbell::GUID AddExponentialNormalizationLayer(const Gravisbell::GUID& i_inputLayerGUID, U32 i_ExponentialTime, U32 i_InitParameterTimes)
+		{
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateExponentialNormalizationLayer(layerDLLManager, layerDataManager, this->GetOutputDataStruct(i_inputLayerGUID).ch, i_ExponentialTime, i_InitParameterTimes),
+				false);
+		}
+
 		/** スケール正規化レイヤー
 			@param	i_inputLayerGUID		追加レイヤーの入力先レイヤーのGUID. */
 		Gravisbell::GUID AddNormalizationScaleLayer(const Gravisbell::GUID& i_inputLayerGUID)

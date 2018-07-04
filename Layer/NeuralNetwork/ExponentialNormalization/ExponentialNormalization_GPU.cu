@@ -20,7 +20,58 @@ using namespace Gravisbell::Layer::NeuralNetwork;
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
+	
+#define CALCULATE_DSCALE_BLOCK_SIZE	32
 
+	/** CHごとの平均を求める.
+		dim = <ch,1,1>
+		block = <32,1,1>
+	*/
+	__global__ void device_UpdateChAverage(F32* o_lpAverage, const F32* i_lpInputValue, U32 i_inputCountPerChannel, U32 i_batchSize, U32 i_loopCount, F32 i_alpha)
+	{
+		__shared__ F32 lpTmpSumValue[CALCULATE_DSCALE_BLOCK_SIZE];
+
+		U32 chNum = blockIdx.x;
+		U32 chCount = gridDim.x;
+		U32 tid = threadIdx.x;
+		U32 inputCount = chCount * i_inputCountPerChannel;
+
+		// DWeightとVectorの乗算を計算
+		lpTmpSumValue[tid] = 0.0f;
+		for(U32 batchNum=0; batchNum<i_batchSize; batchNum++)
+		{
+			for(U32 loopNum=0; loopNum<i_loopCount; loopNum++)
+			{
+				U32 inputNum = CALCULATE_DSCALE_BLOCK_SIZE * loopNum + tid;
+				if(inputNum >= i_inputCountPerChannel)
+					continue;
+
+				U32 offset = batchNum * inputCount + chNum * i_inputCountPerChannel + inputNum;
+
+				lpTmpSumValue[tid] += i_lpInputValue[offset];
+			}
+		}
+		__syncthreads();
+
+		// 合計
+		lpTmpSumValue[tid] += lpTmpSumValue[tid + 16];
+		__syncthreads();
+		lpTmpSumValue[tid] += lpTmpSumValue[tid + 8];
+		__syncthreads();
+		lpTmpSumValue[tid] += lpTmpSumValue[tid + 4];
+		__syncthreads();
+		lpTmpSumValue[tid] += lpTmpSumValue[tid + 2];
+		__syncthreads();
+		lpTmpSumValue[tid] += lpTmpSumValue[tid + 1];
+		__syncthreads();
+
+		if(tid == 0)
+		{
+			F32 average = lpTmpSumValue[tid] / (i_inputCountPerChannel * i_batchSize);
+
+			o_lpAverage[chNum] = i_alpha * average + (1.0f - i_alpha) * o_lpAverage[chNum];
+		}
+	}
 
 	/** コンストラクタ */
 	ExponentialNormalization_GPU::ExponentialNormalization_GPU(Gravisbell::GUID guid, ExponentialNormalization_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)

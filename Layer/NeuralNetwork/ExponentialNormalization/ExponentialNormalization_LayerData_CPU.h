@@ -19,7 +19,6 @@ namespace NeuralNetwork {
 		std::vector<F32> lpMean;		/**< 各Chの平均 */
 		std::vector<F32> lpVariance;	/**< 各Chの分散 */
 
-
 		//===========================
 		// コンストラクタ / デストラクタ
 		//===========================

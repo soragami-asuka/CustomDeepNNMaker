@@ -585,6 +585,55 @@ Layer::ILayerData* CreateNormalizationScaleLayer(
 	return pLayer;
 }
 
+
+/** 指数平滑正規化レイヤー.
+	@param	入力チャンネル数
+	@param	平滑化時間数
+	@param	初期化時間数 */
+GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+Layer::ILayerData* CreateExponentialNormalizationLayer(
+	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+	U32 i_InputChannelCount, U32 i_ExponentialTime, U32 i_InitParameterTimes)
+{
+	const Gravisbell::GUID TYPE_CODE(0x44f733e8, 0x417c, 0x4598, 0xbf, 0x05, 0x2c, 0xc2, 0x6e, 0x1a, 0xb6, 0xf1);
+
+	// DLL取得
+	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(TYPE_CODE);
+	if(pLayerDLL == NULL)
+		return NULL;
+
+	// 設定の作成
+	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
+	if(pConfig == NULL)
+		return NULL;
+
+	// 入力チャンネル数
+	{
+		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"InputChannelCount"));
+		pItem->SetValue(i_InputChannelCount);
+	}
+	// 平滑化時間数
+	{
+		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"ExponentialTime"));
+		pItem->SetValue(i_ExponentialTime);
+	}
+	// 初期化時間数
+	{
+		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"InitParameterTime"));
+		pItem->SetValue(i_InitParameterTimes);
+	}
+
+	// レイヤーの作成
+	Layer::ILayerData* pLayer = layerDataManager.CreateLayerData(layerDLLManager, TYPE_CODE, boost::uuids::random_generator()().data, *pConfig);
+	if(pLayer == NULL)
+		return NULL;
+
+	// 設定情報を削除
+	delete pConfig;
+
+	return pLayer;
+}
+
 /** 広域平均プーリングレイヤー
 	@param	layerDLLManager		レイヤーDLL管理クラス.
 	@param	inputDataStruct		入力データ構造. */
