@@ -85,6 +85,19 @@ namespace
 
 		o_lpWeight[neuronNum * inputCount + inputNum] = i_lpScale[neuronNum] * i_lpVector[neuronNum*inputCount + inputNum] / i_lpVectorScale[neuronNum];
 	}
+	__global__ void device_UpdateWeight_v2(F32* o_lpWeight, const F32* i_lpScale, const F32* i_lpVector, const F32* i_lpVectorScale, U32 i_inputCount, U32 i_loopCount)
+	{
+		U32 neuronNum = blockIdx.x;
+		U32 tid = threadIdx.x;
+
+		for(U32 loopNum=0; loopNum<i_loopCount; loopNum++)
+		{
+			U32 inputNum = CALCULATE_DSCALE_BLOCK_SIZE * loopNum + tid;
+			U32 offset = neuronNum * i_inputCount + inputNum;
+			
+			o_lpWeight[neuronNum * i_inputCount + inputNum] = i_lpScale[neuronNum] * i_lpVector[neuronNum*i_inputCount + inputNum] / i_lpVectorScale[neuronNum];
+		}
+	}
 
 	__global__ void device_CalculateDScale(F32* o_lpDScale, const F32* i_lpDWeight, const F32* i_lpVector, const F32* i_lpVectorScale, U32 i_inputCount, U32 i_loopCount)
 	{
@@ -599,11 +612,22 @@ namespace NeuralNetwork {
 		/** Weight‚ðXV */
 		void UpdateWeight()
 		{
+#if 0
 			device_UpdateWeight<<<this->neuronCount, this->inputCount>>>(
 				thrust::raw_pointer_cast(&this->lpWeight[0]),
 				thrust::raw_pointer_cast(&this->lpScale[0]),
 				thrust::raw_pointer_cast(&this->lpVector[0]),
 				thrust::raw_pointer_cast(&this->lpVectorScale[0]));
+#else
+			U32 loopCount = (this->inputCount + CALCULATE_DSCALE_BLOCK_SIZE-1) / CALCULATE_DSCALE_BLOCK_SIZE;
+			device_UpdateWeight_v2<<<this->neuronCount, CALCULATE_DSCALE_BLOCK_SIZE>>>(
+				thrust::raw_pointer_cast(&this->lpWeight[0]),
+				thrust::raw_pointer_cast(&this->lpScale[0]),
+				thrust::raw_pointer_cast(&this->lpVector[0]),
+				thrust::raw_pointer_cast(&this->lpVectorScale[0]),
+				this->inputCount,
+				loopCount);
+#endif
 
 #ifdef _DEBUG
 			std::vector<F32> lpTmpWeight(this->lpWeight.size());

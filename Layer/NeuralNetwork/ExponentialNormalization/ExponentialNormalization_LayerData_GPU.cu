@@ -46,7 +46,7 @@ namespace NeuralNetwork {
 		for(U32 ch=0; ch<this->layerStructure.InputChannelCount; ch++)
 		{
 			this->lpMean[ch] = 0.0f;
-			this->lpVariance[ch] = 0.0f;
+			this->lpVariance[ch] = 1.0f;
 		}
 
 		this->learnTime = 0;	/**< ŠwK‰ñ” */
