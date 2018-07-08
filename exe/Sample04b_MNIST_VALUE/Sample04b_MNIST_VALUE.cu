@@ -27,7 +27,7 @@
 
 using namespace Gravisbell;
 
-#define USE_GPU	1
+#define USE_GPU	0
 #define USE_HOST_MEMORY 1
 
 #define USE_BATCHNORM	1
@@ -441,7 +441,7 @@ Gravisbell::ErrorCode LoadSampleData_label(
 	U32 teachDataCount = (U32)(dataCount*(1.0f - i_testRate));
 	for(U32 imageNum=0; imageNum<dataCount; imageNum++)
 	{
-		F32 value = (F32)lpBuf[bufPos] / 10.0f * 2.0f - 1;	// 最大値を1.0にする必要があるため、10ではなく9で割る
+		F32 value = (F32)lpBuf[bufPos] / 9.0f * 2.0f - 1;	// 最大値を1.0にする必要があるため、10ではなく9で割る
 
 		if(imageNum < teachDataCount)
 			(*o_ppDataLayerTeach)->AddData(&value);
@@ -607,7 +607,8 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver03(const Layer::Neural
 		lastLayerGUID = pNetworkMaker->AddActivationLayer(lastLayerGUID, L"ReLU");
 
 		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_FA(lastLayerGUID, 10, L"softmax_ALL_crossEntropy");
-		lastLayerGUID = pNetworkMaker->AddProbabilityArray2ValueLayer(lastLayerGUID, -1.0, 1.0f, 0.1f);
+//		lastLayerGUID = pNetworkMaker->AddProbabilityArray2ValueLayer(lastLayerGUID, -1.0, 1.0f, 0.1f);
+		lastLayerGUID = pNetworkMaker->AddSignalArray2ValueLayer(lastLayerGUID, -1.0f, 1.0f);
 
 		// 出力レイヤー設定
 		pNeuralNetwork->SetOutputLayerGUID(lastLayerGUID);

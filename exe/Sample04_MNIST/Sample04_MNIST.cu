@@ -33,7 +33,7 @@ using namespace Gravisbell;
 #define USE_BATCHNORM	1
 #define USE_DROPOUT		1
 
-#define USE_BATCH_SIZE	1
+#define USE_BATCH_SIZE	4
 #define MAX_EPOCH		20
 
 
@@ -70,10 +70,11 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver11(const Layer::Neural
 Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver12(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct);
 Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver13(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct);
 Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver14(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct);
+Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver15(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct);
 
 Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager, const IODataStruct& inputDataStruct, const IODataStruct& outputDataStruct)
 {
-	return CreateNeuralNetwork_ver14(layerDLLManager, layerDataManager, inputDataStruct, outputDataStruct);
+	return CreateNeuralNetwork_ver15(layerDLLManager, layerDataManager, inputDataStruct, outputDataStruct);
 }
 
 
@@ -1686,7 +1687,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver14(const Layer::Neural
 		BATCH,
 		EXP
 	};
-	NORMALIZATION_TYPE normalizationType = NORMALIZATION_TYPE::BATCH;
+	NORMALIZATION_TYPE normalizationType = NORMALIZATION_TYPE::EXP;
 
 	// ニューラルネットワーク作成クラスを作成
 	Gravisbell::Utility::NeuralNetworkLayer::INeuralNetworkMaker* pNetworkMaker = Gravisbell::Utility::NeuralNetworkLayer::CreateNeuralNetworkManaker(layerDLLManager, layerDataManager, &i_inputDataStruct, 1);
@@ -1757,6 +1758,79 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver14(const Layer::Neural
 
 	return pNeuralNetwork;
 }
+
+
+Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver15(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct)
+{
+	enum class NORMALIZATION_TYPE
+	{
+		NONE,
+		BATCH,
+		EXP
+	};
+	NORMALIZATION_TYPE normalizationType = NORMALIZATION_TYPE::BATCH;
+
+	// ニューラルネットワーク作成クラスを作成
+	Gravisbell::Utility::NeuralNetworkLayer::INeuralNetworkMaker* pNetworkMaker = Gravisbell::Utility::NeuralNetworkLayer::CreateNeuralNetworkManaker(layerDLLManager, layerDataManager, &i_inputDataStruct, 1);
+
+	// ニューラルネットワークを作成
+	Layer::Connect::ILayerConnectData* pNeuralNetwork = pNetworkMaker->GetNeuralNetworkLayer();
+	if(pNeuralNetwork == NULL)
+		return NULL;
+
+
+	// レイヤーを追加する
+	if(pNeuralNetwork)
+	{
+		// 入力信号を直前レイヤーに設定
+		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID();
+
+		lastLayerGUID = pNetworkMaker->AddFullyConnectLayer(lastLayerGUID, 1024);
+		switch(normalizationType)
+		{
+		case NORMALIZATION_TYPE::NONE:	break;
+		case NORMALIZATION_TYPE::BATCH:	lastLayerGUID = pNetworkMaker->AddBatchNormalizationLayer(lastLayerGUID);				break;
+		case NORMALIZATION_TYPE::EXP:	lastLayerGUID = pNetworkMaker->AddExponentialNormalizationLayer(lastLayerGUID, 64, 4);	break;
+		}
+		
+		lastLayerGUID = pNetworkMaker->AddFullyConnectLayer(lastLayerGUID, 512);
+		switch(normalizationType)
+		{
+		case NORMALIZATION_TYPE::NONE:	break;
+		case NORMALIZATION_TYPE::BATCH:	lastLayerGUID = pNetworkMaker->AddBatchNormalizationLayer(lastLayerGUID);				break;
+		case NORMALIZATION_TYPE::EXP:	lastLayerGUID = pNetworkMaker->AddExponentialNormalizationLayer(lastLayerGUID, 64, 4);	break;
+		}
+		
+		lastLayerGUID = pNetworkMaker->AddFullyConnectLayer(lastLayerGUID, 256);
+		switch(normalizationType)
+		{
+		case NORMALIZATION_TYPE::NONE:	break;
+		case NORMALIZATION_TYPE::BATCH:	lastLayerGUID = pNetworkMaker->AddBatchNormalizationLayer(lastLayerGUID);				break;
+		case NORMALIZATION_TYPE::EXP:	lastLayerGUID = pNetworkMaker->AddExponentialNormalizationLayer(lastLayerGUID, 64, 4);	break;
+		}
+
+		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_FA(lastLayerGUID, i_outputDataStruct.GetDataCount(), L"softmax_ALL_crossEntropy", L"WeightNormalization");
+
+		// 出力レイヤー設定
+		pNeuralNetwork->SetOutputLayerGUID(lastLayerGUID);
+	}
+
+	// 出力データ構造が正しいことを確認
+	if(pNeuralNetwork->GetOutputDataStruct(&i_inputDataStruct, 1) != i_outputDataStruct)
+	{
+		layerDataManager.EraseLayerByGUID(pNeuralNetwork->GetGUID());
+		return NULL;
+	}
+
+
+	// オプティマイザーの設定
+	pNeuralNetwork->ChangeOptimizer(L"Adam");
+
+	delete pNetworkMaker;
+
+	return pNeuralNetwork;
+}
+
 
 
 /** ニューラルネットワークの学習とサンプル実行を同時実行 */

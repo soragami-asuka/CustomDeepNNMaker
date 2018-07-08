@@ -18,9 +18,52 @@ using namespace Gravisbell::Layer::NeuralNetwork;
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
+	
+#define THREAD_PER_BLOCK	32
 
-#define CALC_BATCH_MAX	(256)
-#define CALC_INPUT_MAX	(1024)
+	/** ì¸óÕÇë´ÇµçáÇÌÇπÇÈ.
+		<outputChNo, batchSize> <32>
+		*/
+	__global__ void device_SignalArray2Value(
+		F32* o_lpOutput,
+		const F32* i_lpInput,
+		U32 i_resolution, U32 i_bufferPerCh, U32 i_loopCount,
+		F32 outputMinValue,
+		F32 outputMaxValue)
+	{
+		U32 batchNum = blockIdx.y;
+		U32 outputChNo = blockIdx.x;
+		U32 outputChCount = gridDim.x;
+		U32 tid = threadIdx.x;
+
+		for(U32 loopNum=0; loopNum<i_loopCount; loopNum++)
+		{
+			U32 bufferPos = loopNum * THREAD_PER_BLOCK + tid;
+			if(bufferPos >= i_bufferPerCh)
+				continue;
+
+			U32 outputOffset = (batchNum * outputChCount + outputChNo) * i_bufferPerCh + bufferPos;
+
+			// ç≈ëÂílÇãÅÇﬂÇÈ
+			U32 maxNum = 0;
+			F32 maxValue = -FLT_MAX;
+			for(U32 inputNum=0; inputNum<i_resolution; inputNum++)
+			{
+				U32 inputChNum = outputChNo * i_resolution + inputNum;
+				U32 inputOffset = (batchNum * (outputChCount * i_resolution) + outputChNo * i_resolution + inputChNum) * i_bufferPerCh + bufferPos;
+
+				F32 value = i_lpInput[inputOffset];
+
+				if(value > maxValue)
+				{
+					maxNum = inputNum;
+					maxValue = value;
+				}
+			}
+
+			o_lpOutput[outputOffset] = (F32)(maxNum / (i_resolution-1)) * (outputMaxValue - outputMinValue) + outputMinValue;
+		}
+	}
 
 	__global__ void device_Value2SignalArray(
 		U32 inputChSize,
@@ -39,7 +82,7 @@ namespace NeuralNetwork {
 
 		F32 teachValue = lpOutputBuffer[outputOffset] + lpDOutputBuffer[outputOffset];
 
-		U32 teachCh = max(0, min(inputChSize-1, (U32)((teachValue - outputMinValue) / (outputMaxValue - outputMinValue) * inputChSize + 0.5f)));
+		U32 teachCh = max(0, min(inputChSize-1, (U32)((teachValue - outputMinValue) / (outputMaxValue - outputMinValue) * (inputChSize-1) + 0.5f)));
 
 		U32 inputOffset = (inputChBufferSize * inputChSize * batchNum) + (inputChBufferSize * teachCh) + bufferPos;
 
@@ -161,6 +204,8 @@ namespace NeuralNetwork {
 		cudaMemset(o_lppOutputBuffer, 0, sizeof(F32)*this->outputBufferCount*this->GetBatchSize());
 		memset(&this->lpTmpOutputBuffer_h[0], 0, sizeof(F32)*this->lpTmpOutputBuffer_h.size());
 
+#if 1
+		// åvéZ
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
 			for(U32 z=0; z<this->GetInputDataStruct().z; z++)
@@ -198,7 +243,20 @@ namespace NeuralNetwork {
 			&this->lpTmpOutputBuffer_h[0],
 			sizeof(F32) * this->lpTmpOutputBuffer_h.size(),
 			cudaMemcpyHostToDevice);
+#else
+		dim3 grid(this->GetOutputDataStruct().ch, this->GetBatchSize());
+		dim3 block(THREAD_PER_BLOCK);
+		U32 loopCount = (this->inputChannelSize + (THREAD_PER_BLOCK-1)) / THREAD_PER_BLOCK;
 
+		device_SignalArray2Value<<<grid, block>>>(
+			o_lppOutputBuffer,
+			i_lppInputBuffer,
+			this->layerData.layerStructure.resolution,
+			this->inputChannelSize,
+			loopCount,
+			this->layerData.layerStructure.outputMinValue, this->layerData.layerStructure.outputMaxValue);
+
+#endif
 
 #if _DEBUG
 			std::vector<F32> lpInputBuffer(this->inputBufferCount * this->GetBatchSize());
