@@ -41,7 +41,7 @@ private:
 	U32 outputBufferCount;				/**< 出力バッファ数 */
 
 	U32 inputBatchBufferSize;			/**< 入力信号のバッチごとのバッファサイズ */
-	U32 inputChannelSize;				/**< 入力信号のチャンネルごとのバッファサイズ */
+	U32 bufferPerChannel;				/**< 入力信号のチャンネルごとのバッファサイズ */
 
 	std::vector<F32> lpTmpOutputBuffer_h;	/**< 一時出力バッファ(ホストメモリ) */
 	std::vector<F32*> lpTmpBatchOutputBuffer_h;	/**< バッチごとの一時出力バッファ(ホストメモリ) */

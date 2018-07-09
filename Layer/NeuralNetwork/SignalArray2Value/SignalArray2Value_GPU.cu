@@ -61,7 +61,7 @@ namespace NeuralNetwork {
 				}
 			}
 
-			o_lpOutput[outputOffset] = (F32)(maxNum / (i_resolution-1)) * (outputMaxValue - outputMinValue) + outputMinValue;
+			o_lpOutput[outputOffset] = ((F32)maxNum / (i_resolution-1)) * (outputMaxValue - outputMinValue) + outputMinValue;
 		}
 	}
 
@@ -72,21 +72,29 @@ namespace NeuralNetwork {
 		F32 outputMaxValue,
 		F32 lpDInputBuffer[],
 		const F32 lpOutputBuffer[],
-		const F32 lpDOutputBuffer[])
+		const F32 lpDOutputBuffer[],
+		U32 i_loopCount,
+		U32 i_bufferPerCh)
 	{
 		U32 batchNum  = blockIdx.x;
-		U32 bufferPos = threadIdx.x;
-		U32 inputChBufferSize = blockDim.x;
+		U32 tid          = threadIdx.x;
 
-		U32 outputOffset = outputBatchBufferSize * batchNum + bufferPos;
+		for(U32 loopNum=0; loopNum<i_loopCount; loopNum++)
+		{
+			U32 bufferPos = loopNum * THREAD_PER_BLOCK + tid;
+			if(bufferPos >= i_bufferPerCh)
+				continue;
 
-		F32 teachValue = lpOutputBuffer[outputOffset] + lpDOutputBuffer[outputOffset];
+			U32 outputOffset = outputBatchBufferSize * batchNum + bufferPos;
 
-		U32 teachCh = max(0, min(inputChSize-1, (U32)((teachValue - outputMinValue) / (outputMaxValue - outputMinValue) * (inputChSize-1) + 0.5f)));
+			F32 teachValue = lpOutputBuffer[outputOffset] + lpDOutputBuffer[outputOffset];
 
-		U32 inputOffset = (inputChBufferSize * inputChSize * batchNum) + (inputChBufferSize * teachCh) + bufferPos;
+			U32 teachCh = max(0, min(inputChSize-1, (U32)((teachValue - outputMinValue) / (outputMaxValue - outputMinValue) * (inputChSize-1) + 0.5f)));
 
-		lpDInputBuffer[inputOffset] = 1.0f;
+			U32 inputOffset = (i_bufferPerCh * inputChSize * batchNum) + (i_bufferPerCh * teachCh) + bufferPos;
+
+			lpDInputBuffer[inputOffset] = 1.0f;
+		}
 	}
 
 
@@ -171,10 +179,10 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
 		// 入力信号のチャンネルごとのバッファサイズ
-		this->inputChannelSize = this->GetOutputDataStruct().x * this->GetOutputDataStruct().y * this->GetOutputDataStruct().z;
+		this->bufferPerChannel = this->GetOutputDataStruct().x * this->GetOutputDataStruct().y * this->GetOutputDataStruct().z;
 
 		/**< 入力信号のバッチごとのバッファサイズ */
-		this->inputBatchBufferSize = this->inputChannelSize * this->GetInputDataStruct().ch;
+		this->inputBatchBufferSize = this->bufferPerChannel * this->GetInputDataStruct().ch;
 
 		// 一時出力バッファ(ホストメモリ)
 		this->lpTmpOutputBuffer_h.resize(this->outputBufferCount * this->GetBatchSize());
@@ -204,7 +212,7 @@ namespace NeuralNetwork {
 		cudaMemset(o_lppOutputBuffer, 0, sizeof(F32)*this->outputBufferCount*this->GetBatchSize());
 		memset(&this->lpTmpOutputBuffer_h[0], 0, sizeof(F32)*this->lpTmpOutputBuffer_h.size());
 
-#if 1
+#if 0
 		// 計算
 		for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 		{
@@ -222,14 +230,16 @@ namespace NeuralNetwork {
 							this->cublasHandle,
 							this->inputBatchBufferSize,
 							&i_lppInputBuffer[this->inputBatchBufferSize*batchNum + offset],
-							this->inputChannelSize,
+							this->bufferPerChannel,
 							&maxPos);
 
 						if(maxPos <= 0)
 							continue;
+						// maxPosは1～なので、0～に書き換える
+						maxPos-=1;
 
 						this->lpTmpBatchOutputBuffer_h[batchNum][offset]
-							= (F32)(maxPos - 1) / this->GetInputDataStruct().ch
+							= (F32)maxPos / (this->GetInputDataStruct().ch -1)
 							* (this->layerData.layerStructure.outputMaxValue - this->layerData.layerStructure.outputMinValue)
 							+ this->layerData.layerStructure.outputMinValue;
 					}
@@ -246,13 +256,13 @@ namespace NeuralNetwork {
 #else
 		dim3 grid(this->GetOutputDataStruct().ch, this->GetBatchSize());
 		dim3 block(THREAD_PER_BLOCK);
-		U32 loopCount = (this->inputChannelSize + (THREAD_PER_BLOCK-1)) / THREAD_PER_BLOCK;
+		U32 loopCount = (this->bufferPerChannel + (THREAD_PER_BLOCK-1)) / THREAD_PER_BLOCK;
 
 		device_SignalArray2Value<<<grid, block>>>(
 			o_lppOutputBuffer,
 			i_lppInputBuffer,
 			this->layerData.layerStructure.resolution,
-			this->inputChannelSize,
+			this->bufferPerChannel,
 			loopCount,
 			this->layerData.layerStructure.outputMinValue, this->layerData.layerStructure.outputMaxValue);
 
@@ -286,15 +296,21 @@ namespace NeuralNetwork {
 			// 出力バッファの初期化
 			cudaMemset(o_lppDInputBuffer, 0, sizeof(F32)*this->inputBufferCount*this->GetBatchSize());
 
+			dim3 grid(this->GetBatchSize());
+			dim3 block(THREAD_PER_BLOCK);
+			U32 loopCount = (this->bufferPerChannel + (THREAD_PER_BLOCK-1)) / THREAD_PER_BLOCK;
+
 			// 出力誤差バッファに正解情報を書き込み
-			device_Value2SignalArray<<<this->GetBatchSize(), this->inputChannelSize>>>(
+			device_Value2SignalArray<<<grid, block>>>(
 				this->GetInputDataStruct().ch,
 				this->outputBufferCount,
 				this->layerData.layerStructure.outputMinValue,
 				this->layerData.layerStructure.outputMaxValue,
 				o_lppDInputBuffer,
 				i_lppOutputBuffer,
-				i_lppDOutputBuffer);
+				i_lppDOutputBuffer,
+				loopCount,
+				this->bufferPerChannel);
 
 #if _DEBUG
 			std::vector<F32> lpDOutputBuffer(this->outputBufferCount * this->GetBatchSize());

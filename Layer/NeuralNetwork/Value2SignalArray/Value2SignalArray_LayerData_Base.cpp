@@ -209,7 +209,7 @@ namespace NeuralNetwork {
 			return IODataStruct(0,0,0,0);
 
 		return IODataStruct(
-			this->layerStructure.resolution,
+			this->layerStructure.resolution * i_lpInputDataStruct[0].ch,
 			i_lpInputDataStruct[0].x,
 			i_lpInputDataStruct[0].y,
 			i_lpInputDataStruct[0].z);

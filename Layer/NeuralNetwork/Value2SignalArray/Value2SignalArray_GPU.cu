@@ -20,40 +20,95 @@ using namespace Gravisbell::Layer::NeuralNetwork;
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
-
-#define CALC_BATCH_MAX	(256)
-#define CALC_INPUT_MAX	(1024)
+	
+#define THREAD_PER_BLOCK	32
 
 	__global__ void device_Value2SignalArray(
-		U32 resolution,
-		F32 inputMinValue,
-		F32 inputMaxValue,
-		const F32 lpInputBuffer[],
-		F32 lpOutputBuffer[])
+		const F32 i_lpValue[],
+		F32 o_lpSignalArray[],
+		U32 i_resolution,
+		F32 i_minValue,
+		F32 i_maxValue,
+		U32 i_loopCount,
+		U32 i_bufferPerCh)
 	{
 		U32 batchNum     = blockIdx.x;
 		U32 inputCh      = blockIdx.y;
 		U32 inputChCount = gridDim.y;
-		U32 bufferPos    = threadIdx.x;
-		U32 inputChBufferSize = blockDim.x;
+		U32 tid          = threadIdx.x;
 
-		U32 inputOffset = batchNum * inputChCount * inputChBufferSize + inputCh * inputChBufferSize + bufferPos;
-		F32 inputValue  = lpInputBuffer[inputOffset];
+		for(U32 loopNum=0; loopNum<i_loopCount; loopNum++)
+		{
+			U32 bufferPos = loopNum * THREAD_PER_BLOCK + tid;
+			if(bufferPos >= i_bufferPerCh)
+				continue;
 
-		// 出力チャンネル番号をfloatで計算
-		F32 fOutputCh = max(0.0f, min((F32)resolution-1 - 1e-8, (inputValue - inputMinValue) / (inputValue - inputMinValue) * resolution));
+			U32 inputOffset = batchNum * inputChCount * i_bufferPerCh + inputCh * i_bufferPerCh + bufferPos;
+			F32 inputValue  = i_lpValue[inputOffset];
 
-		// 整数値に変換
-		U32 iOutputCh = (U32)fOutputCh;
-		F32 t = fOutputCh - iOutputCh;
+			// 出力チャンネル番号をfloatで計算
+			U32 outputCh = max(0, min(i_resolution-1, (U32)((i_resolution-1) * (inputValue - i_minValue) / (i_maxValue - i_minValue) + 0.5f) ));
+			
+			U32 outputOffset = batchNum * (inputChCount*i_resolution) * i_bufferPerCh + (inputCh*i_resolution + outputCh) * i_bufferPerCh + bufferPos;
+			o_lpSignalArray[outputOffset] = 1.0f;
 
-		U32 outputOffset0 = batchNum * (inputChCount*resolution) * inputChBufferSize + (inputCh*resolution + iOutputCh + 0) * inputChBufferSize + bufferPos;
-		U32 outputOffset1 = batchNum * (inputChCount*resolution) * inputChBufferSize + (inputCh*resolution + iOutputCh + 1) * inputChBufferSize + bufferPos;
+			// 整数値に変換
+			//U32 iOutputCh = (U32)fOutputCh;
+			//F32 t = fOutputCh - iOutputCh;
 
-		lpOutputBuffer[outputOffset0] = (1.0f - t);
-		lpOutputBuffer[outputOffset0] = t;
+			//U32 outputOffset0 = batchNum * (inputChCount*resolution) * i_inputChBufferSize + (inputCh*resolution + iOutputCh + 0) * i_inputChBufferSize + bufferPos;
+			//U32 outputOffset1 = batchNum * (inputChCount*resolution) * i_inputChBufferSize + (inputCh*resolution + iOutputCh + 1) * i_inputChBufferSize + bufferPos;
+
+			//lpOutputBuffer[outputOffset0] = (1.0f - t);
+			//lpOutputBuffer[outputOffset1] = t;
+		}
 	}
 
+
+	/** 信号配列を値に変換する.
+		<inputChNo, batchSize> <32>
+		*/
+	__global__ void device_SignalArray2Value(
+		F32* o_lpTeach,
+		const F32* i_lpOutput,
+		const F32* i_lpDOutput,
+		U32 i_resolution, U32 i_bufferPerCh, U32 i_loopCount,
+		F32 i_minValue,
+		F32 i_maxValue)
+	{
+		U32 batchNum = blockIdx.y;
+		U32 inputChNo = blockIdx.x;
+		U32 inputChCount = gridDim.x;
+		U32 tid = threadIdx.x;
+
+		for(U32 loopNum=0; loopNum<i_loopCount; loopNum++)
+		{
+			U32 bufferPos = loopNum * THREAD_PER_BLOCK + tid;
+			if(bufferPos >= i_bufferPerCh)
+				continue;
+
+			U32 inputOffset = (batchNum * inputChCount + inputChNo) * i_bufferPerCh + bufferPos;
+
+			// 最大値を求める
+			U32 maxNum = 0;
+			F32 maxValue = -FLT_MAX;
+			for(U32 outputNum=0; outputNum<i_resolution; outputNum++)
+			{
+				U32 outputChNum = inputChNo * i_resolution + outputNum;
+				U32 outputOffset = (batchNum * (inputChCount * i_resolution) + inputChNo * i_resolution + outputChNum) * i_bufferPerCh + bufferPos;
+
+				F32 value = i_lpOutput[outputOffset] + i_lpDOutput[outputOffset];
+
+				if(value > maxValue)
+				{
+					maxNum = outputNum;
+					maxValue = value;
+				}
+			}
+
+			o_lpTeach[inputOffset] = ((F32)maxNum / (i_resolution-1)) * (i_maxValue - i_minValue) + i_minValue;
+		}
+	}
 
 	/** コンストラクタ */
 	Value2SignalArray_GPU::Value2SignalArray_GPU(Gravisbell::GUID guid, Value2SignalArray_LayerData_GPU& i_layerData, const IODataStruct& i_inputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
@@ -118,7 +173,7 @@ namespace NeuralNetwork {
 
 		// Signal -> value変換を行うための重み配列の作成
 		std::vector<F32> lpSignal2ValueWeight_h(this->layerData.layerStructure.resolution);
-		for(U32 i=0; i<this->layerData.layerStructure.resolution; i++)
+		for(U32 i=0; i<(U32)this->layerData.layerStructure.resolution; i++)
 		{
 			lpSignal2ValueWeight_h[i] = (this->layerData.layerStructure.inputMaxValue - this->layerData.layerStructure.inputMinValue) * i / this->layerData.layerStructure.resolution - this->layerData.layerStructure.inputMinValue;
 		}
@@ -147,19 +202,10 @@ namespace NeuralNetwork {
 			return ErrorCode::ERROR_CODE_FRAUD_OUTPUT_COUNT;
 
 		// 入力信号のチャンネルごとのバッファサイズ
-		this->inputChannelSize = this->GetOutputDataStruct().x * this->GetOutputDataStruct().y * this->GetOutputDataStruct().z;
+		this->bufferPerChannel = this->GetOutputDataStruct().x * this->GetOutputDataStruct().y * this->GetOutputDataStruct().z;
 
 		/**< 入力信号のバッチごとのバッファサイズ */
-		this->inputBatchBufferSize = this->inputChannelSize * this->GetInputDataStruct().ch;
-
-		// 一時出力バッファ(ホストメモリ)
-		this->lpTmpOutputBuffer_h.resize(this->outputBufferCount * this->GetBatchSize());
-		this->lpTmpBatchOutputBuffer_h.resize(this->GetBatchSize());
-		for(U32 i=0; i<this->GetBatchSize(); i++)
-			this->lpTmpBatchOutputBuffer_h[i] = &this->lpTmpOutputBuffer_h[this->outputBufferCount * i];
-
-		// 処理用バッファの確保
-		this->temporaryMemoryManager.SetBufferSize(this->GetGUID(), WORKSPACE_CODE, sizeof(F32)*this->GetBatchSize()*this->outputBufferCount);
+		this->inputBatchBufferSize = this->bufferPerChannel * this->GetInputDataStruct().ch;
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}
@@ -181,17 +227,19 @@ namespace NeuralNetwork {
 	{
 		// 出力バッファの初期化
 		cudaMemset(o_lppOutputBuffer, 0, sizeof(F32)*this->outputBufferCount*this->GetBatchSize());
-		memset(&this->lpTmpOutputBuffer_h[0], 0, sizeof(F32)*this->lpTmpOutputBuffer_h.size());
 
 		dim3 grid(this->GetBatchSize(), this->GetInputDataStruct().ch);
-		dim3 block(this->inputChannelSize);
+		dim3 block(THREAD_PER_BLOCK);
+		U32 loopCount = (this->bufferPerChannel + (THREAD_PER_BLOCK-1)) / THREAD_PER_BLOCK;
 
 		device_Value2SignalArray<<<grid, block>>>(
+			i_lppInputBuffer,
+			o_lppOutputBuffer,
 			this->layerData.layerStructure.resolution,
 			this->layerData.layerStructure.inputMinValue,
 			this->layerData.layerStructure.inputMaxValue,
-			i_lppInputBuffer,
-			o_lppOutputBuffer);
+			loopCount,
+			this->bufferPerChannel);
 
 #if _DEBUG
 			std::vector<F32> lpInputBuffer(this->inputBufferCount * this->GetBatchSize());
@@ -218,57 +266,45 @@ namespace NeuralNetwork {
 		// 入力誤差計算
 		if(o_lppDInputBuffer)
 		{
-			// 入力バッファを入力誤差バッファにコピー
-			cudaMemcpy(o_lppDInputBuffer, i_lppInputBuffer, sizeof(F32)*this->inputBufferCount*this->GetBatchSize(), cudaMemcpyDeviceToDevice);
+			dim3 grid(this->GetInputDataStruct().ch, this->GetBatchSize());
+			dim3 block(THREAD_PER_BLOCK);
+			U32 loopCount = (this->bufferPerChannel + (THREAD_PER_BLOCK-1)) / THREAD_PER_BLOCK;
 
-			// 教師データ作成用の一時バッファを取得
-			F32* lpSignalTeachBuffer = (F32*)this->temporaryMemoryManager.ReserveBuffer(this->GetGUID(), WORKSPACE_CODE);
-
-			// signalの教師データを作成
-			cudaMemcpy(lpSignalTeachBuffer, i_lppOutputBuffer, sizeof(F32)*this->outputBufferCount*this->GetBatchSize(), cudaMemcpyDeviceToDevice);
-			F32 alpha = 1;
-			cublasSaxpy_v2(
-				this->cublasHandle,
-				this->outputBufferCount * this->GetBatchSize(),
-				&alpha,
-				i_lppDOutputBuffer,
-				1,
-				lpSignalTeachBuffer,
-				1);
-
-			// signal -> value変換して出力誤差バッファに格納
-			alpha =  1.0f;
-			F32 beta  = -1.0f;	// yには入力バッファが入っているため、教師信号-入力信号にする
-			cublasSgemv_v2(
-				this->cublasHandle,
-				CUBLAS_OP_N,
-				this->GetOutputDataStruct().ch,
-				this->GetOutputDataStruct().x * this->GetOutputDataStruct().y * this->GetOutputDataStruct().z,
-				&alpha,
-				i_lppOutputBuffer,
-				this->GetOutputDataStruct().x * this->GetOutputDataStruct().y * this->GetOutputDataStruct().z,
-				thrust::raw_pointer_cast(&this->lpSignal2ValueWeight_d[0]),
-				1,
-				&beta,
+			device_SignalArray2Value<<<grid, block>>>(
 				o_lppDInputBuffer,
-				1);
+				i_lppOutputBuffer,
+				i_lppDOutputBuffer,
+				this->layerData.layerStructure.resolution,
+				this->bufferPerChannel,
+				loopCount,
+				this->layerData.layerStructure.inputMinValue, this->layerData.layerStructure.inputMaxValue);
 
 #if _DEBUG
 			std::vector<F32> lpDOutputBuffer(this->outputBufferCount * this->GetBatchSize());
 			cudaMemcpy(&lpDOutputBuffer[0], i_lppDOutputBuffer, sizeof(F32) * this->outputBufferCount * this->GetBatchSize(), cudaMemcpyDeviceToHost);
 
+			std::vector<F32> lpTeachBuffer(this->inputBufferCount * this->GetBatchSize());
+			cudaMemcpy(&lpTeachBuffer[0], o_lppDInputBuffer, sizeof(F32) * this->inputBufferCount * this->GetBatchSize(), cudaMemcpyDeviceToHost);
+#endif
+
+			// 正解と入力で誤差を取る
+			F32 alpha = -1;
+			cublasSaxpy_v2(
+				this->cublasHandle,
+				this->inputBufferCount * this->GetBatchSize(),
+				&alpha,
+				i_lppInputBuffer,
+				1,
+				o_lppDInputBuffer,
+				1);
+
+#if _DEBUG
 			std::vector<F32> lpOutputBuffer(this->outputBufferCount * this->GetBatchSize());
 			cudaMemcpy(&lpOutputBuffer[0], i_lppOutputBuffer, sizeof(F32) * this->outputBufferCount * this->GetBatchSize(), cudaMemcpyDeviceToHost);
-
-			std::vector<F32> lpTeachBuffer(this->outputBufferCount * this->GetBatchSize());
-			cudaMemcpy(&lpTeachBuffer[0], lpSignalTeachBuffer, sizeof(F32) * this->outputBufferCount * this->GetBatchSize(), cudaMemcpyDeviceToHost);
 
 			std::vector<F32> lpDInputBuffer(this->inputBufferCount * this->GetBatchSize());
 			cudaMemcpy(&lpDInputBuffer[0], o_lppDInputBuffer, sizeof(F32) * this->inputBufferCount * this->GetBatchSize(), cudaMemcpyDeviceToHost);
 #endif
-
-			// 教師データバッファの開放
-			this->temporaryMemoryManager.RestoreBuffer(this->GetGUID(), WORKSPACE_CODE);
 
 		}
 
