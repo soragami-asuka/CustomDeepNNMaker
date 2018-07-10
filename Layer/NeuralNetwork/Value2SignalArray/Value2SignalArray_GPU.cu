@@ -95,7 +95,7 @@ namespace NeuralNetwork {
 			for(U32 outputNum=0; outputNum<i_resolution; outputNum++)
 			{
 				U32 outputChNum = inputChNo * i_resolution + outputNum;
-				U32 outputOffset = (batchNum * (inputChCount * i_resolution) + inputChNo * i_resolution + outputChNum) * i_bufferPerCh + bufferPos;
+				U32 outputOffset = (batchNum * (inputChCount * i_resolution) + outputChNum) * i_bufferPerCh + bufferPos;
 
 				F32 value = i_lpOutput[outputOffset] + i_lpDOutput[outputOffset];
 
@@ -266,6 +266,14 @@ namespace NeuralNetwork {
 		// “ü—ÍŒë·ŒvŽZ
 		if(o_lppDInputBuffer)
 		{
+#if _DEBUG
+			std::vector<F32> lpOutputBuffer(this->outputBufferCount * this->GetBatchSize());
+			cudaMemcpy(&lpOutputBuffer[0], i_lppOutputBuffer, sizeof(F32) * this->outputBufferCount * this->GetBatchSize(), cudaMemcpyDeviceToHost);
+			
+			std::vector<F32> lpDOutputBuffer(this->outputBufferCount * this->GetBatchSize());
+			cudaMemcpy(&lpDOutputBuffer[0], i_lppDOutputBuffer, sizeof(F32) * this->outputBufferCount * this->GetBatchSize(), cudaMemcpyDeviceToHost);
+#endif
+
 			dim3 grid(this->GetInputDataStruct().ch, this->GetBatchSize());
 			dim3 block(THREAD_PER_BLOCK);
 			U32 loopCount = (this->bufferPerChannel + (THREAD_PER_BLOCK-1)) / THREAD_PER_BLOCK;
@@ -280,8 +288,8 @@ namespace NeuralNetwork {
 				this->layerData.layerStructure.inputMinValue, this->layerData.layerStructure.inputMaxValue);
 
 #if _DEBUG
-			std::vector<F32> lpDOutputBuffer(this->outputBufferCount * this->GetBatchSize());
-			cudaMemcpy(&lpDOutputBuffer[0], i_lppDOutputBuffer, sizeof(F32) * this->outputBufferCount * this->GetBatchSize(), cudaMemcpyDeviceToHost);
+			std::vector<F32> lpDOutputBuffer2(this->outputBufferCount * this->GetBatchSize());
+			cudaMemcpy(&lpDOutputBuffer2[0], i_lppDOutputBuffer, sizeof(F32) * this->outputBufferCount * this->GetBatchSize(), cudaMemcpyDeviceToHost);
 
 			std::vector<F32> lpTeachBuffer(this->inputBufferCount * this->GetBatchSize());
 			cudaMemcpy(&lpTeachBuffer[0], o_lppDInputBuffer, sizeof(F32) * this->inputBufferCount * this->GetBatchSize(), cudaMemcpyDeviceToHost);
@@ -299,9 +307,6 @@ namespace NeuralNetwork {
 				1);
 
 #if _DEBUG
-			std::vector<F32> lpOutputBuffer(this->outputBufferCount * this->GetBatchSize());
-			cudaMemcpy(&lpOutputBuffer[0], i_lppOutputBuffer, sizeof(F32) * this->outputBufferCount * this->GetBatchSize(), cudaMemcpyDeviceToHost);
-
 			std::vector<F32> lpDInputBuffer(this->inputBufferCount * this->GetBatchSize());
 			cudaMemcpy(&lpDInputBuffer[0], o_lppDInputBuffer, sizeof(F32) * this->inputBufferCount * this->GetBatchSize(), cudaMemcpyDeviceToHost);
 #endif

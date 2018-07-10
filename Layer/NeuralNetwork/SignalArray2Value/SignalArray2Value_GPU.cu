@@ -50,7 +50,7 @@ namespace NeuralNetwork {
 			for(U32 inputNum=0; inputNum<i_resolution; inputNum++)
 			{
 				U32 inputChNum = outputChNo * i_resolution + inputNum;
-				U32 inputOffset = (batchNum * (outputChCount * i_resolution) + outputChNo * i_resolution + inputChNum) * i_bufferPerCh + bufferPos;
+				U32 inputOffset = (batchNum * (outputChCount * i_resolution) + inputChNum) * i_bufferPerCh + bufferPos;
 
 				F32 value = i_lpInput[inputOffset];
 
