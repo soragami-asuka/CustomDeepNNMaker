@@ -36,6 +36,7 @@ namespace NeuralNetwork {
 		S32 dInputBufferID;	/**< 入力誤差バッファID */
 
 		bool onLayerFix;	/**< レイヤー固定化フラグ */
+		bool isNecessaryBackPropagation;	/**< 誤差伝搬が必要なフラグ. falseの場合、ニューラルネットワーク自体が入力誤差バッファを持たない場合は誤差伝搬しない */
 
 	public:
 		/** コンストラクタ */
@@ -149,6 +150,23 @@ namespace NeuralNetwork {
 		/** レイヤーで使用する入力誤差バッファのIDを取得する
 			@param	i_inputNum		レイヤーに接続している何番目のレイヤーを取得するかの指定. */
 		S32 GetDInputBufferID(U32 i_inputNum)const;
+
+
+		//==========================================
+		// 学習フラグ関連
+		//==========================================
+	public:
+		/** 学習固定レイヤーフラグ.
+			学習固定レイヤー(学習が必要ないレイヤー)の場合trueが返る. */
+		bool IsFixLayer(void)const;
+
+		/** 入力誤差の計算が必要なフラグ.
+			必要な場合trueが返る. */
+		bool IsNecessaryCalculateDInput(void)const;
+
+		/** 誤差伝搬が必要なフラグ.
+			誤差伝搬が必要な場合はtrueが返る.falseが返った場合、これ以降誤差伝搬を一切必要としない. */
+		bool IsNecessaryBackPropagation(void)const;
 
 
 	protected:

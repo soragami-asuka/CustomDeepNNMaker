@@ -266,6 +266,36 @@ namespace NeuralNetwork {
 	
 
 	//==========================================
+	// 学習フラグ関連
+	//==========================================
+	/** 学習固定レイヤーフラグ.
+		学習固定レイヤー(学習が必要ないレイヤー)の場合trueが返る. */
+	bool LayerConnectOutput::IsFixLayer(void)const
+	{
+		return true;
+	}
+
+	/** 入力誤差の計算が必要なフラグ.
+		必要な場合trueが返る. */
+	bool LayerConnectOutput::IsNecessaryCalculateDInput(void)const
+	{
+		if(this->lppInputFromLayer.empty())
+			return false;
+
+		return this->lppInputFromLayer[0]->IsNecessaryCalculateDInput();
+	}
+
+	/** 誤差伝搬が必要なフラグ.
+		誤差伝搬が必要な場合はtrueが返る.falseが返った場合、これ以降誤差伝搬を一切必要としない. */
+	bool LayerConnectOutput::IsNecessaryBackPropagation(void)const
+	{
+		if(this->lppInputFromLayer.empty())
+			return false;
+
+		return this->lppInputFromLayer[0]->IsNecessaryBackPropagation();
+	}
+
+	//==========================================
 	// 出力レイヤー関連
 	//==========================================
 

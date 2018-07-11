@@ -735,7 +735,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver05(const Layer::Neural
 
 Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager, const IODataStruct& inputDataStruct, const IODataStruct& outputDataStruct)
 {
-	return CreateNeuralNetwork_ver05(layerDLLManager, layerDataManager, inputDataStruct, outputDataStruct);
+	return CreateNeuralNetwork_ver04(layerDLLManager, layerDataManager, inputDataStruct, outputDataStruct);
 }
 
 /** ニューラルネットワークの学習とサンプル実行を同時実行 */

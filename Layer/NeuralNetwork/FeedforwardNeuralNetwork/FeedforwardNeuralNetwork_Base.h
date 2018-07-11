@@ -83,7 +83,7 @@ namespace NeuralNetwork {
 			追加したレイヤーデータの所有権はNeuralNetworkに移るため、メモリの開放処理などは全てINeuralNetwork内で行われる.
 			@param	i_pLayerData	追加するレイヤーデータ.
 			@param	o_player		追加されたレイヤーのアドレス. */
-		virtual ErrorCode AddTemporaryLayer(ILayerData* i_pLayerData, ILayerBase** o_pLayer, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount);
+		virtual ErrorCode AddTemporaryLayer(ILayerData* i_pLayerData, ILayerBase** o_pLayer, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, bool i_onLyaerFixFlag);
 
 		/** レイヤーを削除する.
 			@param i_guid	削除するレイヤーのGUID */

@@ -643,7 +643,7 @@ namespace NeuralNetwork {
 
 					// レイヤーを追加
 					ILayerBase* pSubstitutionLayer = NULL;
-					err = neuralNetwork.AddTemporaryLayer(pSubstitutionLayerData, &pSubstitutionLayer, &this->GetOutputDataStruct(it.second.guid, i_lpInputDataStruct, i_inputLayerCount), 1);
+					err = neuralNetwork.AddTemporaryLayer(pSubstitutionLayerData, &pSubstitutionLayer, &this->GetOutputDataStruct(it.second.guid, i_lpInputDataStruct, i_inputLayerCount), 1, false);
 					if(err != ErrorCode::ERROR_CODE_NONE)
 						return err;
 
@@ -680,7 +680,7 @@ namespace NeuralNetwork {
 
 			// レイヤーを追加
 			ILayerBase* pSubstitutionLayer = NULL;
-			err = neuralNetwork.AddTemporaryLayer(pSubstitutionLayerData, &pSubstitutionLayer, i_lpInputDataStruct, i_inputLayerCount);
+			err = neuralNetwork.AddTemporaryLayer(pSubstitutionLayerData, &pSubstitutionLayer, i_lpInputDataStruct, i_inputLayerCount, true);
 			if(err != ErrorCode::ERROR_CODE_NONE)
 				return err;
 

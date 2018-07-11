@@ -177,7 +177,7 @@ namespace NeuralNetwork {
 		追加したレイヤーデータの所有権はNeuralNetworkに移るため、メモリの開放処理などは全てINeuralNetwork内で行われる.
 		@param	i_pLayerData	追加するレイヤーデータ.
 		@param	o_player		追加されたレイヤーのアドレス. */
-	ErrorCode FeedforwardNeuralNetwork_Base::AddTemporaryLayer(ILayerData* i_pLayerData, ILayerBase** o_pLayer, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
+	ErrorCode FeedforwardNeuralNetwork_Base::AddTemporaryLayer(ILayerData* i_pLayerData, ILayerBase** o_pLayer, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, bool i_onLyaerFixFlag)
 	{
 		if(i_pLayerData == NULL)
 			return ErrorCode::ERROR_CODE_COMMON_NULL_REFERENCE;
@@ -187,7 +187,7 @@ namespace NeuralNetwork {
 		if(pLayer == NULL)
 			return ErrorCode::ERROR_CODE_LAYER_CREATE;
 
-		ErrorCode err = this->AddLayer(pLayer, false);
+		ErrorCode err = this->AddLayer(pLayer, i_onLyaerFixFlag);
 		if(err != ErrorCode::ERROR_CODE_NONE)
 		{
 			delete pLayer;

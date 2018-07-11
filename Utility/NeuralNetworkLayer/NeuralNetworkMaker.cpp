@@ -161,7 +161,7 @@ namespace NeuralNetworkLayer {
 			return this->AddLayer(
 				i_inputLayerGUID,
 				CreateDropoutLayer(layerDLLManager, layerDataManager, i_rate),
-				false);
+				true);
 		}
 
 		/** ガウスノイズレイヤー.
@@ -173,7 +173,7 @@ namespace NeuralNetworkLayer {
 			return this->AddLayer(
 				i_inputLayerGUID,
 				CreateGaussianNoiseLayer(layerDLLManager, layerDataManager, i_average, i_variance),
-				false);
+				true);
 		}
 
 		/** プーリングレイヤー.
@@ -237,7 +237,7 @@ namespace NeuralNetworkLayer {
 			return this->AddLayer(
 				i_inputLayerGUID,
 				CreateGlobalAveragePoolingLayer(layerDLLManager, layerDataManager),
-				false);
+				true);
 		}
 
 		/** GANにおけるDiscriminatorの出力レイヤー
@@ -247,7 +247,7 @@ namespace NeuralNetworkLayer {
 			return this->AddLayer(
 				i_inputLayerGUID,
 				CreateActivationDiscriminatorLayer(layerDLLManager, layerDataManager),
-				false);
+				true);
 		}
 
 		/** アップサンプリングレイヤー
@@ -259,7 +259,7 @@ namespace NeuralNetworkLayer {
 			return this->AddLayer(
 				i_inputLayerGUID,
 				CreateUpSamplingLayer(layerDLLManager, layerDataManager, i_upScale, i_paddingUseValue),
-				false);
+				true);
 		}
 
 		/** チャンネル抽出レイヤー. 入力されたレイヤーの特定チャンネルを抽出する. 入力/出力データ構造でX,Y,Zは同じサイズ.
@@ -271,7 +271,7 @@ namespace NeuralNetworkLayer {
 			return this->AddLayer(
 				i_inputLayerGUID,
 				CreateChooseChannelLayer(layerDLLManager, layerDataManager, i_startChannelNo, i_channelCount),
-				false);
+				true);
 		}
 
 		/** XYZ抽出レイヤー. 入力されたレイヤーの特定XYZ区間を抽出する. 入力/出力データ構造でCHは同じサイズ.
@@ -282,7 +282,7 @@ namespace NeuralNetworkLayer {
 			return this->AddLayer(
 				i_inputLayerGUID,
 				CreateChooseBoxLayer(layerDLLManager, layerDataManager, startPosition, boxSize),
-				false);
+				true);
 		}
 
 
@@ -296,7 +296,7 @@ namespace NeuralNetworkLayer {
 			return this->AddLayer(
 				i_inputLayerGUID,
 				CreateReshapeLayer(layerDLLManager, layerDataManager, ch, x, y, z),
-				false);
+				true);
 		}
 		/** 出力データ構造変換レイヤー.
 			@param	outputDataStruct 出力データ構造 */
@@ -311,7 +311,7 @@ namespace NeuralNetworkLayer {
 			return this->AddLayer(
 				i_inputLayerGUID,
 				CreateReshapeMirrorXLayer(layerDLLManager, layerDataManager),
-				false);
+				true);
 		}
 		/** X=0で平方化する */
 		Gravisbell::GUID AddReshapeSquareCenterCrossLayer(const Gravisbell::GUID& i_inputLayerGUID)
@@ -319,7 +319,7 @@ namespace NeuralNetworkLayer {
 			return this->AddLayer(
 				i_inputLayerGUID,
 				CreateReshapeSquareCenterCrossLayer(layerDLLManager, layerDataManager),
-				false);
+				true);
 		}
 		/** X=0で平方化する.
 			入力信号数は1次元配列で(x-1)*(y-1)+1以上の要素数が必要.
@@ -330,7 +330,7 @@ namespace NeuralNetworkLayer {
 			return this->AddLayer(
 				i_inputLayerGUID,
 				CreateReshapeSquareZeroSideLeftTopLayer(layerDLLManager, layerDataManager, x, y),
-				false);
+				true);
 		}
 
 		/** 信号の配列から値へ変換 */
@@ -339,14 +339,14 @@ namespace NeuralNetworkLayer {
 			return this->AddLayer(
 				i_inputLayerGUID,
 				CreateSignalArray2ValueLayer(layerDLLManager, layerDataManager, outputMinValue, outputMaxValue, this->GetOutputDataStruct(i_inputLayerGUID).ch),
-				false);
+				true);
 		}
 		Gravisbell::GUID AddSignalArray2ValueLayer(const Gravisbell::GUID& i_inputLayerGUID, Gravisbell::F32 outputMinValue, Gravisbell::F32 outputMaxValue, Gravisbell::U32 resolution)
 		{
 			return this->AddLayer(
 				i_inputLayerGUID,
 				CreateSignalArray2ValueLayer(layerDLLManager, layerDataManager, outputMinValue, outputMaxValue, resolution),
-				false);
+				true);
 		}
 		/** 確率の配列から値へ変換.
 			@param	outputMinValue	出力の最小値
@@ -358,14 +358,14 @@ namespace NeuralNetworkLayer {
 			return this->AddLayer(
 				i_inputLayerGUID,
 				CreateProbabilityArray2ValueLayer(layerDLLManager, layerDataManager, outputMinValue, outputMaxValue, variance, this->GetOutputDataStruct(i_inputLayerGUID).ch),
-				false);
+				true);
 		}
 		Gravisbell::GUID AddProbabilityArray2ValueLayer(const Gravisbell::GUID& i_inputLayerGUID, Gravisbell::F32 outputMinValue, Gravisbell::F32 outputMaxValue, Gravisbell::F32 variance, Gravisbell::U32 resolution)
 		{
 			return this->AddLayer(
 				i_inputLayerGUID,
 				CreateProbabilityArray2ValueLayer(layerDLLManager, layerDataManager, outputMinValue, outputMaxValue, variance, resolution),
-				false);
+				true);
 		}
 		/** 値から信号の配列へ変換.
 			@param	outputMinValue	出力の最小値
@@ -376,7 +376,7 @@ namespace NeuralNetworkLayer {
 			return this->AddLayer(
 				i_inputLayerGUID,
 				CreateValue2SignalArrayLayer(layerDLLManager, layerDataManager, inputMinValue, inputMaxValue, resolution),
-				false);
+				true);
 		}
 
 	public:
@@ -388,7 +388,7 @@ namespace NeuralNetworkLayer {
 			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
 				*this->pLayerConnectData,
 				layerGUID,
-				CreateMergeInputLayer(layerDLLManager, layerDataManager), false,
+				CreateMergeInputLayer(layerDLLManager, layerDataManager), true,
 				lpInputLayerGUID, inputLayerCount);
 
 			return layerGUID;
@@ -402,7 +402,7 @@ namespace NeuralNetworkLayer {
 			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
 				*this->pLayerConnectData,
 				layerGUID,
-				CreateMergeAddLayer(layerDLLManager, layerDataManager, i_layerMergeType, i_scale), false,
+				CreateMergeAddLayer(layerDLLManager, layerDataManager, i_layerMergeType, i_scale), true,
 				lpInputLayerGUID, inputLayerCount);
 
 			return layerGUID;
@@ -416,7 +416,7 @@ namespace NeuralNetworkLayer {
 			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
 				*this->pLayerConnectData,
 				layerGUID,
-				CreateMergeAverageLayer(layerDLLManager, layerDataManager, i_layerMergeType), false,
+				CreateMergeAverageLayer(layerDLLManager, layerDataManager, i_layerMergeType), true,
 				lpInputLayerGUID, inputLayerCount);
 
 			return layerGUID;
@@ -430,7 +430,7 @@ namespace NeuralNetworkLayer {
 			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
 				*this->pLayerConnectData,
 				layerGUID,
-				CreateMergeMaxLayer(layerDLLManager, layerDataManager, i_layerMergeType), false,
+				CreateMergeMaxLayer(layerDLLManager, layerDataManager, i_layerMergeType), true,
 				lpInputLayerGUID, inputLayerCount);
 
 			return layerGUID;
@@ -444,7 +444,7 @@ namespace NeuralNetworkLayer {
 			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
 				*this->pLayerConnectData,
 				layerGUID,
-				CreateMergeMultiplyLayer(layerDLLManager, layerDataManager, i_layerMergeType), false,
+				CreateMergeMultiplyLayer(layerDLLManager, layerDataManager, i_layerMergeType), true,
 				lpInputLayerGUID, inputLayerCount);
 
 			return layerGUID;
@@ -458,7 +458,7 @@ namespace NeuralNetworkLayer {
 			Gravisbell::ErrorCode err = AddLayerToNetworkLast(
 				*this->pLayerConnectData,
 				layerGUID,
-				CreateResidualLayer(layerDLLManager, layerDataManager), false,
+				CreateResidualLayer(layerDLLManager, layerDataManager), true,
 				lpInputLayerGUID, inputLayerCount);
 
 			return layerGUID;

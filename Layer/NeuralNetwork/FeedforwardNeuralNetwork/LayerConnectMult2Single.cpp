@@ -19,6 +19,7 @@ namespace NeuralNetwork {
 		,	pLayer_io			(dynamic_cast<INNMult2SingleLayer*>(pLayer))
 		,	outputBufferID		(INVALID_OUTPUTBUFFER_ID)	/**< 出力バッファID */
 		,	onLayerFix			(onFixFlag)					/**< レイヤー固定化フラグ */
+		,	isNecessaryBackPropagation	(true)	/**< 誤差伝搬が必要なフラグ. falseの場合、ニューラルネットワーク自体が入力誤差バッファを持たない場合は誤差伝搬しない */
 	{
 	}
 	/** デストラクタ */
@@ -270,6 +271,46 @@ namespace NeuralNetwork {
 		return NULL;
 	}
 
+
+	//==========================================
+	// 学習フラグ関連
+	//==========================================
+	/** 学習固定レイヤーフラグ.
+		学習固定レイヤー(学習が必要ないレイヤー)の場合trueが返る. */
+	bool LayerConnectMult2Single::IsFixLayer(void)const
+	{
+		return this->onLayerFix;
+	}
+
+	/** 入力誤差の計算が必要なフラグ.
+		必要な場合trueが返る. */
+	bool LayerConnectMult2Single::IsNecessaryCalculateDInput(void)const
+	{
+		if(this->lppInputFromLayer.empty())
+			return false;
+
+		// 一つ前のレイヤーが誤差伝搬を必要とする場合は入力誤差計算を実行する
+		for(U32 layerNum=0; layerNum<this->lppInputFromLayer.size(); layerNum++)
+		{
+			if(this->lppInputFromLayer[0]->IsNecessaryBackPropagation())
+				return true;
+		}
+		return false;
+	}
+
+	/** 誤差伝搬が必要なフラグ.
+		誤差伝搬が必要な場合はtrueが返る.falseが返った場合、これ以降誤差伝搬を一切必要としない. */
+	bool LayerConnectMult2Single::IsNecessaryBackPropagation(void)const
+	{
+		if(this->isNecessaryBackPropagation)
+			return true;
+
+		// ニューラルネットワーク本体の入力誤差信号が存在するか
+		if(this->neuralNetwork.GetDInputBuffer_d())
+			return true;
+
+		return false;
+	}
 	
 	//==========================================
 	// 出力レイヤー関連
@@ -411,6 +452,22 @@ namespace NeuralNetwork {
 		// 入力誤差バッファID一覧のサイズ更新
 		this->lpDInputBufferID.resize(this->lppInputFromLayer.size(), INVALID_DINPUTBUFFER_ID);
 
+		// 誤差伝搬が必要か確認する
+		if(this->onLayerFix)
+			this->isNecessaryBackPropagation = true;
+		else
+		{
+			this->isNecessaryBackPropagation = false;
+			for(U32 layerNum=0; layerNum<this->lppInputFromLayer.size(); layerNum++)
+			{
+				if(this->lppInputFromLayer[0]->IsNecessaryBackPropagation())
+				{
+					this->isNecessaryBackPropagation = true;
+					break;
+				}
+			}
+		}
+
 		return ErrorCode::ERROR_CODE_NONE;
 	}
 
@@ -461,6 +518,9 @@ namespace NeuralNetwork {
 	/** 学習誤差を計算する. */
 	ErrorCode LayerConnectMult2Single::CalculateDInput(void)
 	{
+		if(!this->IsNecessaryCalculateDInput())
+			return ErrorCode::ERROR_CODE_NONE;
+
 		// 入力/入力誤差配列を作成
 		for(U32 inputNum=0; inputNum<this->lppInputFromLayer.size(); inputNum++)
 		{

@@ -156,6 +156,26 @@ namespace NeuralNetwork {
 		virtual S32 GetDInputBufferID(U32 i_inputNum)const = 0;
 
 
+		//==========================================
+		// 学習フラグ関連
+		//==========================================
+	public:
+		/** 学習固定レイヤーフラグ.
+			学習固定レイヤー(学習が必要ないレイヤー)の場合trueが返る. */
+		virtual bool IsFixLayer(void)const = 0;
+
+		/** 入力誤差の計算が必要なフラグ.
+			必要な場合trueが返る. */
+		virtual bool IsNecessaryCalculateDInput(void)const = 0;
+
+		/** 誤差伝搬が必要なフラグ.
+			誤差伝搬が必要な場合はtrueが返る.falseが返った場合、これ以降誤差伝搬を一切必要としない. */
+		virtual bool IsNecessaryBackPropagation(void)const = 0;
+
+
+		//==========================================
+		// 出力レイヤー関連
+		//==========================================
 	public:
 		/** 出力先レイヤーを追加する */
 		virtual ErrorCode AddOutputToLayer(ILayerConnect* pOutputToLayer) = 0;
