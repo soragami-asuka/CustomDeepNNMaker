@@ -285,6 +285,16 @@ namespace NeuralNetworkLayer {
 				true);
 		}
 
+		/** 後方伝搬範囲制限レイヤー. 出力レイヤーの特定XYZ区間以外の後方伝搬を停止する. 入力/出力データ構造でCH,x,y,zは同じサイズ.
+			@param	startPosition	開始XYZ位置.
+			@param	boxSize			抽出XYZ数. */
+		Gravisbell::GUID AddLimitBackPropagationRangeLayer(const Gravisbell::GUID& i_inputLayerGUID, Vector3D<S32> startPosition, Vector3D<S32> boxSize)
+		{
+			return this->AddLayer(
+				i_inputLayerGUID,
+				CreateLimitBackPropagationRangeLayer(layerDLLManager, layerDataManager, startPosition, boxSize),
+				false);
+		}
 
 		/** 出力データ構造変換レイヤー.
 			@param	ch	CH数.

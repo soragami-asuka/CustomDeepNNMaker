@@ -1060,6 +1060,49 @@ Layer::ILayerData* CreateChooseBoxLayer(
 }
 
 
+/** 後方伝搬範囲制限レイヤー. 出力レイヤーの特定XYZ区間以外の後方伝搬を停止する. 入力/出力データ構造でCH,x,y,zは同じサイズ.
+	@param	startPosition	開始XYZ位置.
+	@param	boxSize			抽出XYZ数. */
+Layer::ILayerData* CreateLimitBackPropagationRangeLayer(
+	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+	Vector3D<S32> startPosition, Vector3D<S32> boxSize)
+{
+	const Gravisbell::GUID TYPE_CODE(0x89359466, 0xe1b2, 0x4129, 0x90, 0xe8, 0x50, 0xc7, 0x4e, 0x4b, 0xc5, 0x97);
+
+	// DLL取得
+	const Gravisbell::Layer::NeuralNetwork::ILayerDLL* pLayerDLL = layerDLLManager.GetLayerDLLByGUID(TYPE_CODE);
+	if(pLayerDLL == NULL)
+		return NULL;
+
+	// 設定の作成
+	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
+	if(pConfig == NULL)
+		return NULL;
+
+	// 開始チャンネル番号
+	{
+		SettingData::Standard::IItem_Vector3D<S32>* pItem = dynamic_cast<SettingData::Standard::IItem_Vector3D<S32>*>(pConfig->GetItemByID(L"startPosition"));
+		pItem->SetValue(startPosition);
+	}
+	// 出力チャンネル数
+	{
+		SettingData::Standard::IItem_Vector3D<S32>* pItem = dynamic_cast<SettingData::Standard::IItem_Vector3D<S32>*>(pConfig->GetItemByID(L"boxSize"));
+		pItem->SetValue(boxSize);
+	}
+
+	// レイヤーの作成
+	Layer::ILayerData* pLayer = layerDataManager.CreateLayerData(layerDLLManager, TYPE_CODE, boost::uuids::random_generator()().data, *pConfig);
+	if(pLayer == NULL)
+		return NULL;
+
+	// 設定情報を削除
+	delete pConfig;
+
+	return pLayer;
+}
+
+
+
 /** 出力データ構造変換レイヤー.
 	@param	ch	CH数.
 	@param	x	X軸.

@@ -209,6 +209,14 @@ namespace NeuralNetworkLayer {
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 		Vector3D<S32> startPosition, Vector3D<S32> boxSize);
 
+	/** 後方伝搬範囲制限レイヤー. 出力レイヤーの特定XYZ区間以外の後方伝搬を停止する. 入力/出力データ構造でCH,x,y,zは同じサイズ.
+		@param	startPosition	開始XYZ位置.
+		@param	boxSize			抽出XYZ数. */
+	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
+	Layer::ILayerData* CreateLimitBackPropagationRangeLayer(
+		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
+		Vector3D<S32> startPosition, Vector3D<S32> boxSize);
+
 	/** 出力データ構造変換レイヤー.
 		@param	ch	CH数.
 		@param	x	X軸.
