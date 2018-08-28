@@ -366,13 +366,13 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(
 {
 	using namespace Gravisbell::Utility::NeuralNetworkLayer;
 
-	Layer::Connect::ILayerConnectData* pNeuralNetwork = Gravisbell::Utility::NeuralNetworkLayer::CreateNeuralNetwork(layerDLLManager, layerDataManager);
+	Layer::Connect::ILayerConnectData* pNeuralNetwork = Gravisbell::Utility::NeuralNetworkLayer::CreateNeuralNetwork(layerDLLManager, layerDataManager, 1);
 
 	if(pNeuralNetwork)
 	{
 		// “ü—ÍM†‚ð’¼‘OƒŒƒCƒ„[‚ÉÝ’è
 		Gravisbell::IODataStruct inputDataStruct = i_inputDataStruct;
-		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID();
+		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID(0);
 
 		// 1‘w–Ú
 		AddLayerToNetworkLast(
@@ -486,7 +486,8 @@ Gravisbell::ErrorCode LearnNeuralNetwork(
 			pTeachLayer->SetBatchDataNoList(pBatchDataNoListGenerator->GetBatchDataNoListByNum(batchNum));
 
 			// ‰‰ŽZ
-			pNeuralNetwork->Calculate(pInputLayer->GetOutputBuffer());
+			CONST_BATCH_BUFFER_POINTER lppInputBuffer[] = {pInputLayer->GetOutputBuffer()};
+			pNeuralNetwork->Calculate(lppInputBuffer);
 
 			// Œë·ŒvŽZ
 			// ‹³ŽtM†‚Æ‚ÌŒë·ŒvŽZ
@@ -544,7 +545,8 @@ Gravisbell::ErrorCode CalculateSampleError(
 		pTeachLayer->SetBatchDataNoList(&dataNum);
 
 		// ‰‰ŽZ
-		pNeuralNetwork->Calculate(pInputLayer->GetOutputBuffer());
+		CONST_BATCH_BUFFER_POINTER lppInputBuffer[] = {pInputLayer->GetOutputBuffer()};
+		pNeuralNetwork->Calculate(lppInputBuffer);
 
 		// Œë·ŒvŽZ
 		pTeachLayer->CalculateLearnError(pNeuralNetwork->GetOutputBuffer());
@@ -647,7 +649,8 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 				pTeachOutputLayer->SetBatchDataNoList(pBatchDataNoListGenerator->GetBatchDataNoListByNum(batchNum));
 
 				// ‰‰ŽZ
-				pNeuralNetworkLearn->Calculate(pTeachInputLayer->GetOutputBuffer());
+				CONST_BATCH_BUFFER_POINTER lppInputBuffer[] = {pTeachInputLayer->GetOutputBuffer()};
+				pNeuralNetworkLearn->Calculate(lppInputBuffer);
 
 				// Œë·ŒvŽZ
 				// ‹³ŽtM†‚Æ‚ÌŒë·ŒvŽZ
@@ -717,7 +720,8 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 				pSampleOutputLayer->SetBatchDataNoList(&dataNum);
 
 				// ‰‰ŽZ
-				pNeuralNetworkSample->Calculate(pSampleInputLayer->GetOutputBuffer());
+				CONST_BATCH_BUFFER_POINTER lppInputBuffer[] = {pSampleInputLayer->GetOutputBuffer()};
+				pNeuralNetworkSample->Calculate(lppInputBuffer);
 
 				// Œë·ŒvŽZ
 				pSampleOutputLayer->CalculateLearnError(pNeuralNetworkSample->GetOutputBuffer());
