@@ -19,6 +19,17 @@ namespace Layer {
 namespace NeuralNetwork {
 namespace FeedforwardNeuralNetwork {
 
+	/** Layer structure */
+	struct LayerStructure
+	{
+		/** Name : 入力レイヤー数
+		  * ID   : inputLayerCount
+		  * Text : 入力信号として取り扱うことのできるレイヤー数
+		  */
+		S32 inputLayerCount;
+
+	};
+
 } // FeedforwardNeuralNetwork
 } // NeuralNetwork
 } // Layer

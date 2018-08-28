@@ -117,7 +117,7 @@ namespace NeuralNetwork {
 	/** 入力誤差バッファを位置指定で取得する */
 	CONST_BATCH_BUFFER_POINTER LayerConnectSingle2Mult::GetDInputBufferByNum_d(S32 num)const
 	{
-		return neuralNetwork.GetDInputBuffer_d(this->GetDInputBufferID(0));
+		return neuralNetwork.GetTmpDInputBuffer_d(this->GetDInputBufferID(0));
 	}
 
 	/** レイヤーリストを作成する.
@@ -304,7 +304,7 @@ namespace NeuralNetwork {
 			return true;
 
 		// ニューラルネットワーク本体の入力誤差信号が存在するか
-		if(this->neuralNetwork.GetDInputBuffer_d())
+		if(this->neuralNetwork.CheckIsHaveDInputBuffer())
 			return true;
 
 		return false;
@@ -438,7 +438,7 @@ namespace NeuralNetwork {
 		}
 
 		// 誤差伝搬が必要か確認する
-		if(this->onLayerFix)
+		if(!this->onLayerFix)
 			this->isNecessaryBackPropagation = true;
 		else
 			this->isNecessaryBackPropagation = this->lppInputFromLayer[0]->IsNecessaryBackPropagation();
@@ -495,11 +495,11 @@ namespace NeuralNetwork {
 		}
 
 		// 演算
-		if(this->GetDInputBufferID(0) < 0)
+		if(this->GetDInputBufferID(0) & NETWORK_DINPUTBUFFER_ID_FLAGBIT)
 		{
 			return this->pLayer_io->CalculateDInput_device(
 				lppInputFromLayer[0]->GetOutputBuffer_d(),
-				this->neuralNetwork.GetDInputBuffer_d(),
+				this->neuralNetwork.GetDInputBuffer_d(this->GetDInputBufferID(0) & 0xFFFF),
 				this->GetOutputBuffer_d(),
 				&this->lpDOutputBuffer[0] );
 		}
@@ -507,7 +507,7 @@ namespace NeuralNetwork {
 		{
 			return this->pLayer_io->CalculateDInput_device(
 				lppInputFromLayer[0]->GetOutputBuffer_d(),
-				this->neuralNetwork.GetDInputBuffer_d(this->GetDInputBufferID(0)),
+				this->neuralNetwork.GetTmpDInputBuffer_d(this->GetDInputBufferID(0)),
 				this->GetOutputBuffer_d(),
 				&this->lpDOutputBuffer[0] );
 		}
@@ -524,11 +524,11 @@ namespace NeuralNetwork {
 			this->lpDOutputBuffer[outputLayerNum] = this->lppOutputToLayer[outputLayerNum].pLayer->GetDInputBufferByNum_d(this->lppOutputToLayer[outputLayerNum].position);
 		}
 		
-		if(this->GetDInputBufferID(0) < 0)
+		if(this->GetDInputBufferID(0) & NETWORK_DINPUTBUFFER_ID_FLAGBIT)
 		{
 			return this->pLayer_io->Training_device(
 				lppInputFromLayer[0]->GetOutputBuffer_d(),
-				this->neuralNetwork.GetDInputBuffer_d(),
+				this->neuralNetwork.GetDInputBuffer_d(this->GetDInputBufferID(0) & 0xFFFF),
 				this->GetOutputBuffer_d(),
 				&this->lpDOutputBuffer[0] );
 		}
@@ -536,7 +536,7 @@ namespace NeuralNetwork {
 		{
 			return this->pLayer_io->Training_device(
 				lppInputFromLayer[0]->GetOutputBuffer_d(),
-				this->neuralNetwork.GetDInputBuffer_d(this->GetDInputBufferID(0)),
+				this->neuralNetwork.GetTmpDInputBuffer_d(this->GetDInputBufferID(0)),
 				this->GetOutputBuffer_d(),
 				&this->lpDOutputBuffer[0] );
 		}

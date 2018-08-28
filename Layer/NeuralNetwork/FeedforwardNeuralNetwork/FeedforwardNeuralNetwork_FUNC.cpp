@@ -46,6 +46,13 @@ namespace DefaultLanguage
     /** ItemData Layer Structure <id, StringData> */
     static const std::map<std::wstring, StringData> g_lpItemData_LayerStructure = 
     {
+        {
+            L"inputLayerCount",
+            {
+                L"入力レイヤー数",
+                L"入力信号として取り扱うことのできるレイヤー数",
+            }
+        },
     };
 
 
@@ -140,6 +147,17 @@ EXPORT_API Gravisbell::SettingData::Standard::IData* CreateLayerStructureSetting
 
 
 	// Create Item
+	/** Name : 入力レイヤー数
+	  * ID   : inputLayerCount
+	  * Text : 入力信号として取り扱うことのできるレイヤー数
+	  */
+	pLayerConfig->AddItem(
+		Gravisbell::SettingData::Standard::CreateItem_Int(
+			L"inputLayerCount",
+			CurrentLanguage::g_lpItemData_LayerStructure[L"inputLayerCount"].name.c_str(),
+			CurrentLanguage::g_lpItemData_LayerStructure[L"inputLayerCount"].text.c_str(),
+			1, 32, 1));
+
 	return pLayerConfig;
 }
 

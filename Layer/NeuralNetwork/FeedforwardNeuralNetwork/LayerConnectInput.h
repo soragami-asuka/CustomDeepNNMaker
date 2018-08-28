@@ -28,9 +28,13 @@ namespace NeuralNetwork {
 
 		std::vector<LayerPosition> lppOutputToLayer;	/**< 出力先レイヤー. SingleOutput扱いなので、必ず1個 */
 
+		const U32 inputNum;	/**< ニューラルネットワーク上の入力番号 */
+
+		const IODataStruct inputDataStruct;
+
 	public:
 		/** コンストラクタ */
-		LayerConnectInput(class FeedforwardNeuralNetwork_Base& neuralNetwork);
+		LayerConnectInput(class FeedforwardNeuralNetwork_Base& neuralNetwork, U32 i_inputNum, const IODataStruct& i_inputDataStruct);
 		/** デストラクタ */
 		virtual ~LayerConnectInput();
 

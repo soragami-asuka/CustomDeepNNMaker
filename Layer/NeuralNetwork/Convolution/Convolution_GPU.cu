@@ -688,11 +688,16 @@ namespace NeuralNetwork {
 				this->inputTensorDesc,
 				o_lppDInputBuffer);
 			if(err_cudnn != 0)
-				return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
-		}
+			{
+				// 一時バッファ解放
+				this->temporaryMemoryManager.RestoreBuffer(this->GetGUID(), WORKSPACE_CODE);
 
-		// 一時バッファ解放
-		this->temporaryMemoryManager.RestoreBuffer(this->GetGUID(), WORKSPACE_CODE);
+				return ErrorCode::ERROR_CODE_CUDA_CALCULATE;
+			}
+
+			// 一時バッファ解放
+			this->temporaryMemoryManager.RestoreBuffer(this->GetGUID(), WORKSPACE_CODE);
+		}
 
 		return ErrorCode::ERROR_CODE_NONE;
 	}

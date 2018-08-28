@@ -117,7 +117,7 @@ namespace NeuralNetwork {
 	/** 入力誤差バッファを位置指定で取得する */
 	CONST_BATCH_BUFFER_POINTER LayerConnectMult2Single::GetDInputBufferByNum_d(S32 num)const
 	{
-		return this->neuralNetwork.GetDInputBuffer_d(this->GetDInputBufferID(num));
+		return this->neuralNetwork.GetTmpDInputBuffer_d(this->GetDInputBufferID(num));
 	}
 
 	/** レイヤーリストを作成する.
@@ -306,7 +306,7 @@ namespace NeuralNetwork {
 			return true;
 
 		// ニューラルネットワーク本体の入力誤差信号が存在するか
-		if(this->neuralNetwork.GetDInputBuffer_d())
+		if(this->neuralNetwork.CheckIsHaveDInputBuffer())
 			return true;
 
 		return false;
@@ -453,7 +453,7 @@ namespace NeuralNetwork {
 		this->lpDInputBufferID.resize(this->lppInputFromLayer.size(), INVALID_DINPUTBUFFER_ID);
 
 		// 誤差伝搬が必要か確認する
-		if(this->onLayerFix)
+		if(!this->onLayerFix)
 			this->isNecessaryBackPropagation = true;
 		else
 		{
@@ -526,10 +526,10 @@ namespace NeuralNetwork {
 		{
 			this->lppInputBuffer[inputNum] = this->lppInputFromLayer[inputNum]->GetOutputBuffer_d();
 
-			if(this->GetDInputBufferID(inputNum) < 0)
-				this->lppDInputBuffer[inputNum] = neuralNetwork.GetDInputBuffer_d();
+			if(this->GetDInputBufferID(inputNum) & NETWORK_DINPUTBUFFER_ID_FLAGBIT)
+				this->lppDInputBuffer[inputNum] = this->neuralNetwork.GetDInputBuffer_d(this->GetDInputBufferID(inputNum) & 0xFFFF);
 			else
-				this->lppDInputBuffer[inputNum] = neuralNetwork.GetDInputBuffer_d(this->GetDInputBufferID(inputNum));
+				this->lppDInputBuffer[inputNum] = neuralNetwork.GetTmpDInputBuffer_d(this->GetDInputBufferID(inputNum));
 		}
 
 		return this->pLayer_io->CalculateDInput_device(
@@ -548,11 +548,11 @@ namespace NeuralNetwork {
 		for(U32 inputNum=0; inputNum<this->lppInputFromLayer.size(); inputNum++)
 		{
 			this->lppInputBuffer[inputNum] = this->lppInputFromLayer[inputNum]->GetOutputBuffer_d();
-
-			if(this->GetDInputBufferID(inputNum) < 0)
-				this->lppDInputBuffer[inputNum] = neuralNetwork.GetDInputBuffer_d();
+			
+			if(this->GetDInputBufferID(inputNum) & NETWORK_DINPUTBUFFER_ID_FLAGBIT)
+				this->lppDInputBuffer[inputNum] = this->neuralNetwork.GetDInputBuffer_d(this->GetDInputBufferID(inputNum) & 0xFFFF);
 			else
-				this->lppDInputBuffer[inputNum] = neuralNetwork.GetDInputBuffer_d(this->GetDInputBufferID(inputNum));
+				this->lppDInputBuffer[inputNum] = neuralNetwork.GetTmpDInputBuffer_d(this->GetDInputBufferID(inputNum));
 		}
 
 		return this->pLayer_io->Training_device(

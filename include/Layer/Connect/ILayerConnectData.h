@@ -71,8 +71,10 @@ namespace Connect {
 		// 入出力レイヤー
 		//====================================
 	public:
+		/** 入力信号レイヤー数を取得する */
+		virtual U32 GetInputCount() = 0;
 		/** 入力信号に割り当てられているGUIDを取得する */
-		virtual GUID GetInputGUID() = 0;
+		virtual GUID GetInputGUID(U32 i_inputLayerNum) = 0;
 
 		/** 出力信号レイヤーを設定する */
 		virtual ErrorCode SetOutputLayerGUID(const Gravisbell::GUID& i_guid) = 0;

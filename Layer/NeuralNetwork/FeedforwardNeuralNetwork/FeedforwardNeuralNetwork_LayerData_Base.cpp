@@ -8,6 +8,8 @@
 #include"FeedforwardNeuralNetwork_FUNC.hpp"
 #include"FeedforwardNeuralNetwork_Base.h"
 
+#include<boost/uuid/uuid_generators.hpp>
+
 namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
@@ -20,7 +22,6 @@ namespace NeuralNetwork {
 	FeedforwardNeuralNetwork_LayerData_Base::FeedforwardNeuralNetwork_LayerData_Base(const ILayerDLLManager& i_layerDLLManager, const Gravisbell::GUID& guid)
 		:	layerDLLManager	(i_layerDLLManager)
 		,	guid			(guid)
-		,	inputLayerGUID	(Gravisbell::GUID(0x2d2805a3, 0x97cc, 0x4ab4, 0x94, 0x2e, 0x69, 0x39, 0xfd, 0x62, 0x35, 0xb1))
 		,	pLayerStructure	(NULL)
 	{
 	}
@@ -64,6 +65,18 @@ namespace NeuralNetwork {
 		if(err != ErrorCode::ERROR_CODE_NONE)
 			return err;
 
+		// 内部保有のレイヤーデータを削除
+		for(auto it : this->lpLayerData)
+			delete it.second;
+		this->lpLayerData.clear();
+
+		// 入力レイヤー一覧を作成
+		this->lpInputLayerGUID.resize(this->layerStructure.inputLayerCount);
+		for(size_t i=0; i<this->lpLayerData.size(); i++)
+		{
+			this->lpInputLayerGUID[i] = Gravisbell::GUID(boost::uuids::random_generator()().data);
+		}
+
 		return this->Initialize();
 	}
 	/** 初期化. バッファからデータを読み込む
@@ -80,17 +93,24 @@ namespace NeuralNetwork {
 		if(pLayerStructure == NULL)
 			return ErrorCode::ERROR_CODE_INITLAYER_READ_CONFIG;
 		readBufferByte += useBufferByte;
+
+		// 初期化
+		this->Initialize(*pLayerStructure);
+
+		// 読み込んだバッファを開放
 		this->SetLayerConfig(*pLayerStructure);
 		delete pLayerStructure;
 
-		// 内部保有のレイヤーデータを削除
-		for(auto it : this->lpLayerData)
-			delete it.second;
-		this->lpLayerData.clear();
+		// 入力レイヤーGUID
+		for(size_t i=0; i<this->lpInputLayerGUID.size(); i++)
+		{
+			Gravisbell::GUID guid;
+			memcpy(&guid, &i_lpBuffer[readBufferByte], sizeof(Gravisbell::GUID));
+			readBufferByte += sizeof(Gravisbell::GUID);
 
-		// 初期化する
-		this->Initialize();
-		
+			this->lpInputLayerGUID[i] = guid;
+		}
+
 		// レイヤーの数
 		U32 layerDataCount = 0;
 		memcpy(&layerDataCount, &i_lpBuffer[readBufferByte], sizeof(U32));
@@ -254,6 +274,9 @@ namespace NeuralNetwork {
 		// 設定情報
 		bufferSize += pLayerStructure->GetUseBufferByteCount();
 
+		// 入力レイヤーGUID一覧
+		bufferSize += this->layerStructure.inputLayerCount * sizeof(Gravisbell::GUID);
+
 		// レイヤーの数
 		bufferSize += sizeof(U32);
 
@@ -336,6 +359,13 @@ namespace NeuralNetwork {
 		// 設定情報
 		writeBufferByte += this->pLayerStructure->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
 
+		// 入力レイヤーGUID
+		for(auto guid : this->lpInputLayerGUID)
+		{
+			memcpy(&o_lpBuffer[writeBufferByte], &guid, sizeof(Gravisbell::GUID));
+			writeBufferByte += sizeof(Gravisbell::GUID);
+		}
+
 		// レイヤーの数
 		tmpCount = (U32)lpTmpLayerData.size();
 		memcpy(&o_lpBuffer[writeBufferByte], &tmpCount, sizeof(U32));
@@ -356,8 +386,8 @@ namespace NeuralNetwork {
 
 			// テスト用
 #ifdef _DEBUG
-			U32 useBufferByte  = it.second->GetUseBufferByteCount();
-			U32 useBufferByte2 = it.second->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
+			U64 useBufferByte  = it.second->GetUseBufferByteCount();
+			S64 useBufferByte2 = it.second->WriteToBuffer(&o_lpBuffer[writeBufferByte]);
 			if(useBufferByte != useBufferByte2)
 			{
 				return ErrorCode::ERROR_CODE_COMMON_OUT_OF_ARRAYRANGE;
@@ -456,6 +486,8 @@ namespace NeuralNetwork {
 			delete this->pLayerStructure;
 		this->pLayerStructure = config.Clone();
 
+		// 構造体に読み込む
+		this->pLayerStructure->WriteToStruct((BYTE*)&this->layerStructure);
 
 		return ERROR_CODE_NONE;
 	}
@@ -486,6 +518,10 @@ namespace NeuralNetwork {
 		@return	入力データ構造が不正な場合(x=0,y=0,z=0,ch=0)が返る. */
 	IODataStruct FeedforwardNeuralNetwork_LayerData_Base::GetOutputDataStruct(const Gravisbell::GUID& i_guid, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
 	{
+		// 入力レイヤー数が異なる場合は終了
+		if(i_inputLayerCount != this->layerStructure.inputLayerCount)
+			return IODataStruct(0,0,0,0);
+
 		this->tmp_lpInputDataStruct = i_lpInputDataStruct;
 		this->tmp_inputLayerCount = i_inputLayerCount;
 		this->tmp_lpOutputDataStruct.clear();
@@ -504,9 +540,12 @@ namespace NeuralNetwork {
 				return it_layer->second;
 		}
 
-		if(i_guid == this->inputLayerGUID)
+		for(size_t inputNum=0; inputNum<this->lpInputLayerGUID.size(); inputNum++)
 		{
-			return this->tmp_lpOutputDataStruct[i_guid] = this->tmp_lpInputDataStruct[0];
+			if(i_guid == this->lpInputLayerGUID[inputNum])
+			{
+				return this->tmp_lpOutputDataStruct[i_guid] = this->tmp_lpInputDataStruct[inputNum];
+			}
 		}
 
 		auto pConnectLayer = this->GetLayerByGUID(i_guid);
@@ -643,7 +682,7 @@ namespace NeuralNetwork {
 
 					// レイヤーを追加
 					ILayerBase* pSubstitutionLayer = NULL;
-					err = neuralNetwork.AddTemporaryLayer(pSubstitutionLayerData, &pSubstitutionLayer, &this->GetOutputDataStruct(it.second.guid, i_lpInputDataStruct, i_inputLayerCount), 1, false);
+					err = neuralNetwork.AddTemporaryLayer(pSubstitutionLayerData, &pSubstitutionLayer, &this->GetOutputDataStruct(it.second.guid, i_lpInputDataStruct, i_inputLayerCount), 1, true);
 					if(err != ErrorCode::ERROR_CODE_NONE)
 						return err;
 
@@ -657,39 +696,42 @@ namespace NeuralNetwork {
 			}
 		}
 		// 入力レイヤーを複数レイヤーから使用していないか確認する
-		if(this->GetOutputLayerCount(this->GetInputGUID()) > 1)
+		for(S32 inputLyaerNum=0; inputLyaerNum<this->layerStructure.inputLayerCount; inputLyaerNum++)
 		{
-			// 出力分割レイヤ－のDLLを取得
-			auto pDLL = this->layerDLLManager.GetLayerDLLByGUID(SEPARATE_LAYER_GUID);
-			if(pDLL == NULL)
-				return ErrorCode::ERROR_CODE_DLL_NOTFOUND;
+			if(this->GetOutputLayerCount(this->GetInputGUID(inputLyaerNum)) > 1)
+			{
+				// 出力分割レイヤ－のDLLを取得
+				auto pDLL = this->layerDLLManager.GetLayerDLLByGUID(SEPARATE_LAYER_GUID);
+				if(pDLL == NULL)
+					return ErrorCode::ERROR_CODE_DLL_NOTFOUND;
 
-			// レイヤー構造情報を作成
-			auto pLayerStructure = pDLL->CreateLayerStructureSetting();
-			if(pLayerStructure == NULL)
-				return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
-			auto pItem = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Int*>(pLayerStructure->GetItemByID(L"separateCount"));
-			if(pItem == NULL)
-				return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+				// レイヤー構造情報を作成
+				auto pLayerStructure = pDLL->CreateLayerStructureSetting();
+				if(pLayerStructure == NULL)
+					return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
+				auto pItem = dynamic_cast<Gravisbell::SettingData::Standard::IItem_Int*>(pLayerStructure->GetItemByID(L"separateCount"));
+				if(pItem == NULL)
+					return ErrorCode::ERROR_CODE_COMMON_NOT_COMPATIBLE;
 
-			pItem->SetValue(this->GetOutputLayerCount(this->GetInputGUID()));
+				pItem->SetValue(this->GetOutputLayerCount(this->GetInputGUID(inputLyaerNum)));
 
-			// レイヤーデータを作成
-			auto pSubstitutionLayerData = pDLL->CreateLayerData(*pLayerStructure);
-			delete pLayerStructure;
+				// レイヤーデータを作成
+				auto pSubstitutionLayerData = pDLL->CreateLayerData(*pLayerStructure);
+				delete pLayerStructure;
 
-			// レイヤーを追加
-			ILayerBase* pSubstitutionLayer = NULL;
-			err = neuralNetwork.AddTemporaryLayer(pSubstitutionLayerData, &pSubstitutionLayer, i_lpInputDataStruct, i_inputLayerCount, true);
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return err;
+				// レイヤーを追加
+				ILayerBase* pSubstitutionLayer = NULL;
+				err = neuralNetwork.AddTemporaryLayer(pSubstitutionLayerData, &pSubstitutionLayer, i_lpInputDataStruct, i_inputLayerCount, true);
+				if(err != ErrorCode::ERROR_CODE_NONE)
+					return err;
 
-			lpSubstitutionLayer[this->GetInputGUID()] = pSubstitutionLayer->GetGUID();
+				lpSubstitutionLayer[this->GetInputGUID(inputLyaerNum)] = pSubstitutionLayer->GetGUID();
 
-			// 代替レイヤーの入力を代替先レイヤーに設定
-			err = neuralNetwork.AddInputLayerToLayer(pSubstitutionLayer->GetGUID(), this->GetInputGUID());
-			if(err != ErrorCode::ERROR_CODE_NONE)
-				return err;
+				// 代替レイヤーの入力を代替先レイヤーに設定
+				err = neuralNetwork.AddInputLayerToLayer(pSubstitutionLayer->GetGUID(), this->GetInputGUID(inputLyaerNum));
+				if(err != ErrorCode::ERROR_CODE_NONE)
+					return err;
+			}
 		}
 
 
@@ -909,10 +951,17 @@ namespace NeuralNetwork {
 	//====================================
 	// 入出力レイヤー
 	//====================================
-	/** 入力信号に割り当てられているGUIDを取得する */
-	GUID FeedforwardNeuralNetwork_LayerData_Base::GetInputGUID()
+	/** 入力信号レイヤー数を取得する */
+	U32 FeedforwardNeuralNetwork_LayerData_Base::GetInputCount()
 	{
-		return this->inputLayerGUID;
+		return this->layerStructure.inputLayerCount;
+	}
+	/** 入力信号に割り当てられているGUIDを取得する */
+	Gravisbell::GUID FeedforwardNeuralNetwork_LayerData_Base::GetInputGUID(U32 i_inputLayerNum)
+	{
+		if(i_inputLayerNum >= this->lpInputLayerGUID.size())
+			return Gravisbell::GUID();
+		return this->lpInputLayerGUID[i_inputLayerNum];
 	}
 
 	/** 出力信号レイヤーを設定する */

@@ -53,37 +53,46 @@ namespace NeuralNetwork {
 	// コンストラクタ/デストラクタ
 	//====================================
 	/** コンストラクタ */
-	FeedforwardNeuralNetwork_Base::FeedforwardNeuralNetwork_Base(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct, Gravisbell::Common::ITemporaryMemoryManager* i_pTemporaryMemoryManager)
+	FeedforwardNeuralNetwork_Base::FeedforwardNeuralNetwork_Base(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, const IODataStruct& i_outputDataStruct, Gravisbell::Common::ITemporaryMemoryManager* i_pTemporaryMemoryManager)
 		:	layerData			(i_layerData)
 		,	guid				(i_guid)			/**< レイヤー識別用のGUID */
-		,	inputDataStruct		(i_inputDataStruct)
 		,	outputDataStruct	(i_outputDataStruct)
-		,	inputLayer			(*this)	/**< 入力信号の代替レイヤーのアドレス. */
-		,	outputLayer			(*this)	/**< 出力信号の代替レイヤーのアドレス. */
+		,	lppInputLayer		(i_inputLayerCount)		/**< 入力信号の代替レイヤーのアドレス. */
+		,	outputLayer			(*this)					/**< 出力信号の代替レイヤーのアドレス. */
 		,	pLearnData			(NULL)
 		,	pLocalTemporaryMemoryManager	(i_pTemporaryMemoryManager)
 		,	temporaryMemoryManager			(*pLocalTemporaryMemoryManager)
+		,	lppInputTmpBuffer		(i_inputLayerCount)			/**< 入力バッファ本体 <インプットレイヤー数><バッチ数*入力信号数> */
+		,	lppInputBuffer			(i_inputLayerCount)			/**< 入力バッファのアドレス <インプットレイヤー数> */
 		,	m_lppInputBuffer		(NULL)	/**< 外部から預かった入力バッファのアドレス(演算デバイス依存) */
 		,	m_lppDInputBuffer		(NULL)	/**< 外部から預かった入力誤差バッファのアドレス(演算デバイス依存) */
 		,	m_lppDOutputBuffer		(NULL)	/**< 外部から預かった出力誤差バッファのアドレス(演算デバイス依存) */
 	{
+		for(U32 i=0; i<this->lppInputLayer.size(); i++)
+		{
+			this->lppInputLayer[i] = new LayerConnectInput(*this, i, i_lpInputDataStruct[i]);
+		}
 	}
 	/** コンストラクタ */
-	FeedforwardNeuralNetwork_Base::FeedforwardNeuralNetwork_Base(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct, const IODataStruct& i_outputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
+	FeedforwardNeuralNetwork_Base::FeedforwardNeuralNetwork_Base(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, const IODataStruct& i_outputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
 		:	layerData						(i_layerData)
 		,	guid							(i_guid)			/**< レイヤー識別用のGUID */
-		,	inputDataStruct					(i_inputDataStruct)
 		,	outputDataStruct				(i_outputDataStruct)
-		,	inputLayer						(*this)	/**< 入力信号の代替レイヤーのアドレス. */
-		,	outputLayer						(*this)	/**< 出力信号の代替レイヤーのアドレス. */
+		,	lppInputLayer					(i_inputLayerCount)		/**< 入力信号の代替レイヤーのアドレス. */
+		,	outputLayer						(*this)					/**< 出力信号の代替レイヤーのアドレス. */
 		,	pLearnData						(NULL)
 		,	pLocalTemporaryMemoryManager	(NULL)
 		,	temporaryMemoryManager			(i_temporaryMemoryManager)
+		,	lppInputTmpBuffer		(i_inputLayerCount)			/**< 入力バッファ本体 <インプットレイヤー数><バッチ数*入力信号数> */
+		,	lppInputBuffer			(i_inputLayerCount)			/**< 入力バッファのアドレス <インプットレイヤー数> */
 		,	m_lppInputBuffer		(NULL)	/**< 外部から預かった入力バッファのアドレス(演算デバイス依存) */
 		,	m_lppDInputBuffer		(NULL)	/**< 外部から預かった入力誤差バッファのアドレス(演算デバイス依存) */
 		,	m_lppDOutputBuffer		(NULL)	/**< 外部から預かった出力誤差バッファのアドレス(演算デバイス依存) */
 	{
-
+		for(U32 i=0; i<this->lppInputLayer.size(); i++)
+		{
+			this->lppInputLayer[i] = new LayerConnectInput(*this, i, i_lpInputDataStruct[i]);
+		}
 	}
 	/** デストラクタ */
 	FeedforwardNeuralNetwork_Base::~FeedforwardNeuralNetwork_Base()
@@ -116,6 +125,11 @@ namespace NeuralNetwork {
 		// 一時バッファ管理削除
 		if(this->pLocalTemporaryMemoryManager != NULL)
 			delete this->pLocalTemporaryMemoryManager;
+
+		// 入力信号の代替レイヤーを削除
+		for(U32 i=0; i<this->lppInputLayer.size(); i++)
+			delete this->lppInputLayer[i];
+		this->lppInputLayer.clear();
 	}
 
 
@@ -260,11 +274,17 @@ namespace NeuralNetwork {
 	//====================================
 	// 入出力レイヤー
 	//====================================
-	/** 入力信号に割り当てられているGUIDを取得する */
-	GUID FeedforwardNeuralNetwork_Base::GetInputGUID()const
+	/** 入力信号レイヤー数を取得する */
+	U32 FeedforwardNeuralNetwork_Base::GetInputCount()
 	{
-		return this->layerData.GetInputGUID();
+		return this->layerData.GetInputCount();
 	}
+	/** 入力信号に割り当てられているGUIDを取得する */
+	Gravisbell::GUID FeedforwardNeuralNetwork_Base::GetInputGUID(U32 i_inputLayerNum)
+	{
+		return this->layerData.GetInputGUID(i_inputLayerNum);
+	}
+
 
 	/** 出力信号レイヤーを設定する */
 	ErrorCode FeedforwardNeuralNetwork_Base::SetOutputLayerGUID(const Gravisbell::GUID& i_guid)
@@ -295,12 +315,16 @@ namespace NeuralNetwork {
 		if(it_receive == this->lpLayerInfo.end())
 			return ErrorCode::ERROR_CODE_ADDLAYER_NOT_EXIST;
 
-		if(postLayer == this->GetInputGUID())
+		// 入力レイヤーを確認
+		for(auto pInputLayer : this->lppInputLayer)
 		{
-			// 入力レイヤーの場合
-			return it_receive->second->AddInputLayerToLayer(&this->inputLayer);
+			if(postLayer == pInputLayer->GetGUID())
+			{
+				return it_receive->second->AddInputLayerToLayer(pInputLayer);
+			}
 		}
-		else
+
+		// 通常レイヤーを確認
 		{
 			// 出力側レイヤーが存在することを確認
 			auto it_post = this->lpLayerInfo.find(postLayer);
@@ -321,12 +345,16 @@ namespace NeuralNetwork {
 		if(it_receive == this->lpLayerInfo.end())
 			return ErrorCode::ERROR_CODE_ADDLAYER_NOT_EXIST;
 
-		if(postLayer == this->GetInputGUID())
+		// 入力レイヤーを確認
+		for(auto pInputLayer : this->lppInputLayer)
 		{
-			// 入力レイヤーの場合
-			return it_receive->second->AddBypassLayerToLayer(&this->inputLayer);
+			if(postLayer == pInputLayer->GetGUID())
+			{
+				return it_receive->second->AddBypassLayerToLayer(pInputLayer);
+			}
 		}
-		else
+
+		// 通常レイヤーを確認
 		{
 			// 出力側レイヤーが存在することを確認
 			auto it_post = this->lpLayerInfo.find(postLayer);
@@ -453,15 +481,15 @@ namespace NeuralNetwork {
 			for(U32 inputNum=0; inputNum<(*it_layer)->GetInputLayerCount(); inputNum++)
 			{
 				auto pInputLayer = (*it_layer)->GetInputLayerByNum(inputNum);
-				if(pInputLayer->GetGUID() == this->GetInputGUID())
+				if(this->GetInputLayerNoByGUID(pInputLayer->GetGUID()) >= 0)
 				{
 					// 入力レイヤー
-					(*it_layer)->SetDInputBufferID(inputNum, -1);
+					(*it_layer)->SetDInputBufferID(inputNum, (inputNum | NETWORK_DINPUTBUFFER_ID_FLAGBIT) );
 				}
 				else if(pInputLayer == NULL)
 				{
 					// 入力が割り当てられていないのでありえないバッファIDを設定する
-					(*it_layer)->SetDInputBufferID(inputNum, 0xFFFF);
+					(*it_layer)->SetDInputBufferID(inputNum, INVALID_DINPUTBUFFER_ID);
 				}
 				else
 				{
@@ -489,7 +517,7 @@ namespace NeuralNetwork {
 				}
 			}
 	
-			// 自分が使用している入力誤差バッファを開放
+			// 自分が出力誤差として使用している入力誤差バッファを開放
 			for(auto& it_DInputBuffer : lpDInputBufferInfo)
 			{
 				if(it_DInputBuffer.second.lpUseLayerID.count((*it_layer)->GetGUID()) > 0)
@@ -524,7 +552,7 @@ namespace NeuralNetwork {
 		{
 			// 入力レイヤーは出力バッファを持つ必要がないのでスキップ
 			// ※入力レイヤーの出力バッファは、ニューラルネットワークの入力バッファ
-			if((*it_layer)->GetGUID() == this->inputLayer.GetGUID())
+			if(this->GetInputLayerNoByGUID((*it_layer)->GetGUID()) >= 0)
 			{
 				it_layer++;
 				continue;
@@ -589,26 +617,36 @@ namespace NeuralNetwork {
 	//====================================
 	// 外部から預かった入出力バッファ関連
 	//====================================
+	///** 入力バッファを取得する(処理デバイス依存) */
+	//CONST_BATCH_BUFFER_POINTER FeedforwardNeuralNetwork_Base::GetInputBuffer()
+	//{
+	//	return &this->lpInputBuffer[0];
+	//}
 	/** 入力バッファを取得する(処理デバイス依存) */
-	CONST_BATCH_BUFFER_POINTER FeedforwardNeuralNetwork_Base::GetInputBuffer()
+	CONST_BATCH_BUFFER_POINTER FeedforwardNeuralNetwork_Base::GetInputBuffer_d(U32 i_inputLayerNum)
 	{
-		return &this->lpInputBuffer[0];
-	}
-	/** 入力バッファを取得する(処理デバイス依存) */
-	CONST_BATCH_BUFFER_POINTER FeedforwardNeuralNetwork_Base::GetInputBuffer_d()
-	{
-		return this->m_lppInputBuffer;
+		return this->m_lppInputBuffer[i_inputLayerNum];
 	}
 	/** 入力誤差バッファを取得する(処理デバイス依存) */
-	BATCH_BUFFER_POINTER FeedforwardNeuralNetwork_Base::GetDInputBuffer_d()
+	BATCH_BUFFER_POINTER FeedforwardNeuralNetwork_Base::GetDInputBuffer_d(U32 i_inputLayerNum)
 	{
-		return this->m_lppDInputBuffer;
+		if(this->m_lppDInputBuffer == NULL)
+			return NULL;
+
+		return this->m_lppDInputBuffer[i_inputLayerNum];
 	}
 	/** 出力誤差バッファを取得する */
 	BATCH_BUFFER_POINTER FeedforwardNeuralNetwork_Base::GetDOutputBuffer_d()
 	{
 		return this->m_lppDOutputBuffer;
 	}
+
+	/** NNが入力誤差バッファを保持しているかを確認する */
+	bool FeedforwardNeuralNetwork_Base::CheckIsHaveDInputBuffer()const
+	{
+		return (this->m_lppDInputBuffer != NULL);
+	}
+
 
 	//====================================
 	// 学習設定
@@ -847,17 +885,44 @@ namespace NeuralNetwork {
 	//===========================
 	// 入力レイヤー関連
 	//===========================
+	/** 入力データの数を取得する */
+	U32 FeedforwardNeuralNetwork_Base::GetInputDataCount()const
+	{
+		return (U32)this->lppInputLayer.size();
+	}
+
+	/** 入力レイヤー番号をIDから取得する.
+		@return	入力レイヤーではない場合は-1,入力レイヤーである場合は番号を0以上で返す */
+	S32 FeedforwardNeuralNetwork_Base::GetInputLayerNoByGUID(const Gravisbell::GUID& i_guid)const
+	{
+		for(S32 no=0; no<this->lppInputLayer.size(); no++)
+		{
+			if(this->lppInputLayer[no])
+			{
+				if(this->lppInputLayer[no]->GetGUID() == i_guid)
+					return no;
+			}
+		}
+		return -1;
+	}
+
 	/** 入力データ構造を取得する.
 		@return	入力データ構造 */
-	IODataStruct FeedforwardNeuralNetwork_Base::GetInputDataStruct()const
+	IODataStruct FeedforwardNeuralNetwork_Base::GetInputDataStruct(U32 i_dataNum)const
 	{
-		return this->inputDataStruct;
+		if(i_dataNum >= this->lppInputLayer.size())
+			return IODataStruct();
+
+		if(this->lppInputLayer[i_dataNum] == NULL)
+			return IODataStruct();
+
+		return this->lppInputLayer[i_dataNum]->GetOutputDataStruct();
 	}
 
 	/** 入力バッファ数を取得する. */
-	U32 FeedforwardNeuralNetwork_Base::GetInputBufferCount()const
+	U32 FeedforwardNeuralNetwork_Base::GetInputBufferCount(U32 i_dataNum)const
 	{
-		return this->GetInputDataStruct().GetDataCount();
+		return this->GetInputDataStruct(i_dataNum).GetDataCount();
 	}
 
 
@@ -1064,7 +1129,7 @@ namespace NeuralNetwork {
 	/** 演算処理を実行する.
 		@param lpInputBuffer	入力データバッファ. GetInputBufferCountで取得した値の要素数が必要
 		@return 成功した場合0が返る */
-	ErrorCode FeedforwardNeuralNetwork_Base::Calculate_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer)
+	ErrorCode FeedforwardNeuralNetwork_Base::Calculate_device(CONST_BATCH_BUFFER_POINTER* i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppOutputBuffer)
 	{
 		// 入力バッファを保存
 		this->m_lppInputBuffer = i_lppInputBuffer;
@@ -1095,7 +1160,7 @@ namespace NeuralNetwork {
 		@param	o_lppDInputBuffer	入力誤差差分格納先レイヤー.	[GetBatchSize()の戻り値][GetInputBufferCount()の戻り値]の要素数が必要.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode FeedforwardNeuralNetwork_Base::CalculateDInput_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode FeedforwardNeuralNetwork_Base::CalculateDInput_device(CONST_BATCH_BUFFER_POINTER* i_lppInputBuffer, BATCH_BUFFER_POINTER* o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		// 入力バッファを保存
 		this->m_lppInputBuffer = i_lppInputBuffer;
@@ -1131,7 +1196,7 @@ namespace NeuralNetwork {
 		入力信号、出力信号は直前のCalculateの値を参照する.
 		@param	i_lppDOutputBuffer	出力誤差差分=次レイヤーの入力誤差差分.	[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]の要素数が必要.
 		直前の計算結果を使用する */
-	ErrorCode FeedforwardNeuralNetwork_Base::Training_device(CONST_BATCH_BUFFER_POINTER i_lppInputBuffer, BATCH_BUFFER_POINTER o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
+	ErrorCode FeedforwardNeuralNetwork_Base::Training_device(CONST_BATCH_BUFFER_POINTER* i_lppInputBuffer, BATCH_BUFFER_POINTER* o_lppDInputBuffer, CONST_BATCH_BUFFER_POINTER i_lppOutputBuffer, CONST_BATCH_BUFFER_POINTER i_lppDOutputBuffer)
 	{
 		// 入力バッファを保存
 		this->m_lppInputBuffer = i_lppInputBuffer;

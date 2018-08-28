@@ -29,7 +29,7 @@ namespace NeuralNetworkLayer {
 		NeuralNetworkMaker(const Layer::NeuralNetwork::ILayerDLLManager& i_layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& i_layerDataManager, const IODataStruct i_lpInputDataStruct[], U32 i_inputCount)
 			:	layerDLLManager		(i_layerDLLManager)
 			,	layerDataManager	(i_layerDataManager)
-			,	pLayerConnectData	(CreateNeuralNetwork(layerDLLManager,layerDataManager))
+			,	pLayerConnectData	(CreateNeuralNetwork(layerDLLManager,layerDataManager, i_inputCount))
 			,	onGetConnectData	(false)
 		{
 			for(U32 i=0; i<i_inputCount; i++)
@@ -185,7 +185,7 @@ namespace NeuralNetworkLayer {
 			return this->AddLayer(
 				i_inputLayerGUID,
 				CreatePoolingLayer(layerDLLManager, layerDataManager, i_filterSize, i_stride),
-				false);
+				true);
 		}
 
 		/** バッチ正規化レイヤー.
@@ -288,12 +288,12 @@ namespace NeuralNetworkLayer {
 		/** 後方伝搬範囲制限レイヤー. 出力レイヤーの特定XYZ区間以外の後方伝搬を停止する. 入力/出力データ構造でCH,x,y,zは同じサイズ.
 			@param	startPosition	開始XYZ位置.
 			@param	boxSize			抽出XYZ数. */
-		Gravisbell::GUID AddLimitBackPropagationRangeLayer(const Gravisbell::GUID& i_inputLayerGUID, Vector3D<S32> startPosition, Vector3D<S32> boxSize)
+		Gravisbell::GUID AddLimitBackPropagationBoxLayer(const Gravisbell::GUID& i_inputLayerGUID, Vector3D<S32> startPosition, Vector3D<S32> boxSize)
 		{
 			return this->AddLayer(
 				i_inputLayerGUID,
-				CreateLimitBackPropagationRangeLayer(layerDLLManager, layerDataManager, startPosition, boxSize),
-				false);
+				CreateLimitBackPropagationBoxLayer(layerDLLManager, layerDataManager, startPosition, boxSize),
+				true);
 		}
 
 		/** 出力データ構造変換レイヤー.

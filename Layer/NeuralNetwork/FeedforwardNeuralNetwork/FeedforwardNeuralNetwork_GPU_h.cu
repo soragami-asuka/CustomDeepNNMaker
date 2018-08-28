@@ -26,13 +26,13 @@ namespace Layer {
 namespace NeuralNetwork {
 
 	/** コンストラクタ */
-	FeedforwardNeuralNetwork_GPU_h::FeedforwardNeuralNetwork_GPU_h(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct)
-		:	FeedforwardNeuralNetwork_GPU_base	(i_guid, i_layerData, i_inputDataStruct)
+	FeedforwardNeuralNetwork_GPU_h::FeedforwardNeuralNetwork_GPU_h(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount)
+		:	FeedforwardNeuralNetwork_GPU_base	(i_guid, i_layerData, i_lpInputDataStruct, i_inputLayerCount)
 	{
 	}
 	/** コンストラクタ */
-	FeedforwardNeuralNetwork_GPU_h::FeedforwardNeuralNetwork_GPU_h(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct& i_inputDataStruct, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
-		:	FeedforwardNeuralNetwork_GPU_base	(i_guid, i_layerData, i_inputDataStruct, i_temporaryMemoryManager)
+	FeedforwardNeuralNetwork_GPU_h::FeedforwardNeuralNetwork_GPU_h(const Gravisbell::GUID& i_guid, class FeedforwardNeuralNetwork_LayerData_Base& i_layerData, const IODataStruct i_lpInputDataStruct[], U32 i_inputLayerCount, Gravisbell::Common::ITemporaryMemoryManager& i_temporaryMemoryManager)
+		:	FeedforwardNeuralNetwork_GPU_base	(i_guid, i_layerData, i_lpInputDataStruct, i_inputLayerCount, i_temporaryMemoryManager)
 	{
 	}
 	/** デストラクタ */

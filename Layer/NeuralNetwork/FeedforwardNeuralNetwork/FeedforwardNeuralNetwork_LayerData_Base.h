@@ -12,6 +12,7 @@
 #include<Layer/Connect/ILayerConnectData.h>
 #include<Layer/ILayerData.h>
 #include<Layer/NeuralNetwork/ILayerDLLManager.h>
+#include"FeedforwardNeuralNetwork_DATA.hpp"
 
 namespace Gravisbell {
 namespace Layer {
@@ -64,13 +65,14 @@ namespace NeuralNetwork {
 		const ILayerDLLManager& layerDLLManager;
 
 		const Gravisbell::GUID guid;			/**< レイヤー識別用のGUID */
-		const Gravisbell::GUID inputLayerGUID;	/**< 入力信号に割り当てられているGUID.入力信号レイヤーの代用として使用する. */
+		std::vector<Gravisbell::GUID> lpInputLayerGUID;	/**< 入力信号に割り当てられているGUID.入力信号レイヤーの代用として使用する. */
 		Gravisbell::GUID outputLayerGUID;		/**< 出力信号に割り当てられているGUID. */
 
 		std::map<Gravisbell::GUID, ILayerData*> lpLayerData;	/**< レイヤーデータGUID, レイヤーデータ */
 		std::map<Gravisbell::GUID, LayerConnect> lpConnectInfo;	/**< レイヤーGUID, レイヤー接続情報 */
 
 		SettingData::Standard::IData* pLayerStructure;	/**< レイヤー構造を定義したコンフィグクラス */
+		FeedforwardNeuralNetwork::LayerStructure layerStructure;	/**< レイヤー構造 */
 
 
 		//====================================
@@ -224,8 +226,10 @@ namespace NeuralNetwork {
 		// 入出力レイヤー
 		//====================================
 	public:
+		/** 入力信号レイヤー数を取得する */
+		U32 GetInputCount();
 		/** 入力信号に割り当てられているGUIDを取得する */
-		GUID GetInputGUID();
+		Gravisbell::GUID GetInputGUID(U32 i_inputLayerNum);
 
 		/** 出力信号レイヤーを設定する */
 		ErrorCode SetOutputLayerGUID(const Gravisbell::GUID& i_guid);

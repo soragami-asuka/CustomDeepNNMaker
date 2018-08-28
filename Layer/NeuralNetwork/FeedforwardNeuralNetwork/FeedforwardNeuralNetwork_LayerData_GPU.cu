@@ -51,9 +51,9 @@ namespace NeuralNetwork {
 
 			FeedforwardNeuralNetwork_Base* pNeuralNetwork = NULL;
 			if(i_useHostMemory)
-				pNeuralNetwork = new FeedforwardNeuralNetwork_GPU_h(guid, *this, i_lpInputDataStruct[0], i_temporaryMemoryManager);
+				pNeuralNetwork = new FeedforwardNeuralNetwork_GPU_h(guid, *this, i_lpInputDataStruct, i_inputLayerCount, i_temporaryMemoryManager);
 			else
-				pNeuralNetwork = new FeedforwardNeuralNetwork_GPU_d(guid, *this, i_lpInputDataStruct[0], i_temporaryMemoryManager);
+				pNeuralNetwork = new FeedforwardNeuralNetwork_GPU_d(guid, *this, i_lpInputDataStruct, i_inputLayerCount, i_temporaryMemoryManager);
 
 			// ニューラルネットワークにレイヤーを追加
 			ErrorCode err = AddConnectionLayersToNeuralNetwork(*pNeuralNetwork, i_lpInputDataStruct, i_inputLayerCount);
@@ -84,9 +84,9 @@ namespace NeuralNetwork {
 			
 			FeedforwardNeuralNetwork_Base* pNeuralNetwork = NULL;
 			if(i_useHostMemory)
-				pNeuralNetwork = new FeedforwardNeuralNetwork_GPU_h(guid, *this, i_lpInputDataStruct[0]);
+				pNeuralNetwork = new FeedforwardNeuralNetwork_GPU_h(guid, *this, i_lpInputDataStruct, i_inputLayerCount);
 			else
-				pNeuralNetwork = new FeedforwardNeuralNetwork_GPU_d(guid, *this, i_lpInputDataStruct[0]);
+				pNeuralNetwork = new FeedforwardNeuralNetwork_GPU_d(guid, *this, i_lpInputDataStruct, i_inputLayerCount);
 
 			// ニューラルネットワークにレイヤーを追加
 			ErrorCode err = AddConnectionLayersToNeuralNetwork(*pNeuralNetwork, i_lpInputDataStruct, i_inputLayerCount);

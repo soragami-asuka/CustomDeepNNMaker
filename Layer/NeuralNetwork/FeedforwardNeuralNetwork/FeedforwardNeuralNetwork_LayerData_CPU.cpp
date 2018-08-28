@@ -48,7 +48,7 @@ namespace NeuralNetwork {
 			if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
 				return NULL;
 
-			FeedforwardNeuralNetwork_Base* pNeuralNetwork = new FeedforwardNeuralNetwork_CPU(guid, *this, i_lpInputDataStruct[0], i_temporaryMemoryManager);
+			FeedforwardNeuralNetwork_Base* pNeuralNetwork = new FeedforwardNeuralNetwork_CPU(guid, *this, i_lpInputDataStruct, i_inputLayerCount, i_temporaryMemoryManager);
 
 			// ニューラルネットワークにレイヤーを追加
 			ErrorCode err = AddConnectionLayersToNeuralNetwork(*pNeuralNetwork, i_lpInputDataStruct, i_inputLayerCount);
@@ -76,7 +76,7 @@ namespace NeuralNetwork {
 			if(this->CheckCanUseInputDataStruct(i_lpInputDataStruct, i_inputLayerCount) == false)
 				return NULL;
 
-			FeedforwardNeuralNetwork_Base* pNeuralNetwork = new FeedforwardNeuralNetwork_CPU(guid, *this, i_lpInputDataStruct[0]);
+			FeedforwardNeuralNetwork_Base* pNeuralNetwork = new FeedforwardNeuralNetwork_CPU(guid, *this, i_lpInputDataStruct, i_inputLayerCount);
 
 			// ニューラルネットワークにレイヤーを追加
 			ErrorCode err = AddConnectionLayersToNeuralNetwork(*pNeuralNetwork, i_lpInputDataStruct, i_inputLayerCount);

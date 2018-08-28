@@ -473,7 +473,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver01(const Layer::Neural
 	if(pNeuralNetwork)
 	{
 		// 入力信号を直前レイヤーに設定
-		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID();
+		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID(0);
 
 		lastLayerGUID = pNetworkMaker->AddConvolutionLayer(lastLayerGUID, Vector3D<S32>(3,3,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(1,1,0));
 //		lastLayerGUID = pNetworkMaker->AddDilatedConvolutionLayer(lastLayerGUID, Vector3D<S32>(3,3,1), 8, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,0));
@@ -520,7 +520,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver02(const Layer::Neural
 	if(pNeuralNetwork)
 	{
 		// 入力信号を直前レイヤーに設定
-		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID();
+		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID(0);
 
 		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_FA(lastLayerGUID, (31*4 + 1)*4, L"ReLU");
 		lastLayerGUID = pNetworkMaker->AddReshapeLayer(lastLayerGUID, 4, 31*4+1, 1, 1);
@@ -597,7 +597,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver03(const Layer::Neural
 	if(pNeuralNetwork)
 	{
 		// 入力信号を直前レイヤーに設定
-		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID();
+		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID(0);
 
 		lastLayerGUID = pNetworkMaker->AddConvolutionLayer(lastLayerGUID, Vector3D<S32>(3,3,1), 8, Vector3D<S32>(1,1,1), Vector3D<S32>(1,1,0));
 //		lastLayerGUID = pNetworkMaker->AddDilatedConvolutionLayer(lastLayerGUID, Vector3D<S32>(3,3,1), 8, Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,1), Vector3D<S32>(2,2,0));
@@ -645,7 +645,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver04(const Layer::Neural
 	if(pNeuralNetwork)
 	{
 		// 入力信号を直前レイヤーに設定
-		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID();
+		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID(0);
 
 		// 入力信号をN段階のフラグに置き換え
 		lastLayerGUID = pNetworkMaker->AddValue2SignalArrayLayer(lastLayerGUID, 0.0f, 1.0f, 32);
@@ -696,7 +696,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork_ver05(const Layer::Neural
 	if(pNeuralNetwork)
 	{
 		// 入力信号を直前レイヤーに設定
-		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID();
+		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID(0);
 
 		// 入力信号をN段階のフラグに置き換え
 		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_CA(lastLayerGUID, Vector3D<S32>(3,3,1), 4, Vector3D<S32>(1,1,1), Vector3D<S32>(1,1,0), L"sigmoid");
@@ -844,7 +844,8 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 				pTeachOutputLayer->SetBatchDataNoList(pBatchDataNoListGenerator->GetBatchDataNoListByNum(batchNum));
 
 				// 演算
-				pNeuralNetworkLearn->Calculate(pTeachInputLayer->GetOutputBuffer());
+				CONST_BATCH_BUFFER_POINTER lpInputBuffer[] = {pTeachInputLayer->GetOutputBuffer()};
+				pNeuralNetworkLearn->Calculate(lpInputBuffer);
 
 				// 誤差計算
 				// 教師信号との誤差計算
@@ -895,7 +896,8 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 				pSampleOutputLayer->SetBatchDataNoList(&dataNum);
 
 				// 演算
-				pNeuralNetworkSample->Calculate(pSampleInputLayer->GetOutputBuffer());
+				CONST_BATCH_BUFFER_POINTER lpInputBuffer[] = {pSampleInputLayer->GetOutputBuffer()};
+				pNeuralNetworkSample->Calculate(lpInputBuffer);
 
 				// 誤差計算
 				pSampleOutputLayer->CalculateLearnError(pNeuralNetworkSample->GetOutputBuffer());

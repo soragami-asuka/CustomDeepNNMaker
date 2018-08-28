@@ -5,6 +5,7 @@
 #define __GRAVISBELL_LAYER_CONNECT_SINGLE2SINGLE_H__
 
 #include<Layer/NeuralNetwork/INeuralNetwork.h>
+#include<Layer/NeuralNetwork/INNSingle2SingleLayer.h>
 
 #include"FeedforwardNeuralNetwork_FUNC.hpp"
 

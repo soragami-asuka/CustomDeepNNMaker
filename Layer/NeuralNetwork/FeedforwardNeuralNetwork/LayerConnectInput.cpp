@@ -13,8 +13,10 @@ namespace NeuralNetwork {
 
 	
 	/** コンストラクタ */
-	LayerConnectInput::LayerConnectInput(class FeedforwardNeuralNetwork_Base& neuralNetwork)
+	LayerConnectInput::LayerConnectInput(class FeedforwardNeuralNetwork_Base& neuralNetwork, U32 i_inputNum, const IODataStruct& i_inputDataStruct)
 		:	neuralNetwork	(neuralNetwork)
+		,	inputNum		(i_inputNum)
+		,	inputDataStruct	(i_inputDataStruct)
 	{
 	}
 	/** デストラクタ */
@@ -25,7 +27,7 @@ namespace NeuralNetwork {
 	/** GUIDを取得する */
 	Gravisbell::GUID LayerConnectInput::GetGUID()const
 	{
-		return this->neuralNetwork.GetInputGUID();
+		return this->neuralNetwork.GetInputGUID(this->inputNum);
 	}
 	/** レイヤー種別の取得.
 		ELayerKind の組み合わせ. */
@@ -86,14 +88,14 @@ namespace NeuralNetwork {
 		@return	出力データ構造 */
 	IODataStruct LayerConnectInput::GetOutputDataStruct()const
 	{
-		return this->neuralNetwork.GetInputDataStruct();
+		return this->inputDataStruct;
 	}
 	/** 出力データバッファを取得する.
 		配列の要素数は[GetBatchSize()の戻り値][GetOutputBufferCount()の戻り値]
 		@return 出力データ配列の先頭ポインタ */
 	CONST_BATCH_BUFFER_POINTER LayerConnectInput::GetOutputBuffer_d()const
 	{
-		return this->neuralNetwork.GetInputBuffer_d();
+		return this->neuralNetwork.GetInputBuffer_d(this->inputNum);
 	}
 
 	/** 入力誤差バッファの位置を入力元レイヤーのGUID指定で取得する */
@@ -106,7 +108,7 @@ namespace NeuralNetwork {
 	{
 		if(this->lppOutputToLayer.empty())
 			return NULL;
-		return this->neuralNetwork.GetDInputBuffer_d();
+		return this->neuralNetwork.GetDInputBuffer_d(this->inputNum);
 	}
 
 	/** レイヤーリストを作成する.
@@ -213,7 +215,7 @@ namespace NeuralNetwork {
 		必要な場合trueが返る. */
 	bool LayerConnectInput::IsNecessaryCalculateDInput(void)const
 	{
-		if(this->neuralNetwork.GetDInputBuffer_d())
+		if(this->neuralNetwork.GetDInputBuffer_d(this->inputNum))
 			return true;
 		else
 			return false;

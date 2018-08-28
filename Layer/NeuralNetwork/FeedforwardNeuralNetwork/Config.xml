@@ -17,6 +17,13 @@
 
   <!--レイヤーのデータ構造-->
   <Structure>
+    <Int id="inputLayerCount">
+      <Name>入力レイヤー数</Name>
+      <Text>入力信号として取り扱うことのできるレイヤー数</Text>
+      <Min>1</Min>
+      <Max>32</Max>
+      <Default>1</Default>
+    </Int>
     <!--<int id="output_x">
       <Name>出力信号の要素数：X</Name>
       <Text>出力信号に設定されるX軸方向の要素数</Text>

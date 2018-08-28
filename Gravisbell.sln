@@ -135,7 +135,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NeuralNetwork.WeightData", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.ExponentialNormalization", "Layer\NeuralNetwork\ExponentialNormalization\ExponentialNormalization.vcxproj", "{85AF2EDF-2BCC-4A8D-8E3F-0E83D5A01B18}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.LimitBackPropagationRange", "Layer\NeuralNetwork\LimitBackPropagationRange\LimitBackPropagationRange.vcxproj", "{1A4DA20E-C175-4330-A41E-D1A442A1C2F0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Layer.NeuralNetwork.LimitBackPropagationBox", "Layer\NeuralNetwork\LimitBackPropagationBox\LimitBackPropagationBox.vcxproj", "{1A4DA20E-C175-4330-A41E-D1A442A1C2F0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

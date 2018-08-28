@@ -50,10 +50,10 @@ namespace NeuralNetworkLayer {
 	//====================================
 	/** 複合ニューラルネットワーク.
 		@param layerDLLManager	レイヤーDLL管理クラス.
-		@param	inputDataStruct	入力データ構造. */
+		@param	inputLayerCount	入力レイヤー数. */
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
 	Layer::Connect::ILayerConnectData* CreateNeuralNetwork(
-		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager);
+		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager, U32 inputLayerCount);
 
 	/** 畳込みニューラルネットワークレイヤー.
 		@param	layerDLLManager		レイヤーDLL管理クラス.
@@ -213,7 +213,7 @@ namespace NeuralNetworkLayer {
 		@param	startPosition	開始XYZ位置.
 		@param	boxSize			抽出XYZ数. */
 	GRAVISBELL_UTILITY_NEURALNETWORKLAYER_API
-	Layer::ILayerData* CreateLimitBackPropagationRangeLayer(
+	Layer::ILayerData* CreateLimitBackPropagationBoxLayer(
 		const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 		Vector3D<S32> startPosition, Vector3D<S32> boxSize);
 

@@ -347,7 +347,7 @@ Layer::Connect::ILayerConnectData* CreateEncoder0(const Layer::NeuralNetwork::IL
 	if(pNeuralNetwork)
 	{
 		// 入力信号を直前レイヤーに設定
-		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID();
+		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID(0);
 
 		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_FA(lastLayerGUID, 1024, L"ReLU");
 		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_FA(lastLayerGUID, 512, L"ReLU");
@@ -389,7 +389,7 @@ Layer::Connect::ILayerConnectData* CreateDecoder0(const Layer::NeuralNetwork::IL
 	if(pNeuralNetwork)
 	{
 		// 入力信号を直前レイヤーに設定
-		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID();
+		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID(0);
 		
 		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_FA(lastLayerGUID, i_inputDataStruct.GetDataCount(), L"ReLU");
 		lastLayerGUID = pNetworkMaker->AddNeuralNetworkLayer_FA(lastLayerGUID, 128, L"ReLU");
@@ -432,7 +432,7 @@ Layer::Connect::ILayerConnectData* CreateAutoencoder0(const Layer::NeuralNetwork
 	if(pNeuralNetwork)
 	{
 		// 入力信号を直前レイヤーに設定
-		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID();
+		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID(0);
 
 		lastLayerGUID = pNetworkMaker->AddLayer(lastLayerGUID, pNNData_encoder0, false);
 		lastLayerGUID = pNetworkMaker->AddLayer(lastLayerGUID, pNNData_decoder0, false);
@@ -534,7 +534,8 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 				pTeachInputLayer->SetBatchDataNoList(pBatchDataNoListGenerator->GetBatchDataNoListByNum(batchNum));
 
 				// 演算
-				pNeuralNetworkLearn->Calculate(pTeachInputLayer->GetOutputBuffer());
+				CONST_BATCH_BUFFER_POINTER lpInputBuffer[] = {pTeachInputLayer->GetOutputBuffer()};
+				pNeuralNetworkLearn->Calculate(lpInputBuffer);
 
 				// 誤差計算
 				// 教師信号との誤差計算
@@ -567,7 +568,8 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 				pSampleInputLayer->SetBatchDataNoList(&dataNum);
 
 				// 演算
-				pNeuralNetworkSample->Calculate(pSampleInputLayer->GetOutputBuffer());
+				CONST_BATCH_BUFFER_POINTER lpInputBuffer[] = {pSampleInputLayer->GetOutputBuffer()};
+				pNeuralNetworkSample->Calculate(lpInputBuffer);
 
 				// 誤差計算
 				pSampleInputLayer->CalculateLearnError(pNeuralNetworkSample->GetOutputBuffer());

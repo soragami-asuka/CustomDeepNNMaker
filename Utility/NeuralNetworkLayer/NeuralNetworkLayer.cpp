@@ -52,7 +52,7 @@ Layer::NeuralNetwork::ILayerDLLManager* CreateLayerDLLManagerGPU(const wchar_t i
 
 /** レイヤーデータを作成 */
 Layer::Connect::ILayerConnectData* CreateNeuralNetwork(
-	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager)
+	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager, U32 inputLayerCount)
 {
 	const Gravisbell::GUID TYPE_CODE(0x1c38e21f, 0x6f01, 0x41b2, 0xb4, 0x0e, 0x7f, 0x67, 0x26, 0x7a, 0x36, 0x92);
 
@@ -65,6 +65,12 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(
 	SettingData::Standard::IData* pConfig = pLayerDLL->CreateLayerStructureSetting();
 	if(pConfig == NULL)
 		return NULL;
+
+	// 入力チャンネル数
+	{
+		SettingData::Standard::IItem_Int* pItem = dynamic_cast<SettingData::Standard::IItem_Int*>(pConfig->GetItemByID(L"inputLayerCount"));
+		pItem->SetValue(inputLayerCount);
+	}
 
 	// レイヤーの作成
 	Layer::ILayerData* pLayer = layerDataManager.CreateLayerData(layerDLLManager, TYPE_CODE, boost::uuids::random_generator()().data, *pConfig);
@@ -1063,7 +1069,7 @@ Layer::ILayerData* CreateChooseBoxLayer(
 /** 後方伝搬範囲制限レイヤー. 出力レイヤーの特定XYZ区間以外の後方伝搬を停止する. 入力/出力データ構造でCH,x,y,zは同じサイズ.
 	@param	startPosition	開始XYZ位置.
 	@param	boxSize			抽出XYZ数. */
-Layer::ILayerData* CreateLimitBackPropagationRangeLayer(
+Layer::ILayerData* CreateLimitBackPropagationBoxLayer(
 	const Layer::NeuralNetwork::ILayerDLLManager& layerDLLManager, Layer::NeuralNetwork::ILayerDataManager& layerDataManager,
 	Vector3D<S32> startPosition, Vector3D<S32> boxSize)
 {

@@ -18,8 +18,10 @@ namespace Gravisbell {
 namespace Layer {
 namespace NeuralNetwork {
 
-	static const S32 INVALID_DINPUTBUFFER_ID = 0xFFFF;
-	static const S32 INVALID_OUTPUTBUFFER_ID = 0xFFFF;
+	static const S32 INVALID_DINPUTBUFFER_ID = 0x0000FFFF;
+	static const S32 INVALID_OUTPUTBUFFER_ID = 0x0000FFFF;
+
+	static const S32 NETWORK_DINPUTBUFFER_ID_FLAGBIT = 0x10000000;
 
 	/** レイヤーのポインタと接続位置の情報 */
 	struct LayerPosition
