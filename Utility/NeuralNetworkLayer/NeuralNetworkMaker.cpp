@@ -486,9 +486,13 @@ namespace NeuralNetworkLayer {
 
 			// 畳み込み
 			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize, i_szWeightData, i_szInitializerID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// 活性化
 			layerGUID = this->AddActivationLayer(layerGUID, i_activationType);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			return layerGUID;
 		}
@@ -500,12 +504,18 @@ namespace NeuralNetworkLayer {
 
 			// 畳み込み
 			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize, i_szWeightData, i_szInitializerID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// バッチ正規化
 			layerGUID = this->AddBatchNormalizationLayer(layerGUID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// 活性化
 			layerGUID = this->AddActivationLayer(layerGUID, i_activationType);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			return layerGUID;
 		}
@@ -517,16 +527,26 @@ namespace NeuralNetworkLayer {
 
 			// 畳み込み
 			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize, i_szWeightData, i_szInitializerID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// バッチ正規化
 			layerGUID = this->AddBatchNormalizationLayer(layerGUID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// ノイズ
 			if(i_noiseVariance > 0.0f)
+			{
 				layerGUID = this->AddGaussianNoiseLayer(layerGUID, 0.0f, i_noiseVariance);
+				if(layerGUID == Gravisbell::GUID())
+					return Gravisbell::GUID();
+			}
 
 			// 活性化
 			layerGUID = this->AddActivationLayer(layerGUID, i_activationType);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			return layerGUID;
 		}
@@ -538,12 +558,18 @@ namespace NeuralNetworkLayer {
 
 			// バッチ正規化
 			layerGUID = this->AddBatchNormalizationLayer(layerGUID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// 活性化
 			layerGUID = this->AddActivationLayer(layerGUID, i_activationType);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// 畳み込み
 			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize, i_szWeightData, i_szInitializerID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			return layerGUID;
 		}
@@ -555,12 +581,18 @@ namespace NeuralNetworkLayer {
 
 			// バッチ正規化
 			layerGUID = this->AddBatchNormalizationLayer(layerGUID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// 活性化
 			layerGUID = this->AddActivationLayer(layerGUID, i_activationType);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// 全結合
 			layerGUID = this->AddFullyConnectLayer(layerGUID, i_outputChannelCount, i_szWeightData, i_szInitializerID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			return layerGUID;
 		}
@@ -578,13 +610,21 @@ namespace NeuralNetworkLayer {
 
 			// 全結合
 			layerGUID = this->AddFullyConnectLayer(layerGUID, i_outputChannelCount, i_szWeightData, i_szInitializerID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// 活性化
 			layerGUID = this->AddActivationLayer(layerGUID, i_activationType);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// ドロップアウト
 			if(i_dropOutRate > 0.0f)
+			{
 				layerGUID = this->AddDropoutLayer(layerGUID, i_dropOutRate);
+				if(layerGUID == Gravisbell::GUID())
+					return Gravisbell::GUID();
+			}
 
 			return layerGUID;
 		}
@@ -596,16 +636,26 @@ namespace NeuralNetworkLayer {
 
 			// バッチ正規化
 			layerGUID = this->AddBatchNormalizationLayer(layerGUID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// ノイズ
 			if(i_noiseVariance > 0.0f)
+			{
 				layerGUID = this->AddGaussianNoiseLayer(layerGUID, 0.0f, i_noiseVariance);
+				if(layerGUID == Gravisbell::GUID())
+					return Gravisbell::GUID();
+			}
 
 			// 活性化
 			layerGUID = this->AddActivationLayer(layerGUID, i_activationType);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// 畳み込み
 			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize, i_szWeightData, i_szInitializerID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			return layerGUID;
 		}
@@ -617,16 +667,26 @@ namespace NeuralNetworkLayer {
 
 			// ノイズ
 			if(i_noiseVariance > 0.0f)
+			{
 				layerGUID = this->AddGaussianNoiseLayer(layerGUID, 0.0f, i_noiseVariance);
+				if(layerGUID == Gravisbell::GUID())
+					return Gravisbell::GUID();
+			}
 
 			// バッチ正規化
 			layerGUID = this->AddBatchNormalizationLayer(layerGUID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// 活性化
 			layerGUID = this->AddActivationLayer(layerGUID, i_activationType);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// 畳み込み
 			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize, i_szWeightData, i_szInitializerID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			return layerGUID;
 		}
@@ -638,13 +698,21 @@ namespace NeuralNetworkLayer {
 
 			// 畳み込み
 			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize, i_szWeightData, i_szInitializerID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// 活性化
 			layerGUID = this->AddActivationLayer(layerGUID, i_activationType);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// ドロップアウト
 			if(i_dropOutRate > 0.0f)
+			{
 				layerGUID = this->AddDropoutLayer(layerGUID, i_dropOutRate);
+				if(layerGUID == Gravisbell::GUID())
+					return Gravisbell::GUID();
+			}
 
 			return layerGUID;
 		}
@@ -656,16 +724,26 @@ namespace NeuralNetworkLayer {
 
 			// 畳み込み
 			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, i_stride, i_paddingSize, i_szWeightData, i_szInitializerID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// バッチ正規化
 			layerGUID = this->AddBatchNormalizationLayer(layerGUID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// 活性化
 			layerGUID = this->AddActivationLayer(layerGUID, i_activationType);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// ドロップアウト
 			if(i_dropOutRate > 0.0f)
+			{
 				layerGUID = this->AddDropoutLayer(layerGUID, i_dropOutRate);
+				if(layerGUID == Gravisbell::GUID())
+					return Gravisbell::GUID();
+			}
 
 			return layerGUID;
 		}
@@ -682,27 +760,45 @@ namespace NeuralNetworkLayer {
 			{
 				// 2層目
 				layerGUID = this->AddNeuralNetworkLayer_BAC(layerGUID, i_filterSize, outputChannel, Vector3D<S32>(1,1,1), Vector3D<S32>(i_filterSize.x/2,i_filterSize.y/2,i_filterSize.z/2), L"ReLU", i_szWeightData, i_szInitializerID);
+				if(layerGUID == Gravisbell::GUID())
+					return Gravisbell::GUID();
 			}
 
 			// バッチ正規化
 			layerGUID = this->AddBatchNormalizationLayer(layerGUID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// ノイズ
 			if(i_noiseVariance > 0.0f)
+			{
 				layerGUID = this->AddGaussianNoiseLayer(layerGUID, 0.0f, i_noiseVariance);
+				if(layerGUID == Gravisbell::GUID())
+					return Gravisbell::GUID();
+			}
 
 			// 活性化
 			layerGUID = this->AddActivationLayer(layerGUID, L"ReLU");
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// ドロップアウト
 			if(i_dropOutRate > 0.0f)
+			{
 				layerGUID = this->AddDropoutLayer(layerGUID, i_dropOutRate);
+				if(layerGUID == Gravisbell::GUID())
+					return Gravisbell::GUID();
+			}
 
 			// 畳み込み
 			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, outputChannel, Vector3D<S32>(1,1,1), Vector3D<S32>(i_filterSize.x/2,i_filterSize.y/2,i_filterSize.z/2), i_szWeightData, i_szInitializerID );
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// Residual
 			layerGUID = INeuralNetworkMaker::AddResidualLayer(layerGUID, bypassLayerGUID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 
 			return S_OK;
@@ -720,37 +816,59 @@ namespace NeuralNetworkLayer {
 			for(S32 layerNum=0; layerNum<(S32)i_front_layerCount-1; layerNum++)
 			{
 				layerGUID = this->AddNeuralNetworkLayer_BAC(layerGUID, i_filterSize, inputChannelCount, Vector3D<S32>(1,1,1), Vector3D<S32>(i_filterSize.x/2,i_filterSize.y/2,i_filterSize.z/2), L"ReLU", i_szWeightData, i_szInitializerID);
+				if(layerGUID == Gravisbell::GUID())
+					return Gravisbell::GUID();
 			}
 
 			// CH数を変更
 			layerGUID = this->AddNeuralNetworkLayer_BAC(layerGUID, i_filterSize, i_outputChannelCount, Vector3D<S32>(1,1,1), Vector3D<S32>(i_filterSize.x/2,i_filterSize.y/2,i_filterSize.z/2), L"ReLU", i_szWeightData, i_szInitializerID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// 後半
 			for(S32 layerNum=0; layerNum<(S32)i_back_layerCount-1; layerNum++)
 			{
 				// 2層目
 				layerGUID = AddNeuralNetworkLayer_BAC(layerGUID, i_filterSize, i_outputChannelCount, Vector3D<S32>(1,1,1), Vector3D<S32>(i_filterSize.x/2,i_filterSize.y/2,i_filterSize.z/2), L"ReLU", i_szWeightData, i_szInitializerID);
+				if(layerGUID == Gravisbell::GUID())
+					return Gravisbell::GUID();
 			}
 
 			// バッチ正規化
 			layerGUID = this->AddBatchNormalizationLayer(layerGUID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// ノイズ
 			if(i_noiseVariance > 0.0f)
+			{
 				layerGUID = this->AddGaussianNoiseLayer(layerGUID, 0.0f, i_noiseVariance);
+				if(layerGUID == Gravisbell::GUID())
+					return Gravisbell::GUID();
+			}
 
 			// 活性化
 			layerGUID = this->AddActivationLayer(layerGUID, L"ReLU");
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// ドロップアウト
 			if(i_dropOutRate > 0.0f)
+			{
 				layerGUID = this->AddDropoutLayer(layerGUID, i_dropOutRate);
+				if(layerGUID == Gravisbell::GUID())
+					return Gravisbell::GUID();
+			}
 
 			// 畳み込み
 			layerGUID = this->AddConvolutionLayer(layerGUID, i_filterSize, i_outputChannelCount, Vector3D<S32>(1,1,1), Vector3D<S32>(i_filterSize.x/2,i_filterSize.y/2,i_filterSize.z/2), i_szWeightData, i_szInitializerID );
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 			// Residual
 			layerGUID = INeuralNetworkMaker::AddResidualLayer(layerGUID, bypassLayerGUID);
+			if(layerGUID == Gravisbell::GUID())
+				return Gravisbell::GUID();
 
 
 			return S_OK;

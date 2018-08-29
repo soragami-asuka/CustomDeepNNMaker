@@ -72,7 +72,7 @@ namespace NeuralNetwork {
 
 		// “ü—ÍƒŒƒCƒ„[ˆê——‚ðì¬
 		this->lpInputLayerGUID.resize(this->layerStructure.inputLayerCount);
-		for(size_t i=0; i<this->lpLayerData.size(); i++)
+		for(size_t i=0; i<this->lpInputLayerGUID.size(); i++)
 		{
 			this->lpInputLayerGUID[i] = Gravisbell::GUID(boost::uuids::random_generator()().data);
 		}
