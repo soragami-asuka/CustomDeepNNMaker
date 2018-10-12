@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+データフォーマットに関する情報.
+-->
+
+<DataFormat-binary version="1.0.0.0" default-language="ja" byte-order="big">
+  <Name>IMAGE</Name>
+  <Text>MNIST画像ファイル</Text>
+
+  <Structure category="input">
+    <x>columns</x>
+    <y>rows</y>
+    <z>1</z>
+    <ch>1</ch>
+
+    <false>0.00</false>
+    <true>1.00</true>
+  </Structure>
+
+  <Data>
+    <Signature size="4">0x00000803</Signature>
+    <Variable size="4" type="uint" id="images"/>
+    <Variable size="4" type="uint" id="rows"/>
+    <Variable size="4" type="uint" id="columns"/>
+
+    <!--<Items id="no" count="images">
+      <Items id="row" count="rows">
+        --><!-- itemsのidは変数名として使用されるので重複しないように注意 --><!--
+        <Items id="column" count="columns">
+          <Float category="input" size="1" type="ubyte" normalize="min-max">
+            <no>no</no>
+            <x>column</x>
+            <y>row</y>
+            <z>0</z>
+            <ch>0</ch>
+
+            <min>0</min>
+            <max>255</max>
+          </Float>
+        </Items>
+      </Items>
+    </Items>-->
+  </Data>
+
+</DataFormat-binary>

@@ -34,7 +34,7 @@ using namespace Gravisbell;
 #define USE_BATCH_SIZE	1
 #define MAX_EPOCH		10000
 
-#define RESOLUTION_COUNT	(20)
+#define RESOLUTION_COUNT	(10)
 #define IMAGE_WIDTH			(512)
 #define RECT_WIDTH			(IMAGE_WIDTH / RESOLUTION_COUNT)
 
@@ -161,7 +161,7 @@ Layer::Connect::ILayerConnectData* CreateNeuralNetwork(const Layer::NeuralNetwor
 	if(pNeuralNetwork)
 	{
 		// 入力信号を直前レイヤーに設定
-		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID();
+		Gravisbell::GUID lastLayerGUID = pNeuralNetwork->GetInputGUID(0);
 
 		lastLayerGUID = pNetworkMaker->AddSOMLayer(lastLayerGUID, outputDataStruct.GetDataCount(), RESOLUTION_COUNT);
 
@@ -212,7 +212,7 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 	if(err != ErrorCode::ERROR_CODE_NONE)
 		return err;
 
-	std::vector<F32> lpInputBuffer(pNeuralNetwork->GetInputBufferCount() * BATCH_SIZE);
+	std::vector<F32> lpInputBuffer(pNeuralNetwork->GetInputBufferCount(0) * BATCH_SIZE);
 	std::vector<F32> lpMapBuffer(layerDataSOM.GetMapSize());
 
 	// ウィンドウと画像を作成
@@ -235,7 +235,8 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 			}
 
 			// 演算
-			pNeuralNetwork->Calculate(&lpInputBuffer[0]);
+			CONST_BATCH_BUFFER_POINTER lppInputBuffer[] = {&lpInputBuffer[0]};
+			pNeuralNetwork->Calculate(lppInputBuffer);
 
 			// 誤差計算
 
@@ -258,9 +259,9 @@ Gravisbell::ErrorCode LearnWithCalculateSampleError(
 						int xPos = x * RECT_WIDTH;
 						int yPos = y * RECT_WIDTH;
 
-						U08 r = (std::min<float>(std::max<float>(lpMapBuffer[offset + 0], 0.0f), 1.0f) * 0xFF);
-						U08 g = (std::min<float>(std::max<float>(lpMapBuffer[offset + 1], 0.0f), 1.0f) * 0xFF);
-						U08 b = (std::min<float>(std::max<float>(lpMapBuffer[offset + 2], 0.0f), 1.0f) * 0xFF);
+						U08 r = (U08)(std::min<float>(std::max<float>(lpMapBuffer[offset + 0], 0.0f), 1.0f) * 0xFF);
+						U08 g = (U08)(std::min<float>(std::max<float>(lpMapBuffer[offset + 1], 0.0f), 1.0f) * 0xFF);
+						U08 b = (U08)(std::min<float>(std::max<float>(lpMapBuffer[offset + 2], 0.0f), 1.0f) * 0xFF);
 
 						cv::rectangle(img, cv::Point(xPos,yPos), cv::Point(xPos+RECT_WIDTH, yPos+RECT_WIDTH), cv::Scalar(r,g,b), -1, CV_AA);
 					}

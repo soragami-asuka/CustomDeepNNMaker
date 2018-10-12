@@ -116,7 +116,7 @@ namespace NeuralNetwork {
 	public:
 		/** マップサイズを取得する.
 			@return	マップのバッファ数を返す. */
-		U32 GetMapSize()const;
+		U32 GetMapSize()const override;
 
 		/** マップのバッファを取得する.
 			@param	o_lpMapBuffer	マップを格納するホストメモリバッファ. GetMapSize()の戻り値の要素数が必要. */

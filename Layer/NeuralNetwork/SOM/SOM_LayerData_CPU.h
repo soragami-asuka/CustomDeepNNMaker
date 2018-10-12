@@ -57,7 +57,7 @@ namespace NeuralNetwork {
 	public:
 		/** マップのバッファを取得する.
 			@param	o_lpMapBuffer	マップを格納するホストメモリバッファ. GetMapSize()の戻り値の要素数が必要. */
-		Gravisbell::ErrorCode GetMapBuffer(F32* o_lpMapBuffer)const;
+		Gravisbell::ErrorCode GetMapBuffer(F32* o_lpMapBuffer)const override;
 
 
 		//===========================

@@ -176,7 +176,7 @@ namespace NeuralNetwork {
 			for(U32 batchNum=0; batchNum<this->GetBatchSize(); batchNum++)
 			{
 				S32 bmuNo = -1;
-				F32 bmuMatchRate = 0.0f;
+				F32 bmuMatchRate = FLT_MAX;
 
 				for(U32 unitNo=0; unitNo<this->unitCount; unitNo++)
 				{
@@ -187,7 +187,7 @@ namespace NeuralNetwork {
 						matchRate += (this->m_lppInputBuffer[batchNum][inputNum] - this->layerData.lppUnitData[unitNo][inputNum]) * (this->m_lppInputBuffer[batchNum][inputNum] - this->layerData.lppUnitData[unitNo][inputNum]);
 					}
 
-					if(bmuNo<0 || matchRate>bmuMatchRate)
+					if(bmuNo<0 || matchRate<bmuMatchRate)
 					{
 						bmuNo = unitNo;
 						bmuMatchRate = matchRate;
@@ -252,7 +252,7 @@ namespace NeuralNetwork {
 				std::vector<F32> lpBMUPos(this->layerData.layerStructure.DimensionCount);
 				{
 					S32 bmuNo = -1;
-					F32 bmuMatchRate = 0.0f;
+					F32 bmuMatchRate = FLT_MAX;
 
 					for(U32 unitNo=0; unitNo<this->unitCount; unitNo++)
 					{
@@ -262,7 +262,7 @@ namespace NeuralNetwork {
 							matchRate += (this->m_lppInputBuffer[batchNum][inputNum] - this->layerData.lppUnitData[unitNo][inputNum]) * (this->m_lppInputBuffer[batchNum][inputNum] - this->layerData.lppUnitData[unitNo][inputNum]);
 						}
 
-						if(bmuNo<0 || matchRate>bmuMatchRate)
+						if(bmuNo<0 || matchRate<bmuMatchRate)
 						{
 							bmuNo = unitNo;
 							bmuMatchRate = matchRate;
@@ -282,15 +282,18 @@ namespace NeuralNetwork {
 					for(U32 dimNo=0; dimNo<(U32)this->layerData.layerStructure.DimensionCount; dimNo++)
 					{
 //						length2 += pow(this->m_lppOutputBuffer[batchNum][dimNo] - this->lpUnitPos[unitNo][dimNo], 2);
-						length2 += pow(lpBMUPos[dimNo] - this->lpUnitPos[unitNo][dimNo], 2);
+//						length2 += pow(lpBMUPos[dimNo] - this->lpUnitPos[unitNo][dimNo], 2);
+						length2 += pow((lpBMUPos[dimNo] - this->lpUnitPos[unitNo][dimNo])*this->layerData.layerStructure.ResolutionCount, 2);
 					}
 
 					// ãóó£å∏êäó¶ÇãÅÇﬂÇÈ
-					F32 lengthAttenuationRate = exp(-length2 / lengthAttenuationRateCoeff);
+//					F32 lengthAttenuationRate = exp(-length2 / lengthAttenuationRateCoeff);
+					F32 lengthAttenuationRate = exp(-length2 / (1.0f - this->layerData.learnTime/this->GetRuntimeParameterByStructure().SOM_ramda));
 
 					// å∏êäó¶ÇãÅÇﬂÇÈ
-					F32 attenuationRate = timeAttenuationRate * lengthAttenuationRate;
+//					F32 attenuationRate = timeAttenuationRate * lengthAttenuationRate;
 //					F32 attenuationRate = 0.5f * exp(-length2*100);
+					F32 attenuationRate = 1.0f * lengthAttenuationRate;
 
 					// åÎç∑ÇÃçXêV
 					for(U32 inputNum=0; inputNum<this->inputBufferCount; inputNum++)
